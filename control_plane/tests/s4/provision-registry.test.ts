@@ -29,12 +29,12 @@ async function openRegistry() {
   const url = `file:${join(root, 'control-plane.sqlite').replaceAll('\\', '/')}`
   await migrateDatabase(url)
   await seedRegistry(url)
-  return url
+  return { url, root }
 }
 
 describe('S4 registry create', () => {
   it('creates PROD and DEV rows without Docker and refuses a second slug', async () => {
-    const url = await openRegistry()
+    const { url, root } = await openRegistry()
     const { client, db } = createDb(url)
     try {
       const created = await createCustomerWithDefaultEnvironments(db, {
@@ -42,6 +42,7 @@ describe('S4 registry create', () => {
         slug: 'strategic-insights',
         timezone: 'America/Denver',
         adminEmail: 'admin@strategic-insights.local',
+        filesRoot: root,
       })
       expect(created.environments).toHaveLength(2)
       expect(created.environments.map(row => row.type).sort()).toEqual(['DEV', 'PROD'])
@@ -69,7 +70,7 @@ describe('S4 registry create', () => {
   })
 
   it('refuses reserved slugs', async () => {
-    const url = await openRegistry()
+    const { url } = await openRegistry()
     const { client, db } = createDb(url)
     try {
       await expect(createCustomerWithDefaultEnvironments(db, {

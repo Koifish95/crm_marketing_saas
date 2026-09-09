@@ -30,4 +30,8 @@ Naming, reserved slugs, and host-port allocator (52200–52999). No Docker. No r
 
 ## Sprint 2
 
-`POST /api/customers` inserts one customer and PROD+DEV registry rows (`lifecycleStatus` provisioning). Duplicate slug refused. No Docker.
+`POST /api/customers` inserts one customer and PROD+DEV registry rows (`lifecycleStatus` provisioning). Duplicate slug refused. No Docker. SHA `4d066d9`.
+
+## Sprint 3
+
+Gitignored env writer + generic `docker-compose.provisioned.yml`. Env files contain `admin` / `setup` and force-change. Volume names are per environment.

@@ -10,6 +10,7 @@ import {
   healthUrlForPort,
 } from './provision-contract'
 import { listRegisteredEnvironments } from './registry'
+import { renderProvisionedEnv, writeProvisionedEnvFile } from './provision-env'
 
 export class ProvisionError extends Error {
   statusCode: number
@@ -43,6 +44,7 @@ export async function createCustomerWithDefaultEnvironments(db: Database, input:
   slug: string
   timezone?: string
   adminEmail: string
+  filesRoot?: string
 }) {
   const displayName = input.displayName.trim()
   if (!displayName) {
@@ -80,7 +82,7 @@ export async function createCustomerWithDefaultEnvironments(db: Database, input:
     createdAt: now,
   })
 
-  const created: { id: string, slug: string, type: string, hostPort: number }[] = []
+  const created: { id: string, slug: string, type: string, hostPort: number, envFileLocal: string }[] = []
   for (const names of defaultEnvironmentPair(slug)) {
     const id = createStableId()
     const hostPort = ports[created.length] as number
@@ -106,7 +108,19 @@ export async function createCustomerWithDefaultEnvironments(db: Database, input:
       lifecycleStatus: 'provisioning',
       createdAt: now,
     })
-    created.push({ id, slug: names.slug, type: names.type, hostPort })
+    writeProvisionedEnvFile(envFile, renderProvisionedEnv({
+      composeProject: names.composeProject,
+      containerName: names.containerName,
+      hostPort,
+      sqliteVolume: names.sqliteVolume,
+      assetsVolume: names.assetsVolume,
+      expectedImage: names.expectedImage,
+      type: names.type,
+      displayName,
+      adminEmail,
+      timezone,
+    }), input.filesRoot)
+    created.push({ id, slug: names.slug, type: names.type, hostPort, envFileLocal: envFile })
   }
 
   return { customerId, slug, displayName, environments: created }

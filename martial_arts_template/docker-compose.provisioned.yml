@@ -1,0 +1,50 @@
+# Generic S4 compose. Names, ports, and volumes come from --env-file.
+# Cwd must be martial_arts_template. Never attach leftover gym or Pi volumes.
+name: ${COMPOSE_PROJECT}
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${EXPECTED_IMAGE:-martial-arts-acquisition:s4}
+    container_name: ${CONTAINER_NAME}
+    init: true
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "5000"
+      APP_ENV: ${APP_ENV}
+      NUXT_PUBLIC_APP_ENV: ${APP_ENV}
+      DATABASE_URL: file:/app/data/sqlite/crm.sqlite
+      ASSET_UPLOAD_DIR: /app/data/uploads
+      DRIZZLE_MIGRATIONS_DIR: /app/drizzle/migrations
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD}
+      NUXT_AUTH_USERNAME: ${NUXT_AUTH_USERNAME:-admin}
+      NUXT_AUTH_EMAIL: ${NUXT_AUTH_EMAIL}
+      NUXT_AUTH_PASSWORD: ${NUXT_AUTH_PASSWORD:-setup}
+      NUXT_AUTH_MUST_CHANGE_PASSWORD: ${NUXT_AUTH_MUST_CHANGE_PASSWORD:-true}
+      NUXT_AUTH_RESET_PASSWORD: ${NUXT_AUTH_RESET_PASSWORD:-false}
+      NUXT_PUBLIC_APP_NAME: ${NUXT_PUBLIC_APP_NAME}
+      NUXT_PUBLIC_BRAND_NAME: ${NUXT_PUBLIC_BRAND_NAME}
+      NUXT_PUBLIC_BRAND_LOCATION: ${NUXT_PUBLIC_BRAND_LOCATION}
+      NUXT_PUBLIC_TIMEZONE: ${NUXT_PUBLIC_TIMEZONE:-America/Denver}
+    ports:
+      - "${HOST_PORT}:5000"
+    volumes:
+      - sqlite:/app/data/sqlite
+      - assets:/app/data/uploads
+    networks:
+      - app-net
+
+volumes:
+  sqlite:
+    name: ${SQLITE_VOLUME}
+  assets:
+    name: ${ASSETS_VOLUME}
+
+networks:
+  app-net:
+    name: ${COMPOSE_PROJECT}-net
