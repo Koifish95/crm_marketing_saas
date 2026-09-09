@@ -39,7 +39,7 @@ Control plane v1 (working decision, not implemented): a **separate** app that li
 Alignment (evidence, not the map): [[wip/SaaS_Project_Alignment_and_Current_Understanding]].
 
 **Git:** this folder is its own repo; `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).  
-**Milestones:** [[SaaS-Milestones]] S0 and S1 Successful. S2 is **in progress** ([[S2-Hand-Boot-Checklist]]); not Successful until Docker/volumes pass or Scott accepts the Nitro proof. Do not implement the control plane until Scott asks (S3).
+**Milestones:** [[SaaS-Milestones]] S0, S1, and S2 Successful. Do not implement the control plane until Scott asks (S3).
 
 ## Platform notes
 
@@ -49,7 +49,7 @@ Alignment (evidence, not the map): [[wip/SaaS_Project_Alignment_and_Current_Unde
 | [[SaaS-Milestones]] | S0–S8 launch path; **Successful** is acceptance |
 | [[Customer-Environment]] | S1 unit: Customer, Environment, node placement |
 | [[SaaS-Decisions]] | SaaS ADR log |
-| [[S2-Hand-Boot-Checklist]] | S2 laptop boot steps (Nitro; Docker not verified) |
+| [[S2-Hand-Boot-Checklist]] | S2 laptop boot (Docker + named lab volumes) |
 | [[S2-Lab-Isolation]] | lab-acme-prod / lab-acme-dev naming |
 | [[SaaS-ToDo]] | Open platform tasks |
 | [[Control-Plane]] | Platform control app — v1 scope |

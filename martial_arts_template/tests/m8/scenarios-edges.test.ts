@@ -72,7 +72,7 @@ describe('M8 scenarios D — multiple children', () => {
       expect(oneJoined.closedAt).toBeNull()
       expectHouseholdStatus(oneJoined, 'ACTIVE_MIXED', 'Active · mixed outcomes')
 
-      const range = { fromYmd: denverYmd(SCENARIO_NOW), toYmd: denverYmd(SCENARIO_NOW + 8 * 86_400_000) }
+      const range = { fromYmd: denverYmd(SCENARIO_NOW), toYmd: denverYmd(utcNowMs()) }
       const report = await acquisitionReport(testDb.db, range)
       expect(report.prospectiveMembers).toBe(2)
       expect(report.funnel.converted).toBe(1)

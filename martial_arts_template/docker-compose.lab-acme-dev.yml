@@ -1,0 +1,53 @@
+# S2 lab customer Acme · DEV. Do not attach renzo-* or webhosting_renzo_* volumes.
+name: lab-acme-dev
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: renzo-acquisition:m10a
+    container_name: lab-acme-dev-app
+    init: true
+    restart: unless-stopped
+    env_file:
+      - path: .env.lab-acme-dev
+        required: false
+      - path: .env.lab-acme-dev.example
+        required: false
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "5000"
+      APP_ENV: dev
+      NUXT_PUBLIC_APP_ENV: dev
+      DATABASE_URL: file:/app/data/sqlite/crm.sqlite
+      ASSET_UPLOAD_DIR: /app/data/uploads
+      DRIZZLE_MIGRATIONS_DIR: /app/drizzle/migrations
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD:?Set NUXT_SESSION_PASSWORD in the lab env file}
+      NUXT_AUTH_USERNAME: ${NUXT_AUTH_USERNAME:-admin}
+      NUXT_AUTH_EMAIL: ${NUXT_AUTH_EMAIL:-admin@lab-acme-dev.local}
+      NUXT_AUTH_PASSWORD: ${NUXT_AUTH_PASSWORD:?Set NUXT_AUTH_PASSWORD in the lab env file}
+      NUXT_AUTH_RESET_PASSWORD: ${NUXT_AUTH_RESET_PASSWORD:-false}
+      NUXT_PUBLIC_APP_NAME: ${NUXT_PUBLIC_APP_NAME:-Acme BJJ Acquisition}
+      NUXT_PUBLIC_BRAND_NAME: ${NUXT_PUBLIC_BRAND_NAME:-Acme BJJ}
+      NUXT_PUBLIC_BRAND_LOCATION: ${NUXT_PUBLIC_BRAND_LOCATION:-Lab DEV}
+      NUXT_PUBLIC_TIMEZONE: ${NUXT_PUBLIC_TIMEZONE:-America/Denver}
+    ports:
+      - "52050:5000"
+    volumes:
+      - lab-acme-dev-sqlite:/app/data/sqlite
+      - lab-acme-dev-assets:/app/data/uploads
+    networks:
+      - lab-acme-dev-net
+
+volumes:
+  lab-acme-dev-sqlite:
+    name: lab-acme-dev-sqlite
+  lab-acme-dev-assets:
+    name: lab-acme-dev-assets
+
+networks:
+  lab-acme-dev-net:
+    name: lab-acme-dev-net

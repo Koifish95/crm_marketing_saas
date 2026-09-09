@@ -174,4 +174,4 @@ Domains, TLS, Compose project layout, image registry, node communication mechani
 
 ## Next
 
-[[SaaS-Milestones]] **S2** is in progress. Boot steps: [[S2-Hand-Boot-Checklist]]. Do not start S3 until Scott asks.
+[[SaaS-Milestones]] **S2** is Successful. Boot steps: [[S2-Hand-Boot-Checklist]]. Do not start S3 until Scott asks.

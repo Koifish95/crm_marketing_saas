@@ -2,7 +2,7 @@
 type: note
 status: current
 area: saas
-updated: 2026-09-08
+updated: 2026-09-09
 aliases:
   - Lab isolation
 tags:
@@ -14,7 +14,7 @@ tags:
 
 Hand-boot two martial-arts environments from the same `martial_arts_template` code. No control plane. No `webhosting_renzo_*`. No `renzo-prod-*`.
 
-Primary proof path is two local `pnpm` processes. Docker is optional and was not required to name the roots.
+Successful proof path is two Docker containers with named lab volumes. Host Nitro + `data/lab-acme-*/` remains a valid earlier isolation proof.
 
 ## Lab customer
 
@@ -25,9 +25,10 @@ Primary proof path is two local `pnpm` processes. Docker is optional and was not
 | Lab slug | `lab-acme-prod` | `lab-acme-dev` |
 | `APP_ENV` | `production` | `dev` |
 | Hosting node | `laptop` | `laptop` |
-| Data root | `data/lab-acme-prod/` | `data/lab-acme-dev/` |
-| SQLite | `data/lab-acme-prod/sqlite/crm.sqlite` | `data/lab-acme-dev/sqlite/crm.sqlite` |
-| Uploads | `data/lab-acme-prod/uploads/` | `data/lab-acme-dev/uploads/` |
+| Container | `lab-acme-prod-app` | `lab-acme-dev-app` |
+| SQLite volume | `lab-acme-prod-sqlite` | `lab-acme-dev-sqlite` |
+| Assets volume | `lab-acme-prod-assets` | `lab-acme-dev-assets` |
+| Host data root (Nitro proof) | `data/lab-acme-prod/` | `data/lab-acme-dev/` |
 | Port | 52040 | 52050 |
 | Isolation marker | `m10a-prod-isolation` | `m10a-dev-isolation` |
 
@@ -38,16 +39,14 @@ Example env files: `martial_arts_template/.env.lab-acme-prod.example` and `.env.
 From `martial_arts_template`:
 
 ```text
-pnpm lab lab-acme-prod setup
-pnpm lab lab-acme-prod stamp
-pnpm lab lab-acme-prod get
-pnpm build
-pnpm lab lab-acme-prod serve
+pnpm lab:docker lab-acme-prod build
+pnpm lab:docker lab-acme-prod up
+pnpm lab:docker lab-acme-prod stamp
+pnpm lab:docker lab-acme-prod get
+pnpm lab:docker lab-acme-prod recreate
 ```
 
-Same for `lab-acme-dev`. `setup` is migrate + seed and **requires** `NUXT_AUTH_PASSWORD`. `stamp` writes `app_settings.m10a.isolation` and the upload-dir marker file using the existing M10A helpers. `get` prints those markers.
-
-`serve` starts the built Nitro process on the lab port (52040 / 52050 on this laptop; 5040–50559 are often Windows-excluded). Use that to run two environments at once. `dev` also honors the lab port and does not steal 5030, but two Vite processes share `.nuxt` and are not the coexist proof.
+Same slug swap for `lab-acme-dev`. Recreate never uses `-v`. Host Nitro commands (`pnpm lab … setup|serve`) remain for the 2026-09-08 directory proof.
 
 ## Isolation contract
 

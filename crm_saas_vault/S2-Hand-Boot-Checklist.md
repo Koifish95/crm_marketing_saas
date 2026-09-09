@@ -2,7 +2,7 @@
 type: note
 status: current
 area: saas
-updated: 2026-09-08
+updated: 2026-09-09
 aliases:
   - S2 checklist
 tags:
@@ -12,11 +12,11 @@ tags:
 
 # S2 hand-boot checklist
 
-Repeatable laptop procedure for a **second martial-arts academy** (not Renzo’s prod/stage/dev triple). Naming: [[S2-Lab-Isolation]]. Evidence: [[wip/S2_Sprint4_Coexist_Evidence]].
+Repeatable laptop procedure for a **second martial-arts academy** (not Renzo’s prod/stage/dev triple). Naming: [[S2-Lab-Isolation]]. Docker evidence: [[wip/S2_Docker_Coexist_Evidence]]. Earlier host-process evidence: [[wip/S2_Sprint4_Coexist_Evidence]].
 
-Do **not** attach `webhosting_renzo_*`, `renzo-prod-*`, or Koi-Pi PRODUCTION SQLite. Do **not** `docker compose down -v`. Do **not** document `setup` as the admin password.
+Do **not** attach `webhosting_renzo_*`, `renzo-prod-*`, or Koi-Pi PRODUCTION SQLite. Do **not** `docker compose down -v`. Do **not** document `setup` as the admin password. Do **not** run `pnpm env:up` (that is the Renzo triple).
 
-This checklist boots **two processes from one build**, not a Compose product. Docker coexist was **not** verified on 2026-09-08 even though a Linux engine was present.
+The **Successful** path is Docker + named lab volumes below. The Nitro/directory section is historical overnight proof.
 
 ## Record these first
 
@@ -25,45 +25,49 @@ This checklist boots **two processes from one build**, not a Compose product. Do
 | Customer slug | `lab-acme` | `lab-acme` |
 | Environment type | `PROD` | `DEV` |
 | Lab slug | `lab-acme-prod` | `lab-acme-dev` |
+| Container | `lab-acme-prod-app` | `lab-acme-dev-app` |
+| SQLite volume | `lab-acme-prod-sqlite` | `lab-acme-dev-sqlite` |
+| Assets volume | `lab-acme-prod-assets` | `lab-acme-dev-assets` |
 | Timezone | America/Denver (lab value only) | America/Denver (lab value only) |
 | ADMIN username | `admin` | `admin` |
-| ADMIN password | set in `.env.lab-acme-prod` — **required** | set in `.env.lab-acme-dev` — **required** |
-| Data root | `martial_arts_template/data/lab-acme-prod/` | `martial_arts_template/data/lab-acme-dev/` |
-| SQLite | `data/lab-acme-prod/sqlite/crm.sqlite` | `data/lab-acme-dev/sqlite/crm.sqlite` |
-| Uploads | `data/lab-acme-prod/uploads/` | `data/lab-acme-dev/uploads/` |
-| Port | 52040 | 52050 |
+| ADMIN password | from `.env.lab-acme-prod` / example — **required** | from `.env.lab-acme-dev` / example — **required** |
+| Host port | 52040 | 52050 |
 | Health | http://127.0.0.1:52040/api/health | http://127.0.0.1:52050/api/health |
 | Hosting node | `laptop` | `laptop` |
 | Isolation marker | `m10a-prod-isolation` | `m10a-dev-isolation` |
 
-Copy `martial_arts_template/.env.lab-acme-prod.example` → `.env.lab-acme-prod` (gitignored) and replace the placeholder ADMIN and session passwords. Same for DEV. Example files are lab placeholders, not SaaS defaults.
+Copy `martial_arts_template/.env.lab-acme-prod.example` → `.env.lab-acme-prod` (gitignored) if you need local overrides. Example placeholders are lab-only, not SaaS defaults. Docker Compose overrides `DATABASE_URL` / `ASSET_UPLOAD_DIR` / container `PORT=5000`; host publish stays 52040/52050.
 
-If 52040/52050 cannot bind (Windows excluded-port ranges), pick two free ports outside 3000, 5000, 5010, 5020, 5030 and the `netsh interface ipv4 show excludedportrange` list. Do not reuse Renzo Docker ports.
+If those host ports cannot bind, pick two free ports outside 3000, 5000, 5010, 5020, 5030 and the Windows excluded-port list.
 
-**Git SHA:** from `martial_arts_template` / repo root, record `git rev-parse HEAD` after the code you built. 2026-09-08 coexist proof was on `working` at `b6465db` (later isolation-doc commits may follow).
+**Git SHA / image:** record `git rev-parse HEAD` and `docker image inspect renzo-acquisition:m10a --format "{{.Id}}"`. 2026-09-09 pass: code `0ce3e9d`, image `sha256:0f558c6d4e39…`.
 
-## Procedure
+## Docker procedure (Successful path)
 
-Work in `martial_arts_template`. Node 22+ and pnpm.
+Work in `martial_arts_template`. Linux Docker engine. Helper: `pnpm lab:docker <lab-acme-prod|lab-acme-dev> <build|up|stamp|get|recreate|ps>`.
 
-1. `pnpm install` if `node_modules` is missing.
-2. `pnpm lab lab-acme-prod setup` — migrate + seed. Fails if `NUXT_AUTH_PASSWORD` is missing. Fresh sqlite has generic programs/sources/lost reasons, **no** $175/$150/$155 offerings, **no** intro rules, compensation percent `0`.
-3. `pnpm lab lab-acme-prod stamp`
-4. Repeat steps 2–3 for `lab-acme-dev`.
-5. `pnpm build`
-6. `pnpm lab lab-acme-prod serve` (leave running).
-7. `pnpm lab lab-acme-dev serve` (leave running).
-8. GET both health URLs. Require `ok: true` and `database: "reachable"`. `appEnv` must be `production` and `dev` respectively.
-9. `pnpm lab lab-acme-prod get` and `pnpm lab lab-acme-dev get`. Markers must differ. PROD uploads must not contain `m10a-dev-isolation.txt`; DEV uploads must not contain `m10a-prod-isolation.txt`.
-10. Stop **only** the PROD process. Do not delete `data/lab-acme-dev/`. Confirm DEV health stays green and both sqlite files still exist.
-11. Start PROD again. Both health URLs green. Markers unchanged.
+1. `pnpm lab:docker lab-acme-prod build` (same image for both labs).
+2. `pnpm lab:docker lab-acme-prod up`
+3. `pnpm lab:docker lab-acme-dev up`
+4. GET both health URLs. Require `ok: true` and `database: "reachable"`.
+5. `docker inspect` each container. Mounts must be the four lab volume names only.
+6. `pnpm lab:docker lab-acme-prod stamp` and the same for `lab-acme-dev`.
+7. `pnpm lab:docker … get`. Markers must differ. Neither uploads dir may contain the sibling marker file.
+8. Recreate **one** environment: `pnpm lab:docker lab-acme-prod recreate` (never `-v`). Confirm its sqlite/assets persist and the sibling health stays green.
+9. `POST /api/auth/login` on each host port with that environment’s ADMIN password. `setup` must fail.
 
-`pnpm lab <slug> dev` honors the lab port and does not steal 5030. Two Vite processes share `.nuxt`; do not use dual `dev` as the coexist proof.
+## Historical: host Nitro / directories (2026-09-08)
 
-## Dry-run result (2026-09-08)
+Overnight S2 used two built Nitro processes and `data/lab-acme-*/` directories, not volumes. That proof still stands as application isolation. It is **not** a substitute for the Docker Successful line.
 
-Followed on this laptop. Both health endpoints green. Isolation markers did not leak. PROD stop/restart left DEV sqlite and markers intact. After Sprint 6, `/api/health` `app` is `Acme BJJ Acquisition` when the lab env files set `NUXT_PUBLIC_APP_NAME`. Landing, `/login`, and `/trial` HTML no longer contain Renzo/Kaysville literals.
+```text
+pnpm lab lab-acme-prod setup && pnpm lab lab-acme-prod stamp
+pnpm lab lab-acme-dev setup && pnpm lab lab-acme-dev stamp
+pnpm build
+pnpm lab lab-acme-prod serve
+pnpm lab lab-acme-dev serve
+```
 
-## Official Successful line
+## Dry-run result (2026-09-09)
 
-[[SaaS-Milestones]] S2 Successful also asks for **Docker** and **isolated volumes**. That part was **not** run. Do not tick S2 Successful until a Docker (or Pi lab volume) pass exists, or Scott accepts the Nitro+directory proof as equivalent.
+Docker path followed on this laptop. Both containers healthy. Isolation markers and unique upload files did not leak. PROD recreate without `-v` left DEV healthy and both volume contents intact. Distinct ADMIN logins succeeded; `setup` returned 401. See [[wip/S2_Docker_Coexist_Evidence]].

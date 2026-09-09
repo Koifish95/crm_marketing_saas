@@ -22,7 +22,7 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 - [x] **Give this workspace its own Git repository (local).** `git init -b main` at `C:\Users\Scoy9\Projects\crm_marketing_saas` on 2026-09-08. There was no existing `.git` and no remotes — nothing to detach from `renzo-crm`. Fresh history (no Renzo commits imported). No GitHub/Cursor remote yet.
 - [x] **Add a hosted remote.** `origin` is https://github.com/Koifish95/crm_marketing_saas.git . `main` pushed 2026-09-08. Not `renzo-crm`.
 - [x] **S1** — Customer-environment unit recorded. [[Customer-Environment]]. **Successful.**
-- [ ] **S2** — Hand-boot a second martial-arts environment. Checklist: [[S2-Hand-Boot-Checklist]]. Nitro/directory proof done; Docker volume proof not done. Not Successful yet.
+- [x] **S2** — Hand-boot a second martial-arts environment. [[S2-Hand-Boot-Checklist]]. Docker + named lab volumes. **Successful** (2026-09-09).
 
 ## Later / not started
 

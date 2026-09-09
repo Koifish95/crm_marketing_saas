@@ -37,7 +37,7 @@ It does **not** mean Stripe by default, every industry, a beauty variant, or ins
 |---|---|---|
 | S0 | Workspace split | Successful |
 | S1 | Environment unit | Successful |
-| S2 | Second martial-arts environment by hand | In progress — Nitro/directory proof; Docker volumes not verified |
+| S2 | Second martial-arts environment by hand | Successful |
 | S3 | Control plane v1 | Not started (S1 done; implement only when Scott asks) |
 | S4 | Sales-led provision | Not started |
 | S5 | Reachable customer access | Not started |
@@ -57,7 +57,7 @@ S0 Workspace split
 → S8 First external customer live
 ```
 
-S1 is Successful. S2 hand-boot is in progress (see [[S2-Hand-Boot-Checklist]]). Prefer finishing S2 before heavy S3 work. Do not start S3 implementation until Scott asks.
+S1 and S2 are Successful. Prefer S2’s second environment when starting S3. Do not start S3 implementation until Scott asks.
 
 ---
 
@@ -87,7 +87,7 @@ S2 boot details and S2 architecture were not decided here.
 
 ## S2 — Boot a second martial-arts environment by hand
 
-Status: **In progress** (2026-09-08). Not Successful.
+Status: **Successful** (2026-09-09)
 
 Prove the template is not “only Renzo.”
 
@@ -95,21 +95,9 @@ Prove the template is not “only Renzo.”
 
 **Not in this milestone:** Control-plane UI. Automatic provision. Public hostname. Copying Renzo PRODUCTION data.
 
-Done on laptop (Nitro processes + host directories):
+- [x] **S2 Successful:** A second martial-arts CRM runs in Docker on the laptop, isolated named volumes (`lab-acme-*-sqlite` / `lab-acme-*-assets`), own admin login (not `setup`), `GET /api/health` green, no shared SQLite with Renzo PRODUCTION. Repeatable via [[S2-Hand-Boot-Checklist]].
 
-- Independent process, own admin password (seed requires `NUXT_AUTH_PASSWORD`), no Kaysville price/intro seed.
-- `GET /api/health` green on lab-acme PROD and DEV.
-- Distinct sqlite + uploads; `m10a.isolation` markers do not leak.
-- Stop/restart PROD without deleting DEV data.
-- Same `martial_arts_template` code (no fork).
-- Repeatable [[S2-Hand-Boot-Checklist]]. Evidence: [[wip/S2_Sprint4_Coexist_Evidence]].
-- Display name is env-driven (`NUXT_PUBLIC_APP_NAME` / brand keys). Lab examples use Acme BJJ.
-
-Not done:
-
-- Docker / isolated **volumes** (the written Successful line). Engine was available; Compose was not used.
-
-- [ ] **S2 Successful:** A second martial-arts CRM runs in Docker on the laptop (or Pi lab), isolated volumes, own admin login, `GET /api/health` green, no shared SQLite with Renzo PRODUCTION. Repeatable via a **checklist**, even if still manual.
+Evidence: [[wip/S2_Docker_Coexist_Evidence]] (Docker + volumes). Earlier host-process proof: [[wip/S2_Sprint4_Coexist_Evidence]].
 
 ---
 

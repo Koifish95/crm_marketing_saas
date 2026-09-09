@@ -133,7 +133,7 @@ describe('M8 admin system process controls', () => {
       const body = status.body as { restartEnabled: boolean, timezone: string, nodeEnv: string, app: string }
       expect(body.restartEnabled).toBe(false)
       expect(body.timezone).toBeTruthy()
-      expect(body.app).toContain('Renzo')
+      expect(body.app).toBe('Martial Arts Acquisition')
       expect(['development', 'test', 'production']).toContain(body.nodeEnv)
     } finally {
       await testDb.close()
