@@ -2,6 +2,11 @@ import { eq } from 'drizzle-orm'
 import type { Database } from '../database'
 import { customers, environments, hostingNodes } from '../database/schema'
 
+export async function getRegisteredEnvironment(db: Database, id: string) {
+  const rows = await listRegisteredEnvironments(db)
+  return rows.find(row => row.id === id) ?? null
+}
+
 export async function listRegisteredEnvironments(db: Database) {
   const rows = await db.select({
     environment: environments,

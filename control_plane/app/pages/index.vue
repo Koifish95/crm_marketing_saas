@@ -3,13 +3,29 @@ useHead({ title: 'Environments' })
 
 const { data, error, pending, refresh } = await useFetch('/api/status')
 const refreshing = ref(false)
+const relaunchingId = ref<string | null>(null)
+const actionError = ref('')
 
 async function refreshStatus() {
   refreshing.value = true
+  actionError.value = ''
   try {
     await refresh()
   } finally {
     refreshing.value = false
+  }
+}
+
+async function relaunch(id: string) {
+  relaunchingId.value = id
+  actionError.value = ''
+  try {
+    await $fetch(`/api/environments/${id}/relaunch`, { method: 'POST' })
+    await refresh()
+  } catch (error) {
+    actionError.value = error instanceof Error ? error.message : 'Relaunch failed.'
+  } finally {
+    relaunchingId.value = null
   }
 }
 </script>
@@ -32,6 +48,12 @@ async function refreshStatus() {
     </div>
     <p class="muted">
       On-demand health. Last checked {{ data?.checkedAt || '—' }}.
+    </p>
+    <p
+      v-if="actionError"
+      class="muted"
+    >
+      {{ actionError }}
     </p>
     <p
       v-if="pending && !data"
@@ -59,6 +81,13 @@ async function refreshStatus() {
       <p class="muted">
         {{ env.node.name }} · runtime {{ env.runtime }} · {{ env.expectedImage }}
       </p>
+      <button
+        type="button"
+        :disabled="Boolean(relaunchingId)"
+        @click="relaunch(env.id)"
+      >
+        {{ relaunchingId === env.id ? 'Relaunching…' : 'Relaunch' }}
+      </button>
     </article>
   </main>
 </template>

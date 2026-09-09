@@ -51,7 +51,11 @@ Exact-name `docker inspect` only. Leftover `renzo-*` names are refused. Runtime 
 
 ## Sprint 5
 
-On-demand `/api/health` on registered loopback URLs only. Combined status: Healthy / Stopped / Unhealthy / Unknown. Refresh button. `/trial` 404 is not used as health.
+On-demand `/api/health` on registered loopback URLs only. Combined status: Healthy / Stopped / Unhealthy / Unknown. Refresh button. `/trial` 404 is not used as health. SHA `37d19da`.
+
+## Sprint 6
+
+Relaunch uses `compose up -d --force-recreate --no-deps app` only. Live laptop proof 2026-09-09: stamped both labs, relaunched PROD through `relaunchRegisteredEnvironment`, markers stayed `m10a-prod-isolation` / `m10a-dev-isolation`, both `/api/health` green, both Docker health `healthy`. Sibling was not recreated.
 
 ## Deviations
 
