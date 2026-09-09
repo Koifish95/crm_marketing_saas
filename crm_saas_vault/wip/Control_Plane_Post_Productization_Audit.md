@@ -119,4 +119,4 @@ Did **not** commit sqlite, `data/provisioned/`, `.env`, or the inventory file bo
 | Operator UI (prior) | `f61bcdf`, `5c32a8f`, `0c0982d` | `working` |
 | Hardening UI | `a3b9efe` | `working` |
 | Tests | `3f5e399` | `working` |
-| Docs + this audit | *(this commit)* | `working` |
+| Docs + this audit | `e84d038` | `working` |
