@@ -5,6 +5,6 @@ export default defineConfig({
   out: './drizzle/migrations',
   dialect: 'sqlite',
   dbCredentials: {
-    url: process.env.DATABASE_URL ?? 'file:./data/renzo.sqlite',
+    url: process.env.DATABASE_URL ?? 'file:./data/app.sqlite',
   },
 })

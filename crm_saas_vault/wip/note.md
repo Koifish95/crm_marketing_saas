@@ -11,7 +11,7 @@ tags:
 
 New browser-QA notes land here. Do not treat this file as the map.
 
-Processed 2026-09-04 / 2026-09-05 dump: [[wip/archive/M9_Human_QA_Inbox_2026-09-04_to_2026-09-05]]. Leftover human work until M9 is accepted: [[wip/M9_Remaining_Human_QA]].
+Processed 2026-09-04 / 2026-09-05 dump: [[wip/archive/M9_Human_QA_Inbox_2026-09-04_to_2026-09-05]]. Leftover human work until M9 is accepted on the external Renzo project: [[wip/archive/M9_Remaining_Human_QA]].
 
 
 User:

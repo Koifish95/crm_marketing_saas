@@ -1,6 +1,8 @@
 <script setup lang="ts">
 const config = useRuntimeConfig()
 const brandName = computed(() => String(config.public.brandName || 'Martial Arts'))
+const { data: trialStatus } = await useFetch<{ published: boolean }>('/api/public/trial-status')
+const trialPublished = computed(() => Boolean(trialStatus.value?.published))
 
 useHead({
   title: 'Acquisition',
@@ -21,6 +23,7 @@ useHead({
       </p>
     </div>
     <NuxtLink
+      v-if="trialPublished"
       to="/trial"
       class="panel block p-5 ring-1 ring-navy-900/10 hover:border-navy-600/40"
     >

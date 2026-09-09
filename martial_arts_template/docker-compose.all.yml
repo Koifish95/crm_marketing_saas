@@ -10,10 +10,10 @@
 # Container port stays 5000. Host: PRODUCTION 5000, STAGE 5010, DEV 5020.
 # Local pnpm dev remains 5030 and is not part of this file.
 
-name: renzo
+name: martial-arts
 
 x-common: &common
-  image: renzo-acquisition:m10a
+  image: martial-arts-acquisition:s2
   init: true
   restart: unless-stopped
   expose:
@@ -35,7 +35,7 @@ x-runtime: &runtime
   NODE_ENV: production
   HOST: 0.0.0.0
   PORT: "5000"
-  DATABASE_URL: file:/app/data/sqlite/renzo.sqlite
+  DATABASE_URL: file:/app/data/sqlite/app.sqlite
   ASSET_UPLOAD_DIR: /app/data/uploads
   DRIZZLE_MIGRATIONS_DIR: /app/drizzle/migrations
   NUXT_PUBLIC_TIMEZONE: America/Denver
@@ -45,7 +45,7 @@ x-runtime: &runtime
 services:
   prod:
     <<: *common
-    container_name: renzo-prod-app-1
+    container_name: martial-arts-prod-app-1
     env_file:
       - path: .env.production
         required: false
@@ -63,7 +63,7 @@ services:
 
   stage:
     <<: *common
-    container_name: renzo-stage-app-1
+    container_name: martial-arts-stage-app-1
     env_file:
       - path: .env.stage
         required: false
@@ -83,16 +83,16 @@ services:
       - stage
 
   backup:
-    image: renzo-acquisition:m10a
-    container_name: renzo-backup-1
+    image: martial-arts-acquisition:s2
+    container_name: martial-arts-backup-1
     init: true
     restart: unless-stopped
     depends_on:
       - prod
     environment:
       APP_ENV: production
-      RENZO_BACKUP_DIR: /backups
-      BACKUP_SQLITE_PATH: /source/sqlite/renzo.sqlite
+      APP_BACKUP_DIR: /backups
+      BACKUP_SQLITE_PATH: /source/sqlite/app.sqlite
       BACKUP_UPLOADS_DIR: /source/uploads
       NUXT_PUBLIC_TIMEZONE: America/Denver
     volumes:
@@ -107,7 +107,7 @@ services:
 
   dev:
     <<: *common
-    container_name: renzo-dev-app-1
+    container_name: martial-arts-dev-app-1
     env_file:
       - path: .env.dev
         required: false
@@ -128,22 +128,22 @@ services:
 
 volumes:
   sqlite-prod:
-    name: renzo-prod-sqlite
+    name: martial-arts-prod-sqlite
   assets-prod:
-    name: renzo-prod-assets
+    name: martial-arts-prod-assets
   sqlite-stage:
-    name: renzo-stage-sqlite
+    name: martial-arts-stage-sqlite
   assets-stage:
-    name: renzo-stage-assets
+    name: martial-arts-stage-assets
   sqlite-dev:
-    name: renzo-dev-sqlite
+    name: martial-arts-dev-sqlite
   assets-dev:
-    name: renzo-dev-assets
+    name: martial-arts-dev-assets
 
 networks:
   prod:
-    name: renzo-prod-net
+    name: martial-arts-prod-net
   stage:
-    name: renzo-stage-net
+    name: martial-arts-stage-net
   dev:
-    name: renzo-dev-net
+    name: martial-arts-dev-net

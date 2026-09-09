@@ -4,7 +4,7 @@ import { readAppEnv } from '../../shared/utils/app-env'
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).optional(),
   APP_ENV: z.enum(['dev', 'stage', 'production']).optional(),
-  DATABASE_URL: z.string().min(1).default('file:./data/renzo.sqlite'),
+  DATABASE_URL: z.string().min(1).default('file:./data/app.sqlite'),
   NUXT_SESSION_PASSWORD: z.string().min(32).optional(),
   NUXT_AUTH_EMAIL: z.string().min(1).optional(),
   NUXT_AUTH_USERNAME: z.string().min(1).optional(),

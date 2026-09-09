@@ -13,11 +13,11 @@ export const APP_ENV_HOST_PORTS: Record<AppEnv, number> = {
   dev: 5020,
 }
 
-/** Public Pi hostnames. Three names only. Never include www variants or the parent apex. */
+/** Optional public hostnames per environment. Empty until a customer is given real DNS (S5). */
 export const APP_ENV_PUBLIC_HOSTS: Record<AppEnv, string> = {
-  production: 'app.renzogracieutah.com',
-  stage: 'stage.app.renzogracieutah.com',
-  dev: 'dev.app.renzogracieutah.com',
+  production: '',
+  stage: '',
+  dev: '',
 }
 
 export const APP_ENV_SWITCHER_ORDER = ['production', 'stage', 'dev'] as const satisfies readonly AppEnv[]
@@ -117,16 +117,25 @@ export function normalizeHostname(hostname: string): string {
 
 export function appEnvForHostname(hostname: string): AppEnv | null {
   const host = normalizeHostname(hostname)
+  if (!host) {
+    return null
+  }
   for (const env of APP_ENVS) {
-    if (APP_ENV_PUBLIC_HOSTS[env] === host) {
+    const configured = APP_ENV_PUBLIC_HOSTS[env]
+    if (configured && configured === host) {
       return env
     }
   }
   return null
 }
 
-export function isRenzoPublicHostname(hostname: string): boolean {
+export function isConfiguredPublicHostname(hostname: string): boolean {
   return appEnvForHostname(hostname) !== null
+}
+
+/** @deprecated Use isConfiguredPublicHostname. Kept so old imports fail loudly if missed. */
+export function isRenzoPublicHostname(hostname: string): boolean {
+  return isConfiguredPublicHostname(hostname)
 }
 
 export function publicHostnameForEnv(env: AppEnv): string {

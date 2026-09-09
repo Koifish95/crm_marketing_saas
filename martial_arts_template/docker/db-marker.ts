@@ -1,7 +1,7 @@
 import { createClient } from '@libsql/client'
 
 async function main() {
-  const databaseUrl = process.env.DATABASE_URL ?? 'file:/app/data/sqlite/renzo.sqlite'
+  const databaseUrl = process.env.DATABASE_URL ?? 'file:/app/data/sqlite/app.sqlite'
   const [command, value] = process.argv.slice(2)
   const client = createClient({ url: databaseUrl })
 

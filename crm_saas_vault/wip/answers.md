@@ -146,8 +146,7 @@ Reviewing AI: ask Scott: “Any integration that should be customer-wide (one Me
 
 **Recommendation.** Industry template = Martial Arts. Required to be usable: timezone, currency (USD default ok), at least one Program or an empty catalog staff can fill, ADMIN user, public form enabled or explicitly off, business display name. Prices and intro timetable can start empty if staff can add them.
 
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “For a brand-new martial-arts academy, must Programs and intro class times exist before they can log in, or is an empty catalog they fill in Settings acceptable for S2?”
+**Answered (2026-09-09).** Staff can log in without intro times or prices. Seed Adult BJJ + Kids BJJ active and Striking + Wrestling inactive. Public `/trial` stays hidden until ADMIN publishes availability.
 
 ### S2.2 Which Renzo capabilities belong in Platform?
 
@@ -169,8 +168,7 @@ Reviewing AI: ask Scott: “For a brand-new martial-arts academy, must Programs 
 
 **Recommendation.** Treat as **Martial Arts template** until a second industry proves it generic. Alignment left this unresolved on purpose.
 
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “For S2, confirm Household stays in the Martial Arts template (not Platform core), knowing Beauty may not use it?”
+**Answered (2026-09-09).** Household stays in the Martial Arts template, not Platform core.
 
 ### S2.7 Is guardian/child Martial Arts-specific?
 
@@ -182,17 +180,13 @@ Reviewing AI: ask Scott: “For S2, confirm Household stays in the Martial Arts 
 
 ### S2.9 Are Acquisition Events enabled by default?
 
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “Should a new martial-arts customer get Acquisition Events enabled on first boot, or off until they need an open-house/event?”
-
-**Recommendation if needed to proceed:** Enabled as a capability, no seeded events.
+**Answered (2026-09-09).** Capability on; no seeded events.
 
 ### S2.10 Is compensation attribution Martial Arts, optional, or Renzo-specific?
 
 **Recommendation.** Optional add-on; **off by default**. The 50% Scott ledger is Renzo-specific and must not seed for customer #2.
 
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “Confirm compensation stays off for a new academy unless you turn it on for them?”
+**Answered (2026-09-09).** Off by default. Turn on per customer if they want it. No 50% Scott ledger.
 
 ### S2.11 Which reports ship in a blank Martial Arts instance?
 
@@ -210,8 +204,7 @@ Reviewing AI: ask Scott: “Confirm compensation stays off for a new academy unl
 - **Onboarding-required:** business name, ADMIN identity, timezone if not defaulted.
 - **Can wait:** prices, intro timetable, Meta, privacy URL.
 
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “Should `allowEarlyTrialOutcomes` default ON for every martial-arts customer, as it does for Renzo?”
+**Answered (2026-09-09).** ON for every martial-arts customer unless they change Settings.
 
 ### S2.14 Should Lead Sources be seeded?
 
@@ -219,8 +212,7 @@ Reviewing AI: ask Scott: “Should `allowEarlyTrialOutcomes` default ON for ever
 
 ### S2.15 Should Programs be seeded or empty?
 
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “New martial-arts customer: seed Adult BJJ + Kids BJJ (inactive extras optional), or start with zero programs?”
+**Answered (2026-09-09).** Seed Adult BJJ + Kids BJJ active; Striking + Wrestling inactive extras.
 
 ### S2.16 Should Membership Offerings/prices start empty?
 
@@ -240,10 +232,7 @@ Reviewing AI: ask Scott: “New martial-arts customer: seed Adult BJJ + Kids BJJ
 
 ### S2.20 Is the public Trial form enabled automatically?
 
-**Recommendation.** Yes for Martial Arts template (form exists). It can show “configure intro times” until availability exists.
-
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “Should `/trial` be live on first boot even with no class times, or hidden until ADMIN publishes availability?”
+**Answered (2026-09-09).** Hidden until ADMIN publishes at least one enabled intro time. Not live-empty.
 
 ### S2.21 What branding/copy must be configurable?
 
@@ -253,8 +242,7 @@ Reviewing AI: ask Scott: “Should `/trial` be live on first boot even with no c
 
 **Recommendation.** Timezone **required** (no silent America/Denver). Currency USD unless Scott says otherwise. Locale can follow timezone country for S2.
 
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “Is USD-only acceptable through S8, or must a customer be able to pick another currency at boot?”
+**Answered (2026-09-09).** USD only through S8.
 
 ## Manual boot
 
@@ -300,8 +288,7 @@ Reviewing AI: ask Scott: “Is USD-only acceptable through S8, or must a custome
 
 **Recommendation.** Operator sets a real password. **`admin` / `setup` is prohibited** as a SaaS default (S5/S8 already say this).
 
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “For S2 lab boots, do you want forced password change on first login, or a password you set once and keep?”
+**Answered (2026-09-09).** Lab: operator-set password, no forced change. Real customer PROD (S4): force first-login change.
 
 ### S2.33 How are runtime secrets created?
 
@@ -368,17 +355,11 @@ Reviewing AI: ask Scott: “For S2 lab boots, do you want forced password change
 
 ### S3.2 Same repository or separate repository?
 
-**Recommendation.** Same SaaS repo, separate app/folder (e.g. `control_plane/` next to `martial_arts_template/`). Not inside a customer CRM.
-
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “Confirm the control plane lives in this same GitHub repo as a second app, not a new remote?”
+**Answered (2026-09-09).** Same SaaS repo, separate app/folder (e.g. `control_plane/` next to `martial_arts_template/`). Not a new remote. Not inside a customer CRM.
 
 ### S3.3 Where does v1 run?
 
-**Recommendation.** Laptop is enough for S3 proof.
-
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “For S3, is laptop-only OK, or do you want it on the Pi from the first control-plane build?”
+**Answered (2026-09-09).** Laptop-only for the S3 proof.
 
 ### S3.4 Does it need to run on a Hosting Node?
 
@@ -446,10 +427,7 @@ Reviewing AI: ask Scott: “For S3, is laptop-only OK, or do you want it on the 
 
 ### S3.20 How does the control plane talk to a node?
 
-**Unresolved.** Options: SSH, Docker API, agent.
-
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “For S3 on the laptop, is talking to local Docker (no SSH, no agent) acceptable as the first mechanism?”
+**Answered (2026-09-09).** Local Docker on the operator laptop. No SSH, no agent.
 
 ### S3.21 Minimum secure mechanism for v1?
 
@@ -481,10 +459,7 @@ Reviewing AI: ask Scott: “For S3 on the laptop, is talking to local Docker (no
 
 ### S3.28 How often is health checked?
 
-**Recommendation.** On-demand plus a simple periodic poll. Exact interval unset.
-
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “Is a 30–60 second health poll fine for S3, or do you only want check-on-page-load?”
+**Answered (2026-09-09).** On-demand (page load / explicit refresh) is enough for S3 Successful. Periodic poll optional later.
 
 ### S3.29 When does Healthy become Unhealthy?
 
@@ -492,7 +467,7 @@ Reviewing AI: ask Scott: “Is a 30–60 second health poll fine for S3, or do y
 
 ### S3.30 Is polling required or is on-demand enough initially?
 
-**Recommendation.** On-demand is enough for S3 Successful. Polling is nicer, not required.
+**Answered (2026-09-09).** On-demand is enough. Polling is nicer, not required.
 
 ### S3.31 Is health history necessary?
 
@@ -1182,10 +1157,7 @@ Do not assume yes.
 
 ### S7.3 Is Renzo a separate design-partner customer?
 
-**Recommendation.** Yes. Renzo Kaysville is a design-partner academy, not automatically the owner CRM.
-
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “Confirm Renzo the gym is a separate customer from the platform-owner CRM, not the same account.”
+**Superseded (2026-09-09).** Real Renzo is **not** a SaaS customer or design-partner tenant. It stays an external reference implementation. See [[SaaS-Decisions#2026-09-09 — Real Renzo CRM is external evidence, not a SaaS customer]].
 
 ### S7.4 What template does the owner's CRM use?
 
@@ -1502,23 +1474,13 @@ Collect these in one pass. Do **not** ask all at once in a giant interview. Use 
 
 6. Manual backport to Renzo for now, or a formal process before S8?
 
-## S2 (before implementing S2)
+## S2 (answered 2026-09-09)
 
-7. Empty catalog vs seeded Adult/Kids BJJ?  
-8. `/trial` live with no times, or hidden until availability exists?  
-9. Events on by default?  
-10. Compensation off by default?  
-11. `allowEarlyTrialOutcomes` ON for all MA customers?  
-12. Forced password change on S2 lab boots?  
-13. USD-only through S8?  
-14. Household stays Martial Arts template, not Platform?
+7–14 answered. See [[SaaS-Decisions#2026-09-09 — Martial Arts template product defaults (S2 closeout)]].
 
-## S3 (before implementing S3)
+## S3 (answered 2026-09-09; do not implement until Scott asks)
 
-15. Control plane in this same repo?  
-16. Laptop-only for S3?  
-17. Local Docker API acceptable as first node mechanism?  
-18. Health poll vs check-on-open?
+15–18 answered. See [[SaaS-Decisions#2026-09-09 — S3 v1 owner decisions]].
 
 ## S4+ (do not ask until that milestone)
 

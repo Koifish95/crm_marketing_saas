@@ -22,7 +22,7 @@ export function sqliteFilePath(url: string): string | null {
 }
 
 export function getDatabaseUrl(): string {
-  return process.env.DATABASE_URL ?? 'file:./data/renzo.sqlite'
+  return process.env.DATABASE_URL ?? 'file:./data/app.sqlite'
 }
 
 export function createDb(databaseUrl = getDatabaseUrl()) {

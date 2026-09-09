@@ -2,7 +2,7 @@
 type: decision
 status: current
 area: process
-updated: 2026-09-08
+updated: 2026-09-09
 tags:
   - adr
   - saas
@@ -12,7 +12,7 @@ tags:
 
 Lightweight ADR log for the **SaaS / platform** workstream only. Newest first. Do not relitigate here — add a new entry if something changes.
 
-Renzo customer-implementation ADRs stay in [[Decisions]]. “Accepted for Renzo” is not “accepted for the platform.”
+Renzo customer-implementation ADRs stay in [[Decisions]] as **historical evidence**. “Accepted for Renzo” is not “accepted for the platform.” Real Renzo is not a SaaS customer.
 
 Template:
 
@@ -22,6 +22,76 @@ Status: accepted | working decision | superseded
 Context: one or two sentences
 Decision: what we chose
 ```
+
+---
+
+## 2026-09-09 — S3 v1 owner decisions
+
+Status: accepted
+
+Context: S2 is Successful. Scott recorded the four questions that unblock an S3 skeleton. This does **not** authorize S3 implementation.
+
+Decision:
+
+- The control plane lives in **this same GitHub repo** as a second app/folder (e.g. `control_plane/` next to `martial_arts_template/`). Not a new remote. Not inside a customer CRM.
+- S3 proof is **laptop-only**.
+- First node mechanism: **local Docker** on the operator laptop. No SSH, no agent. Customer CRM containers never receive a Docker socket.
+- Health for S3 Successful is **on-demand** (page load / explicit refresh). A 30–60s poll is optional later, not required.
+
+S3 Successful remains: human-readable environments, container running **and** `/api/health`, relaunch without `-v`. Not in S3: create/provision, domains, billing, ThePond replacement.
+
+Source: Scott 2026-09-09; [[wip/answers]] S3.2, S3.3, S3.20, S3.28–S3.30
+
+---
+
+## 2026-09-09 — Martial Arts template product defaults (S2 closeout)
+
+Status: accepted
+
+Context: Remaining S2 ASK SCOTT items were answered so the template contract is explicit before S3.
+
+Decision:
+
+- Seed **Adult BJJ** and **Kids BJJ** active; **Striking** and **Wrestling** inactive extras. No Renzo prices. No Kaysville intro timetable (`intro-seed.ts` is a test fixture only).
+- Public `/trial` (and the homepage booking card) is **hidden** until ADMIN publishes at least one enabled intro availability rule. Staff Settings still edit the timetable.
+- Acquisition Events capability is **on**; no seeded events.
+- Compensation stays **off** by default (0 bps). No 50% Scott ledger.
+- `allowEarlyTrialOutcomes` defaults **ON**.
+- Lab / operator-set ADMIN passwords do **not** force a change. Real customer PROD (S4) **must** force first-login password change.
+- **USD only** through S8.
+- **Household** is a Martial Arts template concept, not Platform core.
+
+Source: Scott 2026-09-09; [[wip/answers]]
+
+---
+
+## 2026-09-09 — Real Renzo CRM is external evidence, not a SaaS customer
+
+Status: accepted
+
+Context: This repo was copied from work done for Renzo. Scott clarified the project boundary before S3.
+
+Decision:
+
+- The live gym implementation is `C:\Users\Scoy9\Projects\renzo_crm`. It stays separately maintained, hosted, and deployed. Do not add it as a remote, migrate it here, or manage its PROD/DEV/STAGE from this platform.
+- Inside `crm_marketing_saas`, the copied code is the **Martial Arts template**. Renzo-specific runtime names may be generalized. This repo does not need backward compatibility with Renzo deploy names.
+- “Protect Renzo” means do not touch the external project, Koi-Pi, or `webhosting_renzo_*`. It does not mean freeze copied strings in this repo.
+- First intended real pilots: **Strategic Insights** and **Scott’s sister’s business**. Renzo is not a pilot and must not appear as a control-plane customer.
+- Historical references (lessons, S2 evidence that used `renzo-acquisition:m10a`, warnings about `webhosting_renzo_*`) stay. Do not rewrite history.
+
+Source: Scott 2026-09-09; [[Home]]; [[Working-Agreement]]
+
+---
+
+## 2026-09-09 — S2 Successful: Docker lab-acme coexistence
+
+Status: accepted
+
+Context: S2 proved a second martial-arts academy can run on the laptop without Renzo production resources.
+
+Decision: S2 is **Successful**. Two Docker environments (`lab-acme-prod`, `lab-acme-dev`) with isolated named volumes, green `/api/health`, persist through recreate without `-v`, distinct ADMIN logins, `setup` rejected. Original proof image was `renzo-acquisition:m10a`. Current operator image is `martial-arts-acquisition:s2`. Procedure: [[S2-Hand-Boot-Checklist]]. Evidence: [[wip/archive/S2_Docker_Coexist_Evidence]].
+
+Source: 2026-09-09 acceptance; later closeout naming
 
 ---
 
@@ -53,7 +123,7 @@ Status: working decision
 
 Context: Scott asked for milestones from the current workspace to a fully launched SaaS, with deliverables named Successful, and decisions made along the way.
 
-Decision: The platform sequence is [[SaaS-Milestones]] S0–S8. **Successful** is the acceptance name. “Launched” is S8: first external martial-arts customer live, sales-led. This map does not authorize implementation. S0 and S1 are Successful. Next implementation milestone is S2, only when Scott asks.
+Decision: The platform sequence is [[SaaS-Milestones]] S0–S8. **Successful** is the acceptance name. “Launched” is S8: first external martial-arts customer live, sales-led. This map does not authorize implementation. S0, S1, and S2 are Successful. Next implementation milestone is S3, only when Scott asks.
 
 Source: 2026-09-08 conversation; [[SaaS-Milestones]]
 
@@ -61,7 +131,7 @@ Source: 2026-09-08 conversation; [[SaaS-Milestones]]
 
 ## 2026-09-08 — This workspace gets its own Git repo, not renzo-crm
 
-Status: working decision (execution pending)
+Status: accepted
 
 Context: The SaaS tree started as a snapshot/reference of Renzo. Accidental commits or pushes into `renzo-crm` would mix productization work into the live customer implementation. Scott asked to disconnect from `renzo_crm` and create a new repo, sooner rather than later.
 
@@ -96,7 +166,7 @@ Rationale: prove the fleet-operations model with the smallest safe surface. Prov
 
 Implications: next decision is the environment composition contract (what must exist to observe and relaunch). Do not implement the control app until Scott asks.
 
-Source: [[Control-Plane]], [[Working-Agreement]], [[wip/SaaS_Project_Alignment_and_Current_Understanding]], [[wip/Control_Plane_v1_and_Working_Agreement_2026-09-08]]
+Source: [[Control-Plane]], [[Working-Agreement]], [[wip/archive/SaaS_Project_Alignment_and_Current_Understanding]], [[wip/archive/Control_Plane_v1_and_Working_Agreement_2026-09-08]]
 
 ---
 
@@ -106,6 +176,6 @@ Status: working decision
 
 Context: The copied Renzo codebase is evidence and a design partner, not automatically the SaaS architecture. Live academy data already exists on Koi-Pi.
 
-Decision: Keep CRM fine-tuning and platform expansion as separate tracks in this vault. Do not convert Renzo PRODUCTION into a multi-tenant app. Do not invent answers to Renzo [[Open-Questions]]. Platform work records decisions here; Renzo ADRs stay in [[Decisions]].
+Decision: Keep the Martial Arts template and platform expansion as separate tracks in this vault. Do not convert the external Renzo PRODUCTION into a multi-tenant app. Do not invent answers to Renzo [[Open-Questions]]. Platform work records decisions here; Renzo ADRs stay in [[Decisions]] as historical evidence. Superseded in part by [[#2026-09-09 — Real Renzo CRM is external evidence, not a SaaS customer]].
 
-Source: [[Working-Agreement]], [[wip/SaaS_Project_Alignment_and_Current_Understanding]]
+Source: [[Working-Agreement]], [[wip/archive/SaaS_Project_Alignment_and_Current_Understanding]]

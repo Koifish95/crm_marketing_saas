@@ -4,7 +4,7 @@ export default defineNitroPlugin(() => {
   const appEnv = readAppEnv()
   const publicEnv = String(useRuntimeConfig().public.appEnv || '')
   if (publicEnv && publicEnv !== appEnv) {
-    console.warn(`[renzo] NUXT_PUBLIC_APP_ENV=${publicEnv} does not match APP_ENV=${appEnv}`)
+    console.warn(`[martial-arts] NUXT_PUBLIC_APP_ENV=${publicEnv} does not match APP_ENV=${appEnv}`)
   }
-  console.info(`[renzo] APP_ENV=${appEnv}`)
+  console.info(`[martial-arts] APP_ENV=${appEnv}`)
 })

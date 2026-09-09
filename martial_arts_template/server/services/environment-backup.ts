@@ -37,7 +37,7 @@ import { DomainError } from './errors'
 
 export const BACKUP_MANIFEST_VERSION = 2
 export const BACKUP_SUPPORTED_MANIFEST_VERSIONS = [1, 2] as const
-export const BACKUP_SQLITE_ENTRY = 'sqlite/renzo.sqlite'
+export const BACKUP_SQLITE_ENTRY = 'sqlite/app.sqlite'
 export const BACKUP_MANIFEST_ENTRY = 'manifest.json'
 export const BACKUP_UPLOADS_PREFIX = 'uploads/'
 export const DEFAULT_BACKUP_MAX_BYTES = 512 * 1024 * 1024
@@ -68,7 +68,7 @@ export function backupMaxBytes(env: NodeJS.Dict<string | undefined> = process.en
 export function backupFilename(appEnv: AppEnv, nowMs = utcNowMs()) {
   const parts = denverParts(nowMs)
   const hhmm = `${String(parts.hour).padStart(2, '0')}${String(parts.minute).padStart(2, '0')}`
-  return `renzo-${appEnv}-${parts.ymd}-${hhmm}.zip`
+  return `martial-arts-${appEnv}-${parts.ymd}-${hhmm}.zip`
 }
 
 export function assertRestoreConfirmation(confirmEnv: string, appEnv: AppEnv) {
@@ -160,7 +160,7 @@ export async function validateBackupArchive(zipPath: string) {
   if (!existsSync(zipPath) || !statSync(zipPath).isFile()) {
     throw new DomainError('Backup zip is missing.')
   }
-  const extractDir = join(tmpdir(), `renzo-validate-${randomUUID()}`)
+  const extractDir = join(tmpdir(), `ma-validate-${randomUUID()}`)
   mkdirSync(extractDir, { recursive: true })
   try {
     await extractZip(zipPath, extractDir)
@@ -205,7 +205,7 @@ export async function restoreBackupArchive(input: {
   appEnv: AppEnv
   databaseUrl?: string
 }) {
-  const extractDir = join(tmpdir(), `renzo-restore-${randomUUID()}`)
+  const extractDir = join(tmpdir(), `ma-restore-${randomUUID()}`)
   mkdirSync(extractDir, { recursive: true })
   try {
     await extractZip(input.zipPath, extractDir)
@@ -264,7 +264,7 @@ export async function restoreLiveBackup(zipPath: string, confirmEnv: string) {
 export async function saveRestoreUpload(req: IncomingMessage, maxBytes = backupMaxBytes()) {
   return new Promise<{ zipPath: string, confirmEnv: string }>((resolveUpload, reject) => {
     let settled = false
-    const zipPath = join(tmpdir(), `renzo-restore-upload-${randomUUID()}.zip`)
+    const zipPath = join(tmpdir(), `ma-restore-upload-${randomUUID()}.zip`)
     const fail = (error: Error) => {
       if (settled) {
         return

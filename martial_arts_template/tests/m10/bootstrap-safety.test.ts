@@ -70,7 +70,7 @@ async function seedFresh(env: {
   NUXT_AUTH_RESET_PASSWORD?: string
 }) {
   applyEnv(env)
-  const file = join(tmpdir(), `renzo-m10-${randomUUID()}.sqlite`)
+  const file = join(tmpdir(), `ma-m10-${randomUUID()}.sqlite`)
   const url = `file:${file}`
   await migrateDatabase(url)
   await seedDatabase(url)

@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-08
+updated: 2026-09-09
 aliases:
   - Environment unit
   - Customer Environment
@@ -174,4 +174,6 @@ Domains, TLS, Compose project layout, image registry, node communication mechani
 
 ## Next
 
-[[SaaS-Milestones]] **S2** is Successful. Boot steps: [[S2-Hand-Boot-Checklist]]. Do not start S3 until Scott asks.
+[[SaaS-Milestones]] **S2** is Successful. Boot steps: [[S2-Hand-Boot-Checklist]]. S3 decisions are recorded. Do not start S3 until Scott asks.
+
+Real Renzo is not a Customer in this model. Intended first pilots (not provisioned): Strategic Insights; Scott’s sister’s business. The S2 lab `lab-acme` is a proof environment, not a paying customer.

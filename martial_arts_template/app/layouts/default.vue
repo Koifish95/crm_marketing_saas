@@ -9,7 +9,9 @@ const route = useRoute()
 const isTrial = computed(() => route.path === '/trial')
 const isEvent = computed(() => route.path.startsWith('/events/'))
 const isTracking = computed(() => route.path === '/t' || route.path.startsWith('/t/'))
-const hidePublicCta = computed(() => isTrial.value || isEvent.value || isTracking.value)
+const { data: trialStatus } = await useFetch<{ published: boolean }>('/api/public/trial-status')
+const hideChromeLinks = computed(() => isTrial.value || isEvent.value || isTracking.value)
+const showTrialCta = computed(() => !hideChromeLinks.value && Boolean(trialStatus.value?.published))
 </script>
 
 <template>
@@ -26,14 +28,14 @@ const hidePublicCta = computed(() => isTrial.value || isEvent.value || isTrackin
         <AppBrandMark inverted />
         <nav class="flex flex-wrap items-center gap-3 text-sm">
           <NuxtLink
-            v-if="!hidePublicCta"
+            v-if="showTrialCta"
             to="/trial"
             class="rounded-md bg-white px-3 py-2 font-medium text-navy-900 hover:bg-brand-50"
           >
             Book a free class
           </NuxtLink>
           <NuxtLink
-            v-if="!hidePublicCta"
+            v-if="!hideChromeLinks"
             to="/login"
             class="text-white/75 hover:text-white"
           >

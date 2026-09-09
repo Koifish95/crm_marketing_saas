@@ -45,7 +45,7 @@ afterEach(() => {
 })
 
 function tempDir(label: string) {
-  const dir = join(tmpdir(), `renzo-backup-${label}-${randomUUID()}`)
+  const dir = join(tmpdir(), `ma-backup-${label}-${randomUUID()}`)
   mkdirSync(dir, { recursive: true })
   return dir
 }
@@ -56,7 +56,7 @@ async function writeArchive(stream: NodeJS.ReadableStream, zipPath: string) {
 
 describe('M10 environment backup and restore', () => {
   it('names backups with Denver date and environment', () => {
-    expect(backupFilename('production', Date.UTC(2026, 8, 6, 20, 30, 0))).toBe('renzo-production-2026-09-06-1430.zip')
+    expect(backupFilename('production', Date.UTC(2026, 8, 6, 20, 30, 0))).toBe('martial-arts-production-2026-09-06-1430.zip')
   })
 
   it('requires typing the current environment before restore', () => {
@@ -74,7 +74,7 @@ describe('M10 environment backup and restore', () => {
         throw new Error('expected file sqlite')
       }
       await testDb.client.execute('PRAGMA wal_checkpoint(TRUNCATE)')
-      const packedSqlite = join(sourceDir, 'renzo.sqlite')
+      const packedSqlite = join(sourceDir, 'app.sqlite')
       writeFileSync(packedSqlite, readFileSync(sourceSqlite))
       const sourceUploads = join(sourceDir, 'uploads')
       mkdirSync(sourceUploads, { recursive: true })
@@ -89,7 +89,7 @@ describe('M10 environment backup and restore', () => {
         nowMs: Date.UTC(2026, 8, 6, 20, 30, 0),
         databaseUrl: `file:${packedSqlite.replaceAll('\\', '/')}`,
       })
-      expect(backup.filename).toBe('renzo-production-2026-09-06-1430.zip')
+      expect(backup.filename).toBe('martial-arts-production-2026-09-06-1430.zip')
       expect(backup.manifest.version).toBe(2)
       expect(backup.manifest.sqliteSha256).toBe(sha256File(packedSqlite))
       expect(backup.manifest.files).toContain('uploads/asset.txt')
@@ -99,7 +99,7 @@ describe('M10 environment backup and restore', () => {
       expect(validated.manifest.appEnv).toBe('production')
       expect(validated.bytes).toBeGreaterThan(0)
 
-      const destSqlite = join(destDir, 'renzo.sqlite')
+      const destSqlite = join(destDir, 'app.sqlite')
       const destUploads = join(destDir, 'uploads')
       mkdirSync(destUploads, { recursive: true })
       writeFileSync(join(destUploads, 'old.txt'), 'stale')
@@ -131,7 +131,7 @@ describe('M10 environment backup and restore', () => {
     }
   })
 
-  it('rejects a zip that is not a Renzo backup sqlite', async () => {
+  it('rejects a zip that is not a valid backup sqlite', async () => {
     const dir = tempDir('bad')
     const zipPath = join(dir, 'bad.zip')
     const zip = new ZipFile()
@@ -140,14 +140,14 @@ describe('M10 environment backup and restore', () => {
       appEnv: 'dev',
       createdAt: 1,
     })), 'manifest.json')
-    zip.addBuffer(Buffer.from('not a database'), 'sqlite/renzo.sqlite')
+    zip.addBuffer(Buffer.from('not a database'), 'sqlite/app.sqlite')
     zip.end()
     await writeArchive(zip.outputStream, zipPath)
 
     await expect(validateBackupArchive(zipPath)).rejects.toThrow(/not valid|SQLite/)
     await expect(restoreBackupArchive({
       zipPath,
-      sqlitePath: join(dir, 'renzo.sqlite'),
+      sqlitePath: join(dir, 'app.sqlite'),
       uploadsDir: join(dir, 'uploads'),
       appEnv: 'dev',
     })).rejects.toThrow(/not valid|SQLite/)

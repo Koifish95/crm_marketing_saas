@@ -107,62 +107,15 @@ describe('M10A environment switcher URLs', () => {
 })
 
 describe('M10 public hostname switcher', () => {
-  it('maps the three public hosts only, and never www variants or the parent apex', () => {
-    expect(APP_ENV_PUBLIC_HOSTS.production).toBe('app.renzogracieutah.com')
-    expect(APP_ENV_PUBLIC_HOSTS.stage).toBe('stage.app.renzogracieutah.com')
-    expect(APP_ENV_PUBLIC_HOSTS.dev).toBe('dev.app.renzogracieutah.com')
-    expect(appEnvForHostname('app.renzogracieutah.com')).toBe('production')
-    expect(appEnvForHostname('STAGE.APP.RENZOGRACIEUTAH.COM')).toBe('stage')
-    expect(appEnvForHostname('dev.app.renzogracieutah.com')).toBe('dev')
-    expect(appEnvForHostname('www.app.renzogracieutah.com')).toBeNull()
-    expect(appEnvForHostname('www.stage.app.renzogracieutah.com')).toBeNull()
-    expect(appEnvForHostname('www.dev.app.renzogracieutah.com')).toBeNull()
-    expect(appEnvForHostname('renzogracieutah.com')).toBeNull()
-    expect(appEnvForHostname('www.renzogracieutah.com')).toBeNull()
+  it('does not bake Renzo public hostnames into the Martial Arts template', () => {
+    expect(APP_ENV_PUBLIC_HOSTS.production).toBe('')
+    expect(APP_ENV_PUBLIC_HOSTS.stage).toBe('')
+    expect(APP_ENV_PUBLIC_HOSTS.dev).toBe('')
+    expect(appEnvForHostname('app.renzogracieutah.com')).toBeNull()
+    expect(appEnvForHostname('stage.app.renzogracieutah.com')).toBeNull()
+    expect(appEnvForHostname('dev.app.renzogracieutah.com')).toBeNull()
     expect(isRenzoPublicHostname('localhost')).toBe(false)
-  })
-
-  it('builds hostname-mode URLs without laptop ports or www variants', () => {
-    expect(environmentSwitcherHref({
-      protocol: 'https:',
-      hostname: 'app.renzogracieutah.com',
-      port: '',
-      pathname: '/leads/3',
-      search: '?tab=follow-up',
-      hash: '#notes',
-      targetEnv: 'stage',
-    })).toBe('https://stage.app.renzogracieutah.com/leads/3?tab=follow-up#notes')
-    expect(environmentSwitcherHref({
-      protocol: 'https:',
-      hostname: 'stage.app.renzogracieutah.com',
-      targetEnv: 'dev',
-      pathname: '/login',
-    })).toBe('https://dev.app.renzogracieutah.com/login')
-    expect(publicHostnameForEnv('production')).toBe('app.renzogracieutah.com')
-    const publicHref = environmentSwitcherHref({
-      protocol: 'https:',
-      hostname: 'dev.app.renzogracieutah.com',
-      targetEnv: 'production',
-    })
-    expect(publicHref).not.toMatch(/:5000|:5010|:5020/)
-    expect(publicHref).not.toContain('www.')
-    expect(publicHref).toBe('https://app.renzogracieutah.com/')
-    expect(publicHref).not.toMatch(/^https:\/\/(www\.)?renzogracieutah\.com(\/|$)/)
-  })
-
-  it('keeps hostname-mode protocol so M10C HTTP and M10D HTTPS both work', () => {
-    expect(environmentSwitcherHref({
-      protocol: 'http:',
-      hostname: 'app.renzogracieutah.com',
-      pathname: '/login',
-      targetEnv: 'stage',
-    })).toBe('http://stage.app.renzogracieutah.com/login')
-    expect(environmentSwitcherHref({
-      protocol: 'https:',
-      hostname: 'dev.app.renzogracieutah.com',
-      pathname: '/settings',
-      targetEnv: 'production',
-    })).toBe('https://app.renzogracieutah.com/settings')
+    expect(publicHostnameForEnv('production')).toBe('')
   })
 
   it('keeps laptop port mode on localhost and treats :5030 as none of the three', () => {

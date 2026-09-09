@@ -1,4 +1,4 @@
-name: renzo-prod
+name: martial-arts-prod
 
 services:
   app:
@@ -21,16 +21,16 @@ services:
       - "5000:5000"
 
   backup:
-    image: renzo-acquisition:m10a
-    container_name: renzo-backup-1
+    image: martial-arts-acquisition:s2
+    container_name: martial-arts-backup-1
     init: true
     restart: unless-stopped
     depends_on:
       - app
     environment:
       APP_ENV: production
-      RENZO_BACKUP_DIR: /backups
-      BACKUP_SQLITE_PATH: /source/sqlite/renzo.sqlite
+      APP_BACKUP_DIR: /backups
+      BACKUP_SQLITE_PATH: /source/sqlite/app.sqlite
       BACKUP_UPLOADS_DIR: /source/uploads
       NUXT_PUBLIC_TIMEZONE: America/Denver
     volumes:
@@ -43,10 +43,10 @@ services:
 
 volumes:
   sqlite-data:
-    name: renzo-prod-sqlite
+    name: martial-arts-prod-sqlite
   asset-data:
-    name: renzo-prod-assets
+    name: martial-arts-prod-assets
 
 networks:
   appnet:
-    name: renzo-prod-net
+    name: martial-arts-prod-net

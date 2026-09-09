@@ -54,7 +54,7 @@ function fixtureClient(options?: {
       if (/^act_[^/]+$/.test(normalized)) {
         return {
           id: 'act_123',
-          name: 'Renzo Kaysville Ads',
+          name: 'Lab Academy Ads',
           account_id: '123',
           currency: 'USD',
           account_status: 1,

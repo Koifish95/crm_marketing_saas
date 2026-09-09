@@ -1,14 +1,12 @@
 # Agent instructions
 
-If Cursor opened `C:\Users\Scoy9\Projects`, read the workspace `AGENTS.md` first. This file is the **Renzo CRM evidence** briefing (the first customer implementation).
+This folder is the **Martial Arts template** inside `crm_marketing_saas`. It was derived from the external Renzo CRM implementation. It is not Renzo’s live app.
 
-SaaS / platform work starts at `crm_saas_vault/Home.md`. How we work: `crm_saas_vault/Working-Agreement.md`. Do not implement the control plane or convert this app to multi-tenant SaaS unless Scott explicitly asks.
+SaaS / platform work starts at `crm_saas_vault/Home.md`. How we work: `crm_saas_vault/Working-Agreement.md`. Do not implement the control plane unless Scott explicitly asks.
 
-This is the customer-acquisition app for **Renzo Gracie Jiu Jitsu in Kaysville, Utah**. Working name: Renzo Gracie Kaysville Acquisition.
+This is a generic martial-arts customer-acquisition CRM. It captures leads, stores intro (Trial) history, supports staff follow-up, and runs marketing operations that **feed** acquisition. It is not a gym-management product, not a social-media manager, and not multi-tenant SaaS.
 
-It captures leads, stores intro (Trial) history, supports staff follow-up, and runs collaborative marketing operations that **feed** acquisition. It is not a gym-management product, not a social-media manager, and not multi-tenant SaaS. Build for this gym.
-
-M0–M9 are implemented. M8/M9 await Scott’s human acceptance. Do not merge M9 unless asked. **M10A / M10C / M10D are live** (public HTTPS on the Pi nginx stack). M10B laptop backup is implemented; Pi restore is not LIVE-VALIDATED. Do not start M10E, PostgreSQL, SMS, email, or WhatsApp unless asked. Meta V1 is read-only and must keep working when credentials are missing.
+Do not touch `C:\Users\Scoy9\Projects\renzo_crm`, Koi-Pi, or `webhosting_renzo_*`. Do not deploy this repo onto the live Renzo fleet.
 
 ## Read this first
 
@@ -83,9 +81,9 @@ Report actual results. New tests are not enough if existing tests fail. API, HTT
 
 Schema changes: `pnpm db:generate`, review the SQL, then `pnpm db:migrate`. Prefer that over `pnpm db:push`. After generate, confirm parent tables are created before foreign keys.
 
-Do not commit `.env`, local SQLite (`data/renzo.sqlite`), marketing asset bytes (`data/uploads/`), or host backups (`data/backups/`). `pnpm db:setup` is idempotent.
+Do not commit `.env`, local SQLite (`data/app.sqlite`), marketing asset bytes (`data/uploads/`), or host backups (`data/backups/`). `pnpm db:setup` is idempotent.
 
-More: `crm_saas_vault/How-to-Run.md`. Docker: `pnpm env:up` starts PRODUCTION http://localhost:5000, STAGE http://localhost:5010, DEV http://localhost:5020. Load laptop `data/renzo.sqlite` onto PRODUCTION with `pnpm env:prod:load-local -- --confirm-load-local-into-prod`. Copy PRODUCTION onto STAGE and DEV with `pnpm env:pull -- --confirm-pull-from-prod`. Host backups: `pnpm backup:prod|stage|dev`, `pnpm backup:status`, `pnpm backup:restore -- --env <env> --from <zip> --confirm-env <same>`. PRODUCTION also backs up daily at 02:00 America/Denver into `data/backups/production/` and keeps 14 days — same host only, not off-site. In-app copy is ADMIN Settings → Environment (download a zip, restore it on the destination). Local `pnpm dev` is http://localhost:5030. Public Pi HTTPS is live (`app` / `stage.app` / `dev.app`). Laptop `pnpm backup:*` does **not** protect Koi-Pi volumes. Off-host backup is later M10. Before a Pi deploy, preserve PRODUCTION SQLite — `crm_saas_vault/Operations-PRODUCTION-SQLite.md`.
+More: `crm_saas_vault/How-to-Run.md` (historical source notes). In this folder: `pnpm env:up` starts the **local template** triple at http://localhost:5000 (PROD), :5010 (STAGE), :5020 (DEV). Image `martial-arts-acquisition:s2`. S2 lab customer: `pnpm lab:docker` (`lab-acme-*`). Load laptop `data/app.sqlite` onto local PRODUCTION with `pnpm env:prod:load-local -- --confirm-load-local-into-prod`. Host backups: `pnpm backup:prod|stage|dev`. Local `pnpm dev` is http://localhost:5030. Laptop `pnpm backup:*` does **not** protect Koi-Pi volumes. Never attach `webhosting_renzo_*` or leftover `renzo-*` laptop volumes.
 
 ## Layout
 
@@ -133,8 +131,8 @@ Campaign, Content, Asset, and Marketing Task staff pages use folder routes (`ind
 - **Validation.** Zod lives in `shared/schemas/`. Do not leave the only check in a Vue form or a single handler.
 - **Contact.** A lead needs phone or email (database CHECK). Public flows require phone. Phone and email are indexed, not unique; duplicate rows are allowed.
 - **Portability.** SQLite now, PostgreSQL later if needed. Do not write SQLite-only application logic.
-- **Koi-Pi PRODUCTION SQLite is live data.** Volume `webhosting_renzo_sqlite` (`/app/data/sqlite/renzo.sqlite` in `renzo_crm`). Never `down -v`, never prune volumes, never sync `data/` or `*.sqlite*` to the Pi, never copy a laptop sqlite onto that volume. Rebuild/recreate containers is safe. Read `crm_saas_vault/Operations-PRODUCTION-SQLite.md` before any Pi deploy.
-- **Develop in `Projects/renzo_crm`, not `WebHosting/renzo_crm`.** Git-push the product remote first. Refresh the drop-in with `Refresh-FromSibling.ps1`. Deploy to the Pi separately. Do not commit the whole WebHosting tree for an app change. See `crm_saas_vault/Deploy-Workflow.md`.
+- **External Renzo PRODUCTION SQLite is live data on Koi-Pi.** Volume `webhosting_renzo_sqlite` in the **external** `renzo_crm` project. Never `down -v`, never prune volumes, never attach those volumes to this template, never copy a laptop sqlite onto that volume. Read `crm_saas_vault/Operations-PRODUCTION-SQLite.md` before any work that could touch the Pi.
+- **This repo is `crm_marketing_saas`, remote `crm_marketing_saas`.** Do not add `renzo-crm` as origin. Do not develop in `WebHosting/renzo_crm`.
 
 ## How to change things
 

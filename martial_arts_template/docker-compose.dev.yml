@@ -1,4 +1,4 @@
-name: renzo-dev
+name: martial-arts-dev
 
 services:
   app:
@@ -22,10 +22,10 @@ services:
 
 volumes:
   sqlite-data:
-    name: renzo-dev-sqlite
+    name: martial-arts-dev-sqlite
   asset-data:
-    name: renzo-dev-assets
+    name: martial-arts-dev-assets
 
 networks:
   appnet:
-    name: renzo-dev-net
+    name: martial-arts-dev-net

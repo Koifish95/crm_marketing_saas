@@ -84,6 +84,14 @@ export async function listIntroRules(db: Database) {
   })
 }
 
+export async function hasPublishedIntroAvailability(db: Database) {
+  const [row] = await db.select({ id: introAvailabilityRules.id })
+    .from(introAvailabilityRules)
+    .where(eq(introAvailabilityRules.enabled, true))
+    .limit(1)
+  return Boolean(row)
+}
+
 export async function createIntroRule(db: Database, input: CreateRuleInput) {
   const [program] = await db.select().from(programs).where(eq(programs.id, input.programId)).limit(1)
   if (!program) {

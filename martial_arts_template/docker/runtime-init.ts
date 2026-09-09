@@ -9,20 +9,20 @@ import { seedDatabase } from '../drizzle/seed'
  */
 async function main() {
   const databaseUrl = getDatabaseUrl()
-  console.info('[renzo] applying database migrations')
+  console.info('[martial-arts] applying database migrations')
   await migrateDatabase(databaseUrl)
 
   if (process.env.APP_SKIP_SEED === 'true') {
-    console.info('[renzo] skipping seed (APP_SKIP_SEED=true)')
+    console.info('[martial-arts] skipping seed (APP_SKIP_SEED=true)')
     return
   }
 
-  console.info('[renzo] seeding catalog and bootstrap data')
+  console.info('[martial-arts] seeding catalog and bootstrap data')
   await seedDatabase(databaseUrl)
 }
 
 main().catch((error: unknown) => {
-  console.error('[renzo] startup initialization failed')
+  console.error('[martial-arts] startup initialization failed')
   console.error(error instanceof Error ? error.message : error)
   process.exit(1)
 })

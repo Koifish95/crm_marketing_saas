@@ -5,7 +5,7 @@ import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const IMAGE = 'renzo-acquisition:m10a'
+const IMAGE = 'martial-arts-acquisition:s2'
 const SKIP_TOP = new Set([
   '.git',
   '.nuxt',
@@ -46,12 +46,12 @@ const ACTIONS = ['up', 'down', 'restart', 'build', 'logs', 'ps', 'reset', 'pull'
 const ALL_FILE = 'docker-compose.all.yml'
 const PULL_CONFIRM = '--confirm-pull-from-prod'
 const LOAD_LOCAL_CONFIRM = '--confirm-load-local-into-prod'
-const PROD_CONTAINER = 'renzo-prod-app-1'
+const PROD_CONTAINER = 'martial-arts-prod-app-1'
 const PROD_ISOLATION_MARKER = 'm10a-prod-isolation'
 const PULL_APPS = [
-  { name: 'prod', container: 'renzo-prod-app-1', port: 5000, appEnv: 'production' },
-  { name: 'stage', container: 'renzo-stage-app-1', port: 5010, appEnv: 'stage', marker: 'm10a-stage-isolation' },
-  { name: 'dev', container: 'renzo-dev-app-1', port: 5020, appEnv: 'dev', marker: 'm10a-dev-isolation' },
+  { name: 'prod', container: 'martial-arts-prod-app-1', port: 5000, appEnv: 'production' },
+  { name: 'stage', container: 'martial-arts-stage-app-1', port: 5010, appEnv: 'stage', marker: 'm10a-stage-isolation' },
+  { name: 'dev', container: 'martial-arts-dev-app-1', port: 5020, appEnv: 'dev', marker: 'm10a-dev-isolation' },
 ]
 const ISOLATION_MARKER_FILES = [
   'm10a-dev-isolation.txt',
@@ -63,7 +63,7 @@ function usage(exitCode = 1) {
   console.error(`Usage: node scripts/env.mjs <dev|stage|prod|all> <${ACTIONS.join('|')}>`)
   console.error('DEV reset requires --confirm-dev-reset and deletes the DEV volumes only.')
   console.error('Pull requires --confirm-pull-from-prod and overwrites STAGE and DEV from PRODUCTION.')
-  console.error('Load-local requires --confirm-load-local-into-prod and overwrites PRODUCTION from data/renzo.sqlite.')
+  console.error('Load-local requires --confirm-load-local-into-prod and overwrites PRODUCTION from data/app.sqlite.')
   process.exit(exitCode)
 }
 
@@ -83,7 +83,7 @@ if (action === 'reset' && envName !== 'dev') {
 }
 
 if (action === 'reset' && !extra.includes('--confirm-dev-reset')) {
-  console.error('Destructive DEV reset. This deletes the renzo-dev SQLite and asset volumes.')
+  console.error('Destructive DEV reset. This deletes the martial-arts-dev SQLite and asset volumes.')
   console.error('Re-run: pnpm env:dev:reset -- --confirm-dev-reset')
   process.exit(1)
 }
@@ -116,7 +116,7 @@ function ensureEnvFile(env) {
   const envPath = resolve(root, env.envFile)
   if (!existsSync(envPath)) {
     copyFileSync(resolve(root, env.example), envPath)
-    console.info(`[renzo] created ${env.envFile} from ${env.example}. Edit secrets before a real deployment.`)
+    console.info(`[martial-arts] created ${env.envFile} from ${env.example}. Edit secrets before a real deployment.`)
   }
 }
 
@@ -200,16 +200,16 @@ function downAllStack() {
 }
 
 function printAllUrls() {
-  console.info('[renzo] PRODUCTION → http://localhost:5000')
-  console.info('[renzo] STAGE → http://localhost:5010')
-  console.info('[renzo] DEV → http://localhost:5020')
-  console.info('[renzo] local pnpm dev stays on http://localhost:5030')
+  console.info('[martial-arts] PRODUCTION → http://localhost:5000')
+  console.info('[martial-arts] STAGE → http://localhost:5010')
+  console.info('[martial-arts] DEV → http://localhost:5020')
+  console.info('[martial-arts] local pnpm dev stays on http://localhost:5030')
 }
 
 function stageDockerContext() {
-  const dest = join(tmpdir(), 'renzo-acquisition-docker-context')
-  console.info(`[renzo] staging Docker context at ${dest}`)
-  console.info('[renzo] Docker Desktop cannot read OneDrive cloud files from Desktop; copying a local context')
+  const dest = join(tmpdir(), 'martial-arts-acquisition-docker-context')
+  console.info(`[martial-arts] staging Docker context at ${dest}`)
+  console.info('[martial-arts] Docker Desktop cannot read OneDrive cloud files from Desktop; copying a local context')
   rmSync(dest, { recursive: true, force: true })
   cpSync(root, dest, {
     recursive: true,
@@ -243,7 +243,7 @@ function imageExists() {
 
 function dockerBuild() {
   const context = process.platform === 'win32' ? stageDockerContext() : root
-  console.info(`[renzo] building ${IMAGE}`)
+  console.info(`[martial-arts] building ${IMAGE}`)
   run('docker', ['build', '-t', IMAGE, context])
 }
 
@@ -251,7 +251,7 @@ function prepareImage() {
   const skipBuild = extra.includes('--no-build')
   if (skipBuild) {
     if (!imageExists()) {
-      console.error(`[renzo] ${IMAGE} is missing. Run without --no-build, or pnpm env:build.`)
+      console.error(`[martial-arts] ${IMAGE} is missing. Run without --no-build, or pnpm env:build.`)
       process.exit(1)
     }
     return true
@@ -277,7 +277,7 @@ function ensureVolume(name) {
   if (volumeExists(name)) {
     return
   }
-  console.info(`[renzo] creating volume ${name}`)
+  console.info(`[martial-arts] creating volume ${name}`)
   run('docker', ['volume', 'create', name])
 }
 
@@ -293,10 +293,10 @@ function containerExists(name) {
 
 function stopIfPresent(name) {
   if (!containerExists(name)) {
-    console.info(`[renzo] ${name} is not present`)
+    console.info(`[martial-arts] ${name} is not present`)
     return
   }
-  console.info(`[renzo] stopping ${name}`)
+  console.info(`[martial-arts] stopping ${name}`)
   spawnSync('docker', ['stop', name], {
     cwd: root,
     stdio: 'inherit',
@@ -306,7 +306,7 @@ function stopIfPresent(name) {
 }
 
 function copyVolume(src, dst, { allowEmpty = false } = {}) {
-  console.info(`[renzo] copying ${src} → ${dst}`)
+  console.info(`[martial-arts] copying ${src} → ${dst}`)
   const check = allowEmpty
     ? 'true'
     : 'if [ -z "$(ls -A /src 2>/dev/null)" ]; then echo "source volume is empty" >&2; exit 1; fi'
@@ -365,45 +365,45 @@ async function waitForHealth(port, appEnv, attempts = 40) {
 }
 
 async function pullFromProduction() {
-  const sqliteSrc = 'renzo-prod-sqlite'
-  const assetSrc = 'renzo-prod-assets'
+  const sqliteSrc = 'martial-arts-prod-sqlite'
+  const assetSrc = 'martial-arts-prod-assets'
   if (!volumeExists(sqliteSrc)) {
-    console.error(`[renzo] missing ${sqliteSrc}. Start PRODUCTION first (pnpm env:up or pnpm env:prod:up).`)
+    console.error(`[martial-arts] missing ${sqliteSrc}. Start PRODUCTION first (pnpm env:up or pnpm env:prod:up).`)
     process.exit(1)
   }
   if (!volumeExists(assetSrc)) {
-    console.error(`[renzo] missing ${assetSrc}. Start PRODUCTION first (pnpm env:up or pnpm env:prod:up).`)
+    console.error(`[martial-arts] missing ${assetSrc}. Start PRODUCTION first (pnpm env:up or pnpm env:prod:up).`)
     process.exit(1)
   }
-  ensureVolume('renzo-stage-sqlite')
-  ensureVolume('renzo-dev-sqlite')
-  ensureVolume('renzo-stage-assets')
-  ensureVolume('renzo-dev-assets')
+  ensureVolume('martial-arts-stage-sqlite')
+  ensureVolume('martial-arts-dev-sqlite')
+  ensureVolume('martial-arts-stage-assets')
+  ensureVolume('martial-arts-dev-assets')
 
-  console.warn('[renzo] stopping PRODUCTION, STAGE, and DEV so SQLite can be copied cleanly')
+  console.warn('[martial-arts] stopping PRODUCTION, STAGE, and DEV so SQLite can be copied cleanly')
   for (const app of PULL_APPS) {
     stopIfPresent(app.container)
   }
 
-  copyVolume(sqliteSrc, 'renzo-stage-sqlite')
-  copyVolume(sqliteSrc, 'renzo-dev-sqlite')
-  copyVolume(assetSrc, 'renzo-stage-assets', { allowEmpty: true })
-  copyVolume(assetSrc, 'renzo-dev-assets', { allowEmpty: true })
+  copyVolume(sqliteSrc, 'martial-arts-stage-sqlite')
+  copyVolume(sqliteSrc, 'martial-arts-dev-sqlite')
+  copyVolume(assetSrc, 'martial-arts-stage-assets', { allowEmpty: true })
+  copyVolume(assetSrc, 'martial-arts-dev-assets', { allowEmpty: true })
 
   const missing = PULL_APPS.filter(app => !containerExists(app.container))
   if (missing.length > 0) {
-    console.info('[renzo] starting the combined stack so pulled volumes attach to app containers')
+    console.info('[martial-arts] starting the combined stack so pulled volumes attach to app containers')
     const imageReady = prepareImage()
     composeAll(imageReady ? ['up', '-d', '--no-build'] : ['up', '-d', '--build'])
   } else {
     for (const app of PULL_APPS) {
-      console.info(`[renzo] starting ${app.container}`)
+      console.info(`[martial-arts] starting ${app.container}`)
       run('docker', ['start', app.container])
     }
   }
 
   for (const app of PULL_APPS) {
-    console.info(`[renzo] waiting for ${app.name} health on :${app.port}`)
+    console.info(`[martial-arts] waiting for ${app.name} health on :${app.port}`)
     await waitForHealth(app.port, app.appEnv)
   }
 
@@ -411,29 +411,29 @@ async function pullFromProduction() {
     if (!app.marker) {
       continue
     }
-    console.info(`[renzo] restamping ${app.name} isolation marker`)
+    console.info(`[martial-arts] restamping ${app.name} isolation marker`)
     restampIsolation(app.container, app.marker)
   }
 
-  console.info('[renzo] STAGE and DEV now have PRODUCTION SQLite and marketing uploads.')
-  console.info('[renzo] Sign in on STAGE and DEV with PRODUCTION users and passwords.')
+  console.info('[martial-arts] STAGE and DEV now have PRODUCTION SQLite and marketing uploads.')
+  console.info('[martial-arts] Sign in on STAGE and DEV with PRODUCTION users and passwords.')
   printAllUrls()
 }
 
 function stageLocalData() {
-  const sqlite = resolve(root, 'data', 'renzo.sqlite')
+  const sqlite = resolve(root, 'data', 'app.sqlite')
   if (!existsSync(sqlite)) {
-    console.error('[renzo] missing data/renzo.sqlite. Local pnpm dev data is required.')
+    console.error('[martial-arts] missing data/app.sqlite. Local pnpm dev data is required.')
     process.exit(1)
   }
-  const dest = join(tmpdir(), 'renzo-load-local')
+  const dest = join(tmpdir(), 'ma-load-local')
   rmSync(dest, { recursive: true, force: true })
   const sqliteDir = join(dest, 'sqlite')
   const uploadsDir = join(dest, 'uploads')
   mkdirSync(sqliteDir, { recursive: true })
   mkdirSync(uploadsDir, { recursive: true })
-  copyFileSync(sqlite, join(sqliteDir, 'renzo.sqlite'))
-  for (const extraName of ['renzo.sqlite-wal', 'renzo.sqlite-shm']) {
+  copyFileSync(sqlite, join(sqliteDir, 'app.sqlite'))
+  for (const extraName of ['app.sqlite-wal', 'app.sqlite-shm']) {
     const extraPath = resolve(root, 'data', extraName)
     if (existsSync(extraPath)) {
       copyFileSync(extraPath, join(sqliteDir, extraName))
@@ -447,7 +447,7 @@ function stageLocalData() {
 }
 
 function copyHostDirIntoVolume(hostDir, volume) {
-  const helper = 'renzo-load-helper'
+  const helper = 'ma-load-helper'
   spawnSync('docker', ['rm', '-f', helper], {
     cwd: root,
     stdio: 'pipe',
@@ -469,30 +469,30 @@ function copyHostDirIntoVolume(hostDir, volume) {
 }
 
 async function loadLocalIntoProduction() {
-  console.warn('[renzo] Stop pnpm dev first if it is running, so SQLite WAL is flushed.')
+  console.warn('[martial-arts] Stop pnpm dev first if it is running, so SQLite WAL is flushed.')
   const staged = stageLocalData()
   try {
-    ensureVolume('renzo-prod-sqlite')
-    ensureVolume('renzo-prod-assets')
+    ensureVolume('martial-arts-prod-sqlite')
+    ensureVolume('martial-arts-prod-assets')
     stopIfPresent(PROD_CONTAINER)
-    console.info('[renzo] copying local SQLite into renzo-prod-sqlite')
-    copyHostDirIntoVolume(staged.sqliteDir, 'renzo-prod-sqlite')
-    console.info('[renzo] copying local uploads into renzo-prod-assets')
-    copyHostDirIntoVolume(staged.uploadsDir, 'renzo-prod-assets')
+    console.info('[martial-arts] copying local SQLite into martial-arts-prod-sqlite')
+    copyHostDirIntoVolume(staged.sqliteDir, 'martial-arts-prod-sqlite')
+    console.info('[martial-arts] copying local uploads into martial-arts-prod-assets')
+    copyHostDirIntoVolume(staged.uploadsDir, 'martial-arts-prod-assets')
     if (!containerExists(PROD_CONTAINER)) {
-      console.info('[renzo] starting PRODUCTION container')
+      console.info('[martial-arts] starting PRODUCTION container')
       const imageReady = prepareImage()
       composeAll(imageReady ? ['up', '-d', '--no-build', 'prod'] : ['up', '-d', '--build', 'prod'])
     } else {
-      console.info(`[renzo] starting ${PROD_CONTAINER}`)
+      console.info(`[martial-arts] starting ${PROD_CONTAINER}`)
       run('docker', ['start', PROD_CONTAINER])
     }
-    console.info('[renzo] waiting for PRODUCTION health on :5000')
+    console.info('[martial-arts] waiting for PRODUCTION health on :5000')
     await waitForHealth(5000, 'production')
-    console.info('[renzo] restamping PRODUCTION isolation marker')
+    console.info('[martial-arts] restamping PRODUCTION isolation marker')
     restampIsolation(PROD_CONTAINER, PROD_ISOLATION_MARKER)
-    console.info('[renzo] PRODUCTION now has local pnpm dev SQLite and uploads.')
-    console.info('[renzo] Sign in at http://localhost:5000 with those local users and passwords.')
+    console.info('[martial-arts] PRODUCTION now has local pnpm dev SQLite and uploads.')
+    console.info('[martial-arts] Sign in at http://localhost:5000 with those local users and passwords.')
   } finally {
     rmSync(staged.dest, { recursive: true, force: true })
   }
@@ -501,7 +501,7 @@ async function loadLocalIntoProduction() {
 if (isAll) {
   if (action === 'up') {
     const imageReady = prepareImage()
-    console.info('[renzo] stopping per-environment Compose projects so ports 5000/5010/5020 are free')
+    console.info('[martial-arts] stopping per-environment Compose projects so ports 5000/5010/5020 are free')
     downSplitStacks()
     composeAll(imageReady ? ['up', '-d', '--no-build', '--force-recreate'] : ['up', '-d', '--build', '--force-recreate'])
     printAllUrls()
@@ -529,7 +529,7 @@ if (isAll) {
   compose(imageReady
     ? ['up', '-d', '--no-build', '--force-recreate']
     : ['up', '-d', '--build'])
-  console.info(`[renzo] ${envName} → ${config.url}`)
+  console.info(`[martial-arts] ${envName} → ${config.url}`)
 } else if (action === 'down') {
   compose(['down'])
 } else if (action === 'restart') {
@@ -545,7 +545,7 @@ if (isAll) {
 } else if (action === 'ps') {
   compose(['ps'])
 } else if (action === 'reset') {
-  console.warn('[renzo] DESTROYING DEV volumes (renzo-dev-sqlite, renzo-dev-assets)')
+  console.warn('[martial-arts] DESTROYING DEV volumes (martial-arts-dev-sqlite, martial-arts-dev-assets)')
   compose(['down', '-v', '--remove-orphans'])
 } else if (action === 'load-local') {
   await loadLocalIntoProduction()

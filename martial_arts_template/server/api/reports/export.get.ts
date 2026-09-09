@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     const { kind, ...filters } = parsed.data
     const csv = await reportCsv(useDb(), filters, kind, user.role === 'ADMIN')
     setHeader(event, 'content-type', 'text/csv; charset=utf-8')
-    setHeader(event, 'content-disposition', `attachment; filename="renzo-${kind}-${filters.fromYmd}-to-${filters.toYmd}.csv"`)
+    setHeader(event, 'content-disposition', `attachment; filename="martial-arts-${kind}-${filters.fromYmd}-to-${filters.toYmd}.csv"`)
     return csv
   } catch (error) {
     throwDomain(error)

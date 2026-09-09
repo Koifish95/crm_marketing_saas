@@ -157,7 +157,7 @@ describe('M10 environment backup HTTP', () => {
 
   it('lets ADMIN download a zip backup of the current sqlite and uploads', async () => {
     const testDb = await openTestDatabase()
-    const work = join(tmpdir(), `renzo-backup-http-${randomUUID()}`)
+    const work = join(tmpdir(), `ma-backup-http-${randomUUID()}`)
     mkdirSync(work, { recursive: true })
     try {
       const sourceSqlite = sqliteFilePath(testDb.url)
@@ -165,7 +165,7 @@ describe('M10 environment backup HTTP', () => {
         throw new Error('expected file sqlite')
       }
       await testDb.client.execute('PRAGMA wal_checkpoint(TRUNCATE)')
-      const sqlitePath = join(work, 'renzo.sqlite')
+      const sqlitePath = join(work, 'app.sqlite')
       writeFileSync(sqlitePath, readFileSync(sourceSqlite))
       const uploads = join(work, 'uploads')
       mkdirSync(uploads, { recursive: true })
@@ -179,7 +179,7 @@ describe('M10 environment backup HTTP', () => {
       const response = await fetch(`${base}/api/admin/environment/backup`)
       expect(response.status).toBe(200)
       expect(response.headers.get('content-type')).toContain('application/zip')
-      expect(response.headers.get('content-disposition')).toMatch(/renzo-dev-.*\.zip/)
+      expect(response.headers.get('content-disposition')).toMatch(/martial-arts-dev-.*\.zip/)
       const zipBytes = Buffer.from(await response.arrayBuffer())
       expect(zipBytes.length).toBeGreaterThan(100)
 
@@ -192,7 +192,7 @@ describe('M10 environment backup HTTP', () => {
 
   it('lets ADMIN restore a backup zip into the current environment after typed confirmation', async () => {
     const testDb = await openTestDatabase()
-    const work = join(tmpdir(), `renzo-restore-http-${randomUUID()}`)
+    const work = join(tmpdir(), `ma-restore-http-${randomUUID()}`)
     mkdirSync(work, { recursive: true })
     try {
       const sourceSqlite = sqliteFilePath(testDb.url)

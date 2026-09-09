@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-08
+updated: 2026-09-09
 aliases:
   - SaaS tasks
 tags:
@@ -13,7 +13,7 @@ tags:
 # SaaS to-do
 
 
-Platform / productization tasks only. Renzo customer checkboxes stay in [[Milestones]] and [[Open-Questions]] and still aggregate on [[ToDo]].
+Platform / productization tasks only. Historical Renzo gym checkboxes stay in [[Milestones]] and [[Open-Questions]] and still aggregate on [[ToDo]]. Real Renzo is not a SaaS customer.
 
 Do not treat a box here as permission to implement. Decision-first: [[Working-Agreement]]. Sequence and **Successful** criteria: [[SaaS-Milestones]].
 
@@ -26,5 +26,5 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 
 ## Later / not started
 
-- [ ] **S3** — Control-plane v1 (only after S1 Successful and Scott asks)
+- [ ] **S3** — Control-plane v1 (decisions recorded 2026-09-09; implement only when Scott asks)
 - [ ] **S4–S8** — Provision, access, ops, dogfood, first external customer (see [[SaaS-Milestones]])

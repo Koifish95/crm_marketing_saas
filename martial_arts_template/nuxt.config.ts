@@ -22,7 +22,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
   runtimeConfig: {
-    databaseUrl: 'file:./data/renzo.sqlite',
+    databaseUrl: 'file:./data/app.sqlite',
     session: {
       password: process.env.NUXT_SESSION_PASSWORD || '',
       maxAge: 60 * 60 * 8,

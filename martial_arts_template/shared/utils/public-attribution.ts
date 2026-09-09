@@ -1,4 +1,4 @@
-export const PUBLIC_ATTRIBUTION_STORAGE_KEY = 'renzo-trial-attribution'
+export const PUBLIC_ATTRIBUTION_STORAGE_KEY = 'ma-trial-attribution'
 
 export interface PublicAttributionFields {
   source?: string

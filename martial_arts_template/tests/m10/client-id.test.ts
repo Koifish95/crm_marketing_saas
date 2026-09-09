@@ -16,8 +16,7 @@ describe('createClientId', () => {
       const id = createClientId()
       expect(isClientId(id)).toBe(true)
       expect(id).not.toBe(createClientId())
-    }
-    finally {
+    } finally {
       vi.unstubAllGlobals()
     }
   })

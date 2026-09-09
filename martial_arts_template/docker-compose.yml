@@ -11,14 +11,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: renzo-acquisition:m10a
+    image: martial-arts-acquisition:s2
     init: true
     restart: unless-stopped
     environment:
       NODE_ENV: production
       HOST: 0.0.0.0
       PORT: "5000"
-      DATABASE_URL: file:/app/data/sqlite/renzo.sqlite
+      DATABASE_URL: file:/app/data/sqlite/app.sqlite
       ASSET_UPLOAD_DIR: /app/data/uploads
       DRIZZLE_MIGRATIONS_DIR: /app/drizzle/migrations
       NUXT_PUBLIC_TIMEZONE: ${NUXT_PUBLIC_TIMEZONE:-America/Denver}

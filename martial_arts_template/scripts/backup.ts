@@ -15,19 +15,19 @@ const DOCKER_ENVS: Record<AppEnv, {
   assetVolume: string
 }> = {
   production: {
-    container: 'renzo-prod-app-1',
-    sqliteVolume: 'renzo-prod-sqlite',
-    assetVolume: 'renzo-prod-assets',
+    container: 'martial-arts-prod-app-1',
+    sqliteVolume: 'martial-arts-prod-sqlite',
+    assetVolume: 'martial-arts-prod-assets',
   },
   stage: {
-    container: 'renzo-stage-app-1',
-    sqliteVolume: 'renzo-stage-sqlite',
-    assetVolume: 'renzo-stage-assets',
+    container: 'martial-arts-stage-app-1',
+    sqliteVolume: 'martial-arts-stage-sqlite',
+    assetVolume: 'martial-arts-stage-assets',
   },
   dev: {
-    container: 'renzo-dev-app-1',
-    sqliteVolume: 'renzo-dev-sqlite',
-    assetVolume: 'renzo-dev-assets',
+    container: 'martial-arts-dev-app-1',
+    sqliteVolume: 'martial-arts-dev-sqlite',
+    assetVolume: 'martial-arts-dev-assets',
   },
 }
 
@@ -80,7 +80,7 @@ function volumeExists(name: string) {
 function checkpointContainer(container: string) {
   const result = docker(['exec', container, 'node', 'docker/db-marker.cjs', 'checkpoint'])
   if (result.status !== 0) {
-    console.warn('[renzo] container checkpoint helper unavailable; copying after volume snapshot')
+    console.warn('[martial-arts] container checkpoint helper unavailable; copying after volume snapshot')
     return false
   }
   return true
@@ -98,7 +98,7 @@ function copyFromContainer(container: string, dest: string) {
 
 function copyFromVolume(volume: string, dest: string) {
   mkdirSync(dest, { recursive: true })
-  const helper = `renzo-backup-copy-${Date.now()}`
+  const helper = `ma-backup-copy-${Date.now()}`
   docker(['rm', '-f', helper])
   const run = docker(['run', '-d', '--name', helper, '-v', `${volume}:/src`, 'alpine:3.20', 'sleep', '60'])
   if (run.status !== 0) {
@@ -115,17 +115,17 @@ function copyFromVolume(volume: string, dest: string) {
 }
 
 function snapshotEnvironment(appEnv: AppEnv) {
-  const dest = join(tmpdir(), `renzo-host-backup-${appEnv}-${Date.now()}`)
+  const dest = join(tmpdir(), `ma-host-backup-${appEnv}-${Date.now()}`)
   rmSync(dest, { recursive: true, force: true })
   mkdirSync(dest, { recursive: true })
   const config = DOCKER_ENVS[appEnv]
   if (containerRunning(config.container)) {
-    console.info(`[renzo] checkpointing ${config.container} (PRAGMA wal_checkpoint(TRUNCATE))`)
+    console.info(`[martial-arts] checkpointing ${config.container} (PRAGMA wal_checkpoint(TRUNCATE))`)
     checkpointContainer(config.container)
-    console.info(`[renzo] copying files from ${config.container}`)
+    console.info(`[martial-arts] copying files from ${config.container}`)
     copyFromContainer(config.container, dest)
   } else if (volumeExists(config.sqliteVolume)) {
-    console.info(`[renzo] ${config.container} is not running; copying named volumes`)
+    console.info(`[martial-arts] ${config.container} is not running; copying named volumes`)
     copyFromVolume(config.sqliteVolume, join(dest, 'sqlite'))
     if (volumeExists(config.assetVolume)) {
       copyFromVolume(config.assetVolume, join(dest, 'uploads'))
@@ -135,7 +135,7 @@ function snapshotEnvironment(appEnv: AppEnv) {
   } else {
     throw new Error(`No running ${appEnv} container or ${config.sqliteVolume} volume. Start it with pnpm env:up.`)
   }
-  const sqlitePath = join(dest, 'sqlite', 'renzo.sqlite')
+  const sqlitePath = join(dest, 'sqlite', 'app.sqlite')
   if (!existsSync(sqlitePath)) {
     throw new Error(`Snapshot is missing ${sqlitePath}`)
   }
@@ -148,8 +148,8 @@ function snapshotEnvironment(appEnv: AppEnv) {
 }
 
 async function backupEnvironment(appEnv: AppEnv) {
-  console.info(`[renzo] starting ${appEnv} backup`)
-  console.info(`[renzo] backups stay on this host under data/backups/${appEnv}/ (not off-site)`)
+  console.info(`[martial-arts] starting ${appEnv} backup`)
+  console.info(`[martial-arts] backups stay on this host under data/backups/${appEnv}/ (not off-site)`)
   const snapshot = snapshotEnvironment(appEnv)
   try {
     const record = await createHostBackup({
@@ -158,14 +158,14 @@ async function backupEnvironment(appEnv: AppEnv) {
       uploadsDir: snapshot.uploadsDir,
       databaseUrl: snapshot.databaseUrl,
     })
-    console.info(`[renzo] backup ok ${record.zipPath}`)
-    console.info(`[renzo] bytes=${record.bytes} createdAt=${record.createdAt} uploads=${record.manifest.uploadCount ?? 0}`)
+    console.info(`[martial-arts] backup ok ${record.zipPath}`)
+    console.info(`[martial-arts] bytes=${record.bytes} createdAt=${record.createdAt} uploads=${record.manifest.uploadCount ?? 0}`)
     return record
   } finally {
     try {
       rmSync(snapshot.dest, { recursive: true, force: true, maxRetries: 8, retryDelay: 50 })
     } catch (error) {
-      console.warn(`[renzo] left snapshot temp dir ${snapshot.dest}: ${error instanceof Error ? error.message : error}`)
+      console.warn(`[martial-arts] left snapshot temp dir ${snapshot.dest}: ${error instanceof Error ? error.message : error}`)
     }
   }
 }
@@ -174,12 +174,12 @@ function stopContainer(name: string) {
   if (!containerRunning(name)) {
     return
   }
-  console.info(`[renzo] stopping ${name}`)
+  console.info(`[martial-arts] stopping ${name}`)
   docker(['stop', name], { inherit: true })
 }
 
 function startContainer(name: string) {
-  console.info(`[renzo] starting ${name}`)
+  console.info(`[martial-arts] starting ${name}`)
   const result = docker(['start', name], { inherit: true })
   if (result.status !== 0) {
     throw new Error(`Could not start ${name}`)
@@ -193,7 +193,7 @@ function copyDirIntoVolume(hostDir: string, volume: string) {
       throw new Error(`Could not create volume ${volume}`)
     }
   }
-  const helper = `renzo-restore-${Date.now()}`
+  const helper = `ma-restore-${Date.now()}`
   docker(['rm', '-f', helper])
   const run = docker(['run', '-d', '--name', helper, '-v', `${volume}:/dst`, 'alpine:3.20', 'sleep', '120'])
   if (run.status !== 0) {
@@ -243,11 +243,11 @@ async function waitForHealth(appEnv: AppEnv, attempts = 40) {
 }
 
 async function restoreEnvironment(appEnv: AppEnv, zipPath: string, confirmEnv: string) {
-  console.info(`[renzo] restoring ${zipPath} into ${appEnv}`)
-  const staging = join(tmpdir(), `renzo-restore-stage-${appEnv}-${Date.now()}`)
+  console.info(`[martial-arts] restoring ${zipPath} into ${appEnv}`)
+  const staging = join(tmpdir(), `ma-restore-stage-${appEnv}-${Date.now()}`)
   mkdirSync(join(staging, 'sqlite'), { recursive: true })
   mkdirSync(join(staging, 'uploads'), { recursive: true })
-  const sqlitePath = join(staging, 'sqlite', 'renzo.sqlite')
+  const sqlitePath = join(staging, 'sqlite', 'app.sqlite')
   const uploadsDir = join(staging, 'uploads')
   try {
     const restored = await restoreHostBackup({
@@ -258,28 +258,28 @@ async function restoreEnvironment(appEnv: AppEnv, zipPath: string, confirmEnv: s
       uploadsDir,
       databaseUrl: `file:${sqlitePath.replaceAll('\\', '/')}`,
     })
-    console.info(`[renzo] archive source APP_ENV=${restored.sourceAppEnv}; destination stays ${appEnv}`)
+    console.info(`[martial-arts] archive source APP_ENV=${restored.sourceAppEnv}; destination stays ${appEnv}`)
     const config = DOCKER_ENVS[appEnv]
     stopContainer(config.container)
-    console.info(`[renzo] replacing ${config.sqliteVolume} and ${config.assetVolume} only`)
+    console.info(`[martial-arts] replacing ${config.sqliteVolume} and ${config.assetVolume} only`)
     copyDirIntoVolume(join(staging, 'sqlite'), config.sqliteVolume)
     copyDirIntoVolume(uploadsDir, config.assetVolume)
     startContainer(config.container)
     const health = await waitForHealth(appEnv)
-    console.info(`[renzo] restore ok ${appEnv} health appEnv=${health.appEnv}`)
+    console.info(`[martial-arts] restore ok ${appEnv} health appEnv=${health.appEnv}`)
     return restored
   } finally {
     try {
       rmSync(staging, { recursive: true, force: true, maxRetries: 8, retryDelay: 50 })
     } catch (error) {
-      console.warn(`[renzo] left restore staging ${staging}: ${error instanceof Error ? error.message : error}`)
+      console.warn(`[martial-arts] left restore staging ${staging}: ${error instanceof Error ? error.message : error}`)
     }
   }
 }
 
 async function pruneProduction(keepPaths?: string[]) {
   const result = pruneHostBackups({ appEnv: 'production', keepPaths })
-  console.info(`[renzo] PRODUCTION retention ${BACKUP_RETENTION_DAYS} days: kept=${result.kept} removed=${result.removed}`)
+  console.info(`[martial-arts] PRODUCTION retention ${BACKUP_RETENTION_DAYS} days: kept=${result.kept} removed=${result.removed}`)
   return result
 }
 
@@ -290,17 +290,17 @@ async function scheduleProduction(once: boolean) {
     return record
   }
   const root = hostBackupRoot()
-  console.info(`[renzo] host PRODUCTION scheduler ${String(BACKUP_SCHEDULE_HOUR).padStart(2, '0')}:${String(BACKUP_SCHEDULE_MINUTE).padStart(2, '0')} ${BACKUP_SCHEDULE_TIMEZONE}`)
+  console.info(`[martial-arts] host PRODUCTION scheduler ${String(BACKUP_SCHEDULE_HOUR).padStart(2, '0')}:${String(BACKUP_SCHEDULE_MINUTE).padStart(2, '0')} ${BACKUP_SCHEDULE_TIMEZONE}`)
   while (true) {
     const next = nextScheduledBackupMs(Date.now())
     recordBackupStatus(root, { nextScheduledAt: next })
-    console.info(`[renzo] next PRODUCTION backup at ${new Date(next).toISOString()}`)
+    console.info(`[martial-arts] next PRODUCTION backup at ${new Date(next).toISOString()}`)
     await new Promise(resolve => setTimeout(resolve, Math.max(next - Date.now(), 0)))
     try {
       const record = await backupEnvironment('production')
       await pruneProduction([record.zipPath])
     } catch (error) {
-      console.error('[renzo] scheduled PRODUCTION backup failed')
+      console.error('[martial-arts] scheduled PRODUCTION backup failed')
       console.error(error instanceof Error ? error.message : error)
     }
     await new Promise(resolve => setTimeout(resolve, 60_000))
@@ -309,21 +309,21 @@ async function scheduleProduction(once: boolean) {
 
 function printStatus() {
   const status = readBackupStatus()
-  console.info(`[renzo] host backups — same-host only; does not survive disk/laptop loss`)
-  console.info(`[renzo] PRODUCTION retains ${BACKUP_RETENTION_DAYS} days; STAGE/DEV are manual only`)
-  console.info(`[renzo] scheduled PRODUCTION backup ${String(BACKUP_SCHEDULE_HOUR).padStart(2, '0')}:${String(BACKUP_SCHEDULE_MINUTE).padStart(2, '0')} ${BACKUP_SCHEDULE_TIMEZONE}`)
+  console.info(`[martial-arts] host backups — same-host only; does not survive disk/laptop loss`)
+  console.info(`[martial-arts] PRODUCTION retains ${BACKUP_RETENTION_DAYS} days; STAGE/DEV are manual only`)
+  console.info(`[martial-arts] scheduled PRODUCTION backup ${String(BACKUP_SCHEDULE_HOUR).padStart(2, '0')}:${String(BACKUP_SCHEDULE_MINUTE).padStart(2, '0')} ${BACKUP_SCHEDULE_TIMEZONE}`)
   if (status.nextScheduledAt) {
-    console.info(`[renzo] next scheduled at ${new Date(status.nextScheduledAt).toISOString()}`)
+    console.info(`[martial-arts] next scheduled at ${new Date(status.nextScheduledAt).toISOString()}`)
   }
   if (status.lastSuccess) {
-    console.info(`[renzo] last success ${status.lastSuccess.appEnv} ${status.lastSuccess.operation} ${status.lastSuccess.path || ''} at ${status.lastSuccess.at}`)
+    console.info(`[martial-arts] last success ${status.lastSuccess.appEnv} ${status.lastSuccess.operation} ${status.lastSuccess.path || ''} at ${status.lastSuccess.at}`)
   }
   if (status.lastFailure) {
-    console.info(`[renzo] last failure ${status.lastFailure.appEnv} ${status.lastFailure.operation}: ${status.lastFailure.message}`)
+    console.info(`[martial-arts] last failure ${status.lastFailure.appEnv} ${status.lastFailure.operation}: ${status.lastFailure.message}`)
   }
   for (const env of APP_ENVS) {
     const rows = listHostBackups(env)
-    console.info(`[renzo] ${env}: ${rows.length} backup(s)`)
+    console.info(`[martial-arts] ${env}: ${rows.length} backup(s)`)
     for (const row of rows.slice(0, 5)) {
       console.info(`  ${row.zipPath} (${row.bytes} bytes)`)
     }

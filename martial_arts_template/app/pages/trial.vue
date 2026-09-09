@@ -9,6 +9,11 @@ definePageMeta({
   layout: 'default',
 })
 
+const { data: trialStatus } = await useFetch<{ published: boolean }>('/api/public/trial-status')
+if (!trialStatus.value?.published) {
+  throw createError({ statusCode: 404, statusMessage: 'Not Found' })
+}
+
 useHead({
   title: 'Book a free class',
 })

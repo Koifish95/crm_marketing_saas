@@ -5,9 +5,9 @@ import { fileURLToPath } from 'node:url'
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
 const ENVS = [
-  { name: 'dev', port: 5020, project: 'renzo-dev', appEnv: 'dev', marker: 'm10a-dev-isolation' },
-  { name: 'stage', port: 5010, project: 'renzo-stage', appEnv: 'stage', marker: 'm10a-stage-isolation' },
-  { name: 'prod', port: 5000, project: 'renzo-prod', appEnv: 'production', marker: 'm10a-prod-isolation' },
+  { name: 'dev', port: 5020, project: 'martial-arts-dev', appEnv: 'dev', marker: 'm10a-dev-isolation' },
+  { name: 'stage', port: 5010, project: 'martial-arts-stage', appEnv: 'stage', marker: 'm10a-stage-isolation' },
+  { name: 'prod', port: 5000, project: 'martial-arts-prod', appEnv: 'production', marker: 'm10a-prod-isolation' },
 ]
 
 function run(command, args, options = {}) {
@@ -100,12 +100,12 @@ function assertIsolation() {
 async function persistenceCheck() {
   const env = ENVS[0]
   const container = containerName(env.project)
-  console.info('[renzo] persistence: restart DEV container')
+  console.info('[martial-arts] persistence: restart DEV container')
   run('docker', ['restart', container])
   await waitForHealth(env.port, env.appEnv)
   assertIsolation()
 
-  console.info('[renzo] persistence: recreate DEV container without -v')
+  console.info('[martial-arts] persistence: recreate DEV container without -v')
   const down = compose('dev', ['down'])
   if (down.status !== 0) {
     throw new Error('dev down failed')
@@ -129,12 +129,12 @@ function dockerAvailable() {
 
 async function main() {
   if (!dockerAvailable()) {
-    console.error('[renzo] Docker engine is not reachable. Start Docker Desktop with Linux containers, then retry.')
+    console.error('[martial-arts] Docker engine is not reachable. Start Docker Desktop with Linux containers, then retry.')
     process.exit(2)
   }
 
   for (const env of ENVS) {
-    console.info(`[renzo] starting ${env.name}`)
+    console.info(`[martial-arts] starting ${env.name}`)
     const result = compose(env.name, ['up'])
     if (result.status !== 0) {
       throw new Error(`failed to start ${env.name}`)
@@ -142,18 +142,18 @@ async function main() {
   }
 
   for (const env of ENVS) {
-    console.info(`[renzo] waiting for ${env.name} health`)
+    console.info(`[martial-arts] waiting for ${env.name} health`)
     await waitForHealth(env.port, env.appEnv)
     writeMarker(env.project, env.marker)
   }
 
   assertIsolation()
   await persistenceCheck()
-  console.info('[renzo] isolation and persistence checks passed')
+  console.info('[martial-arts] isolation and persistence checks passed')
 }
 
 main().catch((error) => {
-  console.error('[renzo] isolation check failed')
+  console.error('[martial-arts] isolation check failed')
   console.error(error instanceof Error ? error.message : error)
   process.exit(1)
 })

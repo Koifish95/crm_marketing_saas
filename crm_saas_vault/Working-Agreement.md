@@ -2,7 +2,7 @@
 type: reference
 status: current
 area: process
-updated: 2026-09-08
+updated: 2026-09-09
 aliases:
   - How we work
   - Vault vs wip
@@ -13,13 +13,15 @@ tags:
 
 # Working agreement
 
-This workspace is the SaaS productization effort. Renzo CRM is the first customer implementation, design partner, and proving ground. The two tracks share this vault. They are not one mixed project.
+This workspace is the SaaS productization effort. The Martial Arts template in this repo is the current product. The external `renzo_crm` project is historical evidence and a separately maintained gym implementation. The two tracks share this vault. They are not one mixed project.
+
+Real Renzo is **not** a customer of this platform. It is not provisioned here, not in this Docker fleet, and not shown on the future control plane. First intended pilots are Strategic Insights and Scott’s sister’s business.
 
 ## Two tracks
 
 | Track | What it is | How we work |
 |---|---|---|
-| **CRM fine-tuning** | Improve the existing acquisition app | Evidence-driven. Default: Renzo-only unless we promote the change. |
+| **Martial Arts template** | Improve `martial_arts_template` as the generic industry product | Evidence-driven. Default: template change. |
 | **Platform expansion** | Control plane, customer environments, provisioning | Decision-first. No implementation until Scott asks. |
 
 Do not refactor the CRM into multi-tenant SaaS in order to “get ready.” Do not treat a CRM UX fix as a platform architecture change.
@@ -27,12 +29,13 @@ Do not refactor the CRM into multi-tenant SaaS in order to “get ready.” Do n
 When a CRM change appears, classify it:
 
 ```text
-Renzo-only
-→ martial-arts template?
+template-only (this Martial Arts product)
 → platform-generic?
 ```
 
-Default is **Renzo-only**. Promotion is an explicit decision, recorded in [[SaaS-Decisions]].
+Promotion to platform-generic is an explicit decision, recorded in [[SaaS-Decisions]].
+
+“Protect Renzo” means: do not touch the external `renzo_crm` project, Koi-Pi, or `webhosting_renzo_*`. Copied Renzo-derived artifacts **inside this repository** may be generalized.
 
 ## Vault vs wip
 
@@ -46,7 +49,7 @@ Default is **Renzo-only**. Promotion is an explicit decision, recorded in [[SaaS
 
 Chat is not the record. After a conversation settles something, promote it into a durable note and leave the `wip` file as evidence. Do not delete `wip` after incorporating it.
 
-Renzo customer notes (`Domain-Model`, `Architecture`, `Implementation-State`, [[Decisions]], and the rest) stay **evidence**. Do not rewrite them into SaaS docs. SaaS decisions live in [[SaaS-Decisions]], not in the Renzo ADR log.
+Renzo customer notes (`Domain-Model`, `Architecture`, `Implementation-State`, [[Decisions]], and the rest) stay **historical evidence**. Do not rewrite them into SaaS docs. SaaS decisions live in [[SaaS-Decisions]], not in the Renzo ADR log.
 
 ## Confidence labels
 
@@ -65,7 +68,7 @@ Repository verification required
 
 ## How we decide
 
-1. Use [[wip/SaaS_Project_Alignment_and_Current_Understanding]] plus the create-handoff prompt as context.
+1. Use archived alignment ([[wip/archive/SaaS_Project_Alignment_and_Current_Understanding]]) plus current [[SaaS-Decisions]] as context.
 2. Before asking Scott a question, check whether a note or prior decision already answers it.
 3. Ask only unresolved questions.
 4. Work major decisions **one at a time**.
@@ -75,19 +78,17 @@ Repository verification required
 
 ## Current next decision
 
-Launch path: [[SaaS-Milestones]]. S0 and S1 are Successful. Environment unit: [[Customer-Environment]]. Next is **S2** only when Scott asks. See [[Control-Plane]] and [[SaaS-Decisions]].
+Launch path: [[SaaS-Milestones]]. S0, S1, and S2 are Successful. Environment unit: [[Customer-Environment]]. S3 owner decisions are recorded. Next implementation is **S3** only when Scott asks. See [[Control-Plane]] and [[SaaS-Decisions]].
 
 **Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 
-Do not open a broad repository audit until that decision needs targeted evidence (Docker, volumes, health, env, backup).
-
 ## What we do not do next
 
-- Build the control-plane application
-- Write Compose templates or provisioners
+- Build the control-plane application until Scott asks
+- Write provisioners or a “Create customer” button
 - Add `tenant_id` to the CRM
 - Start Stripe, self-service signup, or a beauty-variant design
-- Touch Koi-Pi PRODUCTION SQLite
-- Start unstarted Renzo milestones unless Scott asks
+- Touch Koi-Pi PRODUCTION SQLite or `Projects/renzo_crm`
+- Start unstarted Renzo gym milestones unless Scott asks
 
-Related: [[Conventions]], [[Home]], [[wip/Control_Plane_v1_and_Working_Agreement_2026-09-08]].
+Related: [[Conventions]], [[Home]], [[wip/archive/Control_Plane_v1_and_Working_Agreement_2026-09-08]].

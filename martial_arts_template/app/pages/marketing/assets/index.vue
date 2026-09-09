@@ -103,7 +103,7 @@ async function onUploaded(id: number) {
       {{ uploadNotice }}
     </AppAlert>
     <p class="text-xs text-muted">
-      Marketing-use is Renzo’s determination for posting — not legal consent tracking.
+      Marketing-use is the academy’s determination for posting — not legal consent tracking.
     </p>
 
     <div class="space-y-3">

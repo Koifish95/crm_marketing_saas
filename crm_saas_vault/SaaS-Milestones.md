@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-08
+updated: 2026-09-09
 aliases:
   - Platform milestones
   - Successful
@@ -15,7 +15,7 @@ tags:
 
 Working map from the current workspace to a **sales-led launched** martial-arts SaaS. Recorded 2026-09-08. This is not permission to start platform implementation. Decisions are made **inside** the milestone they unblock. Do not decide the whole architecture up front.
 
-Renzo gym milestones stay in [[Milestones]]. CRM fine-tuning of `martial_arts_template` runs in parallel and is not a launch gate unless we promote a change ([[Working-Agreement]]).
+Renzo gym milestones stay in [[Milestones]] as historical evidence of the source implementation. Improving `martial_arts_template` runs in parallel and is not a launch gate unless we promote a change ([[Working-Agreement]]). Real Renzo is not a SaaS customer.
 
 **Successful** is the official acceptance name for each milestone. A milestone is not done because code exists. It is done when **Successful** is true.
 
@@ -38,7 +38,7 @@ It does **not** mean Stripe by default, every industry, a beauty variant, or ins
 | S0 | Workspace split | Successful |
 | S1 | Environment unit | Successful |
 | S2 | Second martial-arts environment by hand | Successful |
-| S3 | Control plane v1 | Not started (S1 done; implement only when Scott asks) |
+| S3 | Control plane v1 | Not started (decisions recorded; implement only when Scott asks) |
 | S4 | Sales-led provision | Not started |
 | S5 | Reachable customer access | Not started |
 | S6 | Fleet operations | Not started |
@@ -57,7 +57,7 @@ S0 Workspace split
 → S8 First external customer live
 ```
 
-S1 and S2 are Successful. Prefer S2’s second environment when starting S3. Do not start S3 implementation until Scott asks.
+S1 and S2 are Successful. S3 owner decisions are recorded. Prefer `lab-acme` when starting S3. Do not start S3 implementation until Scott asks.
 
 ---
 
@@ -69,7 +69,7 @@ Git, vault, alignment, and control-plane *scope* (not the app).
 
 **Successful:** This tree is its own repo (`https://github.com/Koifish95/crm_marketing_saas`), not `renzo-crm`. Renzo PRODUCTION is untouched. Two-track agreement exists.
 
-Evidence: [[Working-Agreement]], [[SaaS-Decisions]], [[Control-Plane]], [[wip/SaaS_Project_Alignment_and_Current_Understanding]].
+Evidence: [[Working-Agreement]], [[SaaS-Decisions]], [[Control-Plane]], [[wip/archive/SaaS_Project_Alignment_and_Current_Understanding]].
 
 ---
 
@@ -97,7 +97,7 @@ Prove the template is not “only Renzo.”
 
 - [x] **S2 Successful:** A second martial-arts CRM runs in Docker on the laptop, isolated named volumes (`lab-acme-*-sqlite` / `lab-acme-*-assets`), own admin login (not `setup`), `GET /api/health` green, no shared SQLite with Renzo PRODUCTION. Repeatable via [[S2-Hand-Boot-Checklist]].
 
-Evidence: [[wip/S2_Docker_Coexist_Evidence]] (Docker + volumes). Earlier host-process proof: [[wip/S2_Sprint4_Coexist_Evidence]].
+Evidence: [[wip/archive/S2_Docker_Coexist_Evidence]] (Docker + volumes; original image `renzo-acquisition:m10a`). Earlier host-process proof: [[wip/archive/S2_Sprint4_Coexist_Evidence]]. Current operator image: `martial-arts-acquisition:s2`.
 
 ---
 
@@ -105,13 +105,13 @@ Evidence: [[wip/S2_Docker_Coexist_Evidence]] (Docker + volumes). Earlier host-pr
 
 Separate ops app. Scope: [[Control-Plane]].
 
-**Decide along the way:** Where it runs for the proof (laptop is enough). How it talks to Docker on that machine. How an environment is registered (manual entry is enough; no auto-discovery required).
+**Recorded before coding:** Same repo, separate app folder; laptop-only; local Docker; on-demand health. Manual registration is enough. See [[SaaS-Decisions#2026-09-09 — S3 v1 owner decisions]].
 
 **Not in this milestone:** Create/provision. Domains. Billing. ThePond replacement.
 
 - [ ] **S3 Successful:** Open the control app and see environments, up/down (container running **and** `/api/health`), and relaunch without destroying volumes. The list reads “Customer B · production · healthy,” not a raw container id.
 
-Do not start S3 implementation until S1 is Successful and Scott asks.
+Do not start S3 implementation until Scott asks. S1 and S2 are Successful. Decisions are recorded.
 
 ---
 

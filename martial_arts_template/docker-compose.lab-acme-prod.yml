@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: renzo-acquisition:m10a
+    image: martial-arts-acquisition:s2
     container_name: lab-acme-prod-app
     init: true
     restart: unless-stopped

@@ -2,7 +2,7 @@
 type: index
 status: current
 area: process
-updated: 2026-09-05
+updated: 2026-09-09
 tags:
   - wip
   - archive
@@ -10,7 +10,7 @@ tags:
 
 # WIP archive
 
-Provenance only. Durable facts belong in permanent `vault/` notes. Do not treat these files as the map.
+Provenance only. Durable facts belong in permanent notes. Do not treat these files as the map.
 
 ## Specs and answers
 
@@ -75,9 +75,49 @@ Provenance only. Durable facts belong in permanent `vault/` notes. Do not treat 
 - [[wip/archive/M8_Household_LeadLines_Primary_Acquisition_Story_Handoff_2026-09-02|M8 LeadLine acquisition-story handoff]]
 - [[wip/archive/Post_M8_UI_Regression_Audit_and_Settings_Handoff_2026-09-02|Post-M8 UI / Settings / port handoff]]
 
+## SaaS / S2
+
+- [[wip/archive/SaaS_Project_Alignment_and_Current_Understanding|SaaS alignment and current understanding]]
+- [[wip/archive/Cursor_SaaS_Project_Alignment_Instructions_2026-09-08|SaaS alignment instructions]]
+- [[wip/archive/Create_Renzo_CRM_to_SaaS_Productization_Handoff_Prompt_2026-09-08|Create-handoff prompt]]
+- [[wip/archive/Control_Plane_v1_and_Working_Agreement_2026-09-08|Control plane v1 + working agreement]]
+- [[wip/archive/S2_Renzo_Hardcode_Audit|S2 Renzo hard-code audit]]
+- [[wip/archive/S2_Overnight_Status|S2 overnight status]]
+- [[wip/archive/S2_Sprint4_Coexist_Evidence|S2 Sprint 4 coexist evidence]] (host Nitro; original names)
+- [[wip/archive/S2_Docker_Coexist_Evidence|S2 Docker coexist evidence]] (original image `renzo-acquisition:m10a`)
+
 ## M9
 
-Spec is archived. Implementation and QA evidence still live in the inbox until M9 is accepted: [[wip/_index]].
+Historical Renzo gym evidence. Do not treat as current SaaS spec.
 
 - [[wip/archive/M9_Collaborative_Marketing_Operations_Cursor_Prompt_2026-09-02|M9 Collaborative Marketing Operations prompt]]
-- [[wip/archive/M9_Human_QA_Inbox_2026-09-04_to_2026-09-05|M9 human QA inbox snapshot 2026-09-04 to 2026-09-05]]
+- [[wip/archive/M9_Implementation_Handoff_2026-09-02|M9 implementation handoff]]
+- [[wip/archive/M9_Primary_Record_Workspace_UX_Architecture_Cursor_Review_Request_2026-09-03|M9 PRW architecture review request]]
+- [[wip/archive/M9_Primary_Record_Workspace_UX_Architecture_Review|M9 PRW architecture review]]
+- [[wip/archive/M9_Primary_Record_Workspace_UX_Implementation_Cursor_Prompt_2026-09-03|M9 PRW implementation prompt]]
+- [[wip/archive/M9_Primary_Record_Workspace_Handoff_2026-09-03|M9 PRW handoff]]
+- [[wip/archive/M9_Stabilization_and_Human_QA_Readiness_Cursor_Prompt_2026-09-03|M9 stabilization prompt]]
+- [[wip/archive/Renzo_Gracie_Kaysville_M9_Stabilization_and_Human_QA_Readiness_Handoff_2026-09-03|M9 stabilization handoff]]
+- [[wip/archive/Renzo_Gracie_Kaysville_M9_Implementation_and_Operational_Handoff_2026-09-03|M9 operational handoff]]
+- [[wip/archive/M9_Final_UI_UX_Normalization_Cursor_Prompt_2026-09-04|M9 final UI/UX prompt]]
+- [[wip/archive/M9_Final_UI_UX_Normalization_Implementation_Handoff_2026-09-04|M9 final UI/UX handoff]]
+- [[wip/archive/M9_Human_QA_Correction_Pass_Cursor_Prompt_2026-09-04|M9 human QA correction prompt]]
+- [[wip/archive/M9_Human_QA_Corrections_Implementation_Handoff_2026-09-04|M9 human QA corrections handoff]]
+- [[wip/archive/M9_Acceptance_Fixes_2026-09-04|M9 acceptance fixes]]
+- [[wip/archive/M9_Human_QA_Inbox_2026-09-04_to_2026-09-05|M9 human QA inbox snapshot]]
+- [[wip/archive/M9_QA|M9 QA workbook]]
+- [[wip/archive/M9_Remaining_Human_QA|M9 remaining human QA]]
+- [[wip/archive/M9_Create_Human_QA_Workbook_Cursor_Prompt_2026-09-05|M9 QA workbook prompt]]
+- [[wip/archive/Renzo_Gracie_Kaysville_ADMIN_Operations_Guide_V1|ADMIN operations guide V1]]
+- [[wip/archive/Renzo_Gracie_Kaysville_Staff_Training_Guide_V1|Staff training guide V1]]
+- [[wip/archive/Renzo_Gracie_Kaysville_Marketing_Workflow_2026-09-03|Marketing workflow]]
+- [[wip/archive/September_Kids_BJJ_Trial_Push_Hands_On_Walkthrough_2026-09-03|September Kids BJJ walkthrough]]
+
+## M10
+
+- [[wip/archive/M10A_Docker_Environment_Foundation_Cursor_Prompt_2026-09-05|M10A Docker foundation prompt]]
+- [[wip/archive/M10A_Docker_Environment_Foundation_Implementation_Handoff_2026-09-05|M10A Docker foundation handoff]]
+- [[wip/archive/M10A_Implementation_and_M10_Continuation_Handoff_2026-09-06|M10A continuation handoff]]
+- [[wip/archive/M10B_Local_Backup_Retention_and_Restore_Cursor_Prompt_2026-09-06|M10B backup prompt]]
+- [[wip/archive/M10B_Local_Backup_Retention_and_Restore_Implementation_Handoff_2026-09-06|M10B backup handoff]]
+- [[wip/archive/RENZO_WEHOSTING_POND_AGENT|WebHosting + The Pond work order]]

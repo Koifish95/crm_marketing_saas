@@ -88,7 +88,7 @@ export async function openTestDatabase(options?: { fixtures?: boolean }) {
   process.env.NUXT_AUTH_PASSWORD = TEST_ADMIN_PASSWORD
   process.env.NUXT_AUTH_RESET_PASSWORD = 'false'
 
-  const file = join(tmpdir(), `renzo-m1-${randomUUID()}.sqlite`)
+  const file = join(tmpdir(), `ma-test-${randomUUID()}.sqlite`)
   const url = `file:${file}`
   await migrateDatabase(url)
   await seedDatabase(url)

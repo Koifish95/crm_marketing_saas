@@ -11,19 +11,19 @@ import { DomainError } from '../../server/services/errors'
 import { openTestDatabase } from '../helpers/db'
 
 const original = {
-  RENZO_BACKUP_DIR: process.env.RENZO_BACKUP_DIR,
+  APP_BACKUP_DIR: process.env.APP_BACKUP_DIR,
 }
 
 afterEach(() => {
-  if (original.RENZO_BACKUP_DIR === undefined) {
-    delete process.env.RENZO_BACKUP_DIR
+  if (original.APP_BACKUP_DIR === undefined) {
+    delete process.env.APP_BACKUP_DIR
   } else {
-    process.env.RENZO_BACKUP_DIR = original.RENZO_BACKUP_DIR
+    process.env.APP_BACKUP_DIR = original.APP_BACKUP_DIR
   }
 })
 
 function tempDir(label: string) {
-  const dir = join(tmpdir(), `renzo-host-backup-${label}-${randomUUID()}`)
+  const dir = join(tmpdir(), `ma-host-backup-${label}-${randomUUID()}`)
   mkdirSync(dir, { recursive: true })
   return dir
 }

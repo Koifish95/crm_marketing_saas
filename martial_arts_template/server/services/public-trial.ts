@@ -7,7 +7,7 @@ import { DomainError } from './errors'
 import { personName } from '../../shared/utils/labels'
 import { normalizePhone } from '../../shared/utils/phone'
 import { formatMinuteOfDay } from '../../shared/utils/time'
-import { getBookableSlot } from './availability'
+import { getBookableSlot, hasPublishedIntroAvailability } from './availability'
 import { resolveCampaignAttribution } from './campaigns'
 import { insertLeadLine } from './lead-lines'
 import * as leadService from './leads'
@@ -344,6 +344,9 @@ export async function bookPublicHousehold(
   input: PublicHouseholdTrialInput,
   options?: { nowMs?: number },
 ): Promise<PublicHouseholdBookingResult> {
+  if (!await hasPublishedIntroAvailability(db)) {
+    throw new DomainError('Public intro booking is not available yet.', 404)
+  }
   if (!input.members.length) {
     throw new DomainError('Add at least one person to book.')
   }

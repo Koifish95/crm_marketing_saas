@@ -69,7 +69,7 @@ export type HostBackupStatus = {
 }
 
 export function hostBackupRoot(env: NodeJS.Dict<string | undefined> = process.env) {
-  const raw = env.RENZO_BACKUP_DIR?.trim()
+  const raw = env.APP_BACKUP_DIR?.trim()
   return resolve(raw || join(repoRoot(), DEFAULT_HOST_BACKUP_DIR))
 }
 
@@ -93,7 +93,7 @@ export async function createHostBackup(input: {
   const root = input.root ?? hostBackupRoot()
   const directory = join(hostBackupEnvDir(input.appEnv, root), backupStamp(nowMs))
   mkdirSync(directory, { recursive: true })
-  const filename = `renzo-${input.appEnv}-${backupStamp(nowMs)}.zip`
+  const filename = `martial-arts-${input.appEnv}-${backupStamp(nowMs)}.zip`
   const zipPath = join(directory, filename)
 
   try {

@@ -10,7 +10,7 @@ function bytesToUuidV4(bytes: Uint8Array) {
 /**
  * Client idempotency / draft keys.
  * `crypto.randomUUID` is secure-context only, so HTTP public hostnames
- * (`http://dev.app.renzogracieutah.com`) throw without this fallback.
+ * (`http://dev.example.test`) throw without this fallback.
  */
 export function createClientId() {
   const cryptoObj = globalThis.crypto
@@ -21,8 +21,7 @@ export function createClientId() {
   const bytes = new Uint8Array(16)
   if (typeof cryptoObj?.getRandomValues === 'function') {
     cryptoObj.getRandomValues(bytes)
-  }
-  else {
+  } else {
     for (let index = 0; index < bytes.length; index += 1) {
       bytes[index] = Math.floor(Math.random() * 256)
     }

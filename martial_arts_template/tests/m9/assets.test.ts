@@ -13,7 +13,7 @@ import { openTestDatabase } from '../helpers/db'
 describe('M9 assets', () => {
   it('stores metadata on disk, requires a RESTRICTED note, and blocks DO_NOT_USE publication', async () => {
     const testDb = await openTestDatabase()
-    const dir = mkdtempSync(join(tmpdir(), 'renzo-assets-'))
+    const dir = mkdtempSync(join(tmpdir(), 'ma-assets-'))
     process.env.ASSET_UPLOAD_DIR = dir
     try {
       const [admin] = await testDb.db.select().from(users)
@@ -69,7 +69,7 @@ describe('M9 assets', () => {
 
   it('lists assets by campaign column and asset usage', async () => {
     const testDb = await openTestDatabase()
-    const dir = mkdtempSync(join(tmpdir(), 'renzo-assets-'))
+    const dir = mkdtempSync(join(tmpdir(), 'ma-assets-'))
     process.env.ASSET_UPLOAD_DIR = dir
     try {
       const [admin] = await testDb.db.select().from(users)

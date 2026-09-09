@@ -2,7 +2,7 @@
 type: index
 status: current
 area: overview
-updated: 2026-09-08
+updated: 2026-09-09
 aliases:
   - Start
   - Index
@@ -15,16 +15,30 @@ tags:
 
 Open this `crm_saas_vault/` folder as an Obsidian vault. Scott and Cursor treat it as **the vault**. [[Working-Agreement]] is how we work. [[Conventions]] is how notes are written.
 
-This workspace productizes the Renzo CRM evidence into a commercial platform. It is **not** a license to convert the live Renzo gym app into multi-tenant SaaS.
+This repository is the **generic SaaS platform** and its first industry product, the **Martial Arts template**. It was derived from the external Renzo CRM implementation. It is **not** a license to manage, provision, or migrate live Renzo.
+
+```text
+External renzo_crm (separate repo, host, deploy)
+        | lessons / evidence only
+        v
+crm_marketing_saas
+        |
+        +-- Generic platform
+        +-- Martial Arts template
+        +-- future industry templates (Beauty later)
+        +-- Customer instances: Strategic Insights (pilot), sister's business (pilot), then others
+```
+
+Real Renzo is **not** a SaaS customer and will not appear on the control plane.
 
 ## Two tracks
 
 | Track | Start here |
 |---|---|
 | Platform expansion (decision-first) | [[Working-Agreement]] → [[SaaS-Milestones]] → [[Customer-Environment]] → [[SaaS-Decisions]] → [[Control-Plane]] |
-| CRM fine-tuning (evidence-driven) | [[Overview]] → [[Implementation-State]] → [[Decisions]] |
+| Martial Arts template | `martial_arts_template/` — improve the generic industry product |
 
-Renzo Gracie Kaysville is the first real implementation, design partner, and proving ground. Those notes stay **evidence**. Do not rewrite them into platform law.
+Renzo notes at the vault root (`Overview`, `Implementation-State`, `Decisions`, Koi-Pi, and the rest) are **historical evidence** of the source implementation. Do not rewrite them into platform law. Do not treat them as a deployable customer in this repo.
 
 ## Platform — current understanding
 
@@ -34,12 +48,14 @@ Long-term direction: an ultra-general marketing, lead-generation, and CRM platfo
 Platform → Industry Template → Customer Instance → Enabled Capabilities → Configuration
 ```
 
-Control plane v1 (working decision, not implemented): a **separate** app that lists customer environments, shows up/down, and relaunches without destroying data. It does not provision new customers yet. Details: [[Control-Plane]].
+Control plane v1 (working decision, not implemented): a **separate** app in this same repo that lists customer environments, shows up/down, and relaunches without destroying data. It does not provision new customers yet. Details: [[Control-Plane]]. S3 owner decisions are recorded in [[SaaS-Decisions]].
 
-Alignment (evidence, not the map): [[wip/SaaS_Project_Alignment_and_Current_Understanding]].
+Alignment (evidence, not the map): [[wip/archive/SaaS_Project_Alignment_and_Current_Understanding]].
 
 **Git:** this folder is its own repo; `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).  
-**Milestones:** [[SaaS-Milestones]] S0, S1, and S2 Successful. Do not implement the control plane until Scott asks (S3).
+**Milestones:** [[SaaS-Milestones]] S0, S1, and S2 Successful. S3 decisions are recorded. Do not implement the control plane until Scott asks.
+
+**First intended pilots (not provisioned):** Strategic Insights; Scott’s sister’s business.
 
 ## Platform notes
 
@@ -49,38 +65,37 @@ Alignment (evidence, not the map): [[wip/SaaS_Project_Alignment_and_Current_Unde
 | [[SaaS-Milestones]] | S0–S8 launch path; **Successful** is acceptance |
 | [[Customer-Environment]] | S1 unit: Customer, Environment, node placement |
 | [[SaaS-Decisions]] | SaaS ADR log |
-| [[S2-Hand-Boot-Checklist]] | S2 laptop boot (Docker + named lab volumes) |
-| [[S2-Lab-Isolation]] | lab-acme-prod / lab-acme-dev naming |
+| [[S2-Hand-Boot-Checklist]] | S2 lab boot (Docker + named lab volumes) |
 | [[SaaS-ToDo]] | Open platform tasks |
 | [[Control-Plane]] | Platform control app — v1 scope |
 | [[Conventions]] | How notes, links, and promotions work |
 | [[wip/_index\|WIP inbox]] | Direct Scott ↔ Cursor communication |
 
-## Renzo CRM evidence
+## Renzo CRM evidence (historical / external)
 
-Working name: **Renzo Gracie Kaysville Acquisition**. Product briefing: repo-root `AGENTS.md`. Live PRODUCTION SQLite on Koi-Pi must be preserved: [[Operations-PRODUCTION-SQLite]].
+The live gym app is **`C:\Users\Scoy9\Projects\renzo_crm`**, hosted separately. Do not touch that project, Koi-Pi, or `webhosting_renzo_*` from this repo. Copied Renzo-derived code **inside this repository** may be generalized.
 
-M0–M9 implemented. M8/M9 await Scott browser acceptance. M10A / M10C / M10D live. M10B laptop backup implemented; Pi restore not LIVE-VALIDATED. Do not start M10E, PostgreSQL, SMS, email, or WhatsApp unless asked.
+Working name of the source implementation: **Renzo Gracie Kaysville Acquisition**. Live PRODUCTION SQLite on Koi-Pi must stay in the external project: [[Operations-PRODUCTION-SQLite]].
 
 | Note | Contents |
 |---|---|
 | [[Overview]] | Why the gym app exists |
-| [[Implementation-State]] | What runs now |
-| [[Milestones]] | Sequence and acceptance status |
-| [[Requirements]] | Current business rules |
+| [[Implementation-State]] | What ran in the source implementation |
+| [[Milestones]] | Renzo gym sequence and acceptance status |
+| [[Requirements]] | Source business rules |
 | [[Funnel]] | Acquisition workflow |
 | [[Domain-Model]] | Entities and relationships |
 | [[Database]] | Schema, migrations, seed, money, timestamps |
-| [[Operations-PRODUCTION-SQLite]] | Preserve Koi-Pi PRODUCTION SQLite |
+| [[Operations-PRODUCTION-SQLite]] | Preserve Koi-Pi PRODUCTION SQLite (external) |
 | [[Authentication]] | Sessions, passwords, roles, Access Rights |
 | [[CRM]] | Internal lead / household workflow |
 | [[Design-System]] | UI tokens, shells, Primary Record Workspace |
 | [[Intro-Scheduling]] | Public `/trial` and intro availability |
 | [[Architecture]] | Stack, boundaries, deploy shape |
-| [[How-to-Run]] | Local and Docker commands |
+| [[How-to-Run]] | Local and Docker commands (source + template) |
 | [[Workspace]] | Cursor workspace map (three remotes) |
-| [[Koi-Pi-Infrastructure]] | Pi hardware and update steps |
-| [[Deploy-Workflow]] | Develop in sibling, refresh drop-in, deploy Pi |
+| [[Koi-Pi-Infrastructure]] | Pi hardware and update steps (external Renzo) |
+| [[Deploy-Workflow]] | Renzo develop / copy / deploy (external) |
 | [[Open-Questions]] | Unresolved Renzo items — do not invent answers |
 | [[Decisions]] | Renzo durable choices |
 | [[Glossary]] | Terms |
