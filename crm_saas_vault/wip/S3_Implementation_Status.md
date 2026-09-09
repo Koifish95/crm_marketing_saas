@@ -39,7 +39,11 @@ Nuxt skeleton exists. SHA `5ae4e66`.
 
 ## Sprint 2
 
-Registry schema + idempotent `lab-acme` seed. UUID ids. Slugs are not primary keys. Tests prove a second `db:setup` keeps the same customer/node ids.
+Registry schema + idempotent `lab-acme` seed. UUID ids. Slugs are not primary keys. Tests prove a second `db:setup` keeps the same customer/node ids. SHA `ade96ed`.
+
+## Sprint 3
+
+Read-only dashboard + `GET /api/environments`. Headlines are `Acme BJJ · PROD`, not container ids. No Docker mutation.
 
 ## Deviations
 
