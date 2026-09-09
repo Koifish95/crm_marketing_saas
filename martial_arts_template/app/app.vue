@@ -8,7 +8,8 @@ useHead({
     'data-app-env': appEnv,
   },
   titleTemplate: (title?: string) => {
-    return title ? `${title} · Renzo Gracie Kaysville` : 'Renzo Gracie Kaysville'
+    const name = String(config.public.appName || 'Martial Arts Acquisition')
+    return title ? `${title} · ${name}` : name
   },
 })
 </script>

@@ -8,6 +8,8 @@ useHead({
   title: 'Staff login',
 })
 
+const config = useRuntimeConfig()
+const consoleFor = computed(() => String(config.public.appName || 'Martial Arts Acquisition'))
 const route = useRoute()
 const { fetch: fetchSession } = useUserSession()
 const identifier = ref('')
@@ -48,7 +50,7 @@ async function submit() {
       Staff sign-in
     </h1>
     <p class="mt-2 text-sm text-white/70">
-      Internal acquisition console for Renzo Gracie Kaysville.
+      Internal acquisition console for {{ consoleFor }}.
     </p>
 
     <form

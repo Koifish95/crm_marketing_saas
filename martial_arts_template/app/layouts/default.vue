@@ -1,4 +1,10 @@
 <script setup lang="ts">
+const config = useRuntimeConfig()
+const footerBrand = computed(() => {
+  const name = String(config.public.brandName || 'Martial Arts')
+  const location = String(config.public.brandLocation || 'Academy')
+  return `${name} · ${location}`
+})
 const route = useRoute()
 const isTrial = computed(() => route.path === '/trial')
 const isEvent = computed(() => route.path.startsWith('/events/'))
@@ -43,7 +49,7 @@ const hidePublicCta = computed(() => isTrial.value || isEvent.value || isTrackin
       <slot />
     </main>
     <footer class="border-t border-line py-6 text-center text-xs text-muted">
-      Renzo Gracie Jiu-Jitsu of Kaysville, Utah
+      {{ footerBrand }}
     </footer>
   </div>
 </template>

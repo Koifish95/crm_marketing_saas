@@ -1,5 +1,8 @@
 import tailwindcss from '@tailwindcss/vite'
 import { isForbiddenPort, PREFERRED_PORT } from './scripts/listen-port.mjs'
+import { publicBrand } from './shared/utils/brand'
+
+const brand = publicBrand(process.env)
 
 function listenPort() {
   const raw = Number.parseInt(process.env.NUXT_PORT || process.env.PORT || String(PREFERRED_PORT), 10)
@@ -30,8 +33,11 @@ export default defineNuxtConfig({
       },
     },
     public: {
-      appName: 'Renzo Gracie Kaysville Acquisition',
-      timezone: 'America/Denver',
+      appName: brand.appName,
+      brandName: brand.brandName,
+      brandLocation: brand.brandLocation,
+      publicTagline: brand.publicTagline,
+      timezone: process.env.NUXT_PUBLIC_TIMEZONE || 'America/Denver',
       appEnv: process.env.NUXT_PUBLIC_APP_ENV || process.env.APP_ENV || 'dev',
     },
   },

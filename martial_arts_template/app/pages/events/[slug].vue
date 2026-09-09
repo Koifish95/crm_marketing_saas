@@ -6,6 +6,8 @@ definePageMeta({
   layout: 'default',
 })
 
+const config = useRuntimeConfig()
+const brandLine = computed(() => String(config.public.appName || 'Martial Arts Acquisition'))
 const route = useRoute()
 const slug = computed(() => String(route.params.slug || ''))
 
@@ -126,7 +128,7 @@ async function submit() {
     <template v-else-if="event">
       <header>
         <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">
-          Renzo Gracie Kaysville
+          {{ brandLine }}
         </p>
         <h1 class="font-display text-3xl font-semibold text-navy-900">
           {{ event.title }}

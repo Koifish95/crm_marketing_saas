@@ -1,4 +1,7 @@
 <script setup lang="ts">
+const config = useRuntimeConfig()
+const brandName = computed(() => String(config.public.brandName || 'Martial Arts'))
+
 useHead({
   title: 'Acquisition',
 })
@@ -8,10 +11,10 @@ useHead({
   <section class="mx-auto max-w-2xl space-y-8">
     <div>
       <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-600">
-        Renzo Gracie Jiu-Jitsu
+        {{ brandName }}
       </p>
       <h1 class="mt-2 font-display text-3xl font-semibold tracking-tight text-navy-900">
-        Kaysville acquisition
+        Acquisition
       </h1>
       <p class="mt-3 max-w-xl text-sm leading-6 text-muted">
         Book a free intro class. Staff can sign in separately.

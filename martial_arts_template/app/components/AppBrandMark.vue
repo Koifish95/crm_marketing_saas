@@ -8,6 +8,10 @@ withDefaults(defineProps<{
   inverted: false,
   to: '/',
 })
+
+const config = useRuntimeConfig()
+const brandName = computed(() => String(config.public.brandName || 'Martial Arts'))
+const brandLocation = computed(() => String(config.public.brandLocation || 'Academy'))
 </script>
 
 <template>
@@ -19,7 +23,7 @@ withDefaults(defineProps<{
       class="text-[10px] font-semibold uppercase tracking-[0.22em]"
       :class="inverted ? 'text-brand-200' : 'text-brand-600'"
     >
-      Renzo Gracie
+      {{ brandName }}
     </p>
     <p
       class="font-display font-semibold tracking-tight"
@@ -28,7 +32,7 @@ withDefaults(defineProps<{
         inverted ? 'text-white' : 'text-navy-900',
       ]"
     >
-      Kaysville
+      {{ brandLocation }}
     </p>
   </NuxtLink>
 </template>

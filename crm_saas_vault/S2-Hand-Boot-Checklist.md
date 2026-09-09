@@ -62,7 +62,7 @@ Work in `martial_arts_template`. Node 22+ and pnpm.
 
 ## Dry-run result (2026-09-08)
 
-Followed on this laptop. Both health endpoints green. Isolation markers did not leak. PROD stop/restart left DEV sqlite and markers intact. Display name in `/api/health` was still `Renzo Gracie Kaysville Acquisition` (Sprint 6 leftover).
+Followed on this laptop. Both health endpoints green. Isolation markers did not leak. PROD stop/restart left DEV sqlite and markers intact. After Sprint 6, `/api/health` `app` is `Acme BJJ Acquisition` when the lab env files set `NUXT_PUBLIC_APP_NAME`. Landing, `/login`, and `/trial` HTML no longer contain Renzo/Kaysville literals.
 
 ## Official Successful line
 

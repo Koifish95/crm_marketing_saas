@@ -1,4 +1,5 @@
 import { defineEventHandler } from 'h3'
+import { publicBrand } from '../../../../shared/utils/brand'
 import { readAppEnv } from '../../../../shared/utils/app-env'
 import {
   isRestartEnabled,
@@ -10,7 +11,7 @@ import { requireAdminUser } from '../../../utils/auth'
 export default defineEventHandler(async (event) => {
   await requireAdminUser(event)
   return {
-    app: 'Renzo Gracie Kaysville Acquisition',
+    app: publicBrand().appName,
     timezone: process.env.NUXT_PUBLIC_TIMEZONE?.trim() || 'America/Denver',
     appEnv: readAppEnv(),
     nodeEnv: safeNodeEnv(),

@@ -13,6 +13,10 @@ useHead({
   title: 'Book a free class',
 })
 
+const config = useRuntimeConfig()
+const brandName = computed(() => String(config.public.brandName || 'Martial Arts'))
+const publicTagline = computed(() => String(config.public.publicTagline || ''))
+
 const route = useRoute()
 const attribution = ref(attributionFromQuery(route.query))
 if (import.meta.client) {
@@ -230,7 +234,7 @@ async function submit() {
   <section class="mx-auto max-w-xl space-y-8">
     <div class="text-center sm:text-left">
       <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-600">
-        Renzo Gracie Jiu-Jitsu
+        {{ brandName }}
       </p>
       <h1 class="mt-2 font-display text-3xl font-semibold tracking-tight text-navy-900 sm:text-4xl">
         Book your free class
@@ -239,8 +243,11 @@ async function submit() {
         Book for yourself, a child, or several family members. Each person picks their own class time.
         Times are America/Denver, next {{ BOOKING_HORIZON_DAYS }} days.
       </p>
-      <p class="mt-2 text-xs text-muted">
-        The only certified Renzo Gracie academy in Utah · Kaysville
+      <p
+        v-if="publicTagline"
+        class="mt-2 text-xs text-muted"
+      >
+        {{ publicTagline }}
       </p>
     </div>
 

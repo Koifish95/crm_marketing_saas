@@ -103,11 +103,11 @@ Done on laptop (Nitro processes + host directories):
 - Stop/restart PROD without deleting DEV data.
 - Same `martial_arts_template` code (no fork).
 - Repeatable [[S2-Hand-Boot-Checklist]]. Evidence: [[wip/S2_Sprint4_Coexist_Evidence]].
+- Display name is env-driven (`NUXT_PUBLIC_APP_NAME` / brand keys). Lab examples use Acme BJJ.
 
 Not done:
 
 - Docker / isolated **volumes** (the written Successful line). Engine was available; Compose was not used.
-- Non-Renzo display name in `/api/health` (still `Renzo Gracie Kaysville Acquisition` until Sprint 6).
 
 - [ ] **S2 Successful:** A second martial-arts CRM runs in Docker on the laptop (or Pi lab), isolated volumes, own admin login, `GET /api/health` green, no shared SQLite with Renzo PRODUCTION. Repeatable via a **checklist**, even if still manual.
 
