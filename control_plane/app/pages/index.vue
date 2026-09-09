@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useHead({ title: 'Environments' })
 
-const { data, error, pending } = await useFetch('/api/environments')
+const { data, error, pending } = await useFetch('/api/status')
 </script>
 
 <template>
@@ -11,7 +11,7 @@ const { data, error, pending } = await useFetch('/api/environments')
     </p>
     <h1>Environments</h1>
     <p class="muted">
-      Registered inventory only. Runtime and health are later sprints.
+      Registered inventory plus exact-container runtime. App health is the next sprint.
     </p>
     <p
       v-if="pending"
@@ -34,7 +34,7 @@ const { data, error, pending } = await useFetch('/api/environments')
         {{ env.headline }}
       </p>
       <p class="muted">
-        {{ env.node.name }} · {{ env.expectedImage }}
+        {{ env.node.name }} · runtime {{ env.runtime }} · {{ env.expectedImage }}
       </p>
       <p class="muted">
         Health {{ env.healthUrl }}

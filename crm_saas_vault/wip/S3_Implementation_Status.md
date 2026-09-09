@@ -43,7 +43,11 @@ Registry schema + idempotent `lab-acme` seed. UUID ids. Slugs are not primary ke
 
 ## Sprint 3
 
-Read-only dashboard + `GET /api/environments`. Headlines are `Acme BJJ · PROD`, not container ids. No Docker mutation.
+Read-only dashboard + `GET /api/environments`. Headlines are `Acme BJJ · PROD`, not container ids. No Docker mutation. SHA `800ed64`.
+
+## Sprint 4
+
+Exact-name `docker inspect` only. Leftover `renzo-*` names are refused. Runtime is running / stopped / missing / unknown.
 
 ## Deviations
 
