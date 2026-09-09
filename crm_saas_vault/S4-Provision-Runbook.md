@@ -28,7 +28,7 @@ pnpm install
 pnpm dev
 ```
 
-Open http://127.0.0.1:52100. Fill **Provision**: display name, slug, timezone, admin email. Submit. Wait until both new rows are **healthy**.
+Open http://127.0.0.1:52100 → **Customers → New customer**. Fill display name, slug, timezone, and admin email. Submit. The form calls the same two S4 POSTs, then opens the customer workspace. Wait until both environments are **healthy** (Refresh on Dashboard or the workspace).
 
 ## What it creates
 

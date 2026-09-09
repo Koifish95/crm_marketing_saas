@@ -13,7 +13,7 @@ tags:
 
 # Control plane
 
-S3 and S4 **Successful**. Operator app: `control_plane/` at http://127.0.0.1:52100. Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]]. Handoffs: [[wip/S3_closeout]], [[wip/S4_closeout]].
+S3 and S4 **Successful**. Operator app: `control_plane/` at http://127.0.0.1:52100 — multi-page shell (Dashboard, Customers, Environments, Hosting Nodes, Settings). Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]] (`Customers → New customer`). Frontend status: [[wip/S5_Control_Plane_Productization_Status]]. Hardening audit: [[wip/Control_Plane_Post_Productization_Audit]]. Handoffs: [[wip/S3_closeout]], [[wip/S4_closeout]].
 
 It is not another customer admin page and not the platform owner's CRM.
 
@@ -46,7 +46,7 @@ which customers exist
 → provision a Martial Arts PROD+DEV pair (S4)
 ```
 
-The list reads “Acme BJJ · PROD · healthy,” not a container id.
+Headlines still read “Acme BJJ · PROD · healthy,” not a container id. Indexes are tables; workspaces are read-only except Refresh and existing Relaunch.
 
 Laptop-only. Local Docker. Health on demand. Acme is seeded; new customers are provisioned. No Docker socket in CRM containers.
 
@@ -72,4 +72,4 @@ Relaunch means: recreate the process, remount the same durable data. Never `dock
 
 ## Next
 
-S5 (reachable access) only when Scott asks. Do not duplicate `lab-acme` or `strategic-insights` blindly.
+Owner decisions: [[wip/Post_S4_Foundation_Decision_Inventory]]. Tentative S5 frontend slice is shipped; it is **not** Successful. Historical S5 (reachable access / DNS/TLS) is unset. Do not duplicate `lab-acme` or `strategic-insights` blindly.

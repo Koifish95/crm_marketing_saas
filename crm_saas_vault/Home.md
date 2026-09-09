@@ -48,12 +48,12 @@ Long-term direction: an ultra-general marketing, lead-generation, and CRM platfo
 Platform → Industry Template → Customer Instance → Enabled Capabilities → Configuration
 ```
 
-Control plane is **implemented** as `control_plane/` (http://127.0.0.1:52100). It lists customer environments, shows up/down, relaunches without destroying data, and (since S4) provisions a Martial Arts PROD+DEV pair. Details: [[Control-Plane]]. Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]].
+Control plane is **implemented** as `control_plane/` (http://127.0.0.1:52100): Dashboard, Customers, Environments, Hosting Nodes. It shows up/down, relaunches without destroying data, and provisions a Martial Arts PROD+DEV pair from **Customers → New customer**. Details: [[Control-Plane]]. Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]]. Audit: [[wip/Control_Plane_Post_Productization_Audit]].
 
 Alignment (evidence, not the map): [[wip/archive/SaaS_Project_Alignment_and_Current_Understanding]].
 
 **Git:** this folder is its own repo; `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).  
-**Milestones:** [[SaaS-Milestones]] S0–S4 Successful. Next implementation is S5 only when Scott asks. Evidence: [[wip/S4_closeout]].
+**Milestones:** [[SaaS-Milestones]] S0–S4 Successful. A tentative operator-UI slice of S5 shipped; it is **not** Successful. Next work is the foundation inventory ([[wip/Post_S4_Foundation_Decision_Inventory]]), not DNS/TLS or another milestone. Evidence: [[wip/S4_closeout]], [[wip/S5_Control_Plane_Productization_Status]].
 
 **First intended pilots:** Strategic Insights Consulting, LLC is **laptop-provisioned** (S4 proof, not public). Scott’s sister’s business is **not** provisioned.
 

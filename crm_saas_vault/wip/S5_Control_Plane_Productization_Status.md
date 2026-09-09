@@ -13,7 +13,7 @@ tags:
 
 Authorized first slice of **tentative** S5: operator frontend / operational dashboard foundation.
 
-**This work does not make tentative S5 Successful.** Milestone sequencing remains pending the Foundation Decision Inventory (`Post_S4_Foundation_Decision_Inventory.md` — **not in the repo**). Historical S5 is still “reachable customer access” in [[SaaS-Milestones]].
+**This work does not make tentative S5 Successful.** Milestone sequencing remains pending [[wip/Post_S4_Foundation_Decision_Inventory]]. Historical S5 is still “reachable customer access” in [[SaaS-Milestones]]. Post-UI hardening: [[wip/Control_Plane_Post_Productization_Audit]].
 
 Related: [[wip/post_S4_prompt]], [[wip/Where_We_Are_Now_Post_S4_2026-09-09]].
 
@@ -41,7 +41,7 @@ Honest derived fields only: customer/node overall = worst env status (`unhealthy
 - `/nodes` index + `/nodes/:id` workspace (today: one `laptop` row)
 - `/settings` placeholder
 
-Indexes use client-side search/filter. Native tables (no separate `AppDataTable`).
+Indexes use client-side search/filter. Shared `AppDataTable` / `AppAsyncPanel` after the hardening sprint.
 
 ## Existing functionality preserved
 
@@ -49,7 +49,7 @@ S3 registry, observe, Refresh, Relaunch (never `-v`). S4 provision semantics and
 
 ## Unresolved owner decisions
 
-- Foundation inventory file missing; do not invent answers.
+- Foundation inventory is in-repo; unanswered items stay unset.
 - Settings has nothing legitimate to manage yet (placeholder).
 - No customer/environment edit APIs — configuration tabs stay read-only.
 
@@ -65,8 +65,8 @@ S3 registry, observe, Refresh, Relaunch (never `-v`). S4 provision semantics and
 | 6 Provision move | `5c32a8f` | same + `tests/s5/provision-payload.test.ts` | HTML: form only on `/customers/new`. API: SI resume `resumed=true`, same id `5b3b4674-84df-440d-855b-113689bab69d`, still 2 envs |
 | 7 Consistency | `5c32a8f` | search/filter, empty/loading/error, responsive CSS, badges, tab/search/breadcrumb a11y | HTML/API as above. **Click-through in a real browser was not verified** (no browser automation in this session) |
 
-Sprints 2–7 landed together in `5c32a8f` after sprint 1 (`f61bcdf`).
+Sprints 2–7 landed together in `5c32a8f` after sprint 1 (`f61bcdf`). Hardening: UI `a3b9efe`, tests `3f5e399`. Docs/audit SHA is in [[wip/Control_Plane_Post_Productization_Audit]].
 
 ## Stop
 
-Frontend slice complete. Do not start DNS, public URLs, GoDaddy, TLS, remote nodes, backups, billing, or delete.
+Frontend slice + hardening complete. Do not start DNS, public URLs, GoDaddy, TLS, remote nodes, backups, billing, or delete.

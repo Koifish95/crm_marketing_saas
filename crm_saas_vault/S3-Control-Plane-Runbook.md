@@ -30,7 +30,7 @@ pnpm install
 pnpm dev
 ```
 
-Open http://127.0.0.1:52100. Bind is loopback only. No operator login.
+Open http://127.0.0.1:52100. Home is the **Dashboard** (counts + Needs Attention), not a card stack. Bind is loopback only. No operator login. Operator pages: Customers, Environments, Hosting Nodes. Relaunch lives on an environment workspace. Provision is S4 (`Customers → New customer`).
 
 CRM labs: http://127.0.0.1:52040 (PROD) and http://127.0.0.1:52050 (DEV). Staff login is `admin` / `setup`. Current Acme labs do not force a password change. New environments (S4) use the same unwrap pair **and** `mustChangePassword` — see [[SaaS-Decisions#2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)]].
 
@@ -53,7 +53,7 @@ Explicit seed only. No `docker ps` discovery. Do not register leftover `renzo-*`
 
 ## Status
 
-`GET /api/status` (also used by the dashboard Refresh).
+`GET /api/status` (used by every operator page; Refresh re-runs it).
 
 Healthy = registered container **running** AND `GET` registered health URL returns `ok: true` and `database: "reachable"`.
 
@@ -65,7 +65,7 @@ Unknown = Docker engine unreachable.
 
 ## Relaunch
 
-Dashboard **Relaunch** or `POST /api/environments/:id/relaunch`.
+Environment workspace **Relaunch** or `POST /api/environments/:id/relaunch`.
 
 Uses the registered compose file and env file under `martial_arts_template`:
 
@@ -80,7 +80,7 @@ Never `down`, `-v`, or prune. Verify with `pnpm lab:docker <slug> get` (markers)
 - Exact registered container names and health URLs only
 - No Docker socket in CRM containers
 - Do not attach `webhosting_renzo_*` or leftover `renzo-*` volumes
-- Do not provision a third customer (S4)
+- Do not invent extra-environment or decommission UI (inventory)
 
 ## Exclusions
 
