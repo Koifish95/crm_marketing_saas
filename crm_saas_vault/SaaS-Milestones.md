@@ -36,9 +36,9 @@ It does **not** mean Stripe by default, every industry, a beauty variant, or ins
 | ID | Focus | Status |
 |---|---|---|
 | S0 | Workspace split | Successful |
-| S1 | Environment unit | Next — decision only |
-| S2 | Second martial-arts environment by hand | Not started |
-| S3 | Control plane v1 | Not started (blocked on S1) |
+| S1 | Environment unit | Successful |
+| S2 | Second martial-arts environment by hand | In progress — Nitro/directory proof; Docker volumes not verified |
+| S3 | Control plane v1 | Not started (S1 done; implement only when Scott asks) |
 | S4 | Sales-led provision | Not started |
 | S5 | Reachable customer access | Not started |
 | S6 | Fleet operations | Not started |
@@ -57,7 +57,7 @@ S0 Workspace split
 → S8 First external customer live
 ```
 
-S2 and S3 both need S1. Prefer S2 before heavy S3 work so the control plane has a second real environment to show.
+S1 is Successful. S2 hand-boot is in progress (see [[S2-Hand-Boot-Checklist]]). Prefer finishing S2 before heavy S3 work. Do not start S3 implementation until Scott asks.
 
 ---
 
@@ -75,36 +75,39 @@ Evidence: [[Working-Agreement]], [[SaaS-Decisions]], [[Control-Plane]], [[wip/Sa
 
 ## S1 — Environment unit
 
-Status: next. **Decision only. No platform code.**
+Status: **Successful** (2026-09-08)
 
-**Decide:** What one customer environment *is* for observe/relaunch v1.
+What one Customer Environment is — the object the control plane will list, health-check, and relaunch.
 
-Working recommendation (not accepted until recorded in a dedicated note):
+**Successful:** Durable [[Customer-Environment]] records the unit, including: exactly one `PROD` per Customer; default PROD+DEV entitlement; additional non-PROD environments as capability (not billing); inheritance without silent override clobber; environment-specific credentials; minimal `/api/health`; prior S1 baseline preserved.
 
-```text
-customer id
-+ one app process (one container)
-+ one SQLite volume
-+ one asset volume
-+ one secrets/config bundle
-+ a health URL
-```
-
-Leave STAGE/DEV-per-customer, domains, and TLS out of this unit. Those belong to later milestones.
-
-- [ ] **S1 Successful:** Durable `Customer-Environment.md` (or equivalent) records the unit. [[Control-Plane]] v1 has something concrete to list and relaunch.
-
-See [[SaaS-ToDo]].
+S2 boot details and S2 architecture were not decided here.
 
 ---
 
 ## S2 — Boot a second martial-arts environment by hand
+
+Status: **In progress** (2026-09-08). Not Successful.
 
 Prove the template is not “only Renzo.”
 
 **Decide along the way:** What is required to boot an empty instance (admin user, empty vs seeded catalog, timezone, public form type). What stays Renzo-specific vs martial-arts template.
 
 **Not in this milestone:** Control-plane UI. Automatic provision. Public hostname. Copying Renzo PRODUCTION data.
+
+Done on laptop (Nitro processes + host directories):
+
+- Independent process, own admin password (seed requires `NUXT_AUTH_PASSWORD`), no Kaysville price/intro seed.
+- `GET /api/health` green on lab-acme PROD and DEV.
+- Distinct sqlite + uploads; `m10a.isolation` markers do not leak.
+- Stop/restart PROD without deleting DEV data.
+- Same `martial_arts_template` code (no fork).
+- Repeatable [[S2-Hand-Boot-Checklist]]. Evidence: [[wip/S2_Sprint4_Coexist_Evidence]].
+
+Not done:
+
+- Docker / isolated **volumes** (the written Successful line). Engine was available; Compose was not used.
+- Non-Renzo display name in `/api/health` (still `Renzo Gracie Kaysville Acquisition` until Sprint 6).
 
 - [ ] **S2 Successful:** A second martial-arts CRM runs in Docker on the laptop (or Pi lab), isolated volumes, own admin login, `GET /api/health` green, no shared SQLite with Renzo PRODUCTION. Repeatable via a **checklist**, even if still manual.
 
@@ -128,7 +131,7 @@ Do not start S3 implementation until S1 is Successful and Scott asks.
 
 Operator creates a new environment on demand. Still not public self-serve.
 
-**Decide along the way:** Image / Compose strategy. Naming. Where secrets are created. Whether STAGE/DEV exist per customer (PRODUCTION-only remains allowed).
+**Decide along the way:** Image / Compose strategy. Naming. Where secrets are created. Entitlement checks for extra environments (capability already exists in [[Customer-Environment]]).
 
 **Not in this milestone:** Customer self-signup. Vanity domains (can wait for S5).
 
