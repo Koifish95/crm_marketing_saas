@@ -1,3 +1,7 @@
+import { eq } from 'drizzle-orm'
+import type { Database } from '../server/database'
+import { introAvailabilityRules } from '../server/database/schema'
+
 const MINUTE = {
   am6: 6 * 60,
   am10: 10 * 60,
@@ -10,6 +14,10 @@ const MINUTE = {
   am1130: 11 * 60 + 30,
 } as const
 
+/**
+ * Historical Kaysville weekly timetable.
+ * Product seed does not insert these rows. Tests may install them as fixtures.
+ */
 export const INTRO_RULE_SEED = [
   { seedKey: 'adult-mon-0600-gi', programCode: 'ADULT_BJJ', weekday: 1, startMinute: MINUTE.am6, name: 'Jiu Jitsu with Gi — Adults' },
   { seedKey: 'adult-mon-1800-gi', programCode: 'ADULT_BJJ', weekday: 1, startMinute: MINUTE.pm6, name: 'Jiu Jitsu with Gi — Adults' },
@@ -47,3 +55,33 @@ export const INTRO_RULE_SEED = [
   { seedKey: 'kids-future-thu-1700-nogi', programCode: 'KIDS_BJJ', weekday: 4, startMinute: MINUTE.pm5, name: 'Future Champs No-Gi', ageMin: 12, ageMax: 16 },
   { seedKey: 'kids-future-fri-1700-mma', programCode: 'KIDS_BJJ', weekday: 5, startMinute: MINUTE.pm5, name: 'Future Champs MMA & Self Defense', ageMin: 12, ageMax: 16 },
 ] as const
+
+export async function seedIntroAvailabilityRules(
+  db: Database,
+  programIdByCode: Record<string, number>,
+  now: Date,
+) {
+  for (const rule of INTRO_RULE_SEED) {
+    const programId = programIdByCode[rule.programCode]
+    if (!programId) {
+      continue
+    }
+    const existing = await db.select().from(introAvailabilityRules).where(eq(introAvailabilityRules.seedKey, rule.seedKey)).limit(1)
+    if (existing.length > 0) {
+      continue
+    }
+    await db.insert(introAvailabilityRules).values({
+      seedKey: rule.seedKey,
+      programId,
+      weekday: rule.weekday,
+      startMinute: rule.startMinute,
+      endMinute: 'endMinute' in rule ? rule.endMinute ?? null : null,
+      name: rule.name,
+      ageMin: 'ageMin' in rule ? rule.ageMin ?? null : null,
+      ageMax: 'ageMax' in rule ? rule.ageMax ?? null : null,
+      enabled: true,
+      createdAt: now,
+      updatedAt: now,
+    })
+  }
+}

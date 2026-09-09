@@ -1,20 +1,21 @@
 import { eq } from 'drizzle-orm'
 import { createDb, getDatabaseUrl } from '../server/database'
-import { appSettings, introAvailabilityRules, householdPricingRules, leadSources, lostReasons, membershipOfferings, programs, users } from '../server/database/schema'
+import { appSettings, leadSources, lostReasons, programs, users } from '../server/database/schema'
 import { seedAccessCatalog } from '../server/services/access-rights'
 import { ALLOW_EARLY_TRIAL_OUTCOMES_DEFAULT, ALLOW_EARLY_TRIAL_OUTCOMES_KEY } from '../shared/utils/trial-outcomes'
 import {
   COMPENSATION_BASIS_KEY,
   COMPENSATION_BASIS_PERCENT_OF_MONTHLY,
   COMPENSATION_BPS_KEY,
-  COMPENSATION_DEFAULT_BPS,
   COMPENSATION_TRACKED_OWNER_KEY,
 } from '../shared/utils/compensation'
 import { hashStaffPassword } from '../server/services/password'
 import { utcNowMs } from '../shared/utils/time'
 import { loadLocalEnv } from '../server/utils/load-env'
 import { readAppEnv } from '../shared/utils/app-env'
-import { INTRO_RULE_SEED } from './intro-seed'
+
+export const BOOTSTRAP_PASSWORD_REQUIRED
+  = 'NUXT_AUTH_PASSWORD is required to seed an admin user. Seed will not invent a default password.'
 
 loadLocalEnv()
 
@@ -29,16 +30,18 @@ export function getBootstrapAdmin(env: NodeJS.Dict<string | undefined> = process
   const appEnv = readAppEnv(env)
   const username = (env.NUXT_AUTH_USERNAME ?? 'admin').trim().toLowerCase()
   const email = (env.NUXT_AUTH_EMAIL ?? `${username}@local`).trim().toLowerCase()
-  const fromEnv = env.NUXT_AUTH_PASSWORD?.trim() || undefined
-  const password = fromEnv ?? 'setup'
+  const password = env.NUXT_AUTH_PASSWORD?.trim() || undefined
+  if (!password) {
+    throw new Error(BOOTSTRAP_PASSWORD_REQUIRED)
+  }
   const reset = env.NUXT_AUTH_RESET_PASSWORD === 'true'
   return { username, email, password, reset, appEnv }
 }
 
 export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
+  const admin = getBootstrapAdmin()
   const { client, db } = createDb(databaseUrl)
   const now = new Date(utcNowMs())
-  const admin = getBootstrapAdmin()
 
   try {
     await client.execute('PRAGMA foreign_keys = ON')
@@ -57,7 +60,7 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
 
     const compensationKeys = [
       { key: COMPENSATION_BASIS_KEY, value: COMPENSATION_BASIS_PERCENT_OF_MONTHLY },
-      { key: COMPENSATION_BPS_KEY, value: String(COMPENSATION_DEFAULT_BPS) },
+      { key: COMPENSATION_BPS_KEY, value: '0' },
       { key: COMPENSATION_TRACKED_OWNER_KEY, value: '' },
     ]
     for (const item of compensationKeys) {
@@ -82,9 +85,6 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
         })
       }
     }
-
-    const programRows = await db.select().from(programs)
-    const programIdByCode = Object.fromEntries(programRows.map(row => [row.code, row.id]))
 
     const sourceSeed = [
       { code: 'INSTAGRAM', name: 'Instagram', sortOrder: 10 },
@@ -119,75 +119,7 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
       }
     }
 
-    const adultId = programIdByCode.ADULT_BJJ
-    const kidsId = programIdByCode.KIDS_BJJ
-    if (adultId) {
-      const existingOffering = await db.select().from(membershipOfferings).where(eq(membershipOfferings.programId, adultId)).limit(1)
-      if (existingOffering.length === 0) {
-        await db.insert(membershipOfferings).values({
-          name: 'Adult BJJ membership',
-          programId: adultId,
-          monthlyCents: 17500,
-          enrollmentCents: 0,
-          active: true,
-          sortOrder: 10,
-          createdAt: now,
-          updatedAt: now,
-        })
-      }
-      const existingRule = await db.select().from(householdPricingRules).where(eq(householdPricingRules.programId, adultId)).limit(1)
-      if (existingRule.length === 0) {
-        await db.insert(householdPricingRules).values({
-          programId: adultId,
-          firstMonthlyCents: 17500,
-          additionalMonthlyCents: 15500,
-          active: true,
-          createdAt: now,
-          updatedAt: now,
-        })
-      }
-    }
-    if (kidsId) {
-      const existingKids = await db.select().from(membershipOfferings).where(eq(membershipOfferings.programId, kidsId)).limit(1)
-      if (existingKids.length === 0) {
-        await db.insert(membershipOfferings).values({
-          name: 'Kids BJJ membership',
-          programId: kidsId,
-          monthlyCents: 15000,
-          enrollmentCents: 0,
-          active: true,
-          sortOrder: 20,
-          createdAt: now,
-          updatedAt: now,
-        })
-      }
-    }
-
-    for (const rule of INTRO_RULE_SEED) {
-      const programId = programIdByCode[rule.programCode]
-      if (!programId) {
-        continue
-      }
-      const existing = await db.select().from(introAvailabilityRules).where(eq(introAvailabilityRules.seedKey, rule.seedKey)).limit(1)
-      if (existing.length > 0) {
-        continue
-      }
-      await db.insert(introAvailabilityRules).values({
-        seedKey: rule.seedKey,
-        programId,
-        weekday: rule.weekday,
-        startMinute: rule.startMinute,
-        endMinute: 'endMinute' in rule ? rule.endMinute ?? null : null,
-        name: rule.name,
-        ageMin: 'ageMin' in rule ? rule.ageMin ?? null : null,
-        ageMax: 'ageMax' in rule ? rule.ageMax ?? null : null,
-        enabled: true,
-        createdAt: now,
-        updatedAt: now,
-      })
-    }
-
-    if (admin.reset && admin.password) {
+    if (admin.reset) {
       const resetHash = await hashStaffPassword(admin.password)
       const allUsers = await db.select({ id: users.id, sessionVersion: users.sessionVersion }).from(users)
       for (const row of allUsers) {
@@ -205,30 +137,26 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
       ? [existingAdmin]
       : await db.select().from(users).where(eq(users.username, admin.username)).limit(1)
     const current = existingAdmin ?? existingByUsername
-    const shouldSetPassword = Boolean(admin.password) && (!current || !current.passwordHash || admin.reset)
+    const shouldSetPassword = !current || !current.passwordHash || admin.reset
 
     let passwordHash = current?.passwordHash ?? null
-    if (shouldSetPassword && admin.password) {
+    if (shouldSetPassword) {
       passwordHash = await hashStaffPassword(admin.password)
     }
 
     if (!current) {
-      if (!passwordHash) {
-        console.info('[renzo] skipping admin bootstrap; no password configured for this environment')
-      } else {
-        await db.insert(users).values({
-          email: admin.email,
-          username: admin.username,
-          displayName: 'Admin',
-          role: 'ADMIN',
-          active: true,
-          passwordHash,
-          mustChangePassword: false,
-          sessionVersion: 0,
-          createdAt: now,
-          updatedAt: now,
-        })
-      }
+      await db.insert(users).values({
+        email: admin.email,
+        username: admin.username,
+        displayName: 'Admin',
+        role: 'ADMIN',
+        active: true,
+        passwordHash,
+        mustChangePassword: false,
+        sessionVersion: 0,
+        createdAt: now,
+        updatedAt: now,
+      })
     } else {
       await db.update(users).set({
         username: current.username || admin.username,

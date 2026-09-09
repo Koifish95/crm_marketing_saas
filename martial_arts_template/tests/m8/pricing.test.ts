@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { describe, expect, it } from 'vitest'
-import { membershipOfferings, programs } from '../../server/database/schema'
+import { appSettings, householdPricingRules, introAvailabilityRules, membershipOfferings, programs } from '../../server/database/schema'
 import {
   listLeadSources,
   listLostReasons,
@@ -13,6 +13,7 @@ import { DomainError } from '../../server/services/errors'
 import { forecastHousehold } from '../../server/services/forecast'
 import { addLeadLineToHousehold, updateLeadLine } from '../../server/services/lead-lines'
 import { createLead } from '../../server/services/leads'
+import { COMPENSATION_BPS_KEY } from '../../shared/utils/compensation'
 import { dollarsToCents } from '../../shared/utils/money'
 import { openTestDatabase } from '../helpers/db'
 
@@ -27,14 +28,16 @@ async function offeringFor(db: Awaited<ReturnType<typeof openTestDatabase>>['db'
 }
 
 describe('M8 catalog, household pricing, and forecast', () => {
-  it('seeds offerings, lost reasons, sources, and adult household pricing in integer cents', async () => {
-    const testDb = await openTestDatabase()
+  it('seeds programs, sources, and lost reasons without Kaysville prices or intro rules', async () => {
+    const testDb = await openTestDatabase({ fixtures: false })
     try {
       const sources = await listLeadSources(testDb.db, { activeOnly: true })
       const reasons = await listLostReasons(testDb.db, { activeOnly: true })
       const offerings = await listMembershipOfferings(testDb.db, { activeOnly: true })
-      const adult = offerings.find(row => row.program?.code === 'ADULT_BJJ')
-      const kids = offerings.find(row => row.program?.code === 'KIDS_BJJ')
+      const rules = await testDb.db.select().from(householdPricingRules)
+      const intros = await testDb.db.select().from(introAvailabilityRules)
+      const programRows = await testDb.db.select().from(programs)
+      expect(programRows.map(row => row.code)).toEqual(expect.arrayContaining(['ADULT_BJJ', 'KIDS_BJJ']))
       expect(sources.map(row => row.code)).toContain('WALK_IN')
       expect(reasons.map(row => row.name)).toEqual(expect.arrayContaining([
         'Not interested',
@@ -46,9 +49,11 @@ describe('M8 catalog, household pricing, and forecast', () => {
         'Not ready',
         'Other',
       ]))
-      expect(adult?.monthlyCents).toBe(dollarsToCents('175'))
-      expect(kids?.monthlyCents).toBe(dollarsToCents('150'))
-      expect(Number.isInteger(adult!.monthlyCents)).toBe(true)
+      expect(offerings).toHaveLength(0)
+      expect(rules).toHaveLength(0)
+      expect(intros).toHaveLength(0)
+      const [bps] = await testDb.db.select().from(appSettings).where(eq(appSettings.key, COMPENSATION_BPS_KEY))
+      expect(bps?.value).toBe('0')
     } finally {
       await testDb.close()
     }

@@ -6,8 +6,8 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { eq } from 'drizzle-orm'
 import { createDb } from '../../server/database'
 import { migrateDatabase } from '../../server/database/migrate'
-import { programs, users } from '../../server/database/schema'
-import { seedDatabase } from '../../drizzle/seed'
+import { users } from '../../server/database/schema'
+import { BOOTSTRAP_PASSWORD_REQUIRED, seedDatabase } from '../../drizzle/seed'
 import { verifyStaffPassword } from '../../server/services/password'
 
 const original = {
@@ -89,39 +89,20 @@ async function seedFresh(env: {
 }
 
 describe('M10A production bootstrap safety', () => {
-  it('seeds production admin / setup when no password is configured', async () => {
-    const ctx = await seedFresh({
+  it('refuses to seed production when no password is configured', async () => {
+    await expect(seedFresh({
       APP_ENV: 'production',
       NODE_ENV: 'production',
       NUXT_AUTH_RESET_PASSWORD: 'false',
-    })
-    try {
-      const programRows = await ctx.db.select().from(programs)
-      expect(programRows.length).toBeGreaterThan(0)
-      const [admin] = await ctx.db.select().from(users).where(eq(users.username, 'admin'))
-      expect(admin).toBeTruthy()
-      expect(admin!.email).toBe('admin@local')
-      expect(await verifyStaffPassword(admin!.passwordHash!, 'setup')).toBe(true)
-      expect(admin!.mustChangePassword).toBe(false)
-    } finally {
-      await ctx.close()
-    }
+    })).rejects.toThrow(BOOTSTRAP_PASSWORD_REQUIRED)
   })
 
-  it('creates STAGE admin / setup when no password is configured', async () => {
-    const ctx = await seedFresh({
+  it('refuses to seed STAGE when no password is configured', async () => {
+    await expect(seedFresh({
       APP_ENV: 'stage',
       NODE_ENV: 'production',
       NUXT_AUTH_RESET_PASSWORD: 'false',
-    })
-    try {
-      const [admin] = await ctx.db.select().from(users).where(eq(users.username, 'admin'))
-      expect(admin).toBeTruthy()
-      expect(admin!.email).toBe('admin@local')
-      expect(await verifyStaffPassword(admin!.passwordHash!, 'setup')).toBe(true)
-    } finally {
-      await ctx.close()
-    }
+    })).rejects.toThrow(BOOTSTRAP_PASSWORD_REQUIRED)
   })
 
   it('uses an explicit STAGE password when provided', async () => {

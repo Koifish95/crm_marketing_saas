@@ -14,7 +14,7 @@ import {
   isRenzoPublicHostname,
   publicHostnameForEnv,
 } from '../../shared/utils/app-env'
-import { getBootstrapAdmin } from '../../drizzle/seed'
+import { BOOTSTRAP_PASSWORD_REQUIRED, getBootstrapAdmin } from '../../drizzle/seed'
 
 const original = {
   APP_ENV: process.env.APP_ENV,
@@ -187,23 +187,23 @@ describe('M10 public hostname switcher', () => {
 })
 
 describe('M10A bootstrap password defaults', () => {
-  it('defaults setup for DEV, STAGE, and PRODUCTION when unset', () => {
+  it('requires NUXT_AUTH_PASSWORD for DEV, STAGE, and PRODUCTION', () => {
     delete process.env.NUXT_AUTH_PASSWORD
     process.env.APP_ENV = 'dev'
-    expect(getBootstrapAdmin().password).toBe('setup')
+    expect(() => getBootstrapAdmin()).toThrow(BOOTSTRAP_PASSWORD_REQUIRED)
 
     process.env.APP_ENV = 'stage'
-    expect(getBootstrapAdmin().password).toBe('setup')
+    expect(() => getBootstrapAdmin()).toThrow(BOOTSTRAP_PASSWORD_REQUIRED)
 
     process.env.APP_ENV = 'production'
-    expect(getBootstrapAdmin().password).toBe('setup')
+    expect(() => getBootstrapAdmin()).toThrow(BOOTSTRAP_PASSWORD_REQUIRED)
   })
 
-  it('still defaults setup in production when NODE_ENV is development', () => {
+  it('still requires a password in production when NODE_ENV is development', () => {
     delete process.env.NUXT_AUTH_PASSWORD
     process.env.APP_ENV = 'production'
     process.env.NODE_ENV = 'development'
-    expect(getBootstrapAdmin().password).toBe('setup')
+    expect(() => getBootstrapAdmin()).toThrow(BOOTSTRAP_PASSWORD_REQUIRED)
   })
 
   it('uses an explicit password in every environment', () => {
