@@ -59,7 +59,7 @@ Relaunch uses `compose up -d --force-recreate --no-deps app` only. Live laptop p
 
 ## Sprint 7
 
-Runbook, closeout, milestones marked Successful. Live `GET /api/status` returned both healthy headlines. Homepage HTML showed Refresh + Relaunch and no Provision. Browser click-through **NOT VERIFIED**.
+Runbook, closeout, milestones marked Successful. Live `GET /api/status` returned both healthy headlines. Homepage HTML showed Refresh + Relaunch and no Provision. Browser click-through **NOT VERIFIED**. SHA `cb2664c`.
 
 ## Deviations
 
