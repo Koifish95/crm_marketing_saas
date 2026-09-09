@@ -1,0 +1,85 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  line-height: 1.45;
+  color: #122033;
+  background: #f4f6f8;
+}
+
+body {
+  margin: 0;
+}
+
+.page {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #3d5a80;
+}
+
+h1 {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 1.75rem;
+}
+
+.muted {
+  color: #5b6b7c;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #d7dee6;
+  border-radius: 0.5rem;
+  padding: 1rem 1.1rem;
+  margin-top: 1rem;
+}
+
+.headline {
+  font-weight: 650;
+}
+
+button,
+.button {
+  min-height: 2.5rem;
+  padding: 0 0.85rem;
+  border: 1px solid #1f3a5f;
+  border-radius: 0.35rem;
+  background: #1f3a5f;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #fff;
+  color: #1f3a5f;
+}
+
+.status {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 650;
+  text-transform: lowercase;
+}
+
+.status-healthy { background: #d8f3dc; color: #1b4332; }
+.status-stopped { background: #e9ecef; color: #343a40; }
+.status-unhealthy { background: #f8d7da; color: #842029; }
+.status-unknown { background: #fff3cd; color: #664d03; }
