@@ -1,0 +1,31 @@
+import { describe, expect, it } from 'vitest'
+import { imageBuildArgs, imageInspectArgs, provisionUpCommand } from '../../server/services/provision-runtime'
+import { PROVISIONED_IMAGE } from '../../server/services/provision-contract'
+
+describe('S4 provision runtime commands', () => {
+  it('builds the local s4 image and ups without -v', () => {
+    expect(imageInspectArgs()).toEqual(['image', 'inspect', PROVISIONED_IMAGE])
+    expect(imageBuildArgs()).toEqual(['build', '-t', PROVISIONED_IMAGE, '.'])
+    const command = provisionUpCommand({
+      envFileLocal: 'C:/tmp/missing.env',
+      envFileExample: 'C:/tmp/missing.env',
+      composeFile: 'docker-compose.provisioned.yml',
+      composeProject: 'strategic-insights-prod',
+      root: 'C:/tmp/missing-template',
+    })
+    expect(command.args).toEqual([
+      'compose',
+      '--env-file',
+      'C:/tmp/missing.env',
+      '-f',
+      'docker-compose.provisioned.yml',
+      '-p',
+      'strategic-insights-prod',
+      'up',
+      '-d',
+      '--no-deps',
+      'app',
+    ])
+    expect(command.args.join(' ')).not.toMatch(/-v|prune|down/)
+  })
+})

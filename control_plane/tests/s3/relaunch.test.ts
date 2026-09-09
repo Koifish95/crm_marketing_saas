@@ -8,6 +8,7 @@ describe('safe relaunch', () => {
       composeFile: 'docker-compose.lab-acme-prod.yml',
       envFileLocal: '.env.lab-acme-prod',
       envFileExample: '.env.lab-acme-prod.example',
+      composeProject: 'lab-acme-prod',
       root: 'C:/tmp/missing-template',
     })
     expect(command.args).toEqual([
@@ -16,6 +17,8 @@ describe('safe relaunch', () => {
       '.env.lab-acme-prod.example',
       '-f',
       'docker-compose.lab-acme-prod.yml',
+      '-p',
+      'lab-acme-prod',
       'up',
       '-d',
       '--force-recreate',
@@ -25,11 +28,21 @@ describe('safe relaunch', () => {
     expect(command.args.join(' ')).not.toMatch(/-v|prune|down/)
   })
 
-  it('refuses unknown slugs and compose files', () => {
+  it('allows a registered provisioned compose file and refuses reserved names', () => {
+    const command = relaunchCommand({
+      slug: 'strategic-insights-prod',
+      composeFile: 'docker-compose.provisioned.yml',
+      envFileLocal: 'C:/tmp/provisioned/env.env',
+      envFileExample: 'C:/tmp/provisioned/env.env',
+      composeProject: 'strategic-insights-prod',
+      root: 'C:/tmp/missing-template',
+    })
+    expect(command.args).toContain('docker-compose.provisioned.yml')
+    expect(command.args).toContain('-p')
     expect(() => assertSafeRelaunch({
       slug: 'renzo-prod',
       composeFile: 'docker-compose.prod.yml',
-    })).toThrow(/lab-acme/)
+    })).toThrow(/reserved|compose file|Refusing/)
     expect(() => assertSafeRelaunch({
       slug: 'lab-acme-prod',
       composeFile: 'docker-compose.prod.yml',

@@ -38,4 +38,8 @@ Gitignored env writer + generic `docker-compose.provisioned.yml`. Env files cont
 
 ## Sprint 4
 
-CRM seed honors `NUXT_AUTH_MUST_CHANGE_PASSWORD`. Lab examples stay unset / false.
+CRM seed honors `NUXT_AUTH_MUST_CHANGE_PASSWORD`. Lab examples stay unset / false. SHA `89ae4d4`.
+
+## Sprint 5
+
+Local image build + compose up. Relaunch allowlist is any safe registered compose (lab-acme files or `docker-compose.provisioned.yml`). Failed rows stay Failed; volumes are not deleted.
