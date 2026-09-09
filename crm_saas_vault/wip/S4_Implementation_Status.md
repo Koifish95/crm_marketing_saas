@@ -50,4 +50,4 @@ Provision form on the dashboard. Four fields. No Add-environment. SHA `94ae265`.
 
 ## Sprint 7
 
-Idempotent same-slug resume. Live SI pair healthy on 52200/52201. Acme stayed healthy. Force-change login proven. Runbook + closeout. Browser click **NOT VERIFIED**.
+Idempotent same-slug resume. Live SI pair healthy on 52200/52201. Acme stayed healthy. Force-change login proven. Runbook + closeout. Browser click **NOT VERIFIED**. SHA `27127af`.

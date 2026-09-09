@@ -76,4 +76,4 @@ Do not publish a hostname until the bootstrap password is changed. Image registr
 | 4 Seed flag | `89ae4d4` |
 | 5 Runtime | `ad50499` |
 | 6 UI | `94ae265` |
-| 7 Closeout | (this commit) |
+| 7 Closeout | `27127af` |
