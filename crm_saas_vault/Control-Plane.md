@@ -36,23 +36,24 @@ Sister business / Beauty
 
 Do **not** list the external Renzo gym as a managed customer.
 
-## What v1 does
+## What it does today (S3 + S4)
 
 ```text
 which customers exist
 → which environment(s) they have
 → up / down  (container running AND /api/health)
 → relaunch without destroying data
+→ provision a Martial Arts PROD+DEV pair (S4)
 ```
 
 The list reads “Acme BJJ · PROD · healthy,” not a container id.
 
-Laptop-only. Local Docker. Health on demand. Manual/seed registration. No Docker socket in CRM containers.
+Laptop-only. Local Docker. Health on demand. Acme is seeded; new customers are provisioned. No Docker socket in CRM containers.
 
-## What v1 is not
+## What it is not
 
-- Creating / provisioning a new customer environment
-- Upgrades, rollback, domain/TLS automation
+- Public hostname / TLS / DNS
+- Extra-environment UI, upgrades, rollback
 - Backup/restore orchestration
 - Billing, self-service, ThePond replacement
 - Managing external Renzo

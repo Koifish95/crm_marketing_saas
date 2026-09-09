@@ -48,14 +48,14 @@ Long-term direction: an ultra-general marketing, lead-generation, and CRM platfo
 Platform → Industry Template → Customer Instance → Enabled Capabilities → Configuration
 ```
 
-Control plane v1 is **implemented** as `control_plane/` (http://127.0.0.1:52100). It lists customer environments, shows up/down, and relaunches without destroying data. It does not provision new customers. Details: [[Control-Plane]]. Runbook: [[S3-Control-Plane-Runbook]].
+Control plane is **implemented** as `control_plane/` (http://127.0.0.1:52100). It lists customer environments, shows up/down, relaunches without destroying data, and (since S4) provisions a Martial Arts PROD+DEV pair. Details: [[Control-Plane]]. Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]].
 
 Alignment (evidence, not the map): [[wip/archive/SaaS_Project_Alignment_and_Current_Understanding]].
 
 **Git:** this folder is its own repo; `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).  
 **Milestones:** [[SaaS-Milestones]] S0–S4 Successful. Next implementation is S5 only when Scott asks. Evidence: [[wip/S4_closeout]].
 
-**First intended pilots (not provisioned):** Strategic Insights; Scott’s sister’s business.
+**First intended pilots:** Strategic Insights Consulting, LLC is **laptop-provisioned** (S4 proof, not public). Scott’s sister’s business is **not** provisioned.
 
 ## Platform notes
 

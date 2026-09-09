@@ -182,4 +182,4 @@ Domains, TLS, Compose project layout, image registry, node communication mechani
 
 [[SaaS-Milestones]] **S2**, **S3**, and **S4** are Successful. Boot steps: [[S2-Hand-Boot-Checklist]]. Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]]. Do not start S5 until Scott asks.
 
-Real Renzo is not a Customer in this model. Intended first pilots (not provisioned): Strategic Insights; Scott’s sister’s business. The S2 lab `lab-acme` is a proof environment, not a paying customer.
+Real Renzo is not a Customer in this model. Strategic Insights Consulting, LLC is laptop-provisioned (S4 proof, not a public hostname). Scott’s sister’s business is not provisioned. The S2 lab `lab-acme` is a proof environment, not a paying customer.
