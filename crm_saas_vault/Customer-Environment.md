@@ -89,6 +89,12 @@ The model and future provisioner must support additional non-PROD environments (
 
 Technical capability ≠ customer entitlement. Subscription/entitlement configuration will later decide whether a given Customer may create extras. **Do not design or implement payment processing in S1.** Pricing, subscriptions, and billing enforcement are future concerns.
 
+Recorded 2026-09-09 ([[SaaS-Decisions#2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)]]):
+
+- **S4** provisions the default pair only (one PROD + one DEV). No Add-environment UI. No fee.
+- **S6** operator may add another non-PROD (STAGE, extra DEV, …).
+- **S8** customer may request extras for a fee (invoice/contract first; no payment processor required to start).
+
 DEV exists specifically to test newer changes before PROD.
 
 ## Configuration inheritance

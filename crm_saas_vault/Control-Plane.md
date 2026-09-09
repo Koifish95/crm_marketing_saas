@@ -67,4 +67,4 @@ Relaunch means: recreate the process, remount the same durable data. Never `dock
 
 ## Next
 
-S4 (provision) only when Scott asks. Prefer existing `lab-acme` rows as the first environments the provisioner must not duplicate blindly.
+S4 (provision) only when Scott asks. Owner decisions already recorded: [[SaaS-Decisions#2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)]]. Prefer existing `lab-acme` rows as the first environments the provisioner must not duplicate blindly.

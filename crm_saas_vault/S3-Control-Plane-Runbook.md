@@ -32,6 +32,8 @@ pnpm dev
 
 Open http://127.0.0.1:52100. Bind is loopback only. No operator login.
 
+CRM labs: http://127.0.0.1:52040 (PROD) and http://127.0.0.1:52050 (DEV). Staff login is `admin` / `setup`. Current Acme labs do not force a password change. New environments (S4) use the same unwrap pair **and** `mustChangePassword` — see [[SaaS-Decisions#2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)]].
+
 If the image `martial-arts-acquisition:s2` is missing: `pnpm lab:docker lab-acme-prod build` then `up`. Do **not** `compose down`, `-v`, or `pnpm env:up`.
 
 ## Database

@@ -53,7 +53,7 @@ Control plane v1 is **implemented** as `control_plane/` (http://127.0.0.1:52100)
 Alignment (evidence, not the map): [[wip/archive/SaaS_Project_Alignment_and_Current_Understanding]].
 
 **Git:** this folder is its own repo; `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).  
-**Milestones:** [[SaaS-Milestones]] S0–S3 Successful. Next implementation is S4 only when Scott asks.
+**Milestones:** [[SaaS-Milestones]] S0–S3 Successful. S4 owner decisions recorded ([[SaaS-Decisions#2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)]]). Next implementation is S4 only when Scott asks.
 
 **First intended pilots (not provisioned):** Strategic Insights; Scott’s sister’s business.
 

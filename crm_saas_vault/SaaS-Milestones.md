@@ -119,9 +119,11 @@ Status: **Successful** (2026-09-09). App: `control_plane/` at http://127.0.0.1:5
 
 Operator creates a new environment on demand. Still not public self-serve.
 
-**Decide along the way:** Image / Compose strategy. Naming. Where secrets are created. Entitlement checks for extra environments (capability already exists in [[Customer-Environment]]).
+**Recorded before coding:** Local Docker image on the laptop; per-env gitignored `.env`; provision form is name / slug / timezone / admin email; `admin` / `setup` + forced password change; S4 creates the default PROD+DEV pair only. See [[SaaS-Decisions#2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)]].
 
-**Not in this milestone:** Customer self-signup. Vanity domains (can wait for S5).
+**Decide along the way:** Compose project naming. Exact volume/network names (must include customer + environment ids; never `renzo-*`).
+
+**Not in this milestone:** Customer self-signup. Vanity domains (S5). Extra environments UI (S6). Paid extras (S8). GHCR / Docker Hub.
 
 - [ ] **S4 Successful:** After a sales agreement, an operator (or a control-plane action) produces a new martial-arts environment that the control plane immediately shows as healthy. Doing it a second time does not require inventing a new procedure.
 
@@ -131,7 +133,7 @@ Operator creates a new environment on demand. Still not public self-serve.
 
 A real user can use that environment from a browser.
 
-**Decide along the way:** Platform subdomain vs customer domain vs both. TLS approach. Pilot login policy — do **not** ship `admin` / `setup` as the SaaS default.
+**Decide along the way:** Platform subdomain vs customer domain vs both. TLS approach. Do not publish a hostname until the bootstrap `admin` / `setup` password has been changed ([[SaaS-Decisions#2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)]]).
 
 **Not in this milestone:** Apex/www for Renzo. Cloudflare/Caddy locks from the Renzo hosting contract.
 
@@ -143,7 +145,7 @@ A real user can use that environment from a browser.
 
 Make a live customer survivable.
 
-**Decide along the way:** Where backups live. Who may restore. Lockstep vs per-customer versions. What upgrade and rollback mean.
+**Decide along the way:** Where backups live. Who may restore. Lockstep vs per-customer versions. What upgrade and rollback mean. Operator-add extra non-PROD (already decided: S6, not S4). Image registry if a second machine needs the same build.
 
 **Not in this milestone:** Perfect observability. Multi-region.
 
@@ -167,7 +169,7 @@ Use the product to sell the product.
 
 Commercial launch, sales-led.
 
-**Decide along the way:** How you get paid (invoice, contract, Stripe later — undecided; do not block S1–S3 on it). Support channel. What “we’re live” means legally and operationally.
+**Decide along the way:** How you get paid (invoice, contract, Stripe later — undecided; do not block S1–S4 on it). Support channel. What “we’re live” means legally and operationally. Extra non-PROD for a fee is an S8 commercial concern (invoice/contract is enough to start).
 
 **Not in this milestone:** Self-service. Beauty variant. Multi-location.
 

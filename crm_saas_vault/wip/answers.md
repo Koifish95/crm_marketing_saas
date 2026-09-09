@@ -529,10 +529,7 @@ Reviewing AI: ask Scott: “Any integration that should be customer-wide (one Me
 
 ### S4.1 What customer information is required before provisioning?
 
-**Recommendation.** Display name, slug, industry template (Martial Arts), timezone. Contact email for the buyer/admin.
-
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “Minimum you will type before hitting Provision: legal/business name, slug, timezone, admin email — anything else mandatory?”
+**Answered (2026-09-09).** Display name, slug, timezone, admin email. Martial Arts is the only template. Nothing else mandatory. See [[SaaS-Decisions#2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)]].
 
 ### S4.2 What environment information is required?
 
@@ -548,7 +545,7 @@ Reviewing AI: ask Scott: “Minimum you will type before hitting Provision: lega
 
 ### S4.5 Can one environment be added later?
 
-**Recommendation.** Yes.
+**Answered (2026-09-09).** Yes as capability. S4 does not ship Add-environment. S6: operator adds extra non-PROD. S8: customer requests extras for a fee.
 
 ### S4.6 How is industry template selected?
 
@@ -560,7 +557,7 @@ Reviewing AI: ask Scott: “Minimum you will type before hitting Provision: lega
 
 ### S4.8 What is required before boot versus configurable afterward?
 
-**Recommendation.** Before: IDs, secrets, template, timezone, ADMIN. After: catalog, intro times, branding polish, Meta, extra users.
+**Answered (2026-09-09).** Before: IDs, secrets, template, timezone, ADMIN unwrap (`admin` / `setup`) with `mustChangePassword`. After: catalog, intro times, branding polish, Meta, extra users, and the chosen permanent admin password.
 
 ### S4.9 What makes provisioning idempotent?
 
@@ -584,8 +581,7 @@ Reviewing AI: ask Scott: “Minimum you will type before hitting Provision: lega
 
 ### S4.14 Where are images stored?
 
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “Where should versioned images live for S4 — Docker Hub, GHCR on this GitHub repo, or only images built locally on the node?”
+**Answered (2026-09-09).** Local Docker build on the laptop node only. Not Docker Hub or GHCR until a second machine needs the same image (likely S6).
 
 ### S4.15 Do we require ARM64 + AMD64 / multi-arch?
 
@@ -647,10 +643,7 @@ Reviewing AI: ask Scott only if he has a preference; otherwise use the recommend
 
 ### S4.28 Where are secrets stored?
 
-**ASK SCOTT**  
-Reviewing AI: ask Scott: “For the first provisioner, is a per-environment `.env` on the node (gitignored, not in Git) acceptable, or do you want a secrets manager before S8?”
-
-**Recommendation.** Per-environment env file / Docker secrets on the node for first launch. Control plane stores **references**, not copies of Meta tokens, if we can avoid it.
+**Answered (2026-09-09).** Per-environment `.env` on the node, gitignored, not in Git. Control plane stores references, not live admin passwords or integration tokens. No secrets manager before S8.
 
 ### S4.29 Does the control plane store secret values or references?
 
@@ -1465,7 +1458,7 @@ Collect these in one pass. Do **not** ask all at once in a giant interview. Use 
 ## S1 (ask now)
 
 1. Confirm exactly one PROD per customer is a hard invariant.  
-2. Extra DEV/STAGE/etc. allowed from S4, or only after launch?  
+2. **Answered (2026-09-09).** Default is PROD+DEV. Extra non-PROD: capability now; operator add in S6; paid request in S8. Not in S4 Successful.  
 3. Which customer settings may be overridden per environment?  
 4. Do customer-level config changes apply automatically or via explicit apply/promote?  
 5. Any integration credentials that should be customer-wide rather than per environment?

@@ -27,5 +27,5 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 
 ## Later / not started
 
-- [ ] **S4** — Sales-led provision (implement only when Scott asks)
+- [ ] **S4** — Sales-led provision (implement only when Scott asks). Owner decisions recorded 2026-09-09.
 - [ ] **S5–S8** — Access, ops, dogfood, first external customer (see [[SaaS-Milestones]])

@@ -25,6 +25,43 @@ Decision: what we chose
 
 ---
 
+## 2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)
+
+Status: accepted
+
+Context: S3 is Successful. Scott answered the five questions that unblock S4 design. This does **not** authorize S4 implementation.
+
+Decision:
+
+- **Bootstrap login.** Every newly generated environment writes `admin` / `setup` and sets `mustChangePassword` on the ADMIN row. First login works; CRM use waits on `/account/password`. `setup` is not a compliant permanent password. Seed still throws if `NUXT_AUTH_PASSWORD` is missing. After they change it, the control plane does not store the new password. Break-glass: CRM ADMIN reset, or one-shot `NUXT_AUTH_RESET_PASSWORD` that restores `setup` **and** forces change again. Do not leave reset on. Do not publish an S5 hostname until that change is done. Existing Acme lab rows stay as they are (`mustChangePassword` false) unless Scott asks to flip them.
+- **Provision form (mandatory).** Display name, slug, timezone, admin email. Industry template is Martial Arts (only template). Nothing else is required to hit Provision.
+- **Images.** S4 uses a **local Docker build** on the laptop node only. Not Docker Hub. Not GHCR. Record the learning curve; pick a registry when a second machine (Pi / VPS) needs the same image (likely S6).
+- **Secrets.** Per-environment `.env` on the node, gitignored, not in Git. Control plane stores references, not copies of live admin passwords or integration tokens.
+- **Extra environments.** Default entitlement remains one PROD + one DEV. S4 provisions that pair only — no Add-environment button, no fee. Schema must not hard-code “only two forever.” S6: operator may add another non-PROD. S8: customer may request extras for a fee (invoice/contract is enough; no payment processor required to start).
+
+This supersedes “lab passwords do not force a change” in the S2 product-defaults ADR, for **new** generated environments. It also extends [[#2026-09-09 — Generated lab environments use admin / setup]]: `setup` remains the unwrap key, not the living SaaS password.
+
+Source: Scott 2026-09-09
+
+---
+
+## 2026-09-09 — Generated lab environments use admin / setup
+
+Status: accepted
+
+Context: Scott wanted to log into every generated CRM without hunting per-env placeholders. Existing Acme lab volumes already had hashed `change-me-lab-acme-*-admin` passwords.
+
+Decision:
+
+- Generation path writes `NUXT_AUTH_USERNAME=admin` and `NUXT_AUTH_PASSWORD=setup` (lab env examples and lab Compose default `${NUXT_AUTH_PASSWORD:-setup}`).
+- Seed still throws `BOOTSTRAP_PASSWORD_REQUIRED` if the password is missing. It does not invent `setup`.
+- Existing lab DBs were one-shot reset with `NUXT_AUTH_RESET_PASSWORD=true`, then the flag returned to `false`. Reset re-hashes every user; do not leave it on.
+- First-login force-change and S4 copy rules: [[#2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)]].
+
+Source: Scott 2026-09-09
+
+---
+
 ## 2026-09-09 — S3 Successful: laptop control plane observes and relaunches lab-acme
 
 Status: accepted
@@ -69,7 +106,7 @@ Decision:
 - Acquisition Events capability is **on**; no seeded events.
 - Compensation stays **off** by default (0 bps). No 50% Scott ledger.
 - `allowEarlyTrialOutcomes` defaults **ON**.
-- Lab / operator-set ADMIN passwords do **not** force a change. Real customer PROD (S4) **must** force first-login password change.
+- Lab / operator-set ADMIN passwords do **not** force a change on **existing** Acme labs. **Superseded for new generated environments** by [[#2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)]] (`admin` / `setup` + `mustChangePassword`).
 - **USD only** through S8.
 - **Household** is a Martial Arts template concept, not Platform core.
 
