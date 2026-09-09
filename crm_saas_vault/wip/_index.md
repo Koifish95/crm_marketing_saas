@@ -15,6 +15,9 @@ Processed source material lives in archive. Put new drafts here; move them to ar
 
 ## Active SaaS
 
+- [[wip/S2_Renzo_Hardcode_Audit|S2 Renzo hard-code audit]] (2026-09-08; Sprint 1 of S2)
+- [[wip/answers|S0–S8 discovery answers]] (2026-09-08; ASK SCOTT items still open)
+- [[wip/SaaS_S0-S8_Discovery_Questions_2026-09-08|S0–S8 discovery questions]]
 - [[wip/Control_Plane_v1_and_Working_Agreement_2026-09-08|Control plane v1 + working agreement]] (2026-09-08; promoted to durable notes)
 - [[wip/SaaS_Project_Alignment_and_Current_Understanding|SaaS alignment and current understanding]] (2026-09-08)
 - [[wip/Cursor_SaaS_Project_Alignment_Instructions_2026-09-08|SaaS alignment instructions]]
