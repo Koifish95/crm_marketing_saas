@@ -56,7 +56,20 @@ export async function createCustomerWithDefaultEnvironments(db: Database, input:
 
   const [existing] = await db.select().from(customers).where(eq(customers.slug, slug)).limit(1)
   if (existing) {
-    throw new ProvisionError(`Customer ${slug} already exists.`, 409)
+    const rows = (await listRegisteredEnvironments(db)).filter(row => row.customer.id === existing.id)
+    return {
+      customerId: existing.id,
+      slug: existing.slug,
+      displayName: existing.displayName,
+      resumed: true,
+      environments: rows.map(row => ({
+        id: row.id,
+        slug: row.slug,
+        type: row.type,
+        hostPort: row.hostPort,
+        envFileLocal: row.envFileLocal,
+      })),
+    }
   }
 
   const [node] = await db.select().from(hostingNodes).where(eq(hostingNodes.name, 'laptop')).limit(1)
@@ -123,5 +136,5 @@ export async function createCustomerWithDefaultEnvironments(db: Database, input:
     created.push({ id, slug: names.slug, type: names.type, hostPort, envFileLocal: envFile })
   }
 
-  return { customerId, slug, displayName, environments: created }
+  return { customerId, slug, displayName, resumed: false, environments: created }
 }

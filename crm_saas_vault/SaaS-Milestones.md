@@ -39,7 +39,7 @@ It does **not** mean Stripe by default, every industry, a beauty variant, or ins
 | S1 | Environment unit | Successful |
 | S2 | Second martial-arts environment by hand | Successful |
 | S3 | Control plane v1 | Successful |
-| S4 | Sales-led provision | Not started |
+| S4 | Sales-led provision | Successful |
 | S5 | Reachable customer access | Not started |
 | S6 | Fleet operations | Not started |
 | S7 | Owner dogfood path | Not started |
@@ -57,7 +57,7 @@ S0 Workspace split
 → S8 First external customer live
 ```
 
-S0–S3 are Successful. Next implementation is **S4** only when Scott asks.
+S0–S4 are Successful. Next implementation is **S5** only when Scott asks.
 
 ---
 
@@ -125,7 +125,9 @@ Operator creates a new environment on demand. Still not public self-serve.
 
 **Not in this milestone:** Customer self-signup. Vanity domains (S5). Extra environments UI (S6). Paid extras (S8). GHCR / Docker Hub.
 
-- [ ] **S4 Successful:** After a sales agreement, an operator (or a control-plane action) produces a new martial-arts environment that the control plane immediately shows as healthy. Doing it a second time does not require inventing a new procedure.
+- [x] **S4 Successful:** After a sales agreement, an operator (or a control-plane action) produces a new martial-arts environment that the control plane immediately shows as healthy. Doing it a second time does not require inventing a new procedure.
+
+Status: **Successful** (2026-09-09). Live proof: Strategic Insights Consulting, LLC on 52200/52201. Evidence: [[wip/S4_closeout]]. Runbook: [[S4-Provision-Runbook]]. S5 is not started.
 
 ---
 

@@ -68,7 +68,7 @@ export function runProvisionUp(input: Parameters<typeof provisionUpCommand>[0]) 
   return { args: command.args, stdout: result.stdout }
 }
 
-export async function waitUntilHealthy(healthUrl: string, attempts = 30, delayMs = 2000) {
+export async function waitUntilHealthy(healthUrl: string, attempts = 60, delayMs = 3000) {
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     const probe = await probeRegisteredHealth(healthUrl, [healthUrl])
     if (probe.ok) {
@@ -93,6 +93,14 @@ export async function provisionCustomerEnvironments(db: Database, customerId: st
   for (const row of rows) {
     await setLifecycleStatus(db, row.id, 'provisioning')
     try {
+      if (row.lifecycleStatus === 'ready') {
+        const already = await probeRegisteredHealth(row.healthUrl, [row.healthUrl])
+        if (already.ok) {
+          await setLifecycleStatus(db, row.id, 'ready')
+          results.push({ id: row.id, slug: row.slug, status: 'ready' as const })
+          continue
+        }
+      }
       runProvisionUp({
         envFileLocal: row.envFileLocal,
         envFileExample: row.envFileExample,

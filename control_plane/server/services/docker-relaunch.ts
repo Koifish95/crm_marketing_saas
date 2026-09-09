@@ -51,7 +51,7 @@ export function resolveComposeEnvFile(input: {
   ]
   for (const candidate of candidates) {
     if (candidate && existsSync(candidate)) {
-      return candidate
+      return isAbsolute(candidate) ? candidate : join(process.cwd(), candidate)
     }
   }
   return existsSync(join(root, input.envFileExample))

@@ -168,7 +168,7 @@ Stop is non-destructive: process down, persistent data kept.
 
 Delete / decommission is a **separate gated** action. It is not Stop.
 
-Provisioning / Updating / Failed may be added when S4/S6 exist. Do not implement the state machine in S1.
+S4 stores `lifecycleStatus` `provisioning` | `ready` | `failed` on environment rows. Delete / decommission is still a later gated action.
 
 ## Portability
 
@@ -180,6 +180,6 @@ Domains, TLS, Compose project layout, image registry, node communication mechani
 
 ## Next
 
-[[SaaS-Milestones]] **S2** and **S3** are Successful. Boot steps: [[S2-Hand-Boot-Checklist]]. Control plane: [[S3-Control-Plane-Runbook]]. Do not start S4 until Scott asks.
+[[SaaS-Milestones]] **S2**, **S3**, and **S4** are Successful. Boot steps: [[S2-Hand-Boot-Checklist]]. Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]]. Do not start S5 until Scott asks.
 
 Real Renzo is not a Customer in this model. Intended first pilots (not provisioned): Strategic Insights; Scott’s sister’s business. The S2 lab `lab-acme` is a proof environment, not a paying customer.

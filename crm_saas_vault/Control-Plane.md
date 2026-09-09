@@ -13,7 +13,7 @@ tags:
 
 # Control plane
 
-S3 **Successful**. Operator app: `control_plane/` at http://127.0.0.1:52100. Runbook: [[S3-Control-Plane-Runbook]]. Handoff: [[wip/S3_closeout]]. Owner decisions: [[SaaS-Decisions#2026-09-09 — S3 v1 owner decisions]].
+S3 and S4 **Successful**. Operator app: `control_plane/` at http://127.0.0.1:52100. Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]]. Handoffs: [[wip/S3_closeout]], [[wip/S4_closeout]].
 
 It is not another customer admin page and not the platform owner's CRM.
 
@@ -26,8 +26,12 @@ lab-acme (S2 laptop lab — registered)
 ├── PROD
 └── DEV
 
-Strategic Insights / sister's business
-└── intended pilots — not registered, not provisioned
+Strategic Insights Consulting, LLC (S4 laptop — provisioned)
+├── PROD  (52200)
+└── DEV   (52201)
+
+Sister business / Beauty
+└── not provisioned
 ```
 
 Do **not** list the external Renzo gym as a managed customer.
@@ -67,4 +71,4 @@ Relaunch means: recreate the process, remount the same durable data. Never `dock
 
 ## Next
 
-S4 (provision) only when Scott asks. Owner decisions already recorded: [[SaaS-Decisions#2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)]]. Prefer existing `lab-acme` rows as the first environments the provisioner must not duplicate blindly.
+S5 (reachable access) only when Scott asks. Do not duplicate `lab-acme` or `strategic-insights` blindly.

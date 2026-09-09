@@ -56,11 +56,14 @@ describe('S4 registry create', () => {
       expect(si.some(row => row.containerName === 'strategic-insights-prod-app')).toBe(true)
       expect(rows.filter(row => row.customer.slug === 'lab-acme')).toHaveLength(2)
 
-      await expect(createCustomerWithDefaultEnvironments(db, {
+      const second = await createCustomerWithDefaultEnvironments(db, {
         displayName: 'Strategic Insights Consulting, LLC',
         slug: 'strategic-insights',
         adminEmail: 'admin@strategic-insights.local',
-      })).rejects.toThrow(/already exists/)
+        filesRoot: root,
+      })
+      expect(second.customerId).toBe(created.customerId)
+      expect(second.resumed).toBe(true)
 
       const all = await db.select().from(environments)
       expect(all).toHaveLength(4)

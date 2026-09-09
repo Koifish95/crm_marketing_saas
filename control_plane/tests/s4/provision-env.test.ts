@@ -18,9 +18,10 @@ describe('S4 provisioned env and compose', () => {
       timezone: 'America/Denver',
       sessionPassword: 'test-session-password-32-characters',
     })
-    expect(env).toMatch(/NUXT_AUTH_PASSWORD=setup/)
-    expect(env).toMatch(/NUXT_AUTH_MUST_CHANGE_PASSWORD=true/)
-    expect(env).toMatch(/SQLITE_VOLUME=strategic-insights-prod-sqlite/)
+    expect(env).toMatch(/NUXT_AUTH_PASSWORD="setup"/)
+    expect(env).toMatch(/NUXT_AUTH_MUST_CHANGE_PASSWORD="true"/)
+    expect(env).toMatch(/NUXT_PUBLIC_BRAND_NAME="Strategic Insights Consulting, LLC"/)
+    expect(env).toMatch(/SQLITE_VOLUME="strategic-insights-prod-sqlite"/)
     expect(env).not.toMatch(/renzo/i)
     expect(env).not.toMatch(/webhosting/i)
     expect(env).not.toMatch(/m10a/)

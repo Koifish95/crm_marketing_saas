@@ -10,6 +10,10 @@ export function randomSessionPassword() {
   return randomBytes(24).toString('hex')
 }
 
+function envLine(key: string, value: string | number) {
+  return `${key}="${String(value).replaceAll('\\', '\\\\').replaceAll('"', '\\"')}"`
+}
+
 export function renderProvisionedEnv(input: {
   composeProject: string
   containerName: string
@@ -26,24 +30,24 @@ export function renderProvisionedEnv(input: {
   const appEnv = input.type === 'PROD' ? 'production' : 'dev'
   const location = input.type === 'PROD' ? 'PROD' : 'DEV'
   const lines = [
-    `COMPOSE_PROJECT=${input.composeProject}`,
-    `CONTAINER_NAME=${input.containerName}`,
-    `HOST_PORT=${input.hostPort}`,
-    `SQLITE_VOLUME=${input.sqliteVolume}`,
-    `ASSETS_VOLUME=${input.assetsVolume}`,
-    `EXPECTED_IMAGE=${input.expectedImage}`,
-    `APP_ENV=${appEnv}`,
-    `NUXT_SESSION_PASSWORD=${input.sessionPassword ?? randomSessionPassword()}`,
-    'NUXT_AUTH_USERNAME=admin',
-    `NUXT_AUTH_EMAIL=${input.adminEmail}`,
-    'NUXT_AUTH_PASSWORD=setup',
-    'NUXT_AUTH_MUST_CHANGE_PASSWORD=true',
-    'NUXT_AUTH_RESET_PASSWORD=false',
-    `NUXT_PUBLIC_APP_NAME=${input.displayName} Acquisition`,
-    `NUXT_PUBLIC_BRAND_NAME=${input.displayName}`,
-    `NUXT_PUBLIC_BRAND_LOCATION=${location}`,
-    `NUXT_PUBLIC_TIMEZONE=${input.timezone}`,
-    'SESSION_COOKIE_SECURE=false',
+    envLine('COMPOSE_PROJECT', input.composeProject),
+    envLine('CONTAINER_NAME', input.containerName),
+    envLine('HOST_PORT', input.hostPort),
+    envLine('SQLITE_VOLUME', input.sqliteVolume),
+    envLine('ASSETS_VOLUME', input.assetsVolume),
+    envLine('EXPECTED_IMAGE', input.expectedImage),
+    envLine('APP_ENV', appEnv),
+    envLine('NUXT_SESSION_PASSWORD', input.sessionPassword ?? randomSessionPassword()),
+    envLine('NUXT_AUTH_USERNAME', 'admin'),
+    envLine('NUXT_AUTH_EMAIL', input.adminEmail),
+    envLine('NUXT_AUTH_PASSWORD', 'setup'),
+    envLine('NUXT_AUTH_MUST_CHANGE_PASSWORD', 'true'),
+    envLine('NUXT_AUTH_RESET_PASSWORD', 'false'),
+    envLine('NUXT_PUBLIC_APP_NAME', `${input.displayName} Acquisition`),
+    envLine('NUXT_PUBLIC_BRAND_NAME', input.displayName),
+    envLine('NUXT_PUBLIC_BRAND_LOCATION', location),
+    envLine('NUXT_PUBLIC_TIMEZONE', input.timezone),
+    envLine('SESSION_COOKIE_SECURE', 'false'),
   ]
   return `${lines.join('\n')}\n`
 }

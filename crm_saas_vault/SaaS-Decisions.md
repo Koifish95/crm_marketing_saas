@@ -25,6 +25,18 @@ Decision: what we chose
 
 ---
 
+## 2026-09-09 — S4 Successful: one form provisions a customer pair
+
+Status: accepted
+
+Context: Owner decisions were recorded before coding. The live laptop proof passed for Strategic Insights Consulting, LLC.
+
+Decision: S4 is **Successful**. The control plane writes registry rows and gitignored env files, builds `martial-arts-acquisition:s4` locally, and `compose up`s a generic `docker-compose.provisioned.yml` with an absolute `--env-file` and `-p` project. Same slug resumes; volumes are not deleted. Evidence: [[wip/S4_closeout]]. Procedure: [[S4-Provision-Runbook]].
+
+Source: 2026-09-09 implementation
+
+---
+
 ## 2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)
 
 Status: accepted

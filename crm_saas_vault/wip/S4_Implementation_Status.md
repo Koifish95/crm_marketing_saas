@@ -11,7 +11,7 @@ tags:
 
 # S4 implementation status
 
-S4 in progress. **S5 is not started.**
+S4 **Successful** (2026-09-09). **S5 is not started.**
 
 ## Locked defaults (Scott 2026-09-09)
 
@@ -46,4 +46,8 @@ Local image build + compose up. Relaunch allowlist is any safe registered compos
 
 ## Sprint 6
 
-Provision form on the dashboard. Four fields. No Add-environment.
+Provision form on the dashboard. Four fields. No Add-environment. SHA `94ae265`.
+
+## Sprint 7
+
+Idempotent same-slug resume. Live SI pair healthy on 52200/52201. Acme stayed healthy. Force-change login proven. Runbook + closeout. Browser click **NOT VERIFIED**.
