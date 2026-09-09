@@ -35,7 +35,8 @@ export function getBootstrapAdmin(env: NodeJS.Dict<string | undefined> = process
     throw new Error(BOOTSTRAP_PASSWORD_REQUIRED)
   }
   const reset = env.NUXT_AUTH_RESET_PASSWORD === 'true'
-  return { username, email, password, reset, appEnv }
+  const mustChangePassword = env.NUXT_AUTH_MUST_CHANGE_PASSWORD === 'true'
+  return { username, email, password, reset, mustChangePassword, appEnv }
 }
 
 export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
@@ -125,7 +126,7 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
       for (const row of allUsers) {
         await db.update(users).set({
           passwordHash: resetHash,
-          mustChangePassword: false,
+          mustChangePassword: admin.mustChangePassword,
           sessionVersion: row.sessionVersion + 1,
           updatedAt: now,
         }).where(eq(users.id, row.id))
@@ -152,7 +153,7 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
         role: 'ADMIN',
         active: true,
         passwordHash,
-        mustChangePassword: false,
+        mustChangePassword: admin.mustChangePassword,
         sessionVersion: 0,
         createdAt: now,
         updatedAt: now,
@@ -161,7 +162,7 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
       await db.update(users).set({
         username: current.username || admin.username,
         passwordHash: shouldSetPassword ? passwordHash : current.passwordHash,
-        ...(shouldSetPassword ? { mustChangePassword: false } : {}),
+        ...(shouldSetPassword ? { mustChangePassword: admin.mustChangePassword } : {}),
         updatedAt: now,
       }).where(eq(users.id, current.id))
     }

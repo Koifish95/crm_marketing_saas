@@ -34,4 +34,8 @@ Naming, reserved slugs, and host-port allocator (52200–52999). No Docker. No r
 
 ## Sprint 3
 
-Gitignored env writer + generic `docker-compose.provisioned.yml`. Env files contain `admin` / `setup` and force-change. Volume names are per environment.
+Gitignored env writer + generic `docker-compose.provisioned.yml`. Env files contain `admin` / `setup` and force-change. Volume names are per environment. SHA `3d81290`.
+
+## Sprint 4
+
+CRM seed honors `NUXT_AUTH_MUST_CHANGE_PASSWORD`. Lab examples stay unset / false.

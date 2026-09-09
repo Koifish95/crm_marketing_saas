@@ -17,6 +17,7 @@ const original = {
   NUXT_AUTH_USERNAME: process.env.NUXT_AUTH_USERNAME,
   NUXT_AUTH_EMAIL: process.env.NUXT_AUTH_EMAIL,
   NUXT_AUTH_RESET_PASSWORD: process.env.NUXT_AUTH_RESET_PASSWORD,
+  NUXT_AUTH_MUST_CHANGE_PASSWORD: process.env.NUXT_AUTH_MUST_CHANGE_PASSWORD,
 }
 
 afterEach(() => {
@@ -30,6 +31,7 @@ function clearEnv() {
   delete process.env.NUXT_AUTH_USERNAME
   delete process.env.NUXT_AUTH_EMAIL
   delete process.env.NUXT_AUTH_RESET_PASSWORD
+  delete process.env.NUXT_AUTH_MUST_CHANGE_PASSWORD
 }
 
 function applyEnv(env: {
@@ -39,6 +41,7 @@ function applyEnv(env: {
   NUXT_AUTH_USERNAME?: string
   NUXT_AUTH_EMAIL?: string
   NUXT_AUTH_RESET_PASSWORD?: string
+  NUXT_AUTH_MUST_CHANGE_PASSWORD?: string
 }) {
   clearEnv()
   if (env.APP_ENV !== undefined) {
@@ -59,6 +62,9 @@ function applyEnv(env: {
   if (env.NUXT_AUTH_RESET_PASSWORD !== undefined) {
     process.env.NUXT_AUTH_RESET_PASSWORD = env.NUXT_AUTH_RESET_PASSWORD
   }
+  if (env.NUXT_AUTH_MUST_CHANGE_PASSWORD !== undefined) {
+    process.env.NUXT_AUTH_MUST_CHANGE_PASSWORD = env.NUXT_AUTH_MUST_CHANGE_PASSWORD
+  }
 }
 
 async function seedFresh(env: {
@@ -68,6 +74,7 @@ async function seedFresh(env: {
   NUXT_AUTH_USERNAME?: string
   NUXT_AUTH_EMAIL?: string
   NUXT_AUTH_RESET_PASSWORD?: string
+  NUXT_AUTH_MUST_CHANGE_PASSWORD?: string
 }) {
   applyEnv(env)
   const file = join(tmpdir(), `ma-m10-${randomUUID()}.sqlite`)
@@ -119,6 +126,26 @@ describe('M10A production bootstrap safety', () => {
       expect(admin).toBeTruthy()
       expect(await verifyStaffPassword(admin!.passwordHash!, 'StagePass1!')).toBe(true)
       expect(await verifyStaffPassword(admin!.passwordHash!, 'setup')).toBe(false)
+      expect(admin!.mustChangePassword).toBe(false)
+    } finally {
+      await ctx.close()
+    }
+  })
+
+  it('forces a password change when NUXT_AUTH_MUST_CHANGE_PASSWORD is true', async () => {
+    const ctx = await seedFresh({
+      APP_ENV: 'production',
+      NODE_ENV: 'production',
+      NUXT_AUTH_USERNAME: 'admin',
+      NUXT_AUTH_EMAIL: 'admin@customer.local',
+      NUXT_AUTH_PASSWORD: 'setup',
+      NUXT_AUTH_MUST_CHANGE_PASSWORD: 'true',
+      NUXT_AUTH_RESET_PASSWORD: 'false',
+    })
+    try {
+      const [admin] = await ctx.db.select().from(users).where(eq(users.email, 'admin@customer.local'))
+      expect(admin?.mustChangePassword).toBe(true)
+      expect(await verifyStaffPassword(admin!.passwordHash!, 'setup')).toBe(true)
     } finally {
       await ctx.close()
     }

@@ -10,6 +10,7 @@ const envSchema = z.object({
   NUXT_AUTH_USERNAME: z.string().min(1).optional(),
   NUXT_AUTH_PASSWORD: z.string().min(1).optional(),
   NUXT_AUTH_RESET_PASSWORD: z.enum(['true', 'false']).optional(),
+  NUXT_AUTH_MUST_CHANGE_PASSWORD: z.enum(['true', 'false']).optional(),
 })
 
 export function getServerEnv() {
