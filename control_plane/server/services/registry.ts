@@ -32,10 +32,14 @@ export async function listRegisteredEnvironments(db: Database) {
     assetsVolume: row.environment.assetsVolume,
     expectedImage: row.environment.expectedImage,
     isolationMarker: row.environment.isolationMarker,
+    hostPort: row.environment.hostPort,
+    lifecycleStatus: row.environment.lifecycleStatus,
     customer: {
       id: row.customer.id,
       slug: row.customer.slug,
       displayName: row.customer.displayName,
+      timezone: row.customer.timezone,
+      adminEmail: row.customer.adminEmail,
     },
     node: {
       id: row.node.id,

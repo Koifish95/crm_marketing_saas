@@ -1,0 +1,84 @@
+import { randomUUID } from 'node:crypto'
+import { mkdirSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { afterEach, describe, expect, it } from 'vitest'
+import { createDb } from '../../server/database'
+import { migrateDatabase } from '../../server/database/migrate'
+import { seedRegistry } from '../../server/database/seed'
+import { environments } from '../../server/database/schema'
+import { createCustomerWithDefaultEnvironments } from '../../server/services/provision-registry'
+import { listRegisteredEnvironments } from '../../server/services/registry'
+
+const roots: string[] = []
+
+afterEach(() => {
+  for (const root of roots.splice(0)) {
+    try {
+      rmSync(root, { recursive: true, force: true })
+    } catch {
+      // ignore
+    }
+  }
+})
+
+async function openRegistry() {
+  const root = join(tmpdir(), `s4-registry-${randomUUID()}`)
+  mkdirSync(root, { recursive: true })
+  roots.push(root)
+  const url = `file:${join(root, 'control-plane.sqlite').replaceAll('\\', '/')}`
+  await migrateDatabase(url)
+  await seedRegistry(url)
+  return url
+}
+
+describe('S4 registry create', () => {
+  it('creates PROD and DEV rows without Docker and refuses a second slug', async () => {
+    const url = await openRegistry()
+    const { client, db } = createDb(url)
+    try {
+      const created = await createCustomerWithDefaultEnvironments(db, {
+        displayName: 'Strategic Insights Consulting, LLC',
+        slug: 'strategic-insights',
+        timezone: 'America/Denver',
+        adminEmail: 'admin@strategic-insights.local',
+      })
+      expect(created.environments).toHaveLength(2)
+      expect(created.environments.map(row => row.type).sort()).toEqual(['DEV', 'PROD'])
+      expect(created.environments.every(row => row.hostPort >= 52200)).toBe(true)
+
+      const rows = await listRegisteredEnvironments(db)
+      const si = rows.filter(row => row.customer.slug === 'strategic-insights')
+      expect(si).toHaveLength(2)
+      expect(si.every(row => row.lifecycleStatus === 'provisioning')).toBe(true)
+      expect(si.every(row => row.expectedImage === 'martial-arts-acquisition:s4')).toBe(true)
+      expect(si.some(row => row.containerName === 'strategic-insights-prod-app')).toBe(true)
+      expect(rows.filter(row => row.customer.slug === 'lab-acme')).toHaveLength(2)
+
+      await expect(createCustomerWithDefaultEnvironments(db, {
+        displayName: 'Strategic Insights Consulting, LLC',
+        slug: 'strategic-insights',
+        adminEmail: 'admin@strategic-insights.local',
+      })).rejects.toThrow(/already exists/)
+
+      const all = await db.select().from(environments)
+      expect(all).toHaveLength(4)
+    } finally {
+      client.close()
+    }
+  })
+
+  it('refuses reserved slugs', async () => {
+    const url = await openRegistry()
+    const { client, db } = createDb(url)
+    try {
+      await expect(createCustomerWithDefaultEnvironments(db, {
+        displayName: 'Renzo',
+        slug: 'renzo',
+        adminEmail: 'admin@example.com',
+      })).rejects.toThrow(/reserved/)
+    } finally {
+      client.close()
+    }
+  })
+})

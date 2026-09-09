@@ -18,6 +18,8 @@ export async function seedRegistry(databaseUrl = getDatabaseUrl()) {
         slug: LAB_CUSTOMER_SLUG,
         displayName: 'Acme BJJ',
         industryTemplate: 'martial-arts',
+        timezone: 'America/Denver',
+        adminEmail: 'admin@lab-acme.local',
         createdAt: now,
       })
     }
@@ -56,6 +58,8 @@ export async function seedRegistry(databaseUrl = getDatabaseUrl()) {
         assetsVolume: env.assetsVolume,
         expectedImage: EXPECTED_IMAGE,
         isolationMarker: env.isolationMarker,
+        hostPort: env.hostPort,
+        lifecycleStatus: 'ready',
         createdAt: now,
       })
     }

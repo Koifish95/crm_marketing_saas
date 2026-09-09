@@ -26,4 +26,8 @@ S4 in progress. **S5 is not started.**
 
 ## Sprint 1
 
-Naming, reserved slugs, and host-port allocator (52200–52999). No Docker. No registry writes.
+Naming, reserved slugs, and host-port allocator (52200–52999). No Docker. No registry writes. SHA `a211513`.
+
+## Sprint 2
+
+`POST /api/customers` inserts one customer and PROD+DEV registry rows (`lifecycleStatus` provisioning). Duplicate slug refused. No Docker.
