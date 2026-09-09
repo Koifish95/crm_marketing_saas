@@ -1,0 +1,211 @@
+{
+  "main": {
+    "id": "650c2ca338f0de93",
+    "type": "split",
+    "children": [
+      {
+        "id": "7e2de3595ef3098a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a81856a85f5d5792",
+            "type": "leaf",
+            "state": {
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "94956b77035de83b",
+    "type": "split",
+    "children": [
+      {
+        "id": "ca1d9092708ecdc2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "bf6321a070bd070c",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "01a812b6895424c4",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "2c48e59d8ee49a4a",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "472d5f5ed2dcac15",
+    "type": "split",
+    "children": [
+      {
+        "id": "5b3ea2f3d4d01d8a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0c514036e8d176db",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "90c51360524c7251",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "bda254dfac67dea0",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "fc6aca28af2fd5d2",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "5b4985eebbbff5b2",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "a81856a85f5d5792",
+  "lastOpenFiles": [
+    "vault/wip/M10A_Docker_Environment_Foundation_Implementation_Handoff_2026-09-05.md",
+    "docker/db-marker.ts",
+    "scripts/env-isolation-check.mjs",
+    "scripts/env.mjs",
+    "docker-compose.prod.yml",
+    "docker-compose.stage.yml",
+    "docker-compose.dev.yml",
+    "tests/m10/bootstrap-safety.test.ts",
+    "tests/m10/app-env.test.ts",
+    "tests/m10",
+    "app/components/AppEnvBanner.vue",
+    "vault/wip/M10A_Docker_Environment_Foundation_Cursor_Prompt_2026-09-05.md",
+    "vault/wip/note.md",
+    "vault/wip/archive/Post_M8_UI_Regression_Audit_and_Settings_Handoff_2026-09-02.md",
+    "vault/wip/archive/M9_Human_QA_Inbox_2026-09-04_to_2026-09-05.md",
+    "vault/wip/archive/M9_Collaborative_Marketing_Operations_Cursor_Prompt_2026-09-02.md",
+    "vault/wip/archive/M8_Scenario_Test_Business_Rule_Corrections_Handoff_2026-09-01.md",
+    "vault/wip/archive/M8_Public_Booking_Malformed_QA_Data_2026-09-02.md",
+    "vault/wip/archive/M8_Post_Household_UX_Audit.md",
+    "vault/wip/archive/M8_Internal_Lead_Creation_Household_Model_Handoff_2026-09-02.md",
+    "vault/wip/archive/M8_Internal_Lead_Creation_Household_Model_Cursor_Prompt_V2_2026-09-02.md",
+    "vault/wip/M9_Stabilization_and_Human_QA_Readiness_Cursor_Prompt_2026-09-03.md",
+    "vault/wip/M9_Remaining_Human_QA.md",
+    "vault/wip/M9_QA.md"
+  ]
+}

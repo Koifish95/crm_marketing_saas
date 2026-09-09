@@ -1,0 +1,49 @@
+# Nuxt / Nitro
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# Dependencies
+node_modules
+
+# Logs
+logs
+*.log
+
+# Editor / OS
+.DS_Store
+.fleet
+.idea
+
+# Environment
+.env
+.env.*
+!.env.example
+!.env.dev.example
+!.env.stage.example
+!.env.production.example
+
+# Local SQLite
+/data/*.sqlite
+/data/*.sqlite-journal
+/data/*.db
+/data/*.db-wal
+/data/*.db-shm
+
+# Local uploads (asset bytes; metadata is in SQLite)
+/data/uploads/
+
+# Host backups (same-host M10B store; never commit packages)
+/data/backups/
+
+# Obsidian (keep shared vault config; ignore local UI state)
+vault/.obsidian/workspace.json
+vault/.obsidian/workspace-mobile.json
+vault/.obsidian/cache
+vault/.obsidian/appearance.json
+vault/.obsidian/types.json
+vault/.obsidian/plugins/
+vault/.obsidian/graph.json

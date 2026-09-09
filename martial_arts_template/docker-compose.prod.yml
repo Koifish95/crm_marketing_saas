@@ -1,0 +1,52 @@
+name: renzo-prod
+
+services:
+  app:
+    env_file:
+      - path: .env.production
+        required: false
+    environment:
+      APP_ENV: production
+      NUXT_PUBLIC_APP_ENV: production
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD:?Set NUXT_SESSION_PASSWORD in .env.production}
+      NUXT_AUTH_USERNAME: ${NUXT_AUTH_USERNAME:-admin}
+      NUXT_AUTH_EMAIL: ${NUXT_AUTH_EMAIL:-}
+      NUXT_AUTH_PASSWORD: ${NUXT_AUTH_PASSWORD:-}
+      NUXT_AUTH_RESET_PASSWORD: ${NUXT_AUTH_RESET_PASSWORD:-false}
+      META_ACCESS_TOKEN: ${META_ACCESS_TOKEN:-}
+      META_AD_ACCOUNT_ID: ${META_AD_ACCOUNT_ID:-}
+      META_GRAPH_API_VERSION: ${META_GRAPH_API_VERSION:-v25.0}
+    ports:
+      - "5000:5000"
+
+  backup:
+    image: renzo-acquisition:m10a
+    container_name: renzo-backup-1
+    init: true
+    restart: unless-stopped
+    depends_on:
+      - app
+    environment:
+      APP_ENV: production
+      RENZO_BACKUP_DIR: /backups
+      BACKUP_SQLITE_PATH: /source/sqlite/renzo.sqlite
+      BACKUP_UPLOADS_DIR: /source/uploads
+      NUXT_PUBLIC_TIMEZONE: America/Denver
+    volumes:
+      - sqlite-data:/source/sqlite
+      - asset-data:/source/uploads
+      - ./data/backups:/backups
+    entrypoint: ["node", "docker/backup-scheduler.cjs"]
+    healthcheck:
+      disable: true
+
+volumes:
+  sqlite-data:
+    name: renzo-prod-sqlite
+  asset-data:
+    name: renzo-prod-assets
+
+networks:
+  appnet:
+    name: renzo-prod-net

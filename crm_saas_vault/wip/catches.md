@@ -1,0 +1,1 @@
+We need to adjust the trial page to be more separated from the staff login. We do not want people intentially poking around the staff login as we can help it. I understand the systems are linked, but lets avoid it This will be one of our first updates after having launched to the Raspberry pi and production, so we need to consisder larger infrastructure now.

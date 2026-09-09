@@ -1,0 +1,52 @@
+# Shared application runtime. Do not put secrets here.
+# Per environment:
+#   docker compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml up
+# All three together (PRODUCTION :5000, STAGE :5010, DEV :5020):
+#   docker compose -f docker-compose.all.yml up
+#   pnpm env:up
+# Caddy (later M10) becomes the public reverse proxy. docker/nginx.conf is unused.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: renzo-acquisition:m10a
+    init: true
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "5000"
+      DATABASE_URL: file:/app/data/sqlite/renzo.sqlite
+      ASSET_UPLOAD_DIR: /app/data/uploads
+      DRIZZLE_MIGRATIONS_DIR: /app/drizzle/migrations
+      NUXT_PUBLIC_TIMEZONE: ${NUXT_PUBLIC_TIMEZONE:-America/Denver}
+      APP_RESTART_ENABLED: ${APP_RESTART_ENABLED:-true}
+      APP_RESTART_EXIT_CODE: ${APP_RESTART_EXIT_CODE:-0}
+    volumes:
+      - sqlite-data:/app/data/sqlite
+      - asset-data:/app/data/uploads
+    expose:
+      - "5000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:5000/api/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    networks:
+      - appnet
+
+volumes:
+  sqlite-data:
+  asset-data:
+
+networks:
+  appnet:

@@ -1,0 +1,149 @@
+# One Compose project that runs PRODUCTION, STAGE, and DEV together.
+# Volumes and networks keep the same names as the per-environment overlays
+# so data is shared, not duplicated. Do not run this stack and
+# docker-compose.dev.yml / .stage.yml / .prod.yml at the same time — ports collide.
+#
+#   pnpm env:up
+#   pnpm env:down
+#
+# Secrets come from each service's env_file, not a shared --env-file.
+# Container port stays 5000. Host: PRODUCTION 5000, STAGE 5010, DEV 5020.
+# Local pnpm dev remains 5030 and is not part of this file.
+
+name: renzo
+
+x-common: &common
+  image: renzo-acquisition:m10a
+  init: true
+  restart: unless-stopped
+  expose:
+    - "5000"
+  healthcheck:
+    test:
+      [
+        "CMD",
+        "node",
+        "-e",
+        "fetch('http://127.0.0.1:5000/api/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+      ]
+    interval: 15s
+    timeout: 5s
+    retries: 5
+    start_period: 40s
+
+x-runtime: &runtime
+  NODE_ENV: production
+  HOST: 0.0.0.0
+  PORT: "5000"
+  DATABASE_URL: file:/app/data/sqlite/renzo.sqlite
+  ASSET_UPLOAD_DIR: /app/data/uploads
+  DRIZZLE_MIGRATIONS_DIR: /app/drizzle/migrations
+  NUXT_PUBLIC_TIMEZONE: America/Denver
+  APP_RESTART_ENABLED: "true"
+  APP_RESTART_EXIT_CODE: "0"
+
+services:
+  prod:
+    <<: *common
+    container_name: renzo-prod-app-1
+    env_file:
+      - path: .env.production
+        required: false
+    environment:
+      <<: *runtime
+      APP_ENV: production
+      NUXT_PUBLIC_APP_ENV: production
+    ports:
+      - "5000:5000"
+    volumes:
+      - sqlite-prod:/app/data/sqlite
+      - assets-prod:/app/data/uploads
+    networks:
+      - prod
+
+  stage:
+    <<: *common
+    container_name: renzo-stage-app-1
+    env_file:
+      - path: .env.stage
+        required: false
+    environment:
+      <<: *runtime
+      APP_ENV: stage
+      NUXT_PUBLIC_APP_ENV: stage
+      NUXT_AUTH_USERNAME: ${NUXT_AUTH_USERNAME:-admin}
+      NUXT_AUTH_EMAIL: ${NUXT_AUTH_EMAIL:-admin@local}
+      NUXT_AUTH_PASSWORD: ${NUXT_AUTH_PASSWORD:-setup}
+    ports:
+      - "5010:5000"
+    volumes:
+      - sqlite-stage:/app/data/sqlite
+      - assets-stage:/app/data/uploads
+    networks:
+      - stage
+
+  backup:
+    image: renzo-acquisition:m10a
+    container_name: renzo-backup-1
+    init: true
+    restart: unless-stopped
+    depends_on:
+      - prod
+    environment:
+      APP_ENV: production
+      RENZO_BACKUP_DIR: /backups
+      BACKUP_SQLITE_PATH: /source/sqlite/renzo.sqlite
+      BACKUP_UPLOADS_DIR: /source/uploads
+      NUXT_PUBLIC_TIMEZONE: America/Denver
+    volumes:
+      - sqlite-prod:/source/sqlite
+      - assets-prod:/source/uploads
+      - ./data/backups:/backups
+    entrypoint: ["node", "docker/backup-scheduler.cjs"]
+    healthcheck:
+      disable: true
+    networks:
+      - prod
+
+  dev:
+    <<: *common
+    container_name: renzo-dev-app-1
+    env_file:
+      - path: .env.dev
+        required: false
+    environment:
+      <<: *runtime
+      APP_ENV: dev
+      NUXT_PUBLIC_APP_ENV: dev
+      NUXT_AUTH_USERNAME: ${NUXT_AUTH_USERNAME:-admin}
+      NUXT_AUTH_EMAIL: ${NUXT_AUTH_EMAIL:-admin@local}
+      NUXT_AUTH_PASSWORD: ${NUXT_AUTH_PASSWORD:-setup}
+    ports:
+      - "5020:5000"
+    volumes:
+      - sqlite-dev:/app/data/sqlite
+      - assets-dev:/app/data/uploads
+    networks:
+      - dev
+
+volumes:
+  sqlite-prod:
+    name: renzo-prod-sqlite
+  assets-prod:
+    name: renzo-prod-assets
+  sqlite-stage:
+    name: renzo-stage-sqlite
+  assets-stage:
+    name: renzo-stage-assets
+  sqlite-dev:
+    name: renzo-dev-sqlite
+  assets-dev:
+    name: renzo-dev-assets
+
+networks:
+  prod:
+    name: renzo-prod-net
+  stage:
+    name: renzo-stage-net
+  dev:
+    name: renzo-dev-net

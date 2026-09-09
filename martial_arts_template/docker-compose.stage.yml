@@ -1,0 +1,31 @@
+name: renzo-stage
+
+services:
+  app:
+    env_file:
+      - path: .env.stage
+        required: false
+    environment:
+      APP_ENV: stage
+      NUXT_PUBLIC_APP_ENV: stage
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD:?Set NUXT_SESSION_PASSWORD in .env.stage}
+      NUXT_AUTH_USERNAME: ${NUXT_AUTH_USERNAME:-admin}
+      NUXT_AUTH_EMAIL: ${NUXT_AUTH_EMAIL:-admin@local}
+      NUXT_AUTH_PASSWORD: ${NUXT_AUTH_PASSWORD:-setup}
+      NUXT_AUTH_RESET_PASSWORD: ${NUXT_AUTH_RESET_PASSWORD:-false}
+      META_ACCESS_TOKEN: ${META_ACCESS_TOKEN:-}
+      META_AD_ACCOUNT_ID: ${META_AD_ACCOUNT_ID:-}
+      META_GRAPH_API_VERSION: ${META_GRAPH_API_VERSION:-v25.0}
+    ports:
+      - "5010:5000"
+
+volumes:
+  sqlite-data:
+    name: renzo-stage-sqlite
+  asset-data:
+    name: renzo-stage-assets
+
+networks:
+  appnet:
+    name: renzo-stage-net

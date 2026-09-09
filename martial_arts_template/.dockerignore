@@ -1,0 +1,24 @@
+# Runtime SQLite / uploads must never enter the image build context.
+# Koi-Pi PRODUCTION is Docker volume webhosting_renzo_sqlite, not this tree.
+!Dockerfile
+
+.git
+.nuxt
+.output
+.nitro
+.cache
+.data
+node_modules
+dist
+data
+vault
+tests
+.obsidian
+*.log
+.env
+.env.*
+!.env.example
+README.md
+answers.md
+v1-questions.md
+renzo_gracie_kaysville_customer_acquisition_system.md

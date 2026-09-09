@@ -1,0 +1,44 @@
+# Dependencies and build
+node_modules
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# Logs
+logs
+*.log
+
+# Editor / OS
+.DS_Store
+.fleet
+.idea
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.dev.example
+!.env.stage.example
+!.env.production.example
+
+# Local SQLite, uploads, backups
+**/*.sqlite
+**/*.sqlite-journal
+**/*.db
+**/*.db-wal
+**/*.db-shm
+data/uploads/
+data/backups/
+
+# Obsidian local UI state (vault notes stay tracked)
+crm_saas_vault/.obsidian/workspace.json
+crm_saas_vault/.obsidian/workspace-mobile.json
+crm_saas_vault/.obsidian/cache
+crm_saas_vault/.obsidian/appearance.json
+crm_saas_vault/.obsidian/types.json
+crm_saas_vault/.obsidian/plugins/
+crm_saas_vault/.obsidian/graph.json
+martial_arts_template/vault/.obsidian/
