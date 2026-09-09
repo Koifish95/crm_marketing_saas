@@ -64,7 +64,7 @@ Spin up and relaunch are different jobs. Relaunch is lifecycle of something that
 
 **Customer environment**, not container.
 
-A container is an implementation detail. Renzo already shows an environment is more than a process: app, SQLite volume, asset volume, config/secrets, hostname/route, health endpoint. The composition contract is the **next decision** and is not settled here.
+A container is an implementation detail. Renzo already shows an environment is more than a process: app, SQLite volume, asset volume, config/secrets, hostname/route, health endpoint. The composition contract is [[Customer-Environment]] (S1 Successful).
 
 ## Safety rule
 
@@ -83,6 +83,6 @@ Expected responsibilities that may attach after v1: provisioning, hosting-node i
 
 Where the control plane runs, how it talks to a Pi or VPS, and its relationship to ThePond’s Renzo ship button are **unresolved**. A proof may live on the same Pi as the first customers; that is a poor long-term home if the node dies.
 
-## Next decision
+## Next
 
-[[SaaS-Milestones]] **S1**: define the customer-environment unit. Do not implement this app until S1 is Successful and Scott asks (S3).
+S1 is Successful. Do not implement this app until Scott asks ([[SaaS-Milestones]] S3). Prefer S2 first so there is a second environment to show.

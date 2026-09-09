@@ -20,7 +20,7 @@ The source code is the implementation. Durable notes are the map: read them firs
 | Location | Role |
 |---|---|
 | Notes directly under `crm_saas_vault/` | Permanent knowledge |
-| SaaS / platform notes | [[Working-Agreement]], [[SaaS-Milestones]], [[SaaS-Decisions]], [[Control-Plane]] |
+| SaaS / platform notes | [[Working-Agreement]], [[SaaS-Milestones]], [[Customer-Environment]], [[SaaS-Decisions]], [[Control-Plane]] |
 | Renzo evidence notes | [[Overview]], [[Implementation-State]], [[Decisions]], and the rest of the original map |
 | [[Workspace]] | Cursor workspace map (three remotes). Twin of `C:\Users\Scoy9\Projects\AGENTS.md`. |
 | [[Koi-Pi-Infrastructure]] | Raspberry Pi hardware, directories, and the update loop. |

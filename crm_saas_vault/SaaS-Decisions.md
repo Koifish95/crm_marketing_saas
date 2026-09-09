@@ -25,13 +25,35 @@ Decision: what we chose
 
 ---
 
+## 2026-09-08 — S1 customer environment unit
+
+Status: accepted
+
+Context: S1 discovery questions in [[wip/answers]] were resolved. Scott accepted the remaining S1 answers as hard decisions. This records the environment unit so [[Control-Plane]] v1 has a concrete object to list and relaunch.
+
+Decision:
+
+- Durable model: [[Customer-Environment]].
+- Exactly one environment with Type `PROD` per Customer (hard invariant). Multiple non-PROD environments are allowed.
+- Default entitlement: one PROD + one DEV. Architecture must support additional non-PROD types/names (`DEV-JOHN`, `STAGE`, `UAT`, `TRAINING`, …) from the start. Capability ≠ entitlement. Do not design billing in S1.
+- Customer config supplies defaults; environments may set explicit permitted overrides. Later customer-level changes must not silently overwrite those overrides. Sync mechanics are a later milestone.
+- Integration credentials are environment-specific by default. PROD secrets do not flow into other environments. Sharing would be a future deliberate capability.
+- `/api/health` stays minimal (process availability, readiness, database). Identity, placement, and version live on the control plane. Richer health/diagnostics may be added in S3/S6; this is not a permanent restriction.
+- Preserve prior S1 baseline: customer owns branding/business config; environment owns runtime/secrets; independent SQLite + assets; explicit PROD→DEV copy-down only; no silent sync; no implicit DEV→PROD; one application process (initially one container; Docker not a permanent model requirement); stable IDs; changeable slugs/names; per-environment deployed version; Type ≠ display name; no sibling or cross-customer data access; Stop ≠ gated delete; Environment placed on a Hosting Node; node hosts zero or more environments; Pi→VPS portable model.
+
+S1 is **Successful**. Do not begin S2 implementation from this decision.
+
+Source: Scott 2026-09-08; [[wip/SaaS_S0-S8_Discovery_Questions_2026-09-08]]; [[wip/answers]]
+
+---
+
 ## 2026-09-08 — SaaS launch path is S0–S8 with Successful acceptance
 
 Status: working decision
 
 Context: Scott asked for milestones from the current workspace to a fully launched SaaS, with deliverables named Successful, and decisions made along the way.
 
-Decision: The platform sequence is [[SaaS-Milestones]] S0–S8. **Successful** is the acceptance name. “Launched” is S8: first external martial-arts customer live, sales-led. This map does not authorize implementation. S1 (environment unit) is next and is decision-only.
+Decision: The platform sequence is [[SaaS-Milestones]] S0–S8. **Successful** is the acceptance name. “Launched” is S8: first external martial-arts customer live, sales-led. This map does not authorize implementation. S0 and S1 are Successful. Next implementation milestone is S2, only when Scott asks.
 
 Source: 2026-09-08 conversation; [[SaaS-Milestones]]
 

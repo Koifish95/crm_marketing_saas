@@ -75,7 +75,7 @@ Repository verification required
 
 ## Current next decision
 
-Launch path: [[SaaS-Milestones]]. S0 is Successful. Next is **S1** — define the **customer-environment unit**. See [[Control-Plane]] and [[SaaS-Decisions]].
+Launch path: [[SaaS-Milestones]]. S0 and S1 are Successful. Environment unit: [[Customer-Environment]]. Next is **S2** only when Scott asks. See [[Control-Plane]] and [[SaaS-Decisions]].
 
 **Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 
