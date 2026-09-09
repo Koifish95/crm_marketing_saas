@@ -58,14 +58,14 @@ S3 registry, observe, Refresh, Relaunch (never `-v`). S4 provision semantics and
 | Sprint | SHA | QA | Browser vs API |
 |---|---|---|---|
 | 1 Shell | `f61bcdf` | 11 files / 23 tests; lint, typecheck, build | API/HTML: `/` still loaded status inside the new shell |
-| 2 Dashboard | *(same commit as 3–7)* | 12 files / 24 tests; lint, typecheck, build | HTML: counts + Needs Attention; no New customer on `/` |
-| 3 Customers | *(same)* | same | HTML: Acme + SI index rows; SI workspace Overview |
-| 4 Environments | *(same)* | same | HTML: index + SI PROD workspace with Relaunch. API: Refresh via `GET /api/status`; relaunch Acme DEV (no `-v`); brief unhealthy then healthy on refresh |
-| 5 Nodes | *(same)* | same | HTML: `laptop` index + workspace with placed envs |
-| 6 Provision move | *(same)* | same + `tests/s5/provision-payload.test.ts` | HTML: form only on `/customers/new`. API: SI resume `resumed=true`, same id `5b3b4674-84df-440d-855b-113689bab69d`, still 2 envs |
-| 7 Consistency | *(same)* | search/filter, empty/loading/error, responsive CSS, badges, tab/search/breadcrumb a11y | HTML/API as above. **Click-through in a real browser was not verified** (no browser automation in this session) |
+| 2 Dashboard | `5c32a8f` | 12 files / 24 tests; lint, typecheck, build | HTML: counts + Needs Attention; no New customer on `/` |
+| 3 Customers | `5c32a8f` | same | HTML: Acme + SI index rows; SI workspace Overview |
+| 4 Environments | `5c32a8f` | same | HTML: index + SI PROD workspace with Relaunch. API: Refresh via `GET /api/status`; relaunch Acme DEV (no `-v`); brief unhealthy then healthy on refresh |
+| 5 Nodes | `5c32a8f` | same | HTML: `laptop` index + workspace with placed envs |
+| 6 Provision move | `5c32a8f` | same + `tests/s5/provision-payload.test.ts` | HTML: form only on `/customers/new`. API: SI resume `resumed=true`, same id `5b3b4674-84df-440d-855b-113689bab69d`, still 2 envs |
+| 7 Consistency | `5c32a8f` | search/filter, empty/loading/error, responsive CSS, badges, tab/search/breadcrumb a11y | HTML/API as above. **Click-through in a real browser was not verified** (no browser automation in this session) |
 
-Sprints 2–7 landed together after sprint 1. Fill the shared SHA in the next docs commit after this frontend lands.
+Sprints 2–7 landed together in `5c32a8f` after sprint 1 (`f61bcdf`).
 
 ## Stop
 
