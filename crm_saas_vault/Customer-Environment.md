@@ -174,6 +174,6 @@ Domains, TLS, Compose project layout, image registry, node communication mechani
 
 ## Next
 
-[[SaaS-Milestones]] **S2** is Successful. Boot steps: [[S2-Hand-Boot-Checklist]]. S3 decisions are recorded. Do not start S3 until Scott asks.
+[[SaaS-Milestones]] **S2** and **S3** are Successful. Boot steps: [[S2-Hand-Boot-Checklist]]. Control plane: [[S3-Control-Plane-Runbook]]. Do not start S4 until Scott asks.
 
 Real Renzo is not a Customer in this model. Intended first pilots (not provisioned): Strategic Insights; Scott’s sister’s business. The S2 lab `lab-acme` is a proof environment, not a paying customer.

@@ -23,8 +23,9 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 - [x] **Add a hosted remote.** `origin` is https://github.com/Koifish95/crm_marketing_saas.git . `main` pushed 2026-09-08. Not `renzo-crm`.
 - [x] **S1** — Customer-environment unit recorded. [[Customer-Environment]]. **Successful.**
 - [x] **S2** — Hand-boot a second martial-arts environment. [[S2-Hand-Boot-Checklist]]. Docker + named lab volumes. **Successful** (2026-09-09).
+- [x] **S3** — Control-plane v1. [[S3-Control-Plane-Runbook]]. **Successful** (2026-09-09).
 
 ## Later / not started
 
-- [ ] **S3** — Control-plane v1 (decisions recorded 2026-09-09; implement only when Scott asks)
-- [ ] **S4–S8** — Provision, access, ops, dogfood, first external customer (see [[SaaS-Milestones]])
+- [ ] **S4** — Sales-led provision (implement only when Scott asks)
+- [ ] **S5–S8** — Access, ops, dogfood, first external customer (see [[SaaS-Milestones]])

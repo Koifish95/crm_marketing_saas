@@ -38,7 +38,7 @@ It does **not** mean Stripe by default, every industry, a beauty variant, or ins
 | S0 | Workspace split | Successful |
 | S1 | Environment unit | Successful |
 | S2 | Second martial-arts environment by hand | Successful |
-| S3 | Control plane v1 | Not started (decisions recorded; implement only when Scott asks) |
+| S3 | Control plane v1 | Successful |
 | S4 | Sales-led provision | Not started |
 | S5 | Reachable customer access | Not started |
 | S6 | Fleet operations | Not started |
@@ -57,7 +57,7 @@ S0 Workspace split
 → S8 First external customer live
 ```
 
-S1 and S2 are Successful. S3 owner decisions are recorded. Prefer `lab-acme` when starting S3. Do not start S3 implementation until Scott asks.
+S0–S3 are Successful. Next implementation is **S4** only when Scott asks.
 
 ---
 
@@ -97,7 +97,7 @@ Prove the template is not “only Renzo.”
 
 - [x] **S2 Successful:** A second martial-arts CRM runs in Docker on the laptop, isolated named volumes (`lab-acme-*-sqlite` / `lab-acme-*-assets`), own admin login (not `setup`), `GET /api/health` green, no shared SQLite with Renzo PRODUCTION. Repeatable via [[S2-Hand-Boot-Checklist]].
 
-Evidence: [[wip/archive/S2_Docker_Coexist_Evidence]] (Docker + volumes; original image `renzo-acquisition:m10a`). Earlier host-process proof: [[wip/archive/S2_Sprint4_Coexist_Evidence]]. Current operator image: `martial-arts-acquisition:s2`.
+Evidence: [[wip/S2_closeout]] (definitive handoff). Original Docker proof: [[wip/archive/S2_Docker_Coexist_Evidence]] (image `renzo-acquisition:m10a`). Earlier host-process proof: [[wip/archive/S2_Sprint4_Coexist_Evidence]]. Current operator image: `martial-arts-acquisition:s2`.
 
 ---
 
@@ -109,9 +109,9 @@ Separate ops app. Scope: [[Control-Plane]].
 
 **Not in this milestone:** Create/provision. Domains. Billing. ThePond replacement.
 
-- [ ] **S3 Successful:** Open the control app and see environments, up/down (container running **and** `/api/health`), and relaunch without destroying volumes. The list reads “Customer B · production · healthy,” not a raw container id.
+- [x] **S3 Successful:** Open the control app and see environments, up/down (container running **and** `/api/health`), and relaunch without destroying volumes. The list reads “Acme BJJ · PROD · healthy,” not a raw container id.
 
-Do not start S3 implementation until Scott asks. S1 and S2 are Successful. Decisions are recorded.
+Status: **Successful** (2026-09-09). App: `control_plane/` at http://127.0.0.1:52100. Evidence: [[wip/S3_closeout]]. Runbook: [[S3-Control-Plane-Runbook]]. S4 is not started.
 
 ---
 

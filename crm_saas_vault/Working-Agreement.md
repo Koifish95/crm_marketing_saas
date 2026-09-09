@@ -78,14 +78,13 @@ Repository verification required
 
 ## Current next decision
 
-Launch path: [[SaaS-Milestones]]. S0, S1, and S2 are Successful. Environment unit: [[Customer-Environment]]. S3 owner decisions are recorded. Next implementation is **S3** only when Scott asks. See [[Control-Plane]] and [[SaaS-Decisions]].
+Launch path: [[SaaS-Milestones]]. S0–S3 are Successful. Next implementation is **S4** only when Scott asks. See [[Control-Plane]] and [[SaaS-Decisions]].
 
 **Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 
 ## What we do not do next
 
-- Build the control-plane application until Scott asks
-- Write provisioners or a “Create customer” button
+- Write provisioners or a “Create customer” button (S4)
 - Add `tenant_id` to the CRM
 - Start Stripe, self-service signup, or a beauty-variant design
 - Touch Koi-Pi PRODUCTION SQLite or `Projects/renzo_crm`

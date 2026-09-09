@@ -11,7 +11,7 @@ tags:
 
 # S3 implementation status
 
-S3 in progress. **S4 is not started.**
+S3 **Successful** (2026-09-09). **S4 is not started.**
 
 ## Locked defaults (Scott 2026-09-09)
 
@@ -55,7 +55,11 @@ On-demand `/api/health` on registered loopback URLs only. Combined status: Healt
 
 ## Sprint 6
 
-Relaunch uses `compose up -d --force-recreate --no-deps app` only. Live laptop proof 2026-09-09: stamped both labs, relaunched PROD through `relaunchRegisteredEnvironment`, markers stayed `m10a-prod-isolation` / `m10a-dev-isolation`, both `/api/health` green, both Docker health `healthy`. Sibling was not recreated.
+Relaunch uses `compose up -d --force-recreate --no-deps app` only. Live laptop proof 2026-09-09: stamped both labs, relaunched PROD through `relaunchRegisteredEnvironment`, markers stayed `m10a-prod-isolation` / `m10a-dev-isolation`, both `/api/health` green, both Docker health `healthy`. Sibling was not recreated. SHA `0ef11d0`.
+
+## Sprint 7
+
+Runbook, closeout, milestones marked Successful. Live `GET /api/status` returned both healthy headlines. Homepage HTML showed Refresh + Relaunch and no Provision. Browser click-through **NOT VERIFIED**.
 
 ## Deviations
 

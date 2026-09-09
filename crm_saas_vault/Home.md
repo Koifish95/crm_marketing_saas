@@ -48,12 +48,12 @@ Long-term direction: an ultra-general marketing, lead-generation, and CRM platfo
 Platform → Industry Template → Customer Instance → Enabled Capabilities → Configuration
 ```
 
-Control plane v1 (working decision, not implemented): a **separate** app in this same repo that lists customer environments, shows up/down, and relaunches without destroying data. It does not provision new customers yet. Details: [[Control-Plane]]. S3 owner decisions are recorded in [[SaaS-Decisions]].
+Control plane v1 is **implemented** as `control_plane/` (http://127.0.0.1:52100). It lists customer environments, shows up/down, and relaunches without destroying data. It does not provision new customers. Details: [[Control-Plane]]. Runbook: [[S3-Control-Plane-Runbook]].
 
 Alignment (evidence, not the map): [[wip/archive/SaaS_Project_Alignment_and_Current_Understanding]].
 
 **Git:** this folder is its own repo; `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).  
-**Milestones:** [[SaaS-Milestones]] S0, S1, and S2 Successful. S3 decisions are recorded. Do not implement the control plane until Scott asks.
+**Milestones:** [[SaaS-Milestones]] S0–S3 Successful. Next implementation is S4 only when Scott asks.
 
 **First intended pilots (not provisioned):** Strategic Insights; Scott’s sister’s business.
 
@@ -66,6 +66,9 @@ Alignment (evidence, not the map): [[wip/archive/SaaS_Project_Alignment_and_Curr
 | [[Customer-Environment]] | S1 unit: Customer, Environment, node placement |
 | [[SaaS-Decisions]] | SaaS ADR log |
 | [[S2-Hand-Boot-Checklist]] | S2 lab boot (Docker + named lab volumes) |
+| [[wip/S2_closeout]] | Definitive S2 closeout / handoff |
+| [[S3-Control-Plane-Runbook]] | How to start and use the S3 control plane |
+| [[wip/S3_closeout]] | Definitive S3 closeout / handoff |
 | [[SaaS-ToDo]] | Open platform tasks |
 | [[Control-Plane]] | Platform control app — v1 scope |
 | [[Conventions]] | How notes, links, and promotions work |

@@ -15,9 +15,13 @@ Processed source material lives in [[wip/archive/_index|wip/archive/]]. Put new 
 
 ## Active SaaS
 
-- [[wip/answers|S0–S8 discovery answers]] (living inbox; S0–S2 and the four S3 owner questions are answered)
+- [[wip/S3_closeout|S3 closeout and handoff]] (definitive S3 record)
+- [[wip/S3_Implementation_Status|S3 implementation status]]
+- [[wip/Begin_S3_Control_Plane_v1_Cursor_Prompt_2026-09-09|S3 execution prompt]]
+- [[wip/S2_closeout|S2 closeout and handoff]]
+- [[wip/answers|S0–S8 discovery answers]]
 - [[wip/SaaS_S0-S8_Discovery_Questions_2026-09-08|S0–S8 discovery questions]]
-- [[wip/Renzo_to_Generic_Martial_Arts_Sanitization|Renzo → generic Martial Arts sanitization]] (this closeout)
+- [[wip/Renzo_to_Generic_Martial_Arts_Sanitization|Renzo → generic Martial Arts sanitization]]
 - [[wip/note|Human QA inbox]]
 - [[wip/catches|catches]] (scratch)
 

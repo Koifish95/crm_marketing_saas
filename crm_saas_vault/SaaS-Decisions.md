@@ -25,6 +25,18 @@ Decision: what we chose
 
 ---
 
+## 2026-09-09 — S3 Successful: laptop control plane observes and relaunches lab-acme
+
+Status: accepted
+
+Context: S3 owner decisions were recorded before coding. The app now exists and the live laptop proof passed.
+
+Decision: S3 is **Successful**. `control_plane/` is a separate Nuxt app on `127.0.0.1:52100` with its own SQLite registry. It lists Acme BJJ PROD/DEV as human headlines, combines container running with `/api/health`, and relaunches via `compose up -d --force-recreate --no-deps app`. No provision. No operator login. Procedure: [[S3-Control-Plane-Runbook]]. Evidence: [[wip/S3_closeout]].
+
+Source: 2026-09-09 implementation; Scott confirmed Nuxt, seed-on-setup, port 52100
+
+---
+
 ## 2026-09-09 — S3 v1 owner decisions
 
 Status: accepted
