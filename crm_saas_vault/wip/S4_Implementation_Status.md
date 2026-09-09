@@ -42,4 +42,8 @@ CRM seed honors `NUXT_AUTH_MUST_CHANGE_PASSWORD`. Lab examples stay unset / fals
 
 ## Sprint 5
 
-Local image build + compose up. Relaunch allowlist is any safe registered compose (lab-acme files or `docker-compose.provisioned.yml`). Failed rows stay Failed; volumes are not deleted.
+Local image build + compose up. Relaunch allowlist is any safe registered compose (lab-acme files or `docker-compose.provisioned.yml`). Failed rows stay Failed; volumes are not deleted. SHA `ad50499`.
+
+## Sprint 6
+
+Provision form on the dashboard. Four fields. No Add-environment.

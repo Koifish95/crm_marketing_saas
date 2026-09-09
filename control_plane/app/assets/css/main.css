@@ -83,3 +83,22 @@ button.secondary {
 .status-stopped { background: #e9ecef; color: #343a40; }
 .status-unhealthy { background: #f8d7da; color: #842029; }
 .status-unknown { background: #fff3cd; color: #664d03; }
+
+label {
+  display: block;
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0.25rem;
+  min-height: 2.5rem;
+  padding: 0 0.65rem;
+  border: 1px solid #c5ced8;
+  border-radius: 0.35rem;
+  font: inherit;
+}
