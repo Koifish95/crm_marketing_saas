@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { filterByQuery, groupCustomers, groupNodes, summarizeFleet, worstStatus, type FleetEnvironment } from '../../shared/utils/fleet'
+import { filterByQuery, filterEnvironments, groupCustomers, groupNodes, summarizeFleet, worstStatus, type FleetEnvironment } from '../../shared/utils/fleet'
 
 function env(partial: Partial<FleetEnvironment> & Pick<FleetEnvironment, 'id' | 'status' | 'type'>): FleetEnvironment {
   return {
@@ -81,5 +81,36 @@ describe('fleet grouping', () => {
       }),
     ])
     expect(filterByQuery(customers, 'strategic', row => `${row.displayName} ${row.slug}`)).toHaveLength(1)
+    expect(filterByQuery(customers, '   ', row => row.displayName)).toHaveLength(2)
+  })
+
+  it('treats an empty fleet as zeros with no invented attention rows', () => {
+    const summary = summarizeFleet([])
+    expect(summary.customerCount).toBe(0)
+    expect(summary.environmentCount).toBe(0)
+    expect(summary.nodeCount).toBe(0)
+    expect(summary.needsAttention).toEqual([])
+    expect(worstStatus([])).toBe('unknown')
+  })
+
+  it('keeps client-side index filters usable beyond a handful of rows', () => {
+    const rows = Array.from({ length: 12 }, (_, index) => env({
+      id: `env-${index}`,
+      status: index % 4 === 0 ? 'unhealthy' : 'healthy',
+      type: index % 2 === 0 ? 'PROD' : 'DEV',
+      customer: {
+        id: `cust-${index}`,
+        slug: `shop-${index}`,
+        displayName: `Shop ${index}`,
+        timezone: 'America/Denver',
+        adminEmail: `admin@shop-${index}.local`,
+      },
+    }))
+    const summary = summarizeFleet(rows)
+    expect(summary.customerCount).toBe(12)
+    expect(summary.unhealthyCount).toBe(3)
+    expect(filterEnvironments(rows, '', 'DEV')).toHaveLength(6)
+    expect(filterEnvironments(rows, 'Shop 11', '')).toHaveLength(1)
+    expect(filterEnvironments(rows, 'missing', 'PROD')).toHaveLength(0)
   })
 })
