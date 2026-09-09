@@ -20,7 +20,7 @@ The source code is the implementation. Durable notes are the map: read them firs
 | Location | Role |
 |---|---|
 | Notes directly under `crm_saas_vault/` | Permanent knowledge |
-| SaaS / platform notes | [[Working-Agreement]], [[SaaS-Decisions]], [[Control-Plane]] |
+| SaaS / platform notes | [[Working-Agreement]], [[SaaS-Milestones]], [[SaaS-Decisions]], [[Control-Plane]] |
 | Renzo evidence notes | [[Overview]], [[Implementation-State]], [[Decisions]], and the rest of the original map |
 | [[Workspace]] | Cursor workspace map (three remotes). Twin of `C:\Users\Scoy9\Projects\AGENTS.md`. |
 | [[Koi-Pi-Infrastructure]] | Raspberry Pi hardware, directories, and the update loop. |
@@ -54,7 +54,7 @@ Do not add `created`, owners, or empty tag lists for completeness.
 
 ## Tasks
 
-Put `- [ ]` checkboxes in the note that owns the work ([[Open-Questions]], [[Milestones]], and similar). Do not copy the same task into [[ToDo]].
+Put `- [ ]` checkboxes in the note that owns the work ([[Open-Questions]], [[Milestones]], [[SaaS-Milestones]], and similar). Do not copy the same task into [[ToDo]] or [[SaaS-ToDo]] except as a pointer.
 
 [[ToDo]] gathers incomplete checkboxes with Dataview. Without the plugin, search the vault for `- [ ]`.
 

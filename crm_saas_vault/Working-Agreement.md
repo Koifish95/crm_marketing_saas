@@ -75,9 +75,9 @@ Repository verification required
 
 ## Current next decision
 
-The control-plane v1 scope is recorded. Next product/architecture decision: define the **customer-environment unit** — what pieces must exist for an environment to be observed and relaunched. See [[Control-Plane]] and [[SaaS-Decisions]].
+Launch path: [[SaaS-Milestones]]. S0 is Successful. Next is **S1** — define the **customer-environment unit**. See [[Control-Plane]] and [[SaaS-Decisions]].
 
-**Local Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas` (`main`, no remotes, not `renzo-crm`). Hosted remote still open on [[SaaS-ToDo]].
+**Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 
 Do not open a broad repository audit until that decision needs targeted evidence (Docker, volumes, health, env, backup).
 

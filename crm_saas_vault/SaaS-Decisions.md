@@ -25,6 +25,18 @@ Decision: what we chose
 
 ---
 
+## 2026-09-08 — SaaS launch path is S0–S8 with Successful acceptance
+
+Status: working decision
+
+Context: Scott asked for milestones from the current workspace to a fully launched SaaS, with deliverables named Successful, and decisions made along the way.
+
+Decision: The platform sequence is [[SaaS-Milestones]] S0–S8. **Successful** is the acceptance name. “Launched” is S8: first external martial-arts customer live, sales-led. This map does not authorize implementation. S1 (environment unit) is next and is decision-only.
+
+Source: 2026-09-08 conversation; [[SaaS-Milestones]]
+
+---
+
 ## 2026-09-08 — This workspace gets its own Git repo, not renzo-crm
 
 Status: working decision (execution pending)
@@ -35,7 +47,7 @@ Decision: This workspace must have an **independent Git repository and remote**.
 
 Still unresolved when we execute: keep Renzo history, start fresh, or import a shallow snapshot. Do not `git init` at `C:\Users\Scoy9\Projects`. Do not force-push Renzo `working` / `main`.
 
-Executed 2026-09-08: `git init -b main` in `C:\Users\Scoy9\Projects\crm_marketing_saas`. Confirmed no prior `.git` and no remotes. Fresh history. Hosted remote still pending. Root `.gitignore` added so `.env`, sqlite, uploads, backups, and Obsidian local state stay out.
+Executed 2026-09-08: `git init -b main` in `C:\Users\Scoy9\Projects\crm_marketing_saas`. Confirmed no prior `.git`. Fresh history. Root `.gitignore` added so `.env`, sqlite, uploads, backups, and Obsidian local state stay out. Hosted remote: `origin` → https://github.com/Koifish95/crm_marketing_saas.git (`main` pushed).
 
 Task: [[SaaS-ToDo]]
 

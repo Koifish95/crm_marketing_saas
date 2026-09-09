@@ -21,4 +21,4 @@ WHERE !completed
 GROUP BY file.link
 ```
 
-If Dataview shows nothing, either all boxes are checked or the plugin is off — the Renzo source lists are [[Milestones]] and [[Open-Questions]]. Platform tasks: [[SaaS-ToDo]].
+If Dataview shows nothing, either all boxes are checked or the plugin is off — the Renzo source lists are [[Milestones]] and [[Open-Questions]]. Platform sequence: [[SaaS-Milestones]]. Open platform tasks: [[SaaS-ToDo]].

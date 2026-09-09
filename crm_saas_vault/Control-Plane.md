@@ -85,4 +85,4 @@ Where the control plane runs, how it talks to a Pi or VPS, and its relationship 
 
 ## Next decision
 
-Define the customer-environment unit: the pieces that must exist before an environment can be observed and relaunched. Do not implement this app until that is recorded and Scott asks for implementation.
+[[SaaS-Milestones]] **S1**: define the customer-environment unit. Do not implement this app until S1 is Successful and Scott asks (S3).
