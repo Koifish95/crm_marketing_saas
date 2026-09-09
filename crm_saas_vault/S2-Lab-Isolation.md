@@ -28,7 +28,7 @@ Primary proof path is two local `pnpm` processes. Docker is optional and was not
 | Data root | `data/lab-acme-prod/` | `data/lab-acme-dev/` |
 | SQLite | `data/lab-acme-prod/sqlite/crm.sqlite` | `data/lab-acme-dev/sqlite/crm.sqlite` |
 | Uploads | `data/lab-acme-prod/uploads/` | `data/lab-acme-dev/uploads/` |
-| Port | 5040 | 5050 |
+| Port | 52040 | 52050 |
 | Isolation marker | `m10a-prod-isolation` | `m10a-dev-isolation` |
 
 Example env files: `martial_arts_template/.env.lab-acme-prod.example` and `.env.lab-acme-dev.example`. Copy to `.env.lab-acme-prod` / `.env.lab-acme-dev` (gitignored) if you need local overrides. Replace the placeholder ADMIN passwords before treating a login as real.
@@ -41,10 +41,13 @@ From `martial_arts_template`:
 pnpm lab lab-acme-prod setup
 pnpm lab lab-acme-prod stamp
 pnpm lab lab-acme-prod get
-pnpm lab lab-acme-prod dev
+pnpm build
+pnpm lab lab-acme-prod serve
 ```
 
 Same for `lab-acme-dev`. `setup` is migrate + seed and **requires** `NUXT_AUTH_PASSWORD`. `stamp` writes `app_settings.m10a.isolation` and the upload-dir marker file using the existing M10A helpers. `get` prints those markers.
+
+`serve` starts the built Nitro process on the lab port (52040 / 52050 on this laptop; 5040–50559 are often Windows-excluded). Use that to run two environments at once. `dev` also honors the lab port and does not steal 5030, but two Vite processes share `.nuxt` and are not the coexist proof.
 
 ## Isolation contract
 
