@@ -1,17 +1,15 @@
 <script setup lang="ts">
-const route = useRoute()
+import { OPERATOR_NAV, navLinkActive } from '~~/shared/utils/nav'
 
-const links = [
-  { to: '/', label: 'Dashboard', exact: true },
-  { to: '/customers', label: 'Customers' },
-  { to: '/environments', label: 'Environments' },
-  { to: '/nodes', label: 'Hosting Nodes' },
-  { to: '/settings', label: 'Settings' },
-]
+const route = useRoute()
 </script>
 
 <template>
   <div class="shell">
+    <a
+      class="skip-link"
+      href="#main-content"
+    >Skip to content</a>
     <aside class="nav">
       <p class="eyebrow">
         Operator
@@ -21,17 +19,21 @@ const links = [
       </p>
       <nav aria-label="Primary">
         <NuxtLink
-          v-for="link in links"
+          v-for="link in OPERATOR_NAV"
           :key="link.to"
           :to="link.to"
-          :class="{ active: link.exact ? route.path === '/' : route.path.startsWith(link.to) }"
-          :aria-current="(link.exact ? route.path === '/' : route.path.startsWith(link.to)) ? 'page' : undefined"
+          :class="{ active: navLinkActive(route.path, link) }"
+          :aria-current="navLinkActive(route.path, link) ? 'page' : undefined"
         >
           {{ link.label }}
         </NuxtLink>
       </nav>
     </aside>
-    <div class="shell-main">
+    <div
+      id="main-content"
+      class="shell-main"
+      tabindex="-1"
+    >
       <slot />
     </div>
   </div>

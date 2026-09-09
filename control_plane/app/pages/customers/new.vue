@@ -1,15 +1,12 @@
 <script setup lang="ts">
+import { DEFAULT_PROVISION_FORM, provisionRequestBody } from '~~/shared/utils/provision'
+
 useHead({ title: 'New customer' })
 
 const router = useRouter()
 const provisioning = ref(false)
 const actionError = ref('')
-const form = reactive({
-  displayName: '',
-  slug: '',
-  timezone: 'America/Denver',
-  adminEmail: '',
-})
+const form = reactive({ ...DEFAULT_PROVISION_FORM })
 
 async function provisionCustomer() {
   provisioning.value = true
@@ -17,7 +14,7 @@ async function provisionCustomer() {
   try {
     const created = await $fetch<{ customerId: string }>('/api/customers', {
       method: 'POST',
-      body: { ...form },
+      body: provisionRequestBody(form),
     })
     await $fetch(`/api/customers/${created.customerId}/provision`, { method: 'POST' })
     await router.push(`/customers/${created.customerId}`)
@@ -76,6 +73,7 @@ async function provisionCustomer() {
       <button
         type="submit"
         :disabled="provisioning"
+        :aria-busy="provisioning"
       >
         {{ provisioning ? 'Provisioning…' : 'Provision' }}
       </button>
@@ -83,6 +81,8 @@ async function provisionCustomer() {
     <p
       v-if="actionError"
       class="muted"
+      role="status"
+      aria-live="polite"
     >
       {{ actionError }}
     </p>

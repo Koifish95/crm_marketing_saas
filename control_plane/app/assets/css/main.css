@@ -41,9 +41,24 @@ body {
 }
 
 .nav a.active,
-.nav a:hover {
+.nav a:hover,
+.nav a:focus-visible {
   background: #2d527f;
   color: #fff;
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -3rem;
+  z-index: 2;
+  padding: 0.4rem 0.7rem;
+  background: #fff;
+  color: #1f3a5f;
+}
+
+.skip-link:focus {
+  top: 0.75rem;
 }
 
 .shell-main {
@@ -71,6 +86,10 @@ body {
 
 .crumbs a {
   color: #1f3a5f;
+}
+
+.table-wrap {
+  overflow-x: auto;
 }
 
 .data-table {
@@ -167,18 +186,6 @@ h1 {
 
 .muted {
   color: #5b6b7c;
-}
-
-.access {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 0.75rem;
-  align-items: baseline;
-}
-
-.access a {
-  color: #1f3a5f;
-  font-weight: 650;
 }
 
 .row {

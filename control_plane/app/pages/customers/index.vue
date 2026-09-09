@@ -22,52 +22,25 @@ const rows = computed(() => filterByQuery(
         >
           New customer
         </NuxtLink>
-        <button
-          type="button"
-          class="secondary"
-          :disabled="pending || refreshing"
-          @click="refreshStatus"
-        >
-          Refresh
-        </button>
+        <AppRefreshButton
+          :pending="pending"
+          :refreshing="refreshing"
+          @refresh="refreshStatus"
+        />
       </template>
       {{ summary.customerCount }} customers. Last checked {{ checkedAt || '—' }}.
     </AppPageHeader>
     <AppSearchField v-model="query" />
-    <p
-      v-if="pending && !checkedAt"
-      class="muted"
+    <AppAsyncPanel
+      :pending="pending && !checkedAt"
+      :error="error"
+      :empty="rows.length === 0"
+      empty-message="No customers match."
     >
-      Loading…
-    </p>
-    <p
-      v-else-if="error"
-      class="muted"
-    >
-      Could not load the registry.
-    </p>
-    <p
-      v-else-if="rows.length === 0"
-      class="muted"
-    >
-      No customers match.
-    </p>
-    <table
-      v-else
-      class="data-table"
-      aria-label="Customers"
-    >
-      <thead>
-        <tr>
-          <th>Customer</th>
-          <th>Slug</th>
-          <th>Envs</th>
-          <th>PROD</th>
-          <th>DEV</th>
-          <th>Overall</th>
-        </tr>
-      </thead>
-      <tbody>
+      <AppDataTable
+        label="Customers"
+        :columns="['Customer', 'Slug', 'Envs', 'PROD', 'DEV', 'Overall']"
+      >
         <tr
           v-for="customer in rows"
           :key="customer.id"
@@ -101,7 +74,7 @@ const rows = computed(() => filterByQuery(
           </td>
           <td><AppStatusBadge :status="customer.overall" /></td>
         </tr>
-      </tbody>
-    </table>
+      </AppDataTable>
+    </AppAsyncPanel>
   </main>
 </template>

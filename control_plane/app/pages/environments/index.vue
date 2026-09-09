@@ -1,31 +1,23 @@
 <script setup lang="ts">
-import { filterByQuery } from '~~/shared/utils/fleet'
+import { filterEnvironments } from '~~/shared/utils/fleet'
 
 useHead({ title: 'Environments' })
 
 const { error, pending, refreshing, environments, checkedAt, refreshStatus } = await useFleetStatus()
 const query = ref('')
 const typeFilter = ref('')
-const rows = computed(() => {
-  const filtered = typeFilter.value
-    ? environments.value.filter(env => env.type === typeFilter.value)
-    : environments.value
-  return filterByQuery(filtered, query.value, env => `${env.customer.displayName} ${env.slug} ${env.type} ${env.node.name}`)
-})
+const rows = computed(() => filterEnvironments(environments.value, query.value, typeFilter.value))
 </script>
 
 <template>
   <main class="page">
     <AppPageHeader title="Environments">
       <template #actions>
-        <button
-          type="button"
-          class="secondary"
-          :disabled="pending || refreshing"
-          @click="refreshStatus"
-        >
-          Refresh
-        </button>
+        <AppRefreshButton
+          :pending="pending"
+          :refreshing="refreshing"
+          @refresh="refreshStatus"
+        />
       </template>
       {{ environments.length }} environments. Last checked {{ checkedAt || '—' }}.
     </AppPageHeader>
@@ -46,42 +38,16 @@ const rows = computed(() => {
         </select>
       </label>
     </div>
-    <p
-      v-if="pending && !checkedAt"
-      class="muted"
+    <AppAsyncPanel
+      :pending="pending && !checkedAt"
+      :error="error"
+      :empty="rows.length === 0"
+      empty-message="No environments match."
     >
-      Loading…
-    </p>
-    <p
-      v-else-if="error"
-      class="muted"
-    >
-      Could not load the registry.
-    </p>
-    <p
-      v-else-if="rows.length === 0"
-      class="muted"
-    >
-      No environments match.
-    </p>
-    <table
-      v-else
-      class="data-table"
-      aria-label="Environments"
-    >
-      <thead>
-        <tr>
-          <th>Customer</th>
-          <th>Environment</th>
-          <th>Type</th>
-          <th>Node</th>
-          <th>Runtime</th>
-          <th>Health</th>
-          <th>Image</th>
-          <th>Last checked</th>
-        </tr>
-      </thead>
-      <tbody>
+      <AppDataTable
+        label="Environments"
+        :columns="['Customer', 'Environment', 'Type', 'Node', 'Runtime', 'Health', 'Image', 'Last checked']"
+      >
         <tr
           v-for="env in rows"
           :key="env.id"
@@ -107,7 +73,7 @@ const rows = computed(() => {
           <td>{{ env.expectedImage }}</td>
           <td>{{ checkedAt || '—' }}</td>
         </tr>
-      </tbody>
-    </table>
+      </AppDataTable>
+    </AppAsyncPanel>
   </main>
 </template>

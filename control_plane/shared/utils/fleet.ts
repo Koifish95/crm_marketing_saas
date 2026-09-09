@@ -149,3 +149,32 @@ export function filterByQuery<T>(rows: readonly T[], query: string, text: (row: 
   }
   return rows.filter(row => text(row).toLowerCase().includes(needle))
 }
+
+export function filterEnvironments(
+  environments: readonly FleetEnvironment[],
+  query: string,
+  typeFilter = '',
+) {
+  const typed = typeFilter
+    ? environments.filter(env => env.type === typeFilter)
+    : environments
+  return filterByQuery(
+    typed,
+    query,
+    env => `${env.customer.displayName} ${env.slug} ${env.type} ${env.node.name}`,
+  )
+}
+
+export function findById<T extends { id: string }>(rows: readonly T[], id: string) {
+  return rows.find(row => row.id === id) ?? null
+}
+
+export const FLEET_STATUS_KEY = 'fleet-status'
+
+export function fleetStatusCachedData(
+  key: string,
+  payload: Record<string, unknown> | undefined,
+  staticData?: Record<string, unknown>,
+) {
+  return payload?.[key] ?? staticData?.[key]
+}

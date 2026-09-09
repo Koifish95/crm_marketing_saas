@@ -16,52 +16,25 @@ const rows = computed(() => filterByQuery(
   <main class="page">
     <AppPageHeader title="Hosting Nodes">
       <template #actions>
-        <button
-          type="button"
-          class="secondary"
-          :disabled="pending || refreshing"
-          @click="refreshStatus"
-        >
-          Refresh
-        </button>
+        <AppRefreshButton
+          :pending="pending"
+          :refreshing="refreshing"
+          @refresh="refreshStatus"
+        />
       </template>
       {{ summary.nodeCount }} nodes. Last checked {{ checkedAt || '—' }}.
     </AppPageHeader>
     <AppSearchField v-model="query" />
-    <p
-      v-if="pending && !checkedAt"
-      class="muted"
+    <AppAsyncPanel
+      :pending="pending && !checkedAt"
+      :error="error"
+      :empty="rows.length === 0"
+      empty-message="No hosting nodes match."
     >
-      Loading…
-    </p>
-    <p
-      v-else-if="error"
-      class="muted"
-    >
-      Could not load the registry.
-    </p>
-    <p
-      v-else-if="rows.length === 0"
-      class="muted"
-    >
-      No hosting nodes match.
-    </p>
-    <table
-      v-else
-      class="data-table"
-      aria-label="Hosting nodes"
-    >
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>ID</th>
-          <th>Kind</th>
-          <th>Driver</th>
-          <th>Environments</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
+      <AppDataTable
+        label="Hosting nodes"
+        :columns="['Name', 'ID', 'Kind', 'Driver', 'Environments', 'Status']"
+      >
         <tr
           v-for="node in rows"
           :key="node.id"
@@ -77,7 +50,7 @@ const rows = computed(() => filterByQuery(
           <td>{{ node.environmentCount }}</td>
           <td><AppStatusBadge :status="node.overall" /></td>
         </tr>
-      </tbody>
-    </table>
+      </AppDataTable>
+    </AppAsyncPanel>
   </main>
 </template>

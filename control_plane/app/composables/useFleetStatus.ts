@@ -1,7 +1,14 @@
-import { summarizeFleet, type FleetStatusResponse } from '~~/shared/utils/fleet'
+import { FLEET_STATUS_KEY, fleetStatusCachedData, summarizeFleet, type FleetStatusResponse } from '~~/shared/utils/fleet'
 
 export async function useFleetStatus() {
-  const { data, error, pending, refresh } = await useFetch<FleetStatusResponse>('/api/status')
+  const { data, error, pending, refresh } = await useFetch<FleetStatusResponse>('/api/status', {
+    key: FLEET_STATUS_KEY,
+    getCachedData: (key, nuxtApp) => fleetStatusCachedData(
+      key,
+      nuxtApp.payload.data as Record<string, unknown> | undefined,
+      nuxtApp.static.data as Record<string, unknown> | undefined,
+    ) as FleetStatusResponse | undefined,
+  })
   const refreshing = ref(false)
 
   const environments = computed(() => data.value?.environments || [])

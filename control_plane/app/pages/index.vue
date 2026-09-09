@@ -8,30 +8,18 @@ const { error, pending, refreshing, summary, checkedAt, refreshStatus } = await 
   <main class="page">
     <AppPageHeader title="Dashboard">
       <template #actions>
-        <button
-          type="button"
-          class="secondary"
-          :disabled="pending || refreshing"
-          @click="refreshStatus"
-        >
-          Refresh
-        </button>
+        <AppRefreshButton
+          :pending="pending"
+          :refreshing="refreshing"
+          @refresh="refreshStatus"
+        />
       </template>
       On-demand health. Last checked {{ checkedAt || '—' }}.
     </AppPageHeader>
-    <p
-      v-if="pending && !checkedAt"
-      class="muted"
+    <AppAsyncPanel
+      :pending="pending && !checkedAt"
+      :error="error"
     >
-      Loading…
-    </p>
-    <p
-      v-else-if="error"
-      class="muted"
-    >
-      Could not load the registry.
-    </p>
-    <template v-else>
       <section
         class="summary-grid"
         aria-label="Fleet summary"
@@ -108,39 +96,29 @@ const { error, pending, refreshing, summary, checkedAt, refreshStatus } = await 
       >
         No unhealthy or unknown environments.
       </p>
-      <table
+      <AppDataTable
         v-else
-        class="data-table"
-        aria-label="Environments that need attention"
+        label="Environments that need attention"
+        :columns="['Customer', 'Environment', 'Status', 'Runtime']"
       >
-        <thead>
-          <tr>
-            <th>Customer</th>
-            <th>Environment</th>
-            <th>Status</th>
-            <th>Runtime</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="env in summary.needsAttention"
-            :key="env.id"
-          >
-            <td>
-              <NuxtLink :to="`/customers/${env.customer.id}`">
-                {{ env.customer.displayName }}
-              </NuxtLink>
-            </td>
-            <td>
-              <NuxtLink :to="`/environments/${env.id}`">
-                {{ env.type }}
-              </NuxtLink>
-            </td>
-            <td><AppStatusBadge :status="env.status" /></td>
-            <td>{{ env.runtime }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </template>
+        <tr
+          v-for="env in summary.needsAttention"
+          :key="env.id"
+        >
+          <td>
+            <NuxtLink :to="`/customers/${env.customer.id}`">
+              {{ env.customer.displayName }}
+            </NuxtLink>
+          </td>
+          <td>
+            <NuxtLink :to="`/environments/${env.id}`">
+              {{ env.type }}
+            </NuxtLink>
+          </td>
+          <td><AppStatusBadge :status="env.status" /></td>
+          <td>{{ env.runtime }}</td>
+        </tr>
+      </AppDataTable>
+    </AppAsyncPanel>
   </main>
 </template>

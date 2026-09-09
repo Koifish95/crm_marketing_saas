@@ -1,13 +1,20 @@
 <script setup lang="ts">
+import { findById } from '~~/shared/utils/fleet'
+import { ENVIRONMENT_TABS } from '~~/shared/utils/nav'
+
 const route = useRoute()
 const { error, pending, refreshing, environments, checkedAt, refreshStatus } = await useFleetStatus()
 const tab = ref('overview')
 const relaunching = ref(false)
 const actionError = ref('')
 const environmentId = computed(() => String(route.params.id || ''))
-const env = computed(() => environments.value.find(row => row.id === environmentId.value) ?? null)
+const env = computed(() => findById(environments.value, environmentId.value))
 
-useHead({ title: computed(() => env.value?.headline || 'Environment') })
+useHead({
+  title: computed(() => env.value
+    ? `Environment · ${env.value.customer.displayName} · ${env.value.type}`
+    : 'Environment'),
+})
 
 async function relaunch() {
   if (!env.value) {
@@ -30,20 +37,24 @@ async function relaunch() {
   <main class="page">
     <AppPageHeader
       :title="env?.headline || 'Environment'"
-      :crumbs="[{ to: '/environments', label: 'Environments' }, { label: env?.type || 'Record' }]"
+      :crumbs="env
+        ? [
+          { to: '/environments', label: 'Environments' },
+          { to: `/customers/${env.customer.id}`, label: env.customer.displayName },
+          { label: env.type },
+        ]
+        : [{ to: '/environments', label: 'Environments' }, { label: 'Record' }]"
     >
       <template #actions>
-        <button
-          type="button"
-          class="secondary"
-          :disabled="pending || refreshing"
-          @click="refreshStatus"
-        >
-          Refresh
-        </button>
+        <AppRefreshButton
+          :pending="pending"
+          :refreshing="refreshing"
+          @refresh="refreshStatus"
+        />
         <button
           type="button"
           :disabled="relaunching || !env"
+          :aria-busy="relaunching"
           @click="relaunch"
         >
           {{ relaunching ? 'Relaunching…' : 'Relaunch' }}
@@ -54,29 +65,19 @@ async function relaunch() {
     <p
       v-if="actionError"
       class="muted"
+      role="status"
+      aria-live="polite"
     >
       {{ actionError }}
     </p>
-    <p
-      v-if="pending && !env"
-      class="muted"
+    <AppAsyncPanel
+      :pending="pending && !env"
+      :error="error || (!pending && !env)"
+      error-message="Environment not found in the current registry."
     >
-      Loading…
-    </p>
-    <p
-      v-else-if="error || !env"
-      class="muted"
-    >
-      Environment not found in the current registry.
-    </p>
-    <template v-else>
       <AppWorkspaceTabs
         v-model="tab"
-        :tabs="[
-          { id: 'overview', label: 'Overview' },
-          { id: 'runtime', label: 'Runtime / Health' },
-          { id: 'configuration', label: 'Configuration' },
-        ]"
+        :tabs="[...ENVIRONMENT_TABS]"
       />
       <section
         v-if="tab === 'overview'"
@@ -86,27 +87,27 @@ async function relaunch() {
       >
         <dl class="dl">
           <dt>Environment ID</dt>
-          <dd>{{ env.id }}</dd>
+          <dd>{{ env?.id }}</dd>
           <dt>Customer</dt>
           <dd>
-            <NuxtLink :to="`/customers/${env.customer.id}`">
-              {{ env.customer.displayName }}
+            <NuxtLink :to="`/customers/${env?.customer.id}`">
+              {{ env?.customer.displayName }}
             </NuxtLink>
           </dd>
           <dt>Type</dt>
-          <dd>{{ env.type }}</dd>
+          <dd>{{ env?.type }}</dd>
           <dt>Hosting node</dt>
           <dd>
-            <NuxtLink :to="`/nodes/${env.node.id}`">
-              {{ env.node.name }}
+            <NuxtLink :to="`/nodes/${env?.node.id}`">
+              {{ env?.node.name }}
             </NuxtLink>
           </dd>
           <dt>Container</dt>
-          <dd>{{ env.containerName }}</dd>
+          <dd>{{ env?.containerName }}</dd>
           <dt>Image</dt>
-          <dd>{{ env.expectedImage }}</dd>
+          <dd>{{ env?.expectedImage }}</dd>
           <dt>Status</dt>
-          <dd><AppStatusBadge :status="env.status" /></dd>
+          <dd><AppStatusBadge :status="env?.status || 'unknown'" /></dd>
         </dl>
       </section>
       <section
@@ -117,23 +118,21 @@ async function relaunch() {
       >
         <dl class="dl">
           <dt>Runtime</dt>
-          <dd>{{ env.runtime }}</dd>
+          <dd>{{ env?.runtime }}</dd>
           <dt>Combined status</dt>
-          <dd><AppStatusBadge :status="env.status" /></dd>
+          <dd><AppStatusBadge :status="env?.status || 'unknown'" /></dd>
           <dt>Application health</dt>
-          <dd>{{ env.healthOk ? 'ok' : (env.healthError || 'not ok') }}</dd>
-          <dt>Database health</dt>
-          <dd>{{ env.healthOk ? 'reachable' : 'not confirmed' }}</dd>
+          <dd>{{ env?.healthOk ? 'ok' : (env?.healthError || 'not ok') }}</dd>
           <dt>Last checked</dt>
           <dd>{{ checkedAt || '—' }}</dd>
           <dt>Access URL</dt>
           <dd>
             <a
-              :href="env.accessUrl"
+              :href="env?.accessUrl"
               target="_blank"
               rel="noreferrer"
             >Open</a>
-            <span class="muted"> {{ env.accessUrl }}</span>
+            <span class="muted"> {{ env?.accessUrl }}</span>
           </dd>
         </dl>
       </section>
@@ -148,27 +147,27 @@ async function relaunch() {
         </p>
         <dl class="dl">
           <dt>Slug</dt>
-          <dd>{{ env.slug }}</dd>
+          <dd>{{ env?.slug }}</dd>
           <dt>Host port</dt>
-          <dd>{{ env.hostPort ?? '—' }}</dd>
+          <dd>{{ env?.hostPort ?? '—' }}</dd>
           <dt>Health URL</dt>
-          <dd>{{ env.healthUrl }}</dd>
+          <dd>{{ env?.healthUrl }}</dd>
           <dt>Compose file</dt>
-          <dd>{{ env.composeFile }}</dd>
+          <dd>{{ env?.composeFile }}</dd>
           <dt>Compose project</dt>
-          <dd>{{ env.composeProject || '—' }}</dd>
+          <dd>{{ env?.composeProject || '—' }}</dd>
           <dt>Env file</dt>
-          <dd>{{ env.envFileLocal }}</dd>
+          <dd>{{ env?.envFileLocal }}</dd>
           <dt>SQLite volume</dt>
-          <dd>{{ env.sqliteVolume }}</dd>
+          <dd>{{ env?.sqliteVolume }}</dd>
           <dt>Assets volume</dt>
-          <dd>{{ env.assetsVolume }}</dd>
+          <dd>{{ env?.assetsVolume }}</dd>
           <dt>Isolation marker</dt>
-          <dd>{{ env.isolationMarker }}</dd>
+          <dd>{{ env?.isolationMarker }}</dd>
           <dt>Lifecycle</dt>
-          <dd>{{ env.lifecycleStatus || '—' }}</dd>
+          <dd>{{ env?.lifecycleStatus || '—' }}</dd>
         </dl>
       </section>
-    </template>
+    </AppAsyncPanel>
   </main>
 </template>
