@@ -47,7 +47,11 @@ Read-only dashboard + `GET /api/environments`. Headlines are `Acme BJJ · PROD`,
 
 ## Sprint 4
 
-Exact-name `docker inspect` only. Leftover `renzo-*` names are refused. Runtime is running / stopped / missing / unknown.
+Exact-name `docker inspect` only. Leftover `renzo-*` names are refused. Runtime is running / stopped / missing / unknown. SHA `29e9972`.
+
+## Sprint 5
+
+On-demand `/api/health` on registered loopback URLs only. Combined status: Healthy / Stopped / Unhealthy / Unknown. Refresh button. `/trial` 404 is not used as health.
 
 ## Deviations
 
