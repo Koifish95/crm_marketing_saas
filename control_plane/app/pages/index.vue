@@ -1,8 +1,7 @@
 <script setup lang="ts">
-useHead({ title: 'Environments' })
+useHead({ title: 'Dashboard' })
 
-const { data, error, pending, refresh } = await useFetch('/api/status')
-const refreshing = ref(false)
+const { data, error, pending, refreshing, refreshStatus } = await useFleetStatus()
 const relaunchingId = ref<string | null>(null)
 const provisioning = ref(false)
 const actionError = ref('')
@@ -13,24 +12,9 @@ const form = reactive({
   adminEmail: '',
 })
 
-async function refreshStatus() {
-  refreshing.value = true
+async function onRefresh() {
   actionError.value = ''
-  try {
-    await refresh()
-  } finally {
-    refreshing.value = false
-  }
-}
-
-function fetchMessage(error: unknown, fallback: string) {
-  if (error && typeof error === 'object' && 'data' in error) {
-    const data = (error as { data?: { statusMessage?: string } }).data
-    if (data?.statusMessage) {
-      return data.statusMessage
-    }
-  }
-  return error instanceof Error ? error.message : fallback
+  await refreshStatus()
 }
 
 async function provisionCustomer() {
@@ -42,7 +26,7 @@ async function provisionCustomer() {
       body: { ...form },
     })
     await $fetch(`/api/customers/${created.customerId}/provision`, { method: 'POST' })
-    await refresh()
+    await refreshStatus()
   } catch (error) {
     actionError.value = fetchMessage(error, 'Provision failed.')
   } finally {
@@ -55,7 +39,7 @@ async function relaunch(id: string) {
   actionError.value = ''
   try {
     await $fetch(`/api/environments/${id}/relaunch`, { method: 'POST' })
-    await refresh()
+    await refreshStatus()
   } catch (error) {
     actionError.value = error instanceof Error ? error.message : 'Relaunch failed.'
   } finally {
@@ -66,23 +50,19 @@ async function relaunch(id: string) {
 
 <template>
   <main class="page">
-    <p class="eyebrow">
-      Operator
-    </p>
-    <div class="row">
-      <h1>Environments</h1>
-      <button
-        type="button"
-        class="secondary"
-        :disabled="pending || refreshing"
-        @click="refreshStatus"
-      >
-        Refresh
-      </button>
-    </div>
-    <p class="muted">
+    <AppPageHeader title="Dashboard">
+      <template #actions>
+        <button
+          type="button"
+          class="secondary"
+          :disabled="pending || refreshing"
+          @click="onRefresh"
+        >
+          Refresh
+        </button>
+      </template>
       On-demand health. Last checked {{ data?.checkedAt || '—' }}.
-    </p>
+    </AppPageHeader>
     <form
       class="card"
       @submit.prevent="provisionCustomer"
@@ -159,7 +139,7 @@ async function relaunch(id: string) {
         {{ env.headline }}
       </p>
       <p>
-        <span :class="['status', `status-${env.status}`]">{{ env.status }}</span>
+        <AppStatusBadge :status="env.status" />
       </p>
       <p class="access">
         <a

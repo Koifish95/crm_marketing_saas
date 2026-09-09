@@ -57,7 +57,25 @@ S0 Workspace split
 → S8 First external customer live
 ```
 
-S0–S4 are Successful. Next implementation is **S5** only when Scott asks.
+S0–S4 are Successful.
+
+## Tentative roadmap (pending owner decisions)
+
+Scott and ChatGPT are working through a post-S4 foundation inventory. That file is **not in the repo yet**. The following sequence is **provisional**. It does **not** replace the historical S5–S8 map below until formally approved. Do not mark tentative S5 Successful because frontend work ships.
+
+| ID | Tentative focus | Status |
+|---|---|---|
+| S5 | Control Plane Productization / Operations Foundation | First slice authorized (operator UI). Not Successful. |
+| S6 | Fleet Reliability / Lifecycle | Not started |
+| S7 | Hosting / Security / Remote Nodes | Not started |
+| S8 | Public Exposure | Not started |
+| S9 | Dogfood / Pilot Readiness | Not started |
+| S10 | Second Pilot / Template Expansion | Not started |
+| S11 | External Paying Customer Readiness | Not started |
+
+Historical map (still the last **approved** Successful path): S5 Hostname / TLS → S6 Backup / upgrade → S7 Owner dogfood → S8 first external customer.
+
+Progress: [[wip/S5_Control_Plane_Productization_Status]].
 
 ---
 

@@ -10,10 +10,145 @@ body {
   margin: 0;
 }
 
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.nav {
+  width: 13.5rem;
+  flex-shrink: 0;
+  padding: 1.25rem 1rem;
+  background: #1f3a5f;
+  color: #fff;
+}
+
+.nav .eyebrow {
+  color: #b8c7d9;
+}
+
+.nav-brand {
+  margin: 0.35rem 0 1.25rem;
+  font-weight: 650;
+}
+
+.nav a {
+  display: block;
+  padding: 0.4rem 0.5rem;
+  border-radius: 0.3rem;
+  color: #e8eef4;
+  text-decoration: none;
+}
+
+.nav a.active,
+.nav a:hover {
+  background: #2d527f;
+  color: #fff;
+}
+
+.shell-main {
+  flex: 1;
+  min-width: 0;
+}
+
 .page {
-  max-width: 52rem;
+  max-width: 72rem;
   margin: 0 auto;
-  padding: 2rem 1.25rem 3rem;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.page-header {
+  margin-bottom: 1rem;
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.85rem;
+}
+
+.crumbs a {
+  color: #1f3a5f;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid #d7dee6;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+  border-bottom: 1px solid #e6ecf1;
+  vertical-align: top;
+}
+
+.data-table th {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #5b6b7c;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 0.75rem;
+}
+
+.summary-grid .card {
+  margin-top: 0;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+}
+
+.tabs .active {
+  background: #1f3a5f;
+  color: #fff;
+}
+
+.dl {
+  display: grid;
+  grid-template-columns: 11rem 1fr;
+  gap: 0.35rem 1rem;
+}
+
+.dl dt {
+  color: #5b6b7c;
+}
+
+.search {
+  max-width: 20rem;
+}
+
+@media (max-width: 48rem) {
+  .shell {
+    flex-direction: column;
+  }
+
+  .nav {
+    width: auto;
+  }
+
+  .nav nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .dl {
+    grid-template-columns: 1fr;
+  }
 }
 
 .eyebrow {
