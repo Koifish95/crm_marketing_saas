@@ -43,6 +43,7 @@ export function toEnvironmentView(
     envFileLocal: row.envFileLocal,
     envFileExample: row.envFileExample,
     healthUrl: row.healthUrl,
+    accessUrl: row.accessUrl,
     expectedImage: row.expectedImage,
     sqliteVolume: row.sqliteVolume,
     assetsVolume: row.assetsVolume,

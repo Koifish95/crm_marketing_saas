@@ -35,6 +35,7 @@ export const environments = sqliteTable('environments', {
   envFileLocal: text('env_file_local').notNull(),
   envFileExample: text('env_file_example').notNull(),
   healthUrl: text('health_url').notNull(),
+  accessUrl: text('access_url').notNull(),
   sqliteVolume: text('sqlite_volume').notNull(),
   assetsVolume: text('assets_volume').notNull(),
   expectedImage: text('expected_image').notNull(),

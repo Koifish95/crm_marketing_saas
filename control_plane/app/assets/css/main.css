@@ -34,6 +34,18 @@ h1 {
   color: #5b6b7c;
 }
 
+.access {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  align-items: baseline;
+}
+
+.access a {
+  color: #1f3a5f;
+  font-weight: 650;
+}
+
 .row {
   display: flex;
   flex-wrap: wrap;

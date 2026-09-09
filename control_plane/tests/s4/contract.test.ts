@@ -4,6 +4,7 @@ import {
   HOST_PORT_MIN,
   PROVISIONED_COMPOSE_FILE,
   PROVISIONED_IMAGE,
+  accessUrlForPort,
   allocateHostPorts,
   assertProvisionSlug,
   defaultEnvironmentPair,
@@ -43,5 +44,11 @@ describe('S4 provision contract', () => {
     expect(HOST_PORT_MIN).toBe(52200)
     expect(HOST_PORT_MAX).toBe(52999)
     expect(environmentNames('nova-bjj', 'PROD').assetsVolume).toBe('nova-bjj-prod-assets')
+  })
+
+  it('builds a staff access URL for any positive host port', () => {
+    expect(accessUrlForPort(52200)).toBe('http://localhost:52200')
+    expect(accessUrlForPort(52040)).toBe('http://localhost:52040')
+    expect(() => accessUrlForPort(0)).toThrow(/positive/)
   })
 })

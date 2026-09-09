@@ -54,6 +54,9 @@ describe('S4 registry create', () => {
       expect(si.every(row => row.lifecycleStatus === 'provisioning')).toBe(true)
       expect(si.every(row => row.expectedImage === 'martial-arts-acquisition:s4')).toBe(true)
       expect(si.some(row => row.containerName === 'strategic-insights-prod-app')).toBe(true)
+      expect(si.every(row => row.accessUrl === `http://localhost:${row.hostPort}`)).toBe(true)
+      expect(si.every(row => !row.accessUrl.includes('/api/health'))).toBe(true)
+      expect(si.every(row => row.healthUrl.endsWith('/api/health'))).toBe(true)
       expect(rows.filter(row => row.customer.slug === 'lab-acme')).toHaveLength(2)
 
       const second = await createCustomerWithDefaultEnvironments(db, {

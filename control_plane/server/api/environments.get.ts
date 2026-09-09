@@ -19,6 +19,7 @@ export default defineEventHandler(async () => {
         slug: row.slug,
         containerName: row.containerName,
         healthUrl: row.healthUrl,
+        accessUrl: row.accessUrl,
         expectedImage: row.expectedImage,
         sqliteVolume: row.sqliteVolume,
         assetsVolume: row.assetsVolume,

@@ -47,6 +47,8 @@ describe('S3 registry', () => {
       expect(rows.every(row => row.node.name === 'laptop')).toBe(true)
       expect(rows.every(row => row.expectedImage === 'martial-arts-acquisition:s2')).toBe(true)
       expect(rows.some(row => row.containerName === 'lab-acme-prod-app')).toBe(true)
+      expect(rows.find(row => row.slug === 'lab-acme-prod')?.accessUrl).toBe('http://localhost:52040')
+      expect(rows.find(row => row.slug === 'lab-acme-dev')?.accessUrl).toBe('http://localhost:52050')
       const all = await db.select().from(environments)
       expect(all).toHaveLength(2)
     } finally {

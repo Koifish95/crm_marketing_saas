@@ -51,6 +51,13 @@ export function healthUrlForPort(port: number) {
   return `http://127.0.0.1:${port}/api/health`
 }
 
+export function accessUrlForPort(port: number) {
+  if (!Number.isInteger(port) || port < 1) {
+    throw new Error(`Host port ${port} is not a positive access port.`)
+  }
+  return `http://localhost:${port}`
+}
+
 export function allocateHostPorts(used: readonly number[], count = 2) {
   const taken = new Set(used)
   const ports: number[] = []

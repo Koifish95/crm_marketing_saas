@@ -54,6 +54,7 @@ export async function seedRegistry(databaseUrl = getDatabaseUrl()) {
         envFileLocal: env.envFileLocal,
         envFileExample: env.envFileExample,
         healthUrl: env.healthUrl,
+        accessUrl: env.accessUrl,
         sqliteVolume: env.sqliteVolume,
         assetsVolume: env.assetsVolume,
         expectedImage: EXPECTED_IMAGE,

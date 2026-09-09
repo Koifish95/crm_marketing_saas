@@ -161,6 +161,14 @@ async function relaunch(id: string) {
       <p>
         <span :class="['status', `status-${env.status}`]">{{ env.status }}</span>
       </p>
+      <p class="access">
+        <a
+          :href="env.accessUrl"
+          target="_blank"
+          rel="noreferrer"
+        >Open</a>
+        <span class="muted">{{ env.accessUrl }}</span>
+      </p>
       <p class="muted">
         {{ env.node.name }} · runtime {{ env.runtime }} · {{ env.expectedImage }}
       </p>

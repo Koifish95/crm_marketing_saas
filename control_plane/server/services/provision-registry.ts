@@ -7,6 +7,7 @@ import {
   allocateHostPorts,
   assertProvisionSlug,
   defaultEnvironmentPair,
+  accessUrlForPort,
   healthUrlForPort,
 } from './provision-contract'
 import { listRegisteredEnvironments } from './registry'
@@ -113,6 +114,7 @@ export async function createCustomerWithDefaultEnvironments(db: Database, input:
       envFileLocal: envFile,
       envFileExample: envFile,
       healthUrl: healthUrlForPort(hostPort),
+      accessUrl: accessUrlForPort(hostPort),
       sqliteVolume: names.sqliteVolume,
       assetsVolume: names.assetsVolume,
       expectedImage: names.expectedImage,

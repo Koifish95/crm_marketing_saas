@@ -15,6 +15,13 @@
       "when": 1788988626108,
       "tag": "0001_volatile_galactus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1788990667990,
+      "tag": "0002_grey_fantastic_four",
+      "breakpoints": true
     }
   ]
 }
