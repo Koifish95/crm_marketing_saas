@@ -25,6 +25,7 @@ const links = [
           :key="link.to"
           :to="link.to"
           :class="{ active: link.exact ? route.path === '/' : route.path.startsWith(link.to) }"
+          :aria-current="(link.exact ? route.path === '/' : route.path.startsWith(link.to)) ? 'page' : undefined"
         >
           {{ link.label }}
         </NuxtLink>

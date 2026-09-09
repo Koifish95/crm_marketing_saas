@@ -25,18 +25,27 @@ Provisional only.
 
 ## Frontend architecture
 
-Nuxt pages + `layouts/default.vue`. Live data from existing `GET /api/status`. Mutations unchanged (`POST /api/customers`, provision, relaunch). Client grouping in `shared/utils/fleet.ts`.
+Nuxt pages + `layouts/default.vue`. Live data from existing `GET /api/status`. Mutations unchanged (`POST /api/customers`, `POST /api/customers/:id/provision`, `POST /api/environments/:id/relaunch`). Client grouping in `shared/utils/fleet.ts`. No new write APIs.
+
+Honest derived fields only: customer/node overall = worst env status (`unhealthy` > `unknown` > `stopped` > `healthy`); Needs Attention = `unhealthy` or `unknown`.
 
 ## Routes / components
 
-- Layout: `app/layouts/default.vue` (Dashboard, Customers, Environments, Hosting Nodes, Settings)
-- `useFleetStatus`, `shared/utils/fleet.ts`, `AppStatusBadge`, `AppPageHeader`, `AppWorkspaceTabs`, `AppSearchField`
-- `/` still has the S4 provision form and environment cards
-- Stub indexes for `/customers`, `/environments`, `/nodes`; Settings is a placeholder
+- Layout/nav: Dashboard, Customers, Environments, Hosting Nodes, Settings
+- `useFleetStatus`, `shared/utils/fleet.ts`
+- `AppStatusBadge`, `AppPageHeader`, `AppWorkspaceTabs`, `AppSearchField`
+- `/` operational Dashboard (counts + Needs Attention). No provision form. No full record dump.
+- `/customers` index + `/customers/:id` workspace (Overview / Environments / Configuration, read-only)
+- `/customers/new` S4 provision form (same two POSTs, same fields, resume/retry, redirect to workspace)
+- `/environments` index + `/environments/:id` workspace (Overview / Runtime / Configuration + Refresh + existing Relaunch)
+- `/nodes` index + `/nodes/:id` workspace (today: one `laptop` row)
+- `/settings` placeholder
+
+Indexes use client-side search/filter. Native tables (no separate `AppDataTable`).
 
 ## Existing functionality preserved
 
-S3 registry, observe, Refresh, Relaunch. S4 provision semantics. No DNS/TLS/hostnames.
+S3 registry, observe, Refresh, Relaunch (never `-v`). S4 provision semantics and POST body keys (`displayName`, `slug`, `timezone`, `adminEmail`). No DNS/TLS/hostnames.
 
 ## Unresolved owner decisions
 
@@ -46,12 +55,18 @@ S3 registry, observe, Refresh, Relaunch. S4 provision semantics. No DNS/TLS/host
 
 ## Sprints
 
-| Sprint | SHA | QA | Browser |
+| Sprint | SHA | QA | Browser vs API |
 |---|---|---|---|
-| 1 Shell | | | |
-| 2 Dashboard | | | |
-| 3 Customers | | | |
-| 4 Environments | | | |
-| 5 Nodes | | | |
-| 6 Provision move | | | |
-| 7 Consistency | | | |
+| 1 Shell | `f61bcdf` | 11 files / 23 tests; lint, typecheck, build | API/HTML: `/` still loaded status inside the new shell |
+| 2 Dashboard | *(same commit as 3–7)* | 12 files / 24 tests; lint, typecheck, build | HTML: counts + Needs Attention; no New customer on `/` |
+| 3 Customers | *(same)* | same | HTML: Acme + SI index rows; SI workspace Overview |
+| 4 Environments | *(same)* | same | HTML: index + SI PROD workspace with Relaunch. API: Refresh via `GET /api/status`; relaunch Acme DEV (no `-v`); brief unhealthy then healthy on refresh |
+| 5 Nodes | *(same)* | same | HTML: `laptop` index + workspace with placed envs |
+| 6 Provision move | *(same)* | same + `tests/s5/provision-payload.test.ts` | HTML: form only on `/customers/new`. API: SI resume `resumed=true`, same id `5b3b4674-84df-440d-855b-113689bab69d`, still 2 envs |
+| 7 Consistency | *(same)* | search/filter, empty/loading/error, responsive CSS, badges, tab/search/breadcrumb a11y | HTML/API as above. **Click-through in a real browser was not verified** (no browser automation in this session) |
+
+Sprints 2–7 landed together after sprint 1. Fill the shared SHA in the next docs commit after this frontend lands.
+
+## Stop
+
+Frontend slice complete. Do not start DNS, public URLs, GoDaddy, TLS, remote nodes, backups, billing, or delete.

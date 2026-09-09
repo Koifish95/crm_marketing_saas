@@ -16,11 +16,13 @@ const emit = defineEmits<{
   >
     <button
       v-for="tab in props.tabs"
+      :id="`tab-${tab.id}`"
       :key="tab.id"
       type="button"
       class="secondary"
       role="tab"
       :aria-selected="modelValue === tab.id"
+      :aria-controls="`panel-${tab.id}`"
       :class="{ active: modelValue === tab.id }"
       @click="emit('update:modelValue', tab.id)"
     >

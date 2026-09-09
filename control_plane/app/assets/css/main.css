@@ -238,7 +238,8 @@ label {
   font-weight: 650;
 }
 
-input {
+input,
+select {
   display: block;
   width: 100%;
   box-sizing: border-box;
@@ -248,4 +249,21 @@ input {
   border: 1px solid #c5ced8;
   border-radius: 0.35rem;
   font: inherit;
+}
+
+h2 {
+  margin: 1.5rem 0 0.6rem;
+  font-size: 1.1rem;
+}
+
+button:disabled,
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+a.button {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
 }
