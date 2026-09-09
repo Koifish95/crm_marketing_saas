@@ -35,7 +35,11 @@ CRM containers never receive a Docker socket. Health is on-demand.
 
 ## Sprint 1
 
-Nuxt skeleton exists. No registry, Docker, or relaunch yet.
+Nuxt skeleton exists. SHA `5ae4e66`.
+
+## Sprint 2
+
+Registry schema + idempotent `lab-acme` seed. UUID ids. Slugs are not primary keys. Tests prove a second `db:setup` keeps the same customer/node ids.
 
 ## Deviations
 
