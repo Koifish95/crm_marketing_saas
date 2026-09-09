@@ -25,6 +25,8 @@ logs
 !.env.dev.example
 !.env.stage.example
 !.env.production.example
+!.env.lab-acme-prod.example
+!.env.lab-acme-dev.example
 
 # Local SQLite
 /data/*.sqlite
@@ -35,6 +37,9 @@ logs
 
 # Local uploads (asset bytes; metadata is in SQLite)
 /data/uploads/
+
+# S2 lab customer data roots (never commit)
+/data/lab-*/
 
 # Host backups (same-host M10B store; never commit packages)
 /data/backups/
