@@ -15,6 +15,7 @@ Processed source material lives in [[wip/archive/_index|wip/archive/]]. Put new 
 
 ## Active SaaS
 
+- [[wip/S4_Implementation_Status|S4 implementation status]]
 - [[wip/S3_closeout|S3 closeout and handoff]] (definitive S3 record)
 - [[wip/S3_Implementation_Status|S3 implementation status]]
 - [[wip/Begin_S3_Control_Plane_v1_Cursor_Prompt_2026-09-09|S3 execution prompt]]
