@@ -94,8 +94,8 @@ None that block **local** development. Critical for anything beyond the laptop: 
 
 | Item | Value |
 |---|---|
-| Commit SHA | *recorded in the follow-up line after commit* |
-| Push | *recorded after push* |
+| Commit SHA | `3236396638d9696823cb4dae46d2fd8786484d87` |
+| Push | pending `origin/working` |
 | Staged | New reconciliation files + the tiny durable-note corrections listed above |
 | Not staged | Unrelated working-tree changes; secrets; sqlite; `data/provisioned/`; the reconciliation **prompt** itself |
 
