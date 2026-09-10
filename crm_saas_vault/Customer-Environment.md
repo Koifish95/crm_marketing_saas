@@ -91,9 +91,9 @@ Technical capability ≠ customer entitlement. Subscription/entitlement configur
 
 Recorded 2026-09-09 ([[SaaS-Decisions#2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)]]):
 
-- **S4** provisions the default pair only (one PROD + one DEV). No Add-environment UI. No fee.
-- **S6** operator may add another non-PROD (STAGE, extra DEV, …).
-- **S8** customer may request extras for a fee (invoice/contract first; no payment processor required to start).
+- **S4** provisions the default pair only (one PROD + one DEV). No fee.
+- **Now (post-S4 ten decisions):** operator may add another non-PROD. Still no fee, no hostname. Refuse a second PROD.
+- **Later:** customer may request extras for a fee (invoice/contract first; no payment processor required to start).
 
 DEV exists specifically to test newer changes before PROD.
 

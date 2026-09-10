@@ -25,6 +25,30 @@ Decision: what we chose
 
 ---
 
+## 2026-09-09 — Post-S4 ten decisions (launch, laptop, extras)
+
+Status: accepted
+
+Context: Scott answered the high-leverage post-S4 forks. Full text: [[wip/Post_S4_Ten_Decisions]]. Prompt: [[wip/S5_And_Beyond_Cursor_Prompt]].
+
+Decision:
+
+- Strategic Insights laptop data is **test data** until the first customer is provisioned on a VPS. Then data must be persisted and safe. Do not start backup work before that cutover.
+- Stay on laptop/desktop until launch; then a dedicated VPS (provider TBD). The control plane stays local until that move. Not Pi-first.
+- Operator login is required before the control plane is reachable off localhost. Until then: loopback, no auth.
+- Exactly **one PROD** per customer, API-enforced now.
+- Extra **non-PROD** environments are operator-productized now (no billing, no hostname). This accelerates the old “S6 extras” line in [[#2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)]].
+- Decommission/archive is in-scope before VPS launch. It is not Stop. Never `docker compose down -v`.
+- Combined status **Missing** is distinct from Stopped.
+- Slug is not editable until DNS. Other customer fields stay read-only until a later answer.
+- Sister business remains the second real pilot. Do not build Beauty in this slice.
+- **Launch** means the first customer on the VPS.
+- Retry continue-vs-rebuild, volume auto-delete (default never), and product domain/hostnames remain unset.
+
+Source: Scott 2026-09-09
+
+---
+
 ## 2026-09-09 — S4 Successful: one form provisions a customer pair
 
 Status: accepted
@@ -49,7 +73,7 @@ Decision:
 - **Provision form (mandatory).** Display name, slug, timezone, admin email. Industry template is Martial Arts (only template). Nothing else is required to hit Provision.
 - **Images.** S4 uses a **local Docker build** on the laptop node only. Not Docker Hub. Not GHCR. Record the learning curve; pick a registry when a second machine (Pi / VPS) needs the same image (likely S6).
 - **Secrets.** Per-environment `.env` on the node, gitignored, not in Git. Control plane stores references, not copies of live admin passwords or integration tokens.
-- **Extra environments.** Default entitlement remains one PROD + one DEV. S4 provisions that pair only — no Add-environment button, no fee. Schema must not hard-code “only two forever.” S6: operator may add another non-PROD. S8: customer may request extras for a fee (invoice/contract is enough; no payment processor required to start).
+- **Extra environments.** Default entitlement remains one PROD + one DEV. S4 provisions that pair only — no Add-environment button, no fee. Schema must not hard-code “only two forever.” Timing of extras and decommission is superseded by [[#2026-09-09 — Post-S4 ten decisions (launch, laptop, extras)]].
 
 This supersedes “lab passwords do not force a change” in the S2 product-defaults ADR, for **new** generated environments. It also extends [[#2026-09-09 — Generated lab environments use admin / setup]]: `setup` remains the unwrap key, not the living SaaS password.
 

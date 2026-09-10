@@ -53,7 +53,7 @@ Control plane is **implemented** as `control_plane/` (http://127.0.0.1:52100): D
 Alignment (evidence, not the map): [[wip/archive/SaaS_Project_Alignment_and_Current_Understanding]].
 
 **Git:** this folder is its own repo; `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).  
-**Milestones:** [[SaaS-Milestones]] S0–S4 Successful. A tentative operator-UI slice of S5 shipped; it is **not** Successful. Next work is the foundation inventory ([[wip/Post_S4_Foundation_Decision_Inventory]]), not DNS/TLS or another milestone. Evidence: [[wip/S4_closeout]], [[wip/S5_Control_Plane_Productization_Status]].
+**Milestones:** [[SaaS-Milestones]] S0–S4 Successful. A tentative operator-UI slice of S5 shipped; it is **not** Successful. Next leftovers: [[wip/S5_And_Beyond_Cursor_Prompt]]. Do not start DNS/TLS. Evidence: [[wip/S4_closeout]], [[wip/S5_Control_Plane_Productization_Status]], [[wip/Post_S4_Ten_Decisions]].
 
 **First intended pilots:** Strategic Insights Consulting, LLC is **laptop-provisioned** (S4 proof, not public). Scott’s sister’s business is **not** provisioned.
 

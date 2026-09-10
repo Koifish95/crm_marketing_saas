@@ -15,7 +15,7 @@ Authorized first slice of **tentative** S5: operator frontend / operational dash
 
 **This work does not make tentative S5 Successful.** Milestone sequencing remains pending [[wip/Post_S4_Foundation_Decision_Inventory]]. Historical S5 is still “reachable customer access” in [[SaaS-Milestones]]. Post-UI hardening: [[wip/Control_Plane_Post_Productization_Audit]].
 
-Related: [[wip/post_S4_prompt]], [[wip/Where_We_Are_Now_Post_S4_2026-09-09]].
+Related: [[wip/post_S4_prompt]], [[wip/Where_We_Are_Now_Post_S4_2026-09-09]], [[wip/S5_And_Beyond_Cursor_Prompt]], [[wip/Post_S4_Ten_Decisions]].
 
 ## Tentative roadmap
 

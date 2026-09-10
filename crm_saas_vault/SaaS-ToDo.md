@@ -29,4 +29,4 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 
 - [x] **S4** — Sales-led provision. **Successful** (2026-09-09). [[S4-Provision-Runbook]].
 - [ ] **S5–S8 (historical approved map)** — Hostname/TLS, fleet ops, dogfood, first external customer. Still in [[SaaS-Milestones]].
-- [ ] **Tentative S5 first slice** — Control-plane operator UI (not Successful). [[wip/S5_Control_Plane_Productization_Status]]. Sequencing of tentative S6–S11 is **pending** the foundation inventory (file not in repo yet).
+- [ ] **Tentative S5 leftovers + extras/decommission** — Missing status, one-PROD API, extra non-PROD, gated decommission. Not Successful. [[wip/S5_And_Beyond_Cursor_Prompt]], [[wip/S5_Control_Plane_Productization_Status]].

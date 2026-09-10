@@ -61,7 +61,7 @@ S0–S4 are Successful.
 
 ## Tentative roadmap (pending owner decisions)
 
-Scott and ChatGPT are working through a post-S4 foundation inventory. That file is **not in the repo yet**. The following sequence is **provisional**. It does **not** replace the historical S5–S8 map below until formally approved. Do not mark tentative S5 Successful because frontend work ships.
+Ten forks: [[wip/Post_S4_Ten_Decisions]]. Implementation prompt: [[wip/S5_And_Beyond_Cursor_Prompt]]. Inventory catalog: [[wip/Post_S4_Foundation_Decision_Inventory]]. The following sequence is **provisional**. It does **not** replace the historical S5–S8 map below until formally approved. Do not mark tentative S5 Successful because frontend work or leftovers ship.
 
 | ID | Tentative focus | Status |
 |---|---|---|

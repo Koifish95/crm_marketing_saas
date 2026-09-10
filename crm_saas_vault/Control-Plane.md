@@ -72,4 +72,4 @@ Relaunch means: recreate the process, remount the same durable data. Never `dock
 
 ## Next
 
-Owner decisions: [[wip/Post_S4_Foundation_Decision_Inventory]]. Tentative S5 frontend slice is shipped; it is **not** Successful. Historical S5 (reachable access / DNS/TLS) is unset. Do not duplicate `lab-acme` or `strategic-insights` blindly.
+Owner decisions: [[wip/Post_S4_Ten_Decisions]], [[wip/S5_And_Beyond_Cursor_Prompt]]. Tentative S5 frontend slice is shipped; it is **not** Successful. Historical S5 (reachable access / DNS/TLS) is unset. Do not duplicate `lab-acme` or `strategic-insights` blindly.
