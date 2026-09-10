@@ -80,8 +80,8 @@ Never `down`, `-v`, or prune. Verify with `pnpm lab:docker <slug> get` (markers)
 - Exact registered container names and health URLs only
 - No Docker socket in CRM containers
 - Do not attach `webhosting_renzo_*` or leftover `renzo-*` volumes
-- Do not invent extra-environment or decommission UI (inventory)
+- Extra non-PROD and gated decommission shipped after S3; see [[wip/Clean_Starting_Point_Current_State]]
 
 ## Exclusions
 
-Pi, SSH, agent, DNS/TLS, delete/decommission, billing, ThePond, Strategic Insights / sister business provision.
+Pi, SSH, agent, DNS/TLS, billing, ThePond, hard-delete of volumes. SI is laptop-provisioned (S4). Sister business is not.

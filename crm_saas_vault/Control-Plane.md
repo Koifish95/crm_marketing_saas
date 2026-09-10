@@ -46,17 +46,17 @@ which customers exist
 → provision a Martial Arts PROD+DEV pair (S4)
 ```
 
-Headlines still read “Acme BJJ · PROD · healthy,” not a container id. Indexes are tables; workspaces are read-only except Refresh and existing Relaunch.
+Headlines still read “Acme BJJ · PROD · healthy,” not a container id. Indexes are tables. Workspaces can Refresh, Relaunch, add extra non-PROD, and gated-decommission (volumes stay). Configuration fields stay read-only. Current state: [[wip/Clean_Starting_Point_Current_State]].
 
 Laptop-only. Local Docker. Health on demand. Acme is seeded; new customers are provisioned. No Docker socket in CRM containers.
 
 ## What it is not
 
 - Public hostname / TLS / DNS
-- Extra-environment UI, upgrades, rollback
-- Backup/restore orchestration
+- Upgrades, rollback, backup/restore orchestration
 - Billing, self-service, ThePond replacement
 - Managing external Renzo
+- Operator login (loopback only; required before leaving localhost)
 
 ## Implementation (S3 facts)
 

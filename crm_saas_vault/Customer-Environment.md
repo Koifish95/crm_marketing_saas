@@ -168,7 +168,7 @@ Stop is non-destructive: process down, persistent data kept.
 
 Delete / decommission is a **separate gated** action. It is not Stop.
 
-S4 stores `lifecycleStatus` `provisioning` | `ready` | `failed` on environment rows. Delete / decommission is still a later gated action.
+S4 stores `lifecycleStatus` `provisioning` | `ready` | `failed` on environment rows. Gated decommission (`decommissioned`) now exists in the control plane: process removed, volumes kept. Hard delete of rows/volumes is still later.
 
 ## Portability
 

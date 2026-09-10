@@ -28,5 +28,5 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 ## Later / not started
 
 - [x] **S4** — Sales-led provision. **Successful** (2026-09-09). [[S4-Provision-Runbook]].
-- [ ] **S5–S8 (historical approved map)** — Hostname/TLS, fleet ops, dogfood, first external customer. Still in [[SaaS-Milestones]].
-- [ ] **Tentative S5 leftovers + extras/decommission** — Missing status, one-PROD API, extra non-PROD, gated decommission. Not Successful. [[wip/S5_And_Beyond_Cursor_Prompt]], [[wip/S5_Control_Plane_Productization_Status]].
+- [ ] **S5–S8 (historical approved map)** — Hostname/TLS, fleet ops, dogfood, first external customer. Still in [[SaaS-Milestones]]. Sequencing after S4: [[wip/Clean_Starting_Point_Current_State]].
+- [x] **Post-S4 leftovers (missing, one-PROD API, extra non-PROD, gated decommission, operator UI)** — Shipped on `working`. Tentative S5 is still **not** Successful. [[wip/Clean_Starting_Point_Current_State]].

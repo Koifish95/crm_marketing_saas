@@ -15,8 +15,11 @@ Processed source material lives in [[wip/archive/_index|wip/archive/]]. Put new 
 
 ## Active SaaS
 
+- [[wip/Clean_Starting_Point_Current_State|Clean starting point — current state]] (authoritative 2026-09-10)
+- [[wip/Clean_Starting_Point_Decision_Backlog|Clean starting point — decision backlog]]
+- [[wip/Clean_Starting_Point_Return|Clean starting point — return]]
 - [[wip/S5_Control_Plane_Productization_Status|S5 control-plane productization status]]
-- [[wip/Where_We_Are_Now_Post_S4_2026-09-09|Where we are now — post-S4 handoff]]
+- [[wip/Where_We_Are_Now_Post_S4_2026-09-09|Where we are now — post-S4 handoff]] (superseded for current UI)
 - [[wip/S4_closeout|S4 closeout and handoff]]
 - [[wip/S4_Implementation_Status|S4 implementation status]]
 - [[wip/S3_closeout|S3 closeout and handoff]] (definitive S3 record)

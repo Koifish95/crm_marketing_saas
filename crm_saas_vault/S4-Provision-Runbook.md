@@ -43,10 +43,10 @@ The same slug does not create a second customer. **Provision** again resumes Fai
 ## Safety
 
 - Reserved slugs: `lab-acme`, `renzo`, `martial-arts`, `webhosting*`
-- No extra-environment button (S6/S8)
+- Extra non-PROD and gated decommission now exist on the customer/environment workspaces (post-S4 leftovers). This runbook is still the default-pair procedure.
 - No GHCR / Docker Hub
 - Do not attach leftover gym or Pi volumes
 
 ## Exclusions
 
-S5 hostnames, extras UI, billing, Pi/SSH, delete/decommission, Beauty / sister-business.
+S5 hostnames, billing, Pi/SSH, hard-delete of volumes, Beauty / sister-business. Current map: [[wip/Clean_Starting_Point_Current_State]].
