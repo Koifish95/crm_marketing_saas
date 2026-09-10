@@ -46,7 +46,7 @@ const rows = computed(() => filterEnvironments(environments.value, query.value, 
     >
       <AppDataTable
         label="Environments"
-        :columns="['Customer', 'Environment', 'Type', 'Node', 'Runtime', 'Health', 'Image', 'Last checked']"
+        :columns="['Customer', 'Environment', 'Type', 'Node', 'Runtime', 'Health', 'Image', 'Access']"
       >
         <tr
           v-for="env in rows"
@@ -71,7 +71,7 @@ const rows = computed(() => filterEnvironments(environments.value, query.value, 
           <td>{{ env.runtime }}</td>
           <td><AppStatusBadge :status="env.status" /></td>
           <td>{{ env.expectedImage }}</td>
-          <td>{{ checkedAt || '—' }}</td>
+          <td><AppAccessLink :href="env.accessUrl" /></td>
         </tr>
       </AppDataTable>
     </AppAsyncPanel>

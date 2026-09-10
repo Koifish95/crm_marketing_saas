@@ -99,7 +99,7 @@ const { error, pending, refreshing, summary, checkedAt, refreshStatus } = await 
       <AppDataTable
         v-else
         label="Environments that need attention"
-        :columns="['Customer', 'Environment', 'Status', 'Runtime']"
+        :columns="['Customer', 'Environment', 'Status', 'Runtime', 'Access']"
       >
         <tr
           v-for="env in summary.needsAttention"
@@ -117,6 +117,7 @@ const { error, pending, refreshing, summary, checkedAt, refreshStatus } = await 
           </td>
           <td><AppStatusBadge :status="env.status" /></td>
           <td>{{ env.runtime }}</td>
+          <td><AppAccessLink :href="env.accessUrl" /></td>
         </tr>
       </AppDataTable>
     </AppAsyncPanel>

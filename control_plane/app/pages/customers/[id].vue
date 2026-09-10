@@ -60,7 +60,7 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
       >
         <AppDataTable
           label="Customer environments"
-          :columns="['Type', 'Status', 'Runtime', 'Image']"
+          :columns="['Type', 'Status', 'Runtime', 'Image', 'Access']"
         >
           <tr
             v-for="env in customer?.environments"
@@ -74,6 +74,7 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
             <td><AppStatusBadge :status="env.status" /></td>
             <td>{{ env.runtime }}</td>
             <td>{{ env.expectedImage }}</td>
+            <td><AppAccessLink :href="env.accessUrl" /></td>
           </tr>
         </AppDataTable>
       </section>

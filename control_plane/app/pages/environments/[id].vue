@@ -51,6 +51,20 @@ async function relaunch() {
           :refreshing="refreshing"
           @refresh="refreshStatus"
         />
+        <a
+          v-if="env?.accessUrl"
+          class="button"
+          :href="env.accessUrl"
+          target="_blank"
+          rel="noreferrer"
+        >Open</a>
+        <button
+          v-else
+          type="button"
+          disabled
+        >
+          Open
+        </button>
         <button
           type="button"
           :disabled="relaunching || !env"
@@ -108,6 +122,8 @@ async function relaunch() {
           <dd>{{ env?.expectedImage }}</dd>
           <dt>Status</dt>
           <dd><AppStatusBadge :status="env?.status || 'unknown'" /></dd>
+          <dt>Access URL</dt>
+          <dd><AppAccessLink :href="env?.accessUrl" /></dd>
         </dl>
       </section>
       <section
@@ -126,14 +142,7 @@ async function relaunch() {
           <dt>Last checked</dt>
           <dd>{{ checkedAt || '—' }}</dd>
           <dt>Access URL</dt>
-          <dd>
-            <a
-              :href="env?.accessUrl"
-              target="_blank"
-              rel="noreferrer"
-            >Open</a>
-            <span class="muted"> {{ env?.accessUrl }}</span>
-          </dd>
+          <dd><AppAccessLink :href="env?.accessUrl" /></dd>
         </dl>
       </section>
       <section
