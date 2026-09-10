@@ -1,4 +1,4 @@
-export type CombinedStatus = 'healthy' | 'stopped' | 'unhealthy' | 'unknown'
+export type CombinedStatus = 'healthy' | 'stopped' | 'missing' | 'unhealthy' | 'unknown'
 
 export type HealthProbe = {
   ok: boolean
@@ -30,6 +30,9 @@ export function parseHealthBody(status: number, body: unknown): HealthProbe {
 export function combineStatus(runtime: 'running' | 'stopped' | 'missing' | 'unknown', healthOk: boolean | null): CombinedStatus {
   if (runtime === 'unknown') {
     return 'unknown'
+  }
+  if (runtime === 'missing') {
+    return 'missing'
   }
   if (runtime !== 'running') {
     return 'stopped'

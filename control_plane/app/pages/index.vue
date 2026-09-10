@@ -82,6 +82,14 @@ const { error, pending, refreshing, summary, checkedAt, refreshStatus } = await 
         </article>
         <article class="card">
           <p class="muted">
+            Missing
+          </p>
+          <p class="headline">
+            {{ summary.missingCount }}
+          </p>
+        </article>
+        <article class="card">
+          <p class="muted">
             Hosting nodes
           </p>
           <p class="headline">
@@ -94,7 +102,7 @@ const { error, pending, refreshing, summary, checkedAt, refreshStatus } = await 
         v-if="summary.needsAttention.length === 0"
         class="muted"
       >
-        No unhealthy or unknown environments.
+        No unhealthy, unknown, or missing environments.
       </p>
       <AppDataTable
         v-else

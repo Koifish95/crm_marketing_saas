@@ -1,4 +1,4 @@
-export type CombinedStatus = 'healthy' | 'stopped' | 'unhealthy' | 'unknown'
+export type CombinedStatus = 'healthy' | 'stopped' | 'missing' | 'unhealthy' | 'unknown'
 
 export type FleetEnvironment = {
   id: string
@@ -44,8 +44,9 @@ export type FleetStatusResponse = {
 }
 
 const STATUS_RANK: Record<CombinedStatus, number> = {
-  unhealthy: 4,
-  unknown: 3,
+  unhealthy: 5,
+  unknown: 4,
+  missing: 3,
   stopped: 2,
   healthy: 1,
 }
@@ -60,7 +61,10 @@ export function worstStatus(statuses: readonly CombinedStatus[]): CombinedStatus
 }
 
 export function needsAttention(env: FleetEnvironment) {
-  return env.status === 'unhealthy' || env.status === 'unknown'
+  if (env.lifecycleStatus === 'decommissioned') {
+    return false
+  }
+  return env.status === 'unhealthy' || env.status === 'unknown' || env.status === 'missing'
 }
 
 export function groupCustomers(environments: readonly FleetEnvironment[]) {
@@ -134,6 +138,7 @@ export function summarizeFleet(environments: readonly FleetEnvironment[]) {
     healthyCount: byStatus('healthy'),
     unhealthyCount: byStatus('unhealthy'),
     stoppedCount: byStatus('stopped'),
+    missingCount: byStatus('missing'),
     unknownCount: byStatus('unknown'),
     nodeCount: nodes.length,
     needsAttention: environments.filter(needsAttention),

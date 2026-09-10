@@ -60,8 +60,23 @@ describe('fleet grouping', () => {
     expect(summary.devCount).toBe(1)
     expect(summary.healthyCount).toBe(1)
     expect(summary.unknownCount).toBe(1)
+    expect(summary.missingCount).toBe(0)
     expect(summary.needsAttention.map(row => row.id)).toEqual(['d'])
     expect(groupNodes(summary.needsAttention)[0]?.name).toBe('laptop')
+  })
+
+  it('treats missing as distinct from stopped and includes it in needs-attention', () => {
+    expect(worstStatus(['stopped', 'missing'])).toBe('missing')
+    const summary = summarizeFleet([
+      env({ id: 'p', status: 'stopped', type: 'PROD' }),
+      env({ id: 'd', status: 'missing', type: 'DEV' }),
+    ])
+    expect(summary.stoppedCount).toBe(1)
+    expect(summary.missingCount).toBe(1)
+    expect(summary.needsAttention.map(row => row.id)).toEqual(['d'])
+    expect(summarizeFleet([
+      env({ id: 'gone', status: 'missing', type: 'DEV', lifecycleStatus: 'decommissioned' }),
+    ]).needsAttention).toEqual([])
   })
 
   it('filters rows by operator query', () => {

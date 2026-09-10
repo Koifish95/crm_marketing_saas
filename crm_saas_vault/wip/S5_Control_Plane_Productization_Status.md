@@ -27,7 +27,7 @@ Provisional only.
 
 Nuxt pages + `layouts/default.vue`. Live data from existing `GET /api/status`. Mutations unchanged (`POST /api/customers`, `POST /api/customers/:id/provision`, `POST /api/environments/:id/relaunch`). Client grouping in `shared/utils/fleet.ts`. No new write APIs.
 
-Honest derived fields only: customer/node overall = worst env status (`unhealthy` > `unknown` > `stopped` > `healthy`); Needs Attention = `unhealthy` or `unknown`.
+Honest derived fields only: customer/node overall = worst env status (`unhealthy` > `unknown` > `missing` > `stopped` > `healthy`); Needs Attention = `unhealthy`, `unknown`, or `missing` (not decommissioned).
 
 ## Routes / components
 

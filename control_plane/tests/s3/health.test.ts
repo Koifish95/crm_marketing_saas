@@ -23,7 +23,7 @@ describe('health combine', () => {
     expect(combineStatus('running', true)).toBe('healthy')
     expect(combineStatus('running', false)).toBe('unhealthy')
     expect(combineStatus('stopped', null)).toBe('stopped')
-    expect(combineStatus('missing', null)).toBe('stopped')
+    expect(combineStatus('missing', null)).toBe('missing')
     expect(combineStatus('unknown', null)).toBe('unknown')
   })
 })

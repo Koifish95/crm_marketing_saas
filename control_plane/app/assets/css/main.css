@@ -247,6 +247,7 @@ button.secondary {
 
 .status-healthy { background: #d8f3dc; color: #1b4332; }
 .status-stopped { background: #e9ecef; color: #343a40; }
+.status-missing { background: #e2d6f3; color: #3d2463; }
 .status-unhealthy { background: #f8d7da; color: #842029; }
 .status-unknown { background: #fff3cd; color: #664d03; }
 

@@ -6,8 +6,9 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { createDb } from '../../server/database'
 import { migrateDatabase } from '../../server/database/migrate'
 import { seedRegistry } from '../../server/database/seed'
-import { environments } from '../../server/database/schema'
-import { createCustomerWithDefaultEnvironments } from '../../server/services/provision-registry'
+import { environments, hostingNodes } from '../../server/database/schema'
+import { environmentNames } from '../../server/services/provision-contract'
+import { createCustomerWithDefaultEnvironments, insertNamedEnvironment } from '../../server/services/provision-registry'
 import { listRegisteredEnvironments } from '../../server/services/registry'
 
 const roots: string[] = []
@@ -70,6 +71,44 @@ describe('S4 registry create', () => {
 
       const all = await db.select().from(environments)
       expect(all).toHaveLength(4)
+    } finally {
+      client.close()
+    }
+  })
+
+  it('refuses a second PROD for the same customer', async () => {
+    const { url, root } = await openRegistry()
+    const { client, db } = createDb(url)
+    try {
+      const created = await createCustomerWithDefaultEnvironments(db, {
+        displayName: 'Nova BJJ',
+        slug: 'nova-bjj',
+        adminEmail: 'admin@nova.local',
+        filesRoot: root,
+      })
+      expect(created.environments.filter(row => row.type === 'PROD')).toHaveLength(1)
+      const [node] = await db.select().from(hostingNodes)
+      const names = {
+        ...environmentNames('nova-bjj', 'PROD'),
+        slug: 'nova-bjj-prod-extra',
+        containerName: 'nova-bjj-prod-extra-app',
+        composeProject: 'nova-bjj-prod-extra',
+        sqliteVolume: 'nova-bjj-prod-extra-sqlite',
+        assetsVolume: 'nova-bjj-prod-extra-assets',
+        isolationMarker: 'nova-bjj-prod-extra-isolation',
+      }
+      await expect(insertNamedEnvironment(db, {
+        customer: {
+          id: created.customerId,
+          displayName: 'Nova BJJ',
+          adminEmail: 'admin@nova.local',
+          timezone: 'America/Denver',
+        },
+        nodeId: node!.id,
+        names,
+        hostPort: 52210,
+        filesRoot: root,
+      })).rejects.toThrow(/one PROD/)
     } finally {
       client.close()
     }

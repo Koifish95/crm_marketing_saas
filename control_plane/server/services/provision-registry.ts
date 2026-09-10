@@ -22,6 +22,82 @@ export class ProvisionError extends Error {
   }
 }
 
+export async function assertOneProdPerCustomer(db: Database, customerId: string, type: string) {
+  if (type !== 'PROD') {
+    return
+  }
+  const rows = await db.select({ type: environments.type }).from(environments).where(eq(environments.customerId, customerId))
+  if (rows.some(row => row.type === 'PROD')) {
+    throw new ProvisionError('A customer may have only one PROD environment.')
+  }
+}
+
+type NamedEnvironment = {
+  type: string
+  displayName: string
+  slug: string
+  containerName: string
+  composeProject: string
+  composeFile: string
+  sqliteVolume: string
+  assetsVolume: string
+  isolationMarker: string
+  expectedImage: string
+}
+
+export async function insertNamedEnvironment(db: Database, input: {
+  customer: { id: string, displayName: string, adminEmail: string, timezone: string }
+  nodeId: string
+  names: NamedEnvironment
+  hostPort: number
+  filesRoot?: string
+  now?: string
+}) {
+  await assertOneProdPerCustomer(db, input.customer.id, input.names.type)
+  const [slugHit] = await db.select().from(environments).where(eq(environments.slug, input.names.slug)).limit(1)
+  if (slugHit) {
+    throw new ProvisionError(`Environment slug ${input.names.slug} is already in use.`)
+  }
+  const now = input.now ?? new Date().toISOString()
+  const id = createStableId()
+  const envFile = `data/provisioned/${id}.env`
+  await db.insert(environments).values({
+    id,
+    customerId: input.customer.id,
+    hostingNodeId: input.nodeId,
+    type: input.names.type,
+    displayName: input.names.displayName,
+    slug: input.names.slug,
+    containerName: input.names.containerName,
+    composeProject: input.names.composeProject,
+    composeFile: input.names.composeFile,
+    envFileLocal: envFile,
+    envFileExample: envFile,
+    healthUrl: healthUrlForPort(input.hostPort),
+    accessUrl: accessUrlForPort(input.hostPort),
+    sqliteVolume: input.names.sqliteVolume,
+    assetsVolume: input.names.assetsVolume,
+    expectedImage: input.names.expectedImage,
+    isolationMarker: input.names.isolationMarker,
+    hostPort: input.hostPort,
+    lifecycleStatus: 'provisioning',
+    createdAt: now,
+  })
+  writeProvisionedEnvFile(envFile, renderProvisionedEnv({
+    composeProject: input.names.composeProject,
+    containerName: input.names.containerName,
+    hostPort: input.hostPort,
+    sqliteVolume: input.names.sqliteVolume,
+    assetsVolume: input.names.assetsVolume,
+    expectedImage: input.names.expectedImage,
+    type: input.names.type,
+    displayName: input.customer.displayName,
+    adminEmail: input.customer.adminEmail,
+    timezone: input.customer.timezone,
+  }), input.filesRoot)
+  return { id, slug: input.names.slug, type: input.names.type, hostPort: input.hostPort, envFileLocal: envFile }
+}
+
 export function usedHostPorts(rows: { hostPort?: number, healthUrl: string }[]) {
   return rows.map((row) => {
     if (row.hostPort && row.hostPort > 0) {
@@ -98,44 +174,14 @@ export async function createCustomerWithDefaultEnvironments(db: Database, input:
 
   const created: { id: string, slug: string, type: string, hostPort: number, envFileLocal: string }[] = []
   for (const names of defaultEnvironmentPair(slug)) {
-    const id = createStableId()
-    const hostPort = ports[created.length] as number
-    const envFile = `data/provisioned/${id}.env`
-    await db.insert(environments).values({
-      id,
-      customerId,
-      hostingNodeId: node.id,
-      type: names.type,
-      displayName: names.displayName,
-      slug: names.slug,
-      containerName: names.containerName,
-      composeProject: names.composeProject,
-      composeFile: names.composeFile,
-      envFileLocal: envFile,
-      envFileExample: envFile,
-      healthUrl: healthUrlForPort(hostPort),
-      accessUrl: accessUrlForPort(hostPort),
-      sqliteVolume: names.sqliteVolume,
-      assetsVolume: names.assetsVolume,
-      expectedImage: names.expectedImage,
-      isolationMarker: names.isolationMarker,
-      hostPort,
-      lifecycleStatus: 'provisioning',
-      createdAt: now,
-    })
-    writeProvisionedEnvFile(envFile, renderProvisionedEnv({
-      composeProject: names.composeProject,
-      containerName: names.containerName,
-      hostPort,
-      sqliteVolume: names.sqliteVolume,
-      assetsVolume: names.assetsVolume,
-      expectedImage: names.expectedImage,
-      type: names.type,
-      displayName,
-      adminEmail,
-      timezone,
-    }), input.filesRoot)
-    created.push({ id, slug: names.slug, type: names.type, hostPort, envFileLocal: envFile })
+    created.push(await insertNamedEnvironment(db, {
+      customer: { id: customerId, displayName, adminEmail, timezone },
+      nodeId: node.id,
+      names,
+      hostPort: ports[created.length] as number,
+      filesRoot: input.filesRoot,
+      now,
+    }))
   }
 
   return { customerId, slug, displayName, resumed: false, environments: created }
