@@ -9,8 +9,14 @@ const tab = ref('overview')
 const customerId = computed(() => String(route.params.id || ''))
 const customer = computed(() => findById(summary.value.customers, customerId.value))
 const adding = ref(false)
+const decommissioning = ref(false)
+const confirmDecommission = ref(false)
 const actionError = ref('')
 const extra = reactive({ ...DEFAULT_EXTRA_ENVIRONMENT_FORM })
+const allDecommissioned = computed(() => (
+  !!customer.value?.environments.length
+  && customer.value.environments.every(env => env.lifecycleStatus === 'decommissioned')
+))
 
 async function addExtra() {
   if (!customer.value) {
@@ -29,6 +35,22 @@ async function addExtra() {
     actionError.value = fetchMessage(error, 'Add environment failed.')
   } finally {
     adding.value = false
+  }
+}
+
+async function decommissionCustomer() {
+  if (!customer.value || !confirmDecommission.value) {
+    return
+  }
+  decommissioning.value = true
+  actionError.value = ''
+  try {
+    await $fetch(`/api/customers/${customer.value.id}/decommission`, { method: 'POST' })
+    await refreshStatus()
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Decommission failed.')
+  } finally {
+    decommissioning.value = false
   }
 }
 
@@ -163,6 +185,36 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
           <dt>Environments</dt>
           <dd>{{ customer?.environmentCount }}</dd>
         </dl>
+        <form
+          v-if="!allDecommissioned"
+          class="card"
+          @submit.prevent="decommissionCustomer"
+        >
+          <p>
+            Decommission every environment for this customer. This stops and removes processes only. Volumes stay. This is not Stop. It never runs compose down -v.
+          </p>
+          <label>
+            <input
+              v-model="confirmDecommission"
+              type="checkbox"
+            >
+            I understand volumes stay and data is not deleted.
+          </label>
+          <button
+            type="submit"
+            class="secondary"
+            :disabled="!confirmDecommission || decommissioning || !customer"
+            :aria-busy="decommissioning"
+          >
+            {{ decommissioning ? 'Decommissioning…' : 'Decommission customer' }}
+          </button>
+        </form>
+        <p
+          v-else
+          class="muted"
+        >
+          All environments for this customer are decommissioned. Volumes were left in place.
+        </p>
       </section>
     </AppAsyncPanel>
   </main>

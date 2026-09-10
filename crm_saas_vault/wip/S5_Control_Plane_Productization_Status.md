@@ -67,6 +67,10 @@ S3 registry, observe, Refresh, Relaunch (never `-v`). S4 provision semantics and
 
 Sprints 2–7 landed together in `5c32a8f` after sprint 1 (`f61bcdf`). Hardening: UI `a3b9efe`, tests `3f5e399`, docs/audit `e84d038`.
 
+## Leftovers (2026-09-09)
+
+Missing is a combined status. One PROD is API-enforced. Extra non-PROD and gated decommission (no `-v`) shipped after the ten decisions. Tentative S5 is still **not** Successful.
+
 ## Stop
 
-Frontend slice + hardening complete. Do not start DNS, public URLs, GoDaddy, TLS, remote nodes, backups, billing, or delete.
+Do not start DNS, public URLs, GoDaddy, TLS, remote nodes, backups, billing, or volume delete.

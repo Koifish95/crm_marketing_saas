@@ -12,6 +12,9 @@ export default defineEventHandler(async (event) => {
   if (!row) {
     throw createError({ statusCode: 404, statusMessage: 'Environment not registered.' })
   }
+  if (row.lifecycleStatus === 'decommissioned') {
+    throw createError({ statusCode: 409, statusMessage: 'Decommissioned environments cannot be relaunched.' })
+  }
   const relaunch = relaunchRegisteredEnvironment(row)
   return {
     relaunch,

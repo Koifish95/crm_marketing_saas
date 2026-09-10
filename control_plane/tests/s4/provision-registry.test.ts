@@ -9,6 +9,8 @@ import { seedRegistry } from '../../server/database/seed'
 import { environments, hostingNodes } from '../../server/database/schema'
 import { environmentNames } from '../../server/services/provision-contract'
 import { addExtraNonProdEnvironment, createCustomerWithDefaultEnvironments, insertNamedEnvironment } from '../../server/services/provision-registry'
+import { decommissionEnvironment } from '../../server/services/decommission'
+import { provisionCustomerEnvironments, setLifecycleStatus } from '../../server/services/provision-runtime'
 import { listRegisteredEnvironments } from '../../server/services/registry'
 
 const roots: string[] = []
@@ -148,6 +150,28 @@ describe('S4 registry create', () => {
         displayName: 'DEV',
         filesRoot: root,
       })).rejects.toThrow(/already in use/)
+    } finally {
+      client.close()
+    }
+  })
+
+  it('skips decommissioned environments on provision', async () => {
+    const { url, root } = await openRegistry()
+    const { client, db } = createDb(url)
+    try {
+      const created = await createCustomerWithDefaultEnvironments(db, {
+        displayName: 'Nova BJJ',
+        slug: 'nova-bjj',
+        adminEmail: 'admin@nova.local',
+        filesRoot: root,
+      })
+      for (const row of created.environments) {
+        await setLifecycleStatus(db, row.id, 'decommissioned')
+      }
+      await expect(provisionCustomerEnvironments(db, created.customerId, root)).rejects.toThrow(/No environments/)
+      const already = await decommissionEnvironment(db, created.environments[0]!.id)
+      expect(already.lifecycleStatus).toBe('decommissioned')
+      expect(already.args).toEqual([])
     } finally {
       client.close()
     }

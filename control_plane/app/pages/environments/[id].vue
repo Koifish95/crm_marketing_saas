@@ -6,9 +6,12 @@ const route = useRoute()
 const { error, pending, refreshing, environments, checkedAt, refreshStatus } = await useFleetStatus()
 const tab = ref('overview')
 const relaunching = ref(false)
+const decommissioning = ref(false)
+const confirmDecommission = ref(false)
 const actionError = ref('')
 const environmentId = computed(() => String(route.params.id || ''))
 const env = computed(() => findById(environments.value, environmentId.value))
+const decommissioned = computed(() => env.value?.lifecycleStatus === 'decommissioned')
 
 useHead({
   title: computed(() => env.value
@@ -29,6 +32,22 @@ async function relaunch() {
     actionError.value = fetchMessage(error, 'Relaunch failed.')
   } finally {
     relaunching.value = false
+  }
+}
+
+async function decommission() {
+  if (!env.value || !confirmDecommission.value) {
+    return
+  }
+  decommissioning.value = true
+  actionError.value = ''
+  try {
+    await $fetch(`/api/environments/${env.value.id}/decommission`, { method: 'POST' })
+    await refreshStatus()
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Decommission failed.')
+  } finally {
+    decommissioning.value = false
   }
 }
 </script>
@@ -67,7 +86,7 @@ async function relaunch() {
         </button>
         <button
           type="button"
-          :disabled="relaunching || !env"
+          :disabled="relaunching || !env || decommissioned"
           :aria-busy="relaunching"
           @click="relaunch"
         >
@@ -176,6 +195,36 @@ async function relaunch() {
           <dt>Lifecycle</dt>
           <dd>{{ env?.lifecycleStatus || '—' }}</dd>
         </dl>
+        <form
+          v-if="!decommissioned"
+          class="card"
+          @submit.prevent="decommission"
+        >
+          <p>
+            This stops and removes the process only. Volumes stay. This is not Stop. It never runs compose down -v.
+          </p>
+          <label>
+            <input
+              v-model="confirmDecommission"
+              type="checkbox"
+            >
+            I understand volumes stay and data is not deleted.
+          </label>
+          <button
+            type="submit"
+            class="secondary"
+            :disabled="!confirmDecommission || decommissioning || !env"
+            :aria-busy="decommissioning"
+          >
+            {{ decommissioning ? 'Decommissioning…' : 'Decommission' }}
+          </button>
+        </form>
+        <p
+          v-else
+          class="muted"
+        >
+          This environment is decommissioned. Volumes were left in place.
+        </p>
       </section>
     </AppAsyncPanel>
   </main>

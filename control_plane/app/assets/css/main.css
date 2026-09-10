@@ -258,6 +258,13 @@ label {
   font-weight: 650;
 }
 
+input[type="checkbox"] {
+  display: inline-block;
+  width: auto;
+  min-height: 1.1rem;
+  margin-right: 0.4rem;
+}
+
 input,
 select {
   display: block;

@@ -79,7 +79,7 @@ export async function waitUntilHealthy(healthUrl: string, attempts = 60, delayMs
   throw new Error(`Timed out waiting for ${healthUrl}.`)
 }
 
-export async function setLifecycleStatus(db: Database, id: string, lifecycleStatus: 'provisioning' | 'ready' | 'failed') {
+export async function setLifecycleStatus(db: Database, id: string, lifecycleStatus: 'provisioning' | 'ready' | 'failed' | 'decommissioned') {
   await db.update(environments).set({ lifecycleStatus }).where(eq(environments.id, id))
 }
 

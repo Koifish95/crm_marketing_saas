@@ -59,6 +59,22 @@ export function resolveComposeEnvFile(input: {
     : input.envFileExample
 }
 
+export function composeDecommissionArgs(input: {
+  envFile: string
+  composeFile: string
+  composeProject?: string
+}) {
+  const args = ['compose', '--env-file', input.envFile, '-f', input.composeFile]
+  if (input.composeProject) {
+    args.push('-p', input.composeProject)
+  }
+  args.push('rm', '-f', '--stop', 'app')
+  if (args.some(part => FORBIDDEN.some(token => part === token || part.includes(token)))) {
+    throw new Error('Refusing a forbidden Docker argument.')
+  }
+  return args
+}
+
 export function composeArgs(input: {
   envFile: string
   composeFile: string
@@ -105,6 +121,60 @@ export function relaunchCommand(input: {
       composeProject: input.composeProject,
       recreate: true,
     }),
+  }
+}
+
+export function decommissionCommand(input: {
+  slug: string
+  composeFile: string
+  envFileLocal: string
+  envFileExample: string
+  composeProject?: string
+  root?: string
+  filesRoot?: string
+}) {
+  assertSafeRelaunch(input)
+  const root = input.root ?? templateRoot()
+  const envFile = resolveComposeEnvFile({
+    envFileLocal: input.envFileLocal,
+    envFileExample: input.envFileExample,
+    root,
+    filesRoot: input.filesRoot,
+  })
+  return {
+    cwd: root,
+    args: composeDecommissionArgs({
+      envFile,
+      composeFile: input.composeFile,
+      composeProject: input.composeProject,
+    }),
+  }
+}
+
+export function decommissionRegisteredEnvironment(input: {
+  slug: string
+  composeFile: string
+  envFileLocal: string
+  envFileExample: string
+  composeProject?: string
+  filesRoot?: string
+}) {
+  const command = decommissionCommand(input)
+  const result = spawnSync('docker', command.args, {
+    cwd: command.cwd,
+    encoding: 'utf8',
+    windowsHide: true,
+  })
+  if (result.status !== 0) {
+    const text = `${result.stderr || ''} ${result.stdout || ''}`
+    if (!/no such|not found|does not exist/i.test(text)) {
+      throw new Error(result.stderr?.trim() || result.stdout?.trim() || 'Decommission failed.')
+    }
+  }
+  return {
+    slug: input.slug,
+    args: command.args,
+    stdout: result.stdout,
   }
 }
 

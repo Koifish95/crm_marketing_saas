@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { assertSafeRelaunch, relaunchCommand } from '../../server/services/docker-relaunch'
+import { assertSafeRelaunch, decommissionCommand, relaunchCommand } from '../../server/services/docker-relaunch'
 
 describe('safe relaunch', () => {
   it('uses compose recreate without down or -v', () => {
@@ -47,5 +47,30 @@ describe('safe relaunch', () => {
       slug: 'lab-acme-prod',
       composeFile: 'docker-compose.prod.yml',
     })).toThrow(/compose file/)
+  })
+
+  it('decommissions with compose rm --stop and never -v', () => {
+    const command = decommissionCommand({
+      slug: 'strategic-insights-prod',
+      composeFile: 'docker-compose.provisioned.yml',
+      envFileLocal: 'C:/tmp/provisioned/env.env',
+      envFileExample: 'C:/tmp/provisioned/env.env',
+      composeProject: 'strategic-insights-prod',
+      root: 'C:/tmp/missing-template',
+    })
+    expect(command.args).toEqual([
+      'compose',
+      '--env-file',
+      'C:/tmp/provisioned/env.env',
+      '-f',
+      'docker-compose.provisioned.yml',
+      '-p',
+      'strategic-insights-prod',
+      'rm',
+      '-f',
+      '--stop',
+      'app',
+    ])
+    expect(command.args.join(' ')).not.toMatch(/-v|prune|down/)
   })
 })
