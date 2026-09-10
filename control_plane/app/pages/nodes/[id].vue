@@ -42,7 +42,7 @@ useHead({ title: computed(() => node.value ? `Hosting node · ${node.value.name}
       <h2>Environments</h2>
       <AppDataTable
         label="Placed environments"
-        :columns="['Customer', 'Type', 'Status', 'Runtime', 'Access']"
+        :columns="['Customer', 'Environment', 'Type', 'Status', 'Runtime', 'Access']"
       >
         <tr
           v-for="env in node?.environments"
@@ -55,9 +55,10 @@ useHead({ title: computed(() => node.value ? `Hosting node · ${node.value.name}
           </td>
           <td>
             <NuxtLink :to="`/environments/${env.id}`">
-              {{ env.type }}
+              {{ env.displayName }}
             </NuxtLink>
           </td>
+          <td>{{ env.type }}</td>
           <td><AppStatusBadge :status="env.status" /></td>
           <td>{{ env.runtime }}</td>
           <td><AppAccessLink :href="env.accessUrl" /></td>

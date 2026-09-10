@@ -8,7 +8,7 @@ import { migrateDatabase } from '../../server/database/migrate'
 import { seedRegistry } from '../../server/database/seed'
 import { environments, hostingNodes } from '../../server/database/schema'
 import { environmentNames } from '../../server/services/provision-contract'
-import { createCustomerWithDefaultEnvironments, insertNamedEnvironment } from '../../server/services/provision-registry'
+import { addExtraNonProdEnvironment, createCustomerWithDefaultEnvironments, insertNamedEnvironment } from '../../server/services/provision-registry'
 import { listRegisteredEnvironments } from '../../server/services/registry'
 
 const roots: string[] = []
@@ -109,6 +109,45 @@ describe('S4 registry create', () => {
         hostPort: 52210,
         filesRoot: root,
       })).rejects.toThrow(/one PROD/)
+    } finally {
+      client.close()
+    }
+  })
+
+  it('adds an extra named DEV without a second PROD', async () => {
+    const { url, root } = await openRegistry()
+    const { client, db } = createDb(url)
+    try {
+      const created = await createCustomerWithDefaultEnvironments(db, {
+        displayName: 'Nova BJJ',
+        slug: 'nova-bjj',
+        adminEmail: 'admin@nova.local',
+        filesRoot: root,
+      })
+      const extra = await addExtraNonProdEnvironment(db, created.customerId, {
+        type: 'DEV',
+        displayName: 'DEV-JOHN',
+        filesRoot: root,
+      })
+      expect(extra.type).toBe('DEV')
+      expect(extra.slug).toBe('nova-bjj-dev-john')
+      expect(extra.hostPort).toBeGreaterThanOrEqual(52200)
+
+      const rows = (await listRegisteredEnvironments(db)).filter(row => row.customer.id === created.customerId)
+      expect(rows).toHaveLength(3)
+      expect(rows.filter(row => row.type === 'PROD')).toHaveLength(1)
+
+      await expect(addExtraNonProdEnvironment(db, created.customerId, {
+        type: 'PROD' as 'DEV',
+        displayName: 'PROD-2',
+        filesRoot: root,
+      })).rejects.toThrow(/non-PROD|one PROD/)
+
+      await expect(addExtraNonProdEnvironment(db, created.customerId, {
+        type: 'DEV',
+        displayName: 'DEV',
+        filesRoot: root,
+      })).rejects.toThrow(/already in use/)
     } finally {
       client.close()
     }

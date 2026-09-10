@@ -35,6 +35,15 @@ const rows = computed(() => filterEnvironments(environments.value, query.value, 
           <option value="DEV">
             DEV
           </option>
+          <option value="STAGE">
+            STAGE
+          </option>
+          <option value="UAT">
+            UAT
+          </option>
+          <option value="TRAINING">
+            TRAINING
+          </option>
         </select>
       </label>
     </div>

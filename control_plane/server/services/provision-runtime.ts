@@ -83,8 +83,11 @@ export async function setLifecycleStatus(db: Database, id: string, lifecycleStat
   await db.update(environments).set({ lifecycleStatus }).where(eq(environments.id, id))
 }
 
-export async function provisionCustomerEnvironments(db: Database, customerId: string, filesRoot?: string) {
-  const rows = (await db.select().from(environments)).filter(row => row.customerId === customerId)
+export async function provisionCustomerEnvironments(db: Database, customerId: string, filesRoot?: string, onlyIds?: readonly string[]) {
+  const rows = (await db.select().from(environments))
+    .filter(row => row.customerId === customerId)
+    .filter(row => row.lifecycleStatus !== 'decommissioned')
+    .filter(row => !onlyIds?.length || onlyIds.includes(row.id))
   if (rows.length === 0) {
     throw new Error('No environments to provision.')
   }

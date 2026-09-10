@@ -7,8 +7,10 @@ import {
   allocateHostPorts,
   assertProvisionSlug,
   defaultEnvironmentPair,
+  extraEnvironmentNames,
   accessUrlForPort,
   healthUrlForPort,
+  type NonProdEnvironmentType,
 } from './provision-contract'
 import { listRegisteredEnvironments } from './registry'
 import { renderProvisionedEnv, writeProvisionedEnvFile } from './provision-env'
@@ -185,4 +187,45 @@ export async function createCustomerWithDefaultEnvironments(db: Database, input:
   }
 
   return { customerId, slug, displayName, resumed: false, environments: created }
+}
+
+export async function addExtraNonProdEnvironment(db: Database, customerId: string, input: {
+  type: NonProdEnvironmentType
+  displayName: string
+  filesRoot?: string
+}) {
+  if ((input.type as string) === 'PROD') {
+    throw new ProvisionError('Extra environments must be non-PROD.')
+  }
+  const [customer] = await db.select().from(customers).where(eq(customers.id, customerId)).limit(1)
+  if (!customer) {
+    throw new ProvisionError('Customer not found.', 404)
+  }
+  const [node] = await db.select().from(hostingNodes).where(eq(hostingNodes.name, 'laptop')).limit(1)
+  if (!node) {
+    throw new ProvisionError('Laptop hosting node is not registered.', 500)
+  }
+  let names
+  try {
+    names = extraEnvironmentNames(customer.slug, input.type, input.displayName)
+  } catch (error) {
+    throw new ProvisionError(error instanceof Error ? error.message : 'Invalid extra environment.')
+  }
+  const registered = await listRegisteredEnvironments(db)
+  const ports = allocateHostPorts(usedHostPorts(registered.map(row => ({
+    hostPort: row.hostPort,
+    healthUrl: row.healthUrl,
+  }))), 1)
+  return insertNamedEnvironment(db, {
+    customer: {
+      id: customer.id,
+      displayName: customer.displayName,
+      adminEmail: customer.adminEmail,
+      timezone: customer.timezone,
+    },
+    nodeId: node.id,
+    names,
+    hostPort: ports[0] as number,
+    filesRoot: input.filesRoot,
+  })
 }

@@ -1,12 +1,36 @@
 <script setup lang="ts">
 import { findById } from '~~/shared/utils/fleet'
 import { CUSTOMER_TABS } from '~~/shared/utils/nav'
+import { DEFAULT_EXTRA_ENVIRONMENT_FORM, EXTRA_ENV_TYPES, extraEnvironmentRequestBody } from '~~/shared/utils/provision'
 
 const route = useRoute()
 const { error, pending, refreshing, summary, checkedAt, refreshStatus } = await useFleetStatus()
 const tab = ref('overview')
 const customerId = computed(() => String(route.params.id || ''))
 const customer = computed(() => findById(summary.value.customers, customerId.value))
+const adding = ref(false)
+const actionError = ref('')
+const extra = reactive({ ...DEFAULT_EXTRA_ENVIRONMENT_FORM })
+
+async function addExtra() {
+  if (!customer.value) {
+    return
+  }
+  adding.value = true
+  actionError.value = ''
+  try {
+    await $fetch(`/api/customers/${customer.value.id}/environments`, {
+      method: 'POST',
+      body: extraEnvironmentRequestBody(extra),
+    })
+    extra.displayName = ''
+    await refreshStatus()
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Add environment failed.')
+  } finally {
+    adding.value = false
+  }
+}
 
 useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.displayName}` : 'Customer') })
 </script>
@@ -58,9 +82,52 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
         role="tabpanel"
         aria-labelledby="tab-environments"
       >
+        <form
+          class="card"
+          @submit.prevent="addExtra"
+        >
+          <p>
+            Add one extra non-PROD. Same local image, isolation, and ports as S4. A second PROD is refused.
+          </p>
+          <label>
+            Type
+            <select v-model="extra.type">
+              <option
+                v-for="type in EXTRA_ENV_TYPES"
+                :key="type"
+                :value="type"
+              >
+                {{ type }}
+              </option>
+            </select>
+          </label>
+          <label>
+            Display name
+            <input
+              v-model="extra.displayName"
+              required
+              placeholder="DEV-JOHN or STAGE"
+            >
+          </label>
+          <button
+            type="submit"
+            :disabled="adding || !customer"
+            :aria-busy="adding"
+          >
+            {{ adding ? 'Adding…' : 'Add environment' }}
+          </button>
+        </form>
+        <p
+          v-if="actionError"
+          class="muted"
+          role="status"
+          aria-live="polite"
+        >
+          {{ actionError }}
+        </p>
         <AppDataTable
           label="Customer environments"
-          :columns="['Type', 'Status', 'Runtime', 'Image', 'Access']"
+          :columns="['Environment', 'Type', 'Status', 'Runtime', 'Image', 'Access']"
         >
           <tr
             v-for="env in customer?.environments"
@@ -68,9 +135,10 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
           >
             <td>
               <NuxtLink :to="`/environments/${env.id}`">
-                {{ env.type }}
+                {{ env.displayName }}
               </NuxtLink>
             </td>
+            <td>{{ env.type }}</td>
             <td><AppStatusBadge :status="env.status" /></td>
             <td>{{ env.runtime }}</td>
             <td>{{ env.expectedImage }}</td>

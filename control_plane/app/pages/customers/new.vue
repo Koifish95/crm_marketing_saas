@@ -32,7 +32,7 @@ async function provisionCustomer() {
       title="New customer"
       :crumbs="[{ to: '/customers', label: 'Customers' }, { label: 'New' }]"
     >
-      Creates one PROD and one DEV. No extra environments.
+      Creates one PROD and one DEV. Add extras from the customer workspace.
     </AppPageHeader>
     <form
       class="card"

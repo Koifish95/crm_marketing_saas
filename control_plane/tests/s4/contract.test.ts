@@ -8,6 +8,7 @@ import {
   allocateHostPorts,
   assertProvisionSlug,
   defaultEnvironmentPair,
+  extraEnvironmentNames,
   environmentNames,
   healthUrlForPort,
 } from '../../server/services/provision-contract'
@@ -44,6 +45,17 @@ describe('S4 provision contract', () => {
     expect(HOST_PORT_MIN).toBe(52200)
     expect(HOST_PORT_MAX).toBe(52999)
     expect(environmentNames('nova-bjj', 'PROD').assetsVolume).toBe('nova-bjj-prod-assets')
+  })
+
+  it('names extra non-PROD environments without colliding with the default pair', () => {
+    const extra = extraEnvironmentNames('nova-bjj', 'DEV', 'DEV-JOHN')
+    expect(extra.slug).toBe('nova-bjj-dev-john')
+    expect(extra.displayName).toBe('DEV-JOHN')
+    expect(extra.type).toBe('DEV')
+    expect(extra.isolationMarker).toBe('nova-bjj-dev-john-isolation')
+    expect(extraEnvironmentNames('nova-bjj', 'STAGE', 'STAGE').slug).toBe('nova-bjj-stage')
+    expect(() => extraEnvironmentNames('nova-bjj', 'DEV', 'prod')).toThrow(/non-PROD/)
+    expect(() => extraEnvironmentNames('renzo', 'STAGE', 'STAGE')).toThrow(/reserved/)
   })
 
   it('builds a staff access URL for any positive host port', () => {

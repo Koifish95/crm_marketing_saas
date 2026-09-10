@@ -7,7 +7,11 @@ export const DEFAULT_TIMEZONE = 'America/Denver'
 const CUSTOMER_SLUG = /^[a-z][a-z0-9-]{1,46}[a-z0-9]$/
 const RESERVED = /^(lab-acme|renzo|martial-arts|webhosting)(-|$)/i
 
-export type EnvironmentType = 'PROD' | 'DEV'
+export const NON_PROD_TYPES = ['DEV', 'STAGE', 'UAT', 'TRAINING'] as const
+export type NonProdEnvironmentType = typeof NON_PROD_TYPES[number]
+export type EnvironmentType = 'PROD' | NonProdEnvironmentType
+
+const ENV_LABEL = /^[a-z][a-z0-9-]{1,30}[a-z0-9]$/
 
 export function normalizeCustomerSlug(value: string) {
   return value.trim().toLowerCase()
@@ -42,6 +46,45 @@ export function environmentNames(customerSlug: string, type: EnvironmentType) {
 
 export function defaultEnvironmentPair(customerSlug: string) {
   return [environmentNames(customerSlug, 'PROD'), environmentNames(customerSlug, 'DEV')] as const
+}
+
+export function normalizeEnvironmentLabel(value: string) {
+  return value.trim().toLowerCase().replace(/[\s_]+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/--+/g, '-').replace(/^-|-$/g, '')
+}
+
+export function extraEnvironmentNames(
+  customerSlug: string,
+  type: NonProdEnvironmentType,
+  displayName: string,
+) {
+  if ((type as string) === 'PROD') {
+    throw new Error('Extra environments must be non-PROD.')
+  }
+  const customer = assertProvisionSlug(customerSlug)
+  const raw = displayName.trim() || type
+  const label = normalizeEnvironmentLabel(raw)
+  if (!ENV_LABEL.test(label) || label.includes('--')) {
+    throw new Error(`Invalid extra environment name ${displayName}.`)
+  }
+  if (label === 'prod') {
+    throw new Error('Extra environments must be non-PROD.')
+  }
+  const slug = `${customer}-${label}`
+  if (RESERVED.test(slug) || slug.includes('renzo') || slug.includes('webhosting')) {
+    throw new Error(`Refusing reserved slug ${slug}.`)
+  }
+  return {
+    type,
+    displayName: raw,
+    slug,
+    containerName: `${slug}-app`,
+    composeProject: slug,
+    composeFile: PROVISIONED_COMPOSE_FILE,
+    sqliteVolume: `${slug}-sqlite`,
+    assetsVolume: `${slug}-assets`,
+    isolationMarker: `${slug}-isolation`,
+    expectedImage: PROVISIONED_IMAGE,
+  }
 }
 
 export function healthUrlForPort(port: number) {

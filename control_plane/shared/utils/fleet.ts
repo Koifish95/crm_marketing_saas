@@ -92,7 +92,8 @@ export function groupCustomers(environments: readonly FleetEnvironment[]) {
       ...customer,
       environmentCount: customer.environments.length,
       prod: customer.environments.find(env => env.type === 'PROD') ?? null,
-      dev: customer.environments.find(env => env.type === 'DEV') ?? null,
+      dev: customer.environments.find(env => env.slug === `${customer.slug}-dev`)
+        ?? customer.environments.find(env => env.type === 'DEV') ?? null,
       overall: worstStatus(customer.environments.map(env => env.status)),
     }))
     .sort((left, right) => left.displayName.localeCompare(right.displayName))
