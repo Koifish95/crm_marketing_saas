@@ -97,6 +97,7 @@ No `martial_arts_template/` or `control_plane/` application changes.
 | Item | Value |
 |---|---|
 | Planning commit | `33e116e` |
+| D1–D4 decisions | `fa54497` |
 | Push | `origin/working` |
 
 ## Confirmation
