@@ -9,6 +9,30 @@
     "./shared/utils/brand": "./shared/utils/brand.ts",
     "./shared/utils/app-env": "./shared/utils/app-env.ts",
     "./shared/utils/health": "./shared/utils/health.ts",
-    "./shared/utils/identity": "./shared/utils/identity.ts"
+    "./shared/utils/identity": "./shared/utils/identity.ts",
+    "./shared/utils/password-policy": "./lib/password-policy.ts",
+    "./shared/utils/record-workspace": "./lib/record-workspace.ts",
+    "./shared/utils/nav": "./shared/utils/nav.ts",
+    "./shared/utils/settings-registry": "./shared/utils/settings-registry.ts",
+    "./shared/utils/permission-catalog": "./shared/utils/permission-catalog.ts",
+    "./shared/utils/core-shell": "./shared/utils/core-shell.ts",
+    "./shared/schemas/user-role": "./lib/user-role.ts",
+    "./shared/schemas/user": "./lib/user.ts",
+    "./server/database/schema": "./server/database/schema.ts",
+    "./server/database/types": "./server/database/types.ts",
+    "./server/services/auth": "./server/services/auth.ts",
+    "./server/services/password": "./server/services/password.ts",
+    "./server/services/login-throttle": "./server/services/login-throttle.ts",
+    "./server/services/authorization": "./server/services/authorization.ts",
+    "./server/services/users": "./server/services/users.ts",
+    "./server/services/access-rights": "./server/services/access-rights.ts",
+    "./server/services/app-settings": "./server/services/app-settings.ts",
+    "./server/services/errors": "./server/services/errors.ts"
+  },
+  "dependencies": {
+    "@adonisjs/hash": "^10.1.1",
+    "drizzle-orm": "^0.45.2",
+    "h3": "^1.15.4",
+    "zod": "^4.4.3"
   }
 }

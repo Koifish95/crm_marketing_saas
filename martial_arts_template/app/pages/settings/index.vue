@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { listSettingsSections } from '@crm/core/shared/utils/settings-registry'
 import {
   ALLOW_EARLY_TRIAL_OUTCOMES_DESCRIPTION,
   ALLOW_EARLY_TRIAL_OUTCOMES_LABEL,
@@ -71,38 +72,7 @@ watch(appSettings, (value) => {
   }
 }, { immediate: true })
 
-const areas = [
-  {
-    to: '/settings/intro-availability',
-    title: 'Intro schedule',
-    description: 'Weekly classes and date exceptions for public and staff booking.',
-  },
-  {
-    to: '/settings/catalog',
-    title: 'Catalog',
-    description: 'Programs, sources, offerings, lost reasons, and household pricing.',
-  },
-  {
-    to: '/settings/campaigns',
-    title: 'Campaigns',
-    description: 'Opens Marketing Campaign planning. Tracking links and Meta mapping stay available there.',
-  },
-  {
-    to: '/settings/meta',
-    title: 'Meta',
-    description: 'Read-only Marketing API sync and explicit campaign mapping.',
-  },
-  {
-    to: '/settings/access',
-    title: 'Access',
-    description: 'User Types, User Roles, and Access Rights for Marketing.',
-  },
-  {
-    to: '/settings/environment',
-    title: 'Environment',
-    description: 'Download and restore SQLite backups to copy data between environments.',
-  },
-]
+const areas = listSettingsSections()
 
 function formatUptime(seconds: number) {
   const hours = Math.floor(seconds / 3600)

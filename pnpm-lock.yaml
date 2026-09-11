@@ -90,7 +90,20 @@ importers:
         specifier: ^3.3.11
         version: 3.3.11(typescript@5.9.3)
 
-  packages/crm-core: {}
+  packages/crm-core:
+    dependencies:
+      '@adonisjs/hash':
+        specifier: ^10.1.1
+        version: 10.1.1
+      drizzle-orm:
+        specifier: ^0.45.2
+        version: 0.45.2(@libsql/client@0.17.4)
+      h3:
+        specifier: ^1.15.4
+        version: 1.15.11
+      zod:
+        specifier: ^4.4.3
+        version: 4.6.2
 
 packages:
 

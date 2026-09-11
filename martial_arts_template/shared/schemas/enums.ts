@@ -92,7 +92,7 @@ export const followUpCallOutcomeSchema = z.enum([
   'OTHER',
 ])
 
-export const userRoleSchema = z.enum(['ADMIN', 'STAFF', 'VIEWER'])
+export { userRoleSchema, type UserRole } from '@crm/core/shared/schemas/user-role'
 
 export const campaignStatusSchema = z.enum([
   'DRAFT',
@@ -192,7 +192,6 @@ export const compensationEligibilitySchema = z.enum([
 
 export const compensationPaymentStatusSchema = z.enum(['UNPAID', 'PAID'])
 export type FollowUpCallOutcome = z.infer<typeof followUpCallOutcomeSchema>
-export type UserRole = z.infer<typeof userRoleSchema>
 export type CampaignStatus = z.infer<typeof campaignStatusSchema>
 export type MarketingTaskType = z.infer<typeof marketingTaskTypeSchema>
 export type MarketingTaskStatus = z.infer<typeof marketingTaskStatusSchema>

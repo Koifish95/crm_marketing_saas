@@ -9,11 +9,11 @@ import {
   UNAUTHORIZED_MESSAGE,
   WRITE_ROLES,
   hasRole,
-  isAdmin,
   isPasswordChangeAllowedPath,
   type SessionUser,
 } from '../services/authorization'
-import { resolveEffectiveAccessRightsForUserId } from '../services/access-rights'
+import { requireAccessRight as assertAccessRight } from '../services/access-rights'
+import { DomainError } from '../services/errors'
 import type { AccessRight } from '../../shared/schemas/enums'
 
 function requestPath(event: H3Event) {
@@ -128,16 +128,17 @@ export async function requireAdminUser(event: H3Event): Promise<SessionUser> {
 
 export async function requireAccessRight(event: H3Event, right: AccessRight): Promise<SessionUser> {
   const user = await requireAuthUser(event)
-  if (isAdmin(user.role)) {
-    return user
-  }
-  const rights = await resolveEffectiveAccessRightsForUserId(useDb(), user.id)
-  if (!rights.includes(right)) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: FORBIDDEN_MESSAGE,
-      message: FORBIDDEN_MESSAGE,
-    })
+  try {
+    await assertAccessRight(useDb(), user, right)
+  } catch (error) {
+    if (error instanceof DomainError) {
+      throw createError({
+        statusCode: error.statusCode,
+        statusMessage: error.message,
+        message: error.message,
+      })
+    }
+    throw error
   }
   return user
 }

@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm'
+import { ensureAppSettings, readAppSetting, upsertAppSetting } from '@crm/core/server/services/app-settings'
 import type { Database } from '../database'
-import { appSettings, users } from '../database/schema'
+import { users } from '../database/schema'
 import {
   COMPENSATION_TRACKED_OWNER_DESCRIPTION,
   COMPENSATION_TRACKED_OWNER_KEY,
@@ -63,8 +64,7 @@ function parseUserIdSetting(value: string | undefined) {
 }
 
 async function readSettingRow(db: Database, key: string) {
-  const [row] = await db.select().from(appSettings).where(eq(appSettings.key, key)).limit(1)
-  return row
+  return readAppSetting(db, key)
 }
 
 async function upsertSetting(
@@ -74,24 +74,7 @@ async function upsertSetting(
   actorUserId: number | null,
   nowMs = utcNowMs(),
 ) {
-  const existing = await readSettingRow(db, key)
-  const stamp = new Date(nowMs)
-  if (existing) {
-    await db.update(appSettings)
-      .set({
-        value,
-        updatedAt: stamp,
-        updatedByUserId: actorUserId,
-      })
-      .where(eq(appSettings.key, key))
-    return
-  }
-  await db.insert(appSettings).values({
-    key,
-    value,
-    updatedAt: stamp,
-    updatedByUserId: actorUserId,
-  })
+  await upsertAppSetting(db, key, value, actorUserId, nowMs)
 }
 
 async function activeUserPreview(db: Database, userId: number | null) {
@@ -110,23 +93,10 @@ async function activeUserPreview(db: Database, userId: number | null) {
 }
 
 export async function ensureDefaultAppSettings(db: Database, nowMs = utcNowMs()) {
-  const stamp = new Date(nowMs)
-  const keys = [
+  await ensureAppSettings(db, [
     { key: ALLOW_EARLY_TRIAL_OUTCOMES_KEY, value: serializeBoolean(ALLOW_EARLY_TRIAL_OUTCOMES_DEFAULT) },
     { key: COMPENSATION_TRACKED_OWNER_KEY, value: '' },
-  ]
-  for (const item of keys) {
-    const existing = await readSettingRow(db, item.key)
-    if (existing) {
-      continue
-    }
-    await db.insert(appSettings).values({
-      key: item.key,
-      value: item.value,
-      updatedAt: stamp,
-      updatedByUserId: null,
-    }).onConflictDoNothing()
-  }
+  ], nowMs)
 }
 
 export async function getAllowEarlyTrialOutcomes(db: Database) {

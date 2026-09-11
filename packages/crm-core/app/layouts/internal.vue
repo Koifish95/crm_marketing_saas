@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { roleLabel } from '#shared/utils/labels'
+import { listNavItems } from '../../shared/utils/nav'
+import { roleLabel } from '../../lib/role-label'
 
 const { user, clear } = useUserSession()
 const route = useRoute()
@@ -15,34 +16,11 @@ if (sessionError.value) {
 }
 
 const currentUser = computed(() => me.value?.user ?? user.value)
-const canUseCrm = computed(() => currentUser.value?.role === 'ADMIN' || currentUser.value?.role === 'STAFF')
-const canViewMarketing = computed(() => currentUser.value?.role === 'ADMIN' || Boolean(me.value?.accessRights?.includes('VIEW_MARKETING')))
 
-const links = computed(() => {
-  const items = [
-    { to: '/dashboard', label: 'Dashboard', match: '/dashboard' },
-  ]
-  if (canUseCrm.value) {
-    items.push(
-      { to: '/leads', label: 'Leads', match: '/leads' },
-      { to: '/tasks', label: 'Follow-up', match: '/tasks' },
-    )
-  }
-  if (canViewMarketing.value) {
-    items.push({ to: '/marketing', label: 'Marketing', match: '/marketing' })
-  }
-  if (canUseCrm.value) {
-    items.push({ to: '/reports', label: 'Reports', match: '/reports' })
-  }
-  if (currentUser.value?.role === 'ADMIN') {
-    items.push(
-      { to: '/users', label: 'Users', match: '/users' },
-      { to: '/security', label: 'Security activity', match: '/security' },
-      { to: '/settings', label: 'Settings', match: '/settings' },
-    )
-  }
-  return items
-})
+const links = computed(() => listNavItems({
+  role: currentUser.value?.role,
+  accessRights: me.value?.accessRights,
+}))
 
 function isActive(match: string) {
   return route.path === match || route.path.startsWith(`${match}/`)
@@ -118,7 +96,7 @@ async function logout() {
         >
           <NuxtLink
             v-for="link in links"
-            :key="link.to"
+            :key="link.id"
             :to="link.to"
             class="flex min-h-11 items-center rounded-md px-3 py-2.5 text-sm font-medium transition-colors"
             :class="isActive(link.match)

@@ -1,3 +1,4 @@
+import { registerAccessRights } from '@crm/core/shared/utils/permission-catalog'
 import type { AccessRight } from '../schemas/enums'
 
 export const ACCESS_RIGHTS: readonly AccessRight[] = [
@@ -56,6 +57,23 @@ export const SEEDED_USER_ROLE_CODES = [
   'COMPENSATION_ADMIN',
 ] as const
 
+export const SEEDED_USER_ROLES: Array<{
+  code: (typeof SEEDED_USER_ROLE_CODES)[number]
+  name: string
+  description: string
+}> = [
+  { code: 'MARKETING_VIEWER', name: 'Marketing viewer', description: 'See the Marketing area and reports.' },
+  { code: 'CAMPAIGN_MANAGER', name: 'Campaign manager', description: 'Plan and update Marketing Campaigns.' },
+  { code: 'MARKETING_TASK_MANAGER', name: 'Marketing task manager', description: 'Create and complete Marketing Tasks.' },
+  { code: 'CONTENT_MANAGER', name: 'Content manager', description: 'Plan and record marketing content.' },
+  { code: 'CONTENT_APPROVER', name: 'Content approver', description: 'Approve content when review is required.' },
+  { code: 'ASSET_MANAGER', name: 'Asset manager', description: 'Upload and classify marketing assets.' },
+  { code: 'EVENT_MANAGER', name: 'Event manager', description: 'Create Acquisition Events and Sessions.' },
+  { code: 'EVENT_PROCESSOR', name: 'Event processor', description: 'Run the Event registration batch into Leads.' },
+  { code: 'MARKETING_CONFIGURATOR', name: 'Marketing configurator', description: 'Change Marketing configuration.' },
+  { code: 'COMPENSATION_ADMIN', name: 'Compensation admin', description: 'Assign and correct compensation credit.' },
+]
+
 export const SEEDED_USER_ROLE_RIGHTS: Record<(typeof SEEDED_USER_ROLE_CODES)[number], AccessRight[]> = {
   MARKETING_VIEWER: ['VIEW_MARKETING', 'VIEW_MARKETING_REPORTS'],
   CAMPAIGN_MANAGER: ['VIEW_MARKETING', 'MANAGE_CAMPAIGNS'],
@@ -76,3 +94,9 @@ export function accessRightLabel(right: string) {
 export function hasAccessRight(rights: readonly string[], needed: AccessRight) {
   return rights.includes(needed)
 }
+
+registerAccessRights(ACCESS_RIGHTS.map(code => ({
+  code,
+  label: ACCESS_RIGHT_LABELS[code],
+  description: ACCESS_RIGHT_DESCRIPTIONS[code],
+})))
