@@ -24,7 +24,7 @@ Prompt: [[wip/C1_CRM_Core_Architecture_Cursor_Prompt]]. Plan: [[wip/CRM_Core_Ext
 | 1 | pnpm workspace, thin `@crm/core` layer, ESLint/arch test, repo-root Docker context | `2770c8e` |
 | 2 | brand, health, app-env in Core; MA consumes; no dual copies | `98f3825` |
 | 3 | auth/users/RBAC framework, settings KV, shell + nav/settings/permission registration; journal `0000`–`0020` stays in MA | `60cec54` |
-| 4 | this status (docs only) | docs commit on `working` after `60cec54` |
+| 4 | this status (docs only) | `ac9c7a2` |
 
 `control_plane` stays out of the workspace. Image tags stay `martial-arts-acquisition:s4` / `:s2`. `martial_arts_template/` was not moved to `apps/`.
 
