@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { assertSafeRelaunch, decommissionCommand, relaunchCommand } from '../../server/services/docker-relaunch'
+import { assertSafeRelaunch, decommissionCommand, relaunchCommand, stopCommand } from '../../server/services/docker-relaunch'
 
 describe('safe relaunch', () => {
   it('uses compose recreate without down or -v', () => {
@@ -47,6 +47,38 @@ describe('safe relaunch', () => {
       slug: 'lab-acme-prod',
       composeFile: 'docker-compose.prod.yml',
     })).toThrow(/compose file/)
+  })
+
+  it('stops with compose stop app and never -v, down, prune, or rm', () => {
+    const command = stopCommand({
+      slug: 'lab-acme-dev',
+      composeFile: 'docker-compose.lab-acme-dev.yml',
+      envFileLocal: '.env.lab-acme-dev',
+      envFileExample: '.env.lab-acme-dev.example',
+      composeProject: 'lab-acme-dev',
+      root: 'C:/tmp/missing-template',
+    })
+    expect(command.args).toEqual([
+      'compose',
+      '--env-file',
+      '.env.lab-acme-dev.example',
+      '-f',
+      'docker-compose.lab-acme-dev.yml',
+      '-p',
+      'lab-acme-dev',
+      'stop',
+      'app',
+    ])
+    expect(command.args.join(' ')).not.toMatch(/-v|prune|down|\brm\b/)
+    expect(command.args).not.toContain('lab-acme-prod')
+    expect(relaunchCommand({
+      slug: 'lab-acme-dev',
+      composeFile: 'docker-compose.lab-acme-dev.yml',
+      envFileLocal: '.env.lab-acme-dev',
+      envFileExample: '.env.lab-acme-dev.example',
+      composeProject: 'lab-acme-dev',
+      root: 'C:/tmp/missing-template',
+    }).args).toContain('--force-recreate')
   })
 
   it('decommissions with compose rm --stop and never -v', () => {

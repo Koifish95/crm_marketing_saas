@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { findById } from '~~/shared/utils/fleet'
+import { findById, pollFleetUntilHealthy, type FleetStatusResponse } from '~~/shared/utils/fleet'
+import { formatBackupCreatedAt, formatBackupSize } from '~~/shared/utils/fleet-backup'
 import { ENVIRONMENT_TABS } from '~~/shared/utils/nav'
 import { isRetryableLifecycle } from '~~/shared/utils/provision'
 
 const route = useRoute()
-const { error, pending, refreshing, environments, checkedAt, refreshStatus } = await useFleetStatus()
+const { error, pending, refreshing, environments, checkedAt, refreshStatus, applyStatus } = await useFleetStatus()
 const tab = ref('overview')
 const relaunching = ref(false)
 const retrying = ref(false)
@@ -12,15 +13,25 @@ const decommissioning = ref(false)
 const backingUp = ref(false)
 const restoring = ref(false)
 const copying = ref(false)
+const revealing = ref(false)
 const upgrading = ref(false)
+const stopping = ref(false)
 const confirmRestore = ref(false)
+const confirmStop = ref(false)
 const destinationDir = ref('')
 const confirmDecommission = ref(false)
 const actionError = ref('')
+const actionNotice = ref('')
 const environmentId = computed(() => String(route.params.id || ''))
 const env = computed(() => findById(environments.value, environmentId.value))
 const decommissioned = computed(() => env.value?.lifecycleStatus === 'decommissioned')
 const retryable = computed(() => isRetryableLifecycle(env.value?.lifecycleStatus))
+const canStop = computed(() => Boolean(
+  env.value
+  && !decommissioned.value
+  && env.value.status !== 'stopped'
+  && env.value.status !== 'missing',
+))
 
 useHead({
   title: computed(() => env.value
@@ -29,18 +40,65 @@ useHead({
 })
 
 async function relaunch() {
-  if (!env.value) {
+  if (!env.value || relaunching.value) {
     return
   }
   relaunching.value = true
   actionError.value = ''
+  actionNotice.value = 'Relaunching this environment. Docker is recreating the container. This can take a minute.'
   try {
-    await $fetch(`/api/environments/${env.value.id}/relaunch`, { method: 'POST' })
-    await refreshStatus()
+    const result = await $fetch<FleetStatusResponse>(`/api/environments/${env.value.id}/relaunch`, { method: 'POST' })
+    if (result.checkedAt && result.environments) {
+      applyStatus({ checkedAt: result.checkedAt, environments: result.environments })
+    }
+    if (env.value?.status !== 'healthy') {
+      actionNotice.value = 'Waiting for the app health check…'
+      const outcome = await pollFleetUntilHealthy({
+        isHealthy: () => findById(environments.value, environmentId.value)?.status === 'healthy',
+        refresh: refreshStatus,
+      })
+      if (outcome === 'timeout') {
+        actionNotice.value = 'Relaunch finished, but health did not come up yet. Use Refresh to check again.'
+        return
+      }
+    }
+    actionNotice.value = `Relaunch finished. Status is ${env.value?.status || 'unknown'}.`
   } catch (error) {
+    actionNotice.value = ''
     actionError.value = fetchMessage(error, 'Relaunch failed.')
   } finally {
     relaunching.value = false
+  }
+}
+
+async function stopEnvironment() {
+  if (!env.value || !confirmStop.value || stopping.value) {
+    return
+  }
+  stopping.value = true
+  actionError.value = ''
+  actionNotice.value = 'Stopping this environment. Volumes stay. This is not Decommission.'
+  try {
+    const result = await $fetch<FleetStatusResponse>(`/api/environments/${env.value.id}/stop`, { method: 'POST' })
+    if (result.checkedAt && result.environments) {
+      applyStatus({ checkedAt: result.checkedAt, environments: result.environments })
+    }
+    if (env.value?.status !== 'stopped') {
+      const outcome = await pollFleetUntilHealthy({
+        isHealthy: () => findById(environments.value, environmentId.value)?.status === 'stopped',
+        refresh: refreshStatus,
+      })
+      if (outcome === 'timeout') {
+        actionNotice.value = 'Stop finished, but status is not stopped yet. Use Refresh to check again.'
+        return
+      }
+    }
+    actionNotice.value = 'Environment stopped. Persistent volumes stay. Use Relaunch to start it again.'
+  } catch (error) {
+    actionNotice.value = ''
+    actionError.value = fetchMessage(error, 'Stop failed.')
+  } finally {
+    stopping.value = false
   }
 }
 
@@ -50,6 +108,7 @@ async function retryProvision() {
   }
   retrying.value = true
   actionError.value = ''
+  actionNotice.value = ''
   try {
     await $fetch(`/api/environments/${env.value.id}/provision`, { method: 'POST' })
     await refreshStatus()
@@ -66,6 +125,7 @@ async function backupEnvironment() {
   }
   backingUp.value = true
   actionError.value = ''
+  actionNotice.value = ''
   try {
     await $fetch(`/api/environments/${env.value.id}/backup`, { method: 'POST' })
     await refreshStatus()
@@ -76,12 +136,33 @@ async function backupEnvironment() {
   }
 }
 
+async function revealBackup() {
+  if (!env.value?.lastBackup) {
+    return
+  }
+  revealing.value = true
+  actionError.value = ''
+  actionNotice.value = ''
+  try {
+    await $fetch(`/api/environments/${env.value.id}/backup/reveal`, {
+      method: 'POST',
+      body: { backupId: env.value.lastBackup.id },
+    })
+    actionNotice.value = 'Opened the backup folder in File Explorer.'
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Could not open the backup folder.')
+  } finally {
+    revealing.value = false
+  }
+}
+
 async function copyOffhost() {
   if (!env.value) {
     return
   }
   copying.value = true
   actionError.value = ''
+  actionNotice.value = ''
   try {
     await $fetch(`/api/environments/${env.value.id}/backup/copy`, {
       method: 'POST',
@@ -101,6 +182,7 @@ async function restoreEnvironment() {
   }
   restoring.value = true
   actionError.value = ''
+  actionNotice.value = ''
   try {
     await $fetch(`/api/environments/${env.value.id}/restore`, {
       method: 'POST',
@@ -120,6 +202,7 @@ async function upgradeEnvironment() {
   }
   upgrading.value = true
   actionError.value = ''
+  actionNotice.value = ''
   try {
     await $fetch(`/api/environments/${env.value.id}/upgrade`, { method: 'POST' })
     await refreshStatus()
@@ -136,6 +219,7 @@ async function decommission() {
   }
   decommissioning.value = true
   actionError.value = ''
+  actionNotice.value = ''
   try {
     await $fetch(`/api/environments/${env.value.id}/decommission`, { method: 'POST' })
     await refreshStatus()
@@ -204,11 +288,19 @@ async function decommission() {
     </AppPageHeader>
     <p
       v-if="actionError"
-      class="muted"
+      class="action-error"
       role="status"
       aria-live="polite"
     >
       {{ actionError }}
+    </p>
+    <p
+      v-else-if="actionNotice"
+      class="action-status"
+      role="status"
+      aria-live="polite"
+    >
+      {{ actionNotice }}
     </p>
     <AppAsyncPanel
       :pending="pending && !env"
@@ -282,14 +374,59 @@ async function decommission() {
         </p>
         <dl class="dl">
           <dt>Last backup</dt>
-          <dd>{{ env?.lastBackup?.createdAt || 'none' }}</dd>
+          <dd v-if="env?.lastBackup">
+            {{ formatBackupCreatedAt(env.lastBackup.createdAt, env.customer.timezone) }}
+            <div class="muted">
+              {{ env.lastBackup.createdAt }}
+            </div>
+          </dd>
+          <dd v-else>
+            none
+          </dd>
           <dt>Size</dt>
-          <dd>{{ env?.lastBackup ? `${env.lastBackup.bytes} bytes` : '—' }}</dd>
+          <dd>{{ env?.lastBackup ? formatBackupSize(env.lastBackup.bytes) : '—' }}</dd>
           <dt>Same-host zip</dt>
-          <dd>{{ env?.lastBackup?.zipPath || '—' }}</dd>
+          <dd>
+            <button
+              v-if="env?.lastBackup?.zipPath"
+              type="button"
+              class="path-link"
+              :disabled="revealing"
+              :aria-busy="revealing"
+              @click="revealBackup"
+            >
+              {{ env.lastBackup.zipPath }}
+            </button>
+            <template v-else>
+              —
+            </template>
+          </dd>
           <dt>Off-host copy</dt>
           <dd>{{ env?.lastBackup?.offhostPath || 'not copied' }}</dd>
         </dl>
+        <form
+          class="card"
+          @submit.prevent="stopEnvironment"
+        >
+          <p>
+            Stop halts this environment’s process only. Volumes, backups, and identity stay. This is not Decommission. Use Relaunch to start it again.
+          </p>
+          <label>
+            <input
+              v-model="confirmStop"
+              type="checkbox"
+            >
+            I understand this stops the running application.
+          </label>
+          <button
+            type="submit"
+            class="secondary"
+            :disabled="!confirmStop || stopping || !canStop"
+            :aria-busy="stopping"
+          >
+            {{ stopping ? 'Stopping…' : 'Stop Environment' }}
+          </button>
+        </form>
         <div class="card">
           <button
             type="button"

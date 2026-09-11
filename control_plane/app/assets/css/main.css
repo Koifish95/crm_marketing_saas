@@ -188,6 +188,17 @@ h1 {
   color: #5b6b7c;
 }
 
+.action-status {
+  margin: 0.75rem 0 0;
+  font-weight: 650;
+}
+
+.action-error {
+  margin: 0.75rem 0 0;
+  color: #842029;
+  font-weight: 650;
+}
+
 .access {
   display: flex;
   flex-wrap: wrap;
@@ -198,6 +209,24 @@ h1 {
 .access a {
   color: #1f3a5f;
   font-weight: 650;
+}
+
+button.path-link {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: #1f3a5f;
+  font-weight: 650;
+  text-align: left;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+button.path-link:disabled {
+  opacity: 0.6;
 }
 
 .row {

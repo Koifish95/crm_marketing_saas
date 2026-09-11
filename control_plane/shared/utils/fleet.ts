@@ -184,6 +184,12 @@ export function findById<T extends { id: string }>(rows: readonly T[], id: strin
 }
 
 export const FLEET_STATUS_KEY = 'fleet-status'
+export const FLEET_HEALTH_POLL_MS = 3000
+export const FLEET_HEALTH_POLL_ATTEMPTS = 20
+
+export function shouldReuseFleetStatusCache(cause?: string) {
+  return cause === 'initial'
+}
 
 export function fleetStatusCachedData(
   key: string,
@@ -191,4 +197,27 @@ export function fleetStatusCachedData(
   staticData?: Record<string, unknown>,
 ) {
   return payload?.[key] ?? staticData?.[key]
+}
+
+export async function pollFleetUntilHealthy(input: {
+  isHealthy: () => boolean
+  refresh: () => Promise<void>
+  sleep?: (ms: number) => Promise<void>
+  attempts?: number
+  delayMs?: number
+}) {
+  if (input.isHealthy()) {
+    return 'healthy' as const
+  }
+  const attempts = input.attempts ?? FLEET_HEALTH_POLL_ATTEMPTS
+  const delayMs = input.delayMs ?? FLEET_HEALTH_POLL_MS
+  const sleep = input.sleep ?? ((ms: number) => new Promise(resolve => setTimeout(resolve, ms)))
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    await sleep(delayMs)
+    await input.refresh()
+    if (input.isHealthy()) {
+      return 'healthy' as const
+    }
+  }
+  return 'timeout' as const
 }

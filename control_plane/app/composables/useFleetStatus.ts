@@ -1,13 +1,24 @@
-import { FLEET_STATUS_KEY, fleetStatusCachedData, summarizeFleet, type FleetStatusResponse } from '~~/shared/utils/fleet'
+import {
+  FLEET_STATUS_KEY,
+  fleetStatusCachedData,
+  shouldReuseFleetStatusCache,
+  summarizeFleet,
+  type FleetStatusResponse,
+} from '~~/shared/utils/fleet'
 
 export async function useFleetStatus() {
   const { data, error, pending, refresh } = await useFetch<FleetStatusResponse>('/api/status', {
     key: FLEET_STATUS_KEY,
-    getCachedData: (key, nuxtApp) => fleetStatusCachedData(
-      key,
-      nuxtApp.payload.data as Record<string, unknown> | undefined,
-      nuxtApp.static.data as Record<string, unknown> | undefined,
-    ) as FleetStatusResponse | undefined,
+    getCachedData: (key, nuxtApp, ctx) => {
+      if (!shouldReuseFleetStatusCache(ctx.cause)) {
+        return
+      }
+      return fleetStatusCachedData(
+        key,
+        nuxtApp.payload.data as Record<string, unknown> | undefined,
+        nuxtApp.static.data as Record<string, unknown> | undefined,
+      ) as FleetStatusResponse | undefined
+    },
   })
   const refreshing = ref(false)
 
@@ -23,6 +34,10 @@ export async function useFleetStatus() {
     }
   }
 
+  function applyStatus(payload: FleetStatusResponse) {
+    data.value = payload
+  }
+
   return {
     data,
     error,
@@ -32,6 +47,7 @@ export async function useFleetStatus() {
     summary,
     checkedAt: computed(() => data.value?.checkedAt || ''),
     refreshStatus,
+    applyStatus,
   }
 }
 
