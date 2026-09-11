@@ -11,7 +11,7 @@ tags:
 
 # Clean starting point — execution return
 
-**Historical.** Current orientation: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]].
+**Historical.** Current orientation: [[Current-State]].
 
 Reconciliation executed 2026-09-10 on branch `working`. No new feature milestone was started.
 

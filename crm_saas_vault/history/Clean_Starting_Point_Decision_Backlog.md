@@ -11,7 +11,9 @@ tags:
 
 # Clean starting point — decision backlog
 
-Unresolved owner/product/architecture decisions that **still matter** after the 2026-09-10 repository audit. Full context (historical 2026-09-10 snapshot): [[wip/archive/Clean_Starting_Point_Current_State]]. Current orientation: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]]. IMM-01–04 resolved 2026-09-10: [[wip/Post_S4_Foundation_Decision_Closeout]], [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]].
+**Historical.** Live open questions: [[SaaS-Open-Questions]].
+
+Unresolved owner/product/architecture decisions that **still matter** after the 2026-09-10 repository audit. Full context (historical 2026-09-10 snapshot): [[wip/archive/Clean_Starting_Point_Current_State]]. Current orientation: [[Current-State]]. IMM-01–04 resolved 2026-09-10: [[history/Post_S4_Foundation_Decision_Closeout]], [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]].
 
 Dropped as already answered by ADRs or code: operator nav/workspaces; provision at Customers → New; Missing ≠ Stopped; one-PROD API; extra non-PROD now; gated decommission; never auto-delete volumes; SI disposable until VPS; laptop then VPS; no operator auth on loopback; Scott-only Platform Administrator for now; no slug edit until DNS; sister is second pilot; do not build Beauty in the leftover slice; launch = first VPS customer; Renzo is not a customer.
 
@@ -132,7 +134,7 @@ Safe to leave until after a map rewrite or after the first VPS customer.
 
 - **Decision/question:** When to extract a shared CRM core and build the Beauty template for the sister pilot?
 - **Current known context:** Sister is the second real pilot. Beauty is not to be built in the leftover slice. Still Beauty laptop row (if still present) is not a template decision. **2026-09-11:** Core timing is answered by [[ADR-CRM-Core-Vertical-Architecture]]. **C1 is code-shipped.** Do not establish Core again. Prove with Sales (C2, not started), then Beauty. Sister-as-Beauty remains a later business milestone (Map B S10), after the architecture-proven finish line.
-- **Recommendation:** Do not build Beauty to “get the architecture.” C1 is done. Follow [[wip/CRM_Core_Extraction_Implementation_Plan]] C2–C3 only when Scott asks.
+- **Recommendation:** Do not build Beauty to “get the architecture.” C1 is done. Follow [[history/CRM_Core_Extraction_Implementation_Plan]] C2–C3 only when Scott asks.
 - **What it blocks:** Sister as a Beauty customer; second industry product.
 - **Can Cursor continue without it?** Yes.
 

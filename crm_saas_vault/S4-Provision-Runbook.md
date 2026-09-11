@@ -16,7 +16,7 @@ Laptop-only operator procedure. Not self-serve. Not DNS/TLS.
 
 App: `control_plane/` at http://127.0.0.1:52100  
 CRM image: `martial-arts-acquisition:s4` (local Docker build)  
-Handoff: [[wip/S4_closeout]]
+Handoff: [[history/S4_closeout]]
 
 ## Start
 
@@ -49,4 +49,4 @@ The same slug does not create a second customer. **Provision** again resumes Fai
 
 ## Exclusions
 
-S5 hostnames, billing, Pi/SSH, hard-delete of volumes, Beauty / sister-business. Current map: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]].
+S5 hostnames, billing, Pi/SSH, hard-delete of volumes, Beauty / sister-business. Current map: [[Current-State]].

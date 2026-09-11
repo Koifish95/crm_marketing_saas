@@ -12,11 +12,11 @@ tags:
 
 This page does **not** own tasks. Incomplete checkboxes live in the notes that explain them. Click a file name in the list below to open that context.
 
-Requires [[Plugins|Dataview]]. Without it, search the vault for `- [ ]` (ignore `wip/`).
+Requires [[Plugins|Dataview]]. Without it, search the vault for `- [ ]` (ignore `wip/` and `history/`).
 
 ```dataview
 TASK
-FROM -"wip"
+FROM -"wip" AND -"history"
 WHERE !completed
 GROUP BY file.link
 ```

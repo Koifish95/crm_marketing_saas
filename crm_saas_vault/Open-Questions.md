@@ -9,6 +9,8 @@ tags:
 
 # Open questions
 
+**Renzo gym unknowns.** Platform NEAR/DEF: [[SaaS-Open-Questions]]. Live map: [[Current-State]].
+
 Do not invent answers. Check a box when confirmed and move the fact into [[Requirements]], [[Funnel]], or [[Architecture]].
 
 ## Meta and ads

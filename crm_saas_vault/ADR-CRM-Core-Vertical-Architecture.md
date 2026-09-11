@@ -14,7 +14,7 @@ tags:
 
 # ADR — CRM Core + Vertical Product Architecture
 
-**Current implementation (2026-09-11):** C1 is **code-shipped** — `pnpm-workspace.yaml`, `packages/crm-core` (`@crm/core`), Martial Arts consumes Core, architecture import tests exist. See [[wip/C1_CRM_Core_Architecture_Return]] and [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]]. Sections 2 and 4 below still describe the **pre-C1** repository (no workspace, no Core). That is historical context for the decision, not current repo fact. Do not “establish Core” again. C2 / Sales / D1 schema are **not** started.
+**Current implementation (2026-09-11):** C1 is **code-shipped** — `pnpm-workspace.yaml`, `packages/crm-core` (`@crm/core`), Martial Arts consumes Core, architecture import tests exist. See [[history/C1_CRM_Core_Architecture_Return]] and [[Current-State]]. Sections 2 and 4 below still describe the **pre-C1** repository (no workspace, no Core). That is historical context for the decision, not current repo fact. Do not “establish Core” again. C2 / Sales / D1 schema are **not** started.
 
 ## 1. Title
 
@@ -22,7 +22,7 @@ CRM Core is shared infrastructure consumed by independently built vertical produ
 
 ## 2. Status
 
-**Accepted** (2026-09-11). Owner-approved in the architectural discussion recorded by [wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]. D1–D4 resolved the same day: [SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]. Implementation has **not** started. Extraction plan: [wip/CRM_Core_Extraction_Implementation_Plan]. Pointer: [SaaS-Decisions#2026-09-11 — CRM Core + vertical architecture].
+**Accepted** (2026-09-11). Owner-approved in the architectural discussion recorded by [wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]. D1–D4 resolved the same day: [SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]. **C1 is code-shipped.** C2 / Sales / D1 schema are not started. Extraction plan (not a license): [history/CRM_Core_Extraction_Implementation_Plan]. Pointer: [SaaS-Decisions#2026-09-11 — CRM Core + vertical architecture]. Live map: [Current-State].
 
 ## 3. Date
 
@@ -77,7 +77,7 @@ Vertical A -X-> Vertical B
 
 Core must never import Martial Arts, Sales, Beauty, or another vertical. Verticals may depend on Core. Verticals must not depend on each other.
 
-This is not a documentation convention. It must be mechanically enforced (package dependencies, ESLint import restrictions, architecture tests). See [wip/CRM_Core_Extraction_Implementation_Plan].
+This is not a documentation convention. It must be mechanically enforced (package dependencies, ESLint import restrictions, architecture tests). See [history/CRM_Core_Extraction_Implementation_Plan].
 
 Do not create intermediate packages shared by only some verticals (`sales_beauty_shared`) without an explicit stable domain boundary (ADR-24). Premature duplication is preferable to a dependency maze.
 
@@ -257,7 +257,7 @@ Then stop treating Core extraction as an open-ended refactor. Beauty is the thir
 
 ## 22. Deferred implementation choices
 
-Deferred to [wip/CRM_Core_Extraction_Implementation_Plan] and later owner authorization:
+Deferred to [history/CRM_Core_Extraction_Implementation_Plan] and later owner authorization:
 
 - Exact `pnpm-workspace.yaml` membership and whether `control_plane` joins later.
 - Nuxt layer vs extra workspace packages as Core grows.
@@ -276,9 +276,9 @@ Does **not** supersede S0–S5 Successful closeouts, IMM-01–04, S4 provision d
 
 **Conflicts / sequencing (record, do not erase):**
 
-- Map B listed S7 hosting/VPS next after S6. This ADR places Core / Martial Arts / Sales / Beauty **before** production VPS. Do not rewrite [SaaS-Milestones] until Scott accepts the implementation plan’s proposed C1–C3 insert.
+- Map B listed S7 hosting/VPS next after S6. This ADR places Core / Martial Arts / Sales / Beauty **before** production VPS. [SaaS-Milestones] now records a **separate C-track** (C1 shipped, C2/C3 not started) and does **not** rewrite S7.
 - [Home] still says the likely second industry is Beauty. Sales is now the second **architecture** consumer; Beauty remains the sister-pilot industry (S10), later.
-- [wip/Clean_Starting_Point_Decision_Backlog] “when to extract Core and build Beauty” is answered for Core timing; Beauty still waits for the architecture-proven finish line.
+- [SaaS-Open-Questions] “when to extract Core and build Beauty” is answered for Core timing; Beauty still waits for the architecture-proven finish line.
 - Prompt language “do not build fleet backup merely to protect laptop SI” remains true for *motive*. Authorized S6 already shipped production-shaped backup/restore. SI stays disposable. This ADR does not reopen S6.
 
 Preserved in force: retry = continue/resume; display name editable; slug/timezone/admin email read-only; hostname `{slug}.{product-domain}` with domain unset; no DNS/TLS in this work; no `tenant_id`; Renzo is not a customer.
@@ -286,11 +286,11 @@ Preserved in force: retry = continue/resume; display name editable; slug/timezon
 ## 24. References
 
 - Prompt: [wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]
-- Plan: [wip/CRM_Core_Extraction_Implementation_Plan]
+- Plan: [history/CRM_Core_Extraction_Implementation_Plan]
 - Return: [wip/archive/CRM_Core_Architecture_Planning_Return]
-- Current state: [wip/archive/Clean_Starting_Point_Current_State], [Home], [Working-Agreement]
-- Roadmap: [SaaS-Milestones], [wip/Post_S4_Foundation_Decision_Closeout]
+- Current state: [Current-State], [Home], [Working-Agreement]
+- Roadmap: [SaaS-Milestones], [history/Post_S4_Foundation_Decision_Closeout]
 - Domain unit: [Customer-Environment]
 - Operator app: [Control-Plane]
 - Prior ADRs: [SaaS-Decisions]
-- Backlog: [wip/Clean_Starting_Point_Decision_Backlog]
+- Backlog: [SaaS-Open-Questions]

@@ -13,7 +13,7 @@ tags:
 
 Official S6 (Map B): Fleet Reliability / Lifecycle. **Successful** (2026-09-11). Owner pass: Scott.
 
-Definitive record: [[wip/S6_closeout]]. Prompt: [[wip/archive/S6_Fleet_Reliability_Cursor_Prompt]]. Runbook: [[S6-Fleet-Runbook]]. ADR: [[SaaS-Decisions#2026-09-11 — Official S6 is Successful]]. Working decisions: [[SaaS-Decisions#2026-09-10 — S6 backup, restore, and upgrade]].
+Definitive record: [[history/S6_closeout]]. Prompt: [[wip/archive/S6_Fleet_Reliability_Cursor_Prompt]]. Runbook: [[S6-Fleet-Runbook]]. ADR: [[SaaS-Decisions#2026-09-11 — Official S6 is Successful]]. Working decisions: [[SaaS-Decisions#2026-09-10 — S6 backup, restore, and upgrade]].
 
 ## Shipped
 

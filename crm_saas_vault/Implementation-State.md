@@ -9,6 +9,8 @@ tags:
 
 # Implementation state
 
+**Renzo source-product evidence.** This is not the SaaS live map. Platform current state: [[Current-State]]. Platform roadmap: [[SaaS-Milestones]].
+
 **Milestone:** M0–M9 implemented in code. M10A accepted. M10C live. M10D HTTPS is live on Koi-Pi. M10B laptop backup is implemented; Pi restore is not LIVE-VALIDATED yet. **Koi-Pi PRODUCTION SQLite is live data** — preserve volume `webhosting_renzo_sqlite` on every deploy ([[Operations-PRODUCTION-SQLite]]). Develop in this repo; copy with Refresh-FromSibling; do not Git-push all of WebHosting ([[Deploy-Workflow]]). Workspace map: [[Workspace]]. M8/M9 still await Scott browser acceptance. Next infra when asked: M10B Pi restore. PostgreSQL, SMS, email, and WhatsApp stay later unless explicitly asked.
 
 Live Meta Graph calls need `META_ACCESS_TOKEN` and `META_AD_ACCOUNT_ID`. Automated tests mock Marketing API **v25.0**. The rest of the app runs without those env vars.

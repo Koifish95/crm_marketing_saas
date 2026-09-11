@@ -1,5 +1,6 @@
 ---
 type: note
+# Historical C2+ narrative. Not authorization. Live architecture: Platform-Architecture.md / ADR-CRM-Core-Vertical-Architecture.md.
 status: current
 area: architecture
 updated: 2026-09-11
@@ -11,7 +12,7 @@ tags:
 
 # CRM Core extraction — implementation plan
 
-C1 units 1–3 are **code-shipped**. Sales is not started. D1 CP schema is unchanged. ADR: [[ADR-CRM-Core-Vertical-Architecture]]. Prompt: [[wip/archive/C1_CRM_Core_Architecture_Cursor_Prompt]]. C1 return: [[wip/C1_CRM_Core_Architecture_Return]]. Planning return: [[wip/archive/CRM_Core_Architecture_Planning_Return]].
+C1 units 1–3 are **code-shipped**. Sales is not started. D1 CP schema is unchanged. ADR: [[ADR-CRM-Core-Vertical-Architecture]]. Prompt: [[wip/archive/C1_CRM_Core_Architecture_Cursor_Prompt]]. C1 return: [[history/C1_CRM_Core_Architecture_Return]]. Planning return: [[wip/archive/CRM_Core_Architecture_Planning_Return]].
 
 Distinguish **repository fact** from **recommendation** throughout.
 
@@ -388,7 +389,7 @@ Avoid one official S-number per file move.
 
 **Rollback:** revert that commit.
 
-C1 / Sprint 1–3 shipped. See [[wip/C1_CRM_Core_Architecture_Return]].
+C1 / Sprint 1–3 shipped. See [[history/C1_CRM_Core_Architecture_Return]].
 
 ---
 

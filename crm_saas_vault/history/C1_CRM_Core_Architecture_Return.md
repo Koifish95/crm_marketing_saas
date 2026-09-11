@@ -1,10 +1,10 @@
 ---
 type: note
-status: current
+status: historical
 area: architecture
 updated: 2026-09-11
 tags:
-  - wip
+  - history
   - saas
   - c1
   - handoff
@@ -12,9 +12,11 @@ tags:
 
 # C1 CRM Core architecture — return
 
-C1 units 1–3 are **code-shipped** on `working`. Sales is **not** started. D1 Control Plane schema is **unchanged**. Map B is **not** Successful. C2 is **not** started.
+**Historical evidence.** Live map: [[Current-State]]. S-track S0–S6 are Successful; this return predates official S6 Successful and must not be read as current status.
 
-Prompt: [[wip/archive/C1_CRM_Core_Architecture_Cursor_Prompt]]. Plan: [[wip/CRM_Core_Extraction_Implementation_Plan]]. ADR: [[ADR-CRM-Core-Vertical-Architecture]].
+C1 units 1–3 are **code-shipped** on `working`. Sales is **not** started. D1 Control Plane schema is **unchanged**. C2 is **not** started.
+
+Prompt: [[wip/archive/C1_CRM_Core_Architecture_Cursor_Prompt]]. Plan: [[history/CRM_Core_Extraction_Implementation_Plan]]. ADR: [[ADR-CRM-Core-Vertical-Architecture]].
 
 ## Shipped
 

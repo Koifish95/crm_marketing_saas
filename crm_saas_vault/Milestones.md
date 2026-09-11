@@ -9,6 +9,8 @@ tags:
 
 # Milestones
 
+**Renzo gym sequence (M0–M11).** Historical evidence for the source product. Not the SaaS S-track. Live platform roadmap: [[SaaS-Milestones]]. Live implementation map: [[Current-State]].
+
 Priority comes from [[wip/archive/PROJCET_UPDATE_2026-08-26]], the 2026-08-29 UI/UX pivot, and the 2026-08-30 auth pivot ([[Decisions]]). Numbers are labels, not a promise that old M4 still means “content.”
 
 | ID | Focus | Status |

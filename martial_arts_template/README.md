@@ -2,7 +2,7 @@
 
 Generic martial-arts customer-acquisition CRM. This is the industry template inside `crm_marketing_saas`. It was derived from the external Renzo CRM implementation. It is **not** that live gym app.
 
-SaaS map: [`crm_saas_vault/Home.md`](../crm_saas_vault/Home.md). Agent briefing: [`AGENTS.md`](./AGENTS.md).
+SaaS map: [`crm_saas_vault/Home.md`](../crm_saas_vault/Home.md). Live state: [`crm_saas_vault/Current-State.md`](../crm_saas_vault/Current-State.md). Agent briefing: [`AGENTS.md`](./AGENTS.md) and repo-root [`AGENTS.md`](../AGENTS.md).
 
 ## Run
 

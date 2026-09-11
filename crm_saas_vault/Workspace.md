@@ -12,7 +12,9 @@ tags:
 
 # Projects workspace briefing
 
-Cursor loads `C:\Users\Scoy9\Projects\AGENTS.md` for every new instance in this workspace. This note is the same briefing, git-tracked in the product remote. Keep the two files in sync. Product-deep rules stay in repo-root `AGENTS.md`.
+**This repository is `crm_marketing_saas`, not `renzo_crm`.** Default work *in this repo* is the SaaS platform + Martial Arts template. Start: [[Home]] → [[Current-State]]. Do not treat the three-remote Renzo briefing below as this repo’s identity. External Renzo remains protected: do not touch `Projects/renzo_crm`, Koi-Pi, or `webhosting_renzo_*`.
+
+Cursor loads `C:\Users\Scoy9\Projects\AGENTS.md` for every new instance in this workspace. This note is the same briefing, git-tracked. Keep the two files in sync **for the Projects workspace**. Product-deep rules for **this** repo stay in repo-root `AGENTS.md`.
 
 `Projects\` is **not** a Git repository. Do not `git init` there. Default work is Renzo unless the user names another folder. Do not explore the whole workspace to get oriented.
 

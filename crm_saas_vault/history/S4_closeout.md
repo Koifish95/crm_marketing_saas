@@ -18,7 +18,7 @@ Definitive record of Milestone **S4 — Sales-led provision**. Written 2026-09-0
 
 **S5 was not started.**
 
-Related: [[S4-Provision-Runbook]], [[Control-Plane]], [[wip/S3_closeout]], [[wip/archive/S4_Implementation_Status]].
+Related: [[S4-Provision-Runbook]], [[Control-Plane]], [[history/S3_closeout]], [[wip/archive/S4_Implementation_Status]].
 
 ## 1. Successful
 

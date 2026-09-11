@@ -13,7 +13,7 @@ tags:
 
 # Customer and Environment
 
-S1 **Successful**. Conceptual unit the control plane will list, health-check, and relaunch. Not an implementation spec. Domains, TLS, Compose, provisioning scripts, and billing enforcement are out of this note.
+S1 **Successful**. Conceptual unit the control plane will list, health-check, and relaunch. Not an implementation spec. Domains, TLS, Compose, provisioning scripts, and billing enforcement are out of this note. Live map: [[Current-State]]. Platform architecture: [[Platform-Architecture]].
 
 Decisions: [[SaaS-Decisions#2026-09-08 — S1 customer environment unit]]. D1 hierarchy: [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]]. Milestones: [[SaaS-Milestones]].
 

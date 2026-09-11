@@ -2,7 +2,7 @@
 
 This folder is the **Martial Arts template** inside `crm_marketing_saas`. It was derived from the external Renzo CRM implementation. It is not Renzo’s live app.
 
-SaaS / platform work starts at `crm_saas_vault/Home.md`. How we work: `crm_saas_vault/Working-Agreement.md`. Do not implement the control plane unless Scott explicitly asks.
+SaaS / platform work starts at `crm_saas_vault/Home.md` and `crm_saas_vault/Current-State.md`. How we work: `crm_saas_vault/Working-Agreement.md`. Repo-root `AGENTS.md` is the platform brief. Do not implement the control plane, C2, Sales, Beauty, or S7 unless an active work order (or Scott in the current chat) authorizes it.
 
 This is a generic martial-arts customer-acquisition CRM. It captures leads, stores intro (Trial) history, supports staff follow-up, and runs marketing operations that **feed** acquisition. It is not a gym-management product, not a social-media manager, and not multi-tenant SaaS.
 
@@ -10,12 +10,25 @@ Do not touch `C:\Users\Scoy9\Projects\renzo_crm`, Koi-Pi, or `webhosting_renzo_*
 
 ## Read this first
 
-Project knowledge lives in `crm_saas_vault/`. SaaS map: `crm_saas_vault/Home.md`. Renzo evidence notes are in the same folder. Code is authoritative for implementation details; durable vault notes are authoritative for documented rules. If they conflict, investigate before changing behavior.
+Project knowledge lives in `crm_saas_vault/`. Code is authoritative for implementation details; durable vault notes are authoritative for documented rules. If they conflict, investigate before changing behavior.
+
+**Platform (this repo’s live map):**
 
 | Need | Note |
 |---|---|
-| What runs now | `crm_saas_vault/Implementation-State.md` |
-| What is next | `crm_saas_vault/Milestones.md` |
+| Bootstrap | `crm_saas_vault/Home.md` |
+| What exists now | `crm_saas_vault/Current-State.md` |
+| What is next (not permission) | `crm_saas_vault/SaaS-Milestones.md` |
+| How we work / authorization | `crm_saas_vault/Working-Agreement.md`, `crm_saas_vault/Work-Order-Protocol.md` |
+| Platform architecture | `crm_saas_vault/Platform-Architecture.md` |
+| SaaS decisions | `crm_saas_vault/SaaS-Decisions.md` |
+| Lockfile | `crm_saas_vault/project-state.yaml` |
+
+**Martial Arts domain (source evidence — not SaaS law):**
+
+| Need | Note |
+|---|---|
+| Inherited gym behavior | `crm_saas_vault/Implementation-State.md` (Renzo evidence) |
 | Domain | `crm_saas_vault/Domain-Model.md` |
 | Business rules | `crm_saas_vault/Requirements.md` |
 | Schema, money, time | `crm_saas_vault/Database.md` |
@@ -23,22 +36,18 @@ Project knowledge lives in `crm_saas_vault/`. SaaS map: `crm_saas_vault/Home.md`
 | Staff CRM / household | `crm_saas_vault/CRM.md` |
 | Staff UI / Primary Record Workspace | `crm_saas_vault/Design-System.md` |
 | Public intro | `crm_saas_vault/Intro-Scheduling.md` |
-| Stack and boundaries | `crm_saas_vault/Architecture.md` |
-| Unresolved items | `crm_saas_vault/Open-Questions.md` |
+| Source stack | `crm_saas_vault/Architecture.md` (Renzo evidence; platform architecture is separate) |
+| Unresolved Renzo items | `crm_saas_vault/Open-Questions.md` |
 | Renzo durable choices | `crm_saas_vault/Decisions.md` |
-| SaaS durable choices | `crm_saas_vault/SaaS-Decisions.md` |
 | How notes work | `crm_saas_vault/Working-Agreement.md` and `crm_saas_vault/Conventions.md` |
 | How to run | `crm_saas_vault/How-to-Run.md` |
 | Preserve Pi PRODUCTION SQLite | `crm_saas_vault/Operations-PRODUCTION-SQLite.md` |
-| Workspace map (three remotes) | `../AGENTS.md` and `crm_saas_vault/Workspace.md` |
-| Pi hardware / update steps | `crm_saas_vault/Koi-Pi-Infrastructure.md` |
-| Develop / copy / deploy | `crm_saas_vault/Deploy-Workflow.md` |
 
-`crm_saas_vault/wip/` is direct Scott ↔ Cursor communication. Processed sources live in `crm_saas_vault/wip/archive/` and `crm_saas_vault/archive/`. Do not treat either as the map. Dated handoffs are evidence, not current spec.
+`crm_saas_vault/wip/` is direct Scott ↔ Cursor communication (work orders only). `crm_saas_vault/history/` and `crm_saas_vault/wip/archive/` are evidence, not the map.
 
 Do not invent answers to items in `crm_saas_vault/Open-Questions.md`. If work depends on an unanswered question, stop and ask.
 
-Do not start an unstarted milestone unless the user explicitly asked. Check `crm_saas_vault/Implementation-State.md` and `crm_saas_vault/Milestones.md` before expanding scope. Implement the requested work and stop.
+Do not start an unstarted **platform** milestone unless an active work order names it. Do not treat `Milestones.md` (Renzo M-track) as the SaaS roadmap. Implement the requested work and stop.
 
 ## Commands
 
@@ -140,9 +149,9 @@ Campaign, Content, Asset, and Marketing Task staff pages use folder routes (`ind
 2. Read the relevant `crm_saas_vault/` note, then only the code that matters.
 3. Keep Nitro handlers thin; put rules in `server/services/`.
 4. Match existing files. ESLint stylistic is on (`1tbs` braces).
-5. Update vault notes in the same work when architecture, domain, rules, config, deploy, milestone status, or limitations change. Do not document what is obvious from the code. Renzo choices: `crm_saas_vault/Decisions.md`. SaaS choices: `crm_saas_vault/SaaS-Decisions.md`.
+5. Update vault notes in the same work when architecture, domain, rules, config, deploy, milestone status, or limitations change. Always update `crm_saas_vault/Current-State.md` and `crm_saas_vault/project-state.yaml` when those change. Do not document what is obvious from the code. Renzo choices: `crm_saas_vault/Decisions.md`. SaaS choices: `crm_saas_vault/SaaS-Decisions.md`.
 6. Add tests next to the milestone they belong to. Do not weaken existing tests to land a change.
-7. Commit only the files for the requested work. Do not include `.env`, `crm_saas_vault/.obsidian/`, or `crm_saas_vault/wip/` prompts/reviews unless the user asked.
+7. Commit only the files for the requested work. Do not include `.env`, `crm_saas_vault/.obsidian/`, or `crm_saas_vault/wip/` work orders unless the user asked. Archive spent work orders; do not leave them as the map.
 8. Before finishing a behavior change: `pnpm test`, `pnpm lint`, `pnpm typecheck`, and `pnpm build`. For UI, exercise the staff flow in the browser when tooling exists (login → the pages you touched).
 
 ## Cursor Cloud specific instructions

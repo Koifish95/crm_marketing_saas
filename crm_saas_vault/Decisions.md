@@ -9,9 +9,9 @@ tags:
 
 # Decisions
 
-Lightweight ADR log for the **Renzo customer implementation**. Newest first. Do not relitigate here — add a new entry if something changes.
+Lightweight ADR log for the **Renzo customer implementation** (historical evidence). Newest first. Do not relitigate here — add a new entry if something changes.
 
-SaaS / platform decisions live in [[SaaS-Decisions]]. Do not add them here.
+SaaS / platform decisions live in [[SaaS-Decisions]]. Do not add them here. Live map: [[Current-State]].
 
 Template:
 

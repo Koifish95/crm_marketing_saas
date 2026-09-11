@@ -14,7 +14,7 @@ tags:
 
 # Clean starting point — current state
 
-**Historical 2026-09-10 snapshot.** Do not treat this file as current law. Fresh-agent orientation: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]].
+**Historical 2026-09-10 snapshot.** Do not treat this file as current law. Live map: [[Current-State]].
 
 Written 2026-09-10 from the repository, Git history, and vault notes on branch `working` at `18a1c0f` (pre-this-handoff tip). This remains the **architecture / “what exists”** baseline.
 

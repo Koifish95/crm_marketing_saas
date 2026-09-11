@@ -11,7 +11,7 @@ tags:
 
 # S5 control-plane productization status
 
-Official S5 (Map B): Control Plane Productization / Operations Foundation. **Successful** (2026-09-10). Closeout: [[wip/S5_closeout]].
+Official S5 (Map B): Control Plane Productization / Operations Foundation. **Successful** (2026-09-10). Closeout: [[history/S5_closeout]].
 
 Retry UI (continue/resume) is implemented. Owner browser/Docker pass accepted by Scott. Post-UI hardening: [[wip/archive/Control_Plane_Post_Productization_Audit]].
 

@@ -9,7 +9,9 @@ tags:
 
 # How to run
 
-Requires Node 22+ and pnpm. Workspace map: [[Workspace]]. Develop / copy / deploy: [[Deploy-Workflow]]. Pi hardware and every update step: [[Koi-Pi-Infrastructure]].
+Source / Martial Arts template commands. Platform live map: [[Current-State]]. Control plane: [[S3-Control-Plane-Runbook]], [[S4-Provision-Runbook]], [[S6-Fleet-Runbook]].
+
+Requires Node 22+ and pnpm. Workspace map: [[Workspace]]. Develop / copy / deploy (external Renzo): [[Deploy-Workflow]]. Pi hardware (external Renzo): [[Koi-Pi-Infrastructure]].
 
 ```bash
 pnpm install

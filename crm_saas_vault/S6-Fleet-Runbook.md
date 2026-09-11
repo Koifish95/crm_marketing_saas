@@ -12,12 +12,12 @@ tags:
 
 # S6 fleet reliability runbook
 
-Laptop-only operator procedure. Not off-site SaaS. Not Successful until Scott accepts.
+Laptop-only operator procedure. Official S6 is **Successful** (2026-09-11). Not off-site SaaS.
 
 App: `control_plane/` at http://127.0.0.1:52100  
 Prompt: [[wip/archive/S6_Fleet_Reliability_Cursor_Prompt]]  
 ADR: [[SaaS-Decisions#2026-09-10 — S6 backup, restore, and upgrade]]  
-Current state: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]]
+Current state: [[Current-State]]
 
 ## Backup / restore / copy / upgrade
 

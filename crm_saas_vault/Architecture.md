@@ -9,6 +9,8 @@ tags:
 
 # Architecture
 
+**Renzo / source-product stack.** Platform composition lives in [[Platform-Architecture]] and [[ADR-CRM-Core-Vertical-Architecture]]. Live map: [[Current-State]].
+
 One Nuxt 4 application: Vue UI, Nitro API, Drizzle, SQLite file. No Express/FastAPI split. No Python in V1.
 
 ## Stack (running)

@@ -1,0 +1,56 @@
+# Machine-readable project-state lockfile.
+# Human map: Current-State.md. This file is an index, not a second essay.
+# Update in the same commit as the work that changes these fields.
+schema_version: 1
+updated: 2026-09-11
+repo: crm_marketing_saas
+branch: working
+remote: https://github.com/Koifish95/crm_marketing_saas.git
+head_at_write: "584b837"
+
+canonical:
+  bootstrap: Home.md
+  process: Working-Agreement.md
+  current_state: Current-State.md
+  roadmap: SaaS-Milestones.md
+  decisions: SaaS-Decisions.md
+  architecture: Platform-Architecture.md
+  work_orders: Work-Order-Protocol.md
+  open_questions: SaaS-Open-Questions.md
+  history: history/_index.md
+
+tracks:
+  s:
+    map: B
+    last_successful: S6
+    next: S7
+    authorized: null
+  c:
+    last_shipped: C1
+    next: C2
+    authorized: null
+  d:
+    accepted: [D1, D2, D3, D4]
+    d1_schema: not_shipped
+
+authorization:
+  active_work_order: null
+  rule: "Roadmaps, ADRs, plans, ChatGPT memory, and archived prompts never authorize implementation."
+
+hard_stops:
+  - no_renzo_crm
+  - no_koi_pi
+  - no_webhosting_renzo_volumes
+  - no_docker_compose_down_v
+  - no_docker_prune
+  - no_sales_vertical_unless_authorized
+  - no_beauty_vertical_unless_authorized
+  - no_d1_schema_unless_authorized
+  - no_vps_dns_tls_unless_authorized
+  - no_force_push_main
+
+notes:
+  successful_requires_owner_acceptance: true
+  code_existing_is_not_successful: true
+  wip_is_not_the_map: true
+  chatgpt_is_not_the_record: true

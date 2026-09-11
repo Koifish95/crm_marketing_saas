@@ -25,11 +25,30 @@ Decision: what we chose
 
 ---
 
+## 2026-09-11 — Vault is the sole durable project-state system
+
+Status: accepted
+
+Context: ChatGPT memory, ChatGPT Project sources, `wip/` handoffs, Renzo notes, and the live SaaS map had become overlapping systems of record. Dual-S5 and dated “current state” snapshots were symptoms of that design.
+
+Decision:
+
+- The git vault is the only durable project-state system. ChatGPT Project sources are a bootstrap packet, not a parallel map. ChatGPT memory stores process rules, not milestone status.
+- Live canonical set: [[Home]], [[Working-Agreement]], [[Current-State]], [[SaaS-Milestones]], [[SaaS-Decisions]], [[Platform-Architecture]], [[project-state.yaml]], [[Work-Order-Protocol]], [[SaaS-Open-Questions]].
+- **WIP communicates work but never defines durable project truth.** At most one active work order. Closeouts and dated snapshots live in [[history/_index|history/]].
+- Roadmaps, ADRs, plans, ChatGPT memory, and archived prompts never authorize implementation. Only an active work order or Scott’s explicit ask in the current chat does.
+- S-track and C-track are separate ID spaces. Historical Map A lives only in [[history/Map-A-Milestones]]. Never reuse a milestone ID for a new meaning.
+- Update [[Current-State]] and [[project-state.yaml]] in the same work as the change.
+
+Source: Scott 2026-09-11 (architectural discussion; Cursor implemented the protocol)
+
+---
+
 ## 2026-09-11 — Official S6 is Successful
 
 Status: accepted
 
-Context: Official S6 (Fleet Reliability / Lifecycle) was implemented, then Scott completed the owner pass (backup, restore, workflows, off-host copy). Last code: Lifecycle running / success / conflict notices and dest-zip 409 (`35b15bf`). Closeout: [[wip/S6_closeout]].
+Context: Official S6 (Fleet Reliability / Lifecycle) was implemented, then Scott completed the owner pass (backup, restore, workflows, off-host copy). Last code: Lifecycle running / success / conflict notices and dest-zip 409 (`35b15bf`). Closeout: [[history/S6_closeout]].
 
 Decision:
 
@@ -67,7 +86,7 @@ Context: Scott approved CRM Core as shared infrastructure consumed by Martial Ar
 
 Decision:
 
-- Full ADR: [[ADR-CRM-Core-Vertical-Architecture]]. Implementation plan: [[wip/CRM_Core_Extraction_Implementation_Plan]].
+- Full ADR: [[ADR-CRM-Core-Vertical-Architecture]]. Implementation plan: [[history/CRM_Core_Extraction_Implementation_Plan]].
 - Core is not a sellable Generic CRM. Composition, not inheritance or forks. Separate product images. One-way dependency: Vertical → Core only.
 - Conservative Core membership and a promotion gate. Incremental Martial Arts extraction. Sales before Beauty, early enough to challenge Core.
 - Product family locally before production VPS. Do not start S7 on this ADR. Do not mark S6 Successful.
@@ -97,7 +116,7 @@ Source: Scott 2026-09-10 (S6 execution prompt)
 
 Status: accepted
 
-Context: Official S5 (Control Plane Productization / Operations Foundation) was substantially implemented, then Retry UI shipped, then Scott completed the owner browser/Docker pass on http://127.0.0.1:52100. Closeout: [[wip/S5_closeout]].
+Context: Official S5 (Control Plane Productization / Operations Foundation) was substantially implemented, then Retry UI shipped, then Scott completed the owner browser/Docker pass on http://127.0.0.1:52100. Closeout: [[history/S5_closeout]].
 
 Decision:
 
@@ -113,7 +132,7 @@ Source: Scott 2026-09-10
 
 Status: accepted
 
-Context: Two S5 definitions sat in [[SaaS-Milestones]] after the 2026-09-09 remap was labeled provisional. Scott resolved IMM-01–04. Briefing: [[wip/archive/Milestone_Map_Conflict_Decision]]. Closeout: [[wip/Post_S4_Foundation_Decision_Closeout]].
+Context: Two S5 definitions sat in [[SaaS-Milestones]] after the 2026-09-09 remap was labeled provisional. Scott resolved IMM-01–04. Briefing: [[wip/archive/Milestone_Map_Conflict_Decision]]. Closeout: [[history/Post_S4_Foundation_Decision_Closeout]].
 
 Decision:
 
@@ -162,7 +181,7 @@ Status: accepted
 
 Context: Owner decisions were recorded before coding. The live laptop proof passed for Strategic Insights Consulting, LLC.
 
-Decision: S4 is **Successful**. The control plane writes registry rows and gitignored env files, builds `martial-arts-acquisition:s4` locally, and `compose up`s a generic `docker-compose.provisioned.yml` with an absolute `--env-file` and `-p` project. Same slug resumes; volumes are not deleted. Evidence: [[wip/S4_closeout]]. Procedure: [[S4-Provision-Runbook]].
+Decision: S4 is **Successful**. The control plane writes registry rows and gitignored env files, builds `martial-arts-acquisition:s4` locally, and `compose up`s a generic `docker-compose.provisioned.yml` with an absolute `--env-file` and `-p` project. Same slug resumes; volumes are not deleted. Evidence: [[history/S4_closeout]]. Procedure: [[S4-Provision-Runbook]].
 
 Source: 2026-09-09 implementation
 
@@ -211,7 +230,7 @@ Status: accepted
 
 Context: S3 owner decisions were recorded before coding. The app now exists and the live laptop proof passed.
 
-Decision: S3 is **Successful**. `control_plane/` is a separate Nuxt app on `127.0.0.1:52100` with its own SQLite registry. It lists Acme BJJ PROD/DEV as human headlines, combines container running with `/api/health`, and relaunches via `compose up -d --force-recreate --no-deps app`. No provision. No operator login. Procedure: [[S3-Control-Plane-Runbook]]. Evidence: [[wip/S3_closeout]].
+Decision: S3 is **Successful**. `control_plane/` is a separate Nuxt app on `127.0.0.1:52100` with its own SQLite registry. It lists Acme BJJ PROD/DEV as human headlines, combines container running with `/api/health`, and relaunches via `compose up -d --force-recreate --no-deps app`. No provision. No operator login. Procedure: [[S3-Control-Plane-Runbook]]. Evidence: [[history/S3_closeout]].
 
 Source: 2026-09-09 implementation; Scott confirmed Nuxt, seed-on-setup, port 52100
 

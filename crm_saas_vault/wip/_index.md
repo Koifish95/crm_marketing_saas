@@ -9,39 +9,22 @@ tags:
 
 # WIP inbox
 
-`crm_saas_vault/wip/` is direct Scott ↔ Cursor communication. Do not treat it as the project map. How we work: [[Working-Agreement]]. Start: [[Home]].
+`crm_saas_vault/wip/` is direct Scott ↔ Cursor communication. **WIP communicates work but never defines durable project truth.**
 
-Processed and superseded material lives in [[wip/archive/_index|wip/archive/]]. Do not read the archive as current law.
+How we work: [[Working-Agreement]]. Start: [[Home]]. Live map: [[Current-State]]. Authorization: [[Work-Order-Protocol]]. Evidence: [[history/_index]], [[wip/archive/_index]].
 
-## Current / Start Here
+Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] or [[history/_index|history/]]. Do not read either as current law.
 
-- [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11|Current state and fresh-agent handoff]] (**primary orientation**)
-- [[Working-Agreement]]
-- [[Home]]
-- [[ADR-CRM-Core-Vertical-Architecture]]
-- [[SaaS-Milestones]] (official Map B)
+## Active work order
 
-## Active Work
+None. Await Scott.
 
-Nothing is authorized to implement next. Await Scott.
+When a work order exists, it is the only **authorized implementation** file that should live here besides this index (plus its return until promotion).
 
-- Official S6 is **Successful** — [[wip/S6_closeout]], [[S6-Fleet-Runbook]]
-- C1 is **code-shipped**; C2 / Sales are **not started** — [[wip/C1_CRM_Core_Architecture_Return]]
-- Open NEAR/DEF questions only — [[wip/Clean_Starting_Point_Decision_Backlog]] (IMM-01–04 are resolved)
+## Current communication (not a work order)
 
-## Current Supporting Context
+- [[wip/Pre_Development_Product_Architecture_Decision_Worksheet]] — Scott checkbox worksheet for Sales/Core pre-development decisions. **Decision/discovery only.** Checking boxes does not authorize implementation.
 
-- [[wip/CRM_Core_Extraction_Implementation_Plan|CRM Core extraction plan]] (C2+; not a license to start)
-- [[wip/Control_Plane_Bulk_Lifecycle_Return|Control Plane bulk start/stop return]]
-- [[wip/Post_S4_Foundation_Decision_Closeout|Map B closeout]]
-- [[wip/S6_closeout|S6 closeout]] (Successful)
-- [[wip/S5_closeout|S5 closeout]] (Successful)
-- [[wip/S4_closeout|S4 closeout]]
-- [[wip/S3_closeout|S3 closeout]]
-- [[wip/S2_closeout|S2 closeout]]
-- [[wip/note|Human QA inbox]]
-- [[wip/catches|catches]] (scratch)
+## Do not put here
 
-## Archive
-
-Historical and completed prompts, statuses, and superseded “current state” notes: [[wip/archive/_index]].
+Current-state notes, closeouts labeled “definitive,” or roadmap rewrites. Those go to the canonical set or `history/`. Decision worksheets and work orders are communication; they are not the map.

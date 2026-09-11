@@ -14,6 +14,8 @@ tags:
 
 # Current state and fresh-agent handoff
 
+**Historical 2026-09-11 snapshot. Not the live map.** Use [[Current-State]] and [[project-state.yaml]].
+
 Primary orientation for a new Cursor chat. Written 2026-09-11 from Git, vault notes, and repository code on `working`. **Do not treat chat history as the record.**
 
 This note is also the return for the 2026-09-11 documentation consolidation: what moved, what stayed, and what a fresh agent must not restart.
@@ -31,7 +33,7 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | Layer | Status |
 |---|---|
 | Official Map B S0–S6 | **Successful** |
-| Official S6 (fleet backup / restore / upgrade + start/stop) | **Successful** (2026-09-11). Closeout: [[wip/S6_closeout]] |
+| Official S6 (fleet backup / restore / upgrade + start/stop) | **Successful** (2026-09-11). Closeout: [[history/S6_closeout]] |
 | CRM Core + vertical ADR | **Accepted** |
 | D1–D4 | **Accepted** (D1 schema **not** shipped) |
 | C1 Core extraction | **Code-shipped** |
@@ -105,7 +107,7 @@ Sales vertical, Beauty vertical, D1 Account vs Product Instance schema, multi-pr
 
 # 4. CRM Core / vertical architecture
 
-Authoritative ADR: [[ADR-CRM-Core-Vertical-Architecture]]. Pointer: [[SaaS-Decisions#2026-09-11 — CRM Core + vertical architecture]]. Extraction plan (C2+ not started): [[wip/CRM_Core_Extraction_Implementation_Plan]]. C1 evidence: [[wip/C1_CRM_Core_Architecture_Return]].
+Authoritative ADR: [[ADR-CRM-Core-Vertical-Architecture]]. Pointer: [[SaaS-Decisions#2026-09-11 — CRM Core + vertical architecture]]. Extraction plan (C2+ not started): [[history/CRM_Core_Extraction_Implementation_Plan]]. C1 evidence: [[history/C1_CRM_Core_Architecture_Return]].
 
 The ADR body still describes the **pre-C1** repo (no workspace, no Core). That historical context is labeled at the top of the ADR. **C1 has shipped.** Do not “establish Core” again.
 
@@ -161,7 +163,7 @@ http://127.0.0.1:52100. Multi-page shell: Dashboard, Customers, Environments, Ho
 | Bulk start/stop | `POST .../bulk/start` · `.../bulk/stop` | Sequential; `{ scope: selected\|all, ids? }` |
 | Decommission | `compose rm -f --stop app` | Sets `decommissioned`. Volumes stay |
 
-Eligibility: [[wip/Control_Plane_Bulk_Lifecycle_Return]]. Start All / Stop All = eligible **registered fleet**, not the table filter.
+Eligibility: [[history/Control_Plane_Bulk_Lifecycle_Return]]. Start All / Stop All = eligible **registered fleet**, not the table filter.
 
 ## Provisioning
 
@@ -169,7 +171,7 @@ Sales-led. `Customers → New customer` builds `martial-arts-acquisition:s4` fro
 
 ## Backup / restore (official S6, Successful)
 
-Lifecycle tab: same-host zip, gated restore, off-host copy to an existing folder, backup-gated local upgrade, Explorer reveal (`POST .../backup/reveal` with `{ backupId }`, path must stay under `data/backups/`). Retention 14 days. Runbook: [[S6-Fleet-Runbook]]. Status: [[wip/S6_Implementation_Status]].
+Lifecycle tab: same-host zip, gated restore, off-host copy to an existing folder, backup-gated local upgrade, Explorer reveal (`POST .../backup/reveal` with `{ backupId }`, path must stay under `data/backups/`). Retention 14 days. Runbook: [[S6-Fleet-Runbook]]. Status: [[history/S6_Implementation_Status]].
 
 ## Docker / runtime
 
@@ -271,13 +273,13 @@ Link, do not re-litigate.
 | Decision | Authority |
 |---|---|
 | Two tracks; Renzo is external | [[Working-Agreement]], [[Home]] |
-| Map B official; S0–S5 Successful | [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]], [[wip/S5_closeout]] |
+| Map B official; S0–S5 Successful | [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]], [[history/S5_closeout]] |
 | S6 backup/restore/upgrade working decisions (NEAR-01–03) | [[SaaS-Decisions#2026-09-10 — S6 backup, restore, and upgrade]] |
 | Core + vertical architecture | [[ADR-CRM-Core-Vertical-Architecture]] |
 | D1–D4 | [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]] |
 | Customer / environment unit | [[Customer-Environment]] |
 | Never `-v` / prune / Renzo volumes | [[Control-Plane]] |
-| Retry = continue/resume | IMM-02 in [[wip/Clean_Starting_Point_Decision_Backlog]] |
+| Retry = continue/resume | IMM-02 in [[SaaS-Open-Questions]] |
 | Display name editable; slug/timezone/email read-only | IMM-03 |
 | Hostname shape `{slug}.{product-domain}`; domain unset | IMM-04 |
 
@@ -287,7 +289,7 @@ Link, do not re-litigate.
 
 IMM-01–04 are **resolved**. Do not present them as open.
 
-Still unresolved (development can continue locally without them): [[wip/Clean_Starting_Point_Decision_Backlog]] NEAR-04–10 and DEF-02–08.
+Still unresolved (development can continue locally without them): [[SaaS-Open-Questions]] NEAR-04–10 and DEF-02–08.
 
 | ID | Question | When | Blocks | Continue without? |
 |---|---|---|---|---|
@@ -338,18 +340,18 @@ Do not infer permission from the extraction plan, S6 runbook, or an old prompt. 
 | Milestones | [[SaaS-Milestones]] | Official Map B; Successful criteria |
 | Decisions | [[SaaS-Decisions]] | SaaS ADR log |
 | Core / vertical ADR | [[ADR-CRM-Core-Vertical-Architecture]] | Architecture law (banner: C1 shipped) |
-| Core extraction plan | [[wip/CRM_Core_Extraction_Implementation_Plan]] | C2+ plan; not a license to start |
-| C1 evidence | [[wip/C1_CRM_Core_Architecture_Return]] | What C1 actually shipped |
+| Core extraction plan | [[history/CRM_Core_Extraction_Implementation_Plan]] | C2+ plan; not a license to start |
+| C1 evidence | [[history/C1_CRM_Core_Architecture_Return]] | What C1 actually shipped |
 | Customer / environment | [[Customer-Environment]] | Target hierarchy vs current rows |
 | Control Plane | [[Control-Plane]] | Operator app scope and APIs |
 | S6 runbook | [[S6-Fleet-Runbook]] | Backup/restore/upgrade procedure |
-| S6 closeout | [[wip/S6_closeout]] | Official S6 Successful evidence |
-| S6 status | [[wip/S6_Implementation_Status]] | Successful (2026-09-11) |
-| Bulk start/stop return | [[wip/Control_Plane_Bulk_Lifecycle_Return]] | Eligibility, sequential Docker, QA |
+| S6 closeout | [[history/S6_closeout]] | Official S6 Successful evidence |
+| S6 status | [[history/S6_Implementation_Status]] | Successful (2026-09-11) |
+| Bulk start/stop return | [[history/Control_Plane_Bulk_Lifecycle_Return]] | Eligibility, sequential Docker, QA |
 | Current ToDo | [[SaaS-ToDo]] | Checkboxes; not permission |
-| Open NEAR/DEF questions | [[wip/Clean_Starting_Point_Decision_Backlog]] | Unresolved only |
-| Map B closeout | [[wip/Post_S4_Foundation_Decision_Closeout]] | Why Map B is official |
-| S5 closeout | [[wip/S5_closeout]] | Official S5 Successful evidence |
+| Open NEAR/DEF questions | [[SaaS-Open-Questions]] | Unresolved only |
+| Map B closeout | [[history/Post_S4_Foundation_Decision_Closeout]] | Why Map B is official |
+| S5 closeout | [[history/S5_closeout]] | Official S5 Successful evidence |
 | Conventions | [[Conventions]] | How notes and links work |
 | WIP index | [[wip/_index]] | Current vs archive |
 | Archive | [[wip/archive/_index]] | Historical evidence only |
@@ -377,7 +379,7 @@ Copy everything inside the following block into a **new** Cursor Agent chat:
 ```text
 Work only in C:\Users\Scoy9\Projects\crm_marketing_saas on branch working (origin https://github.com/Koifish95/crm_marketing_saas.git). This is not renzo-crm.
 
-Read first: crm_saas_vault/wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11.md
+Read first: crm_saas_vault/Current-State.md
 Then follow its Documentation Map. Do not scan wip/ indiscriminately. Archived files under crm_saas_vault/wip/archive/ are historical evidence, not current law.
 
 Before doing anything: inspect git status, branch, and HEAD. Code is implementation truth. ADRs and owner decisions in SaaS-Decisions / ADR-CRM-Core-Vertical-Architecture are architecture truth. Distinguish TARGET architecture from IMPLEMENTED state.

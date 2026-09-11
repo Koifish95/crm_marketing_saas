@@ -25,7 +25,7 @@ Definitive record of Milestone **S3 — Control Plane v1**. Written 2026-09-09 f
 | 3. Lab / testing defaults | `lab-acme`, ports 52040/52050/52100, `m10a-*` |
 | 4. Deferred work | S4+ |
 
-Related: [[S3-Control-Plane-Runbook]], [[Control-Plane]], [[wip/S2_closeout]], [[wip/archive/S3_Implementation_Status]].
+Related: [[S3-Control-Plane-Runbook]], [[Control-Plane]], [[history/S2_closeout]], [[wip/archive/S3_Implementation_Status]].
 
 ---
 

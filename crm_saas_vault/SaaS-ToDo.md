@@ -14,7 +14,7 @@ tags:
 
 Platform / productization tasks only. Historical Renzo gym checkboxes stay in [[Milestones]] and [[Open-Questions]] and still aggregate on [[ToDo]]. Real Renzo is not a SaaS customer.
 
-Do not treat a box here as permission to implement. Decision-first: [[Working-Agreement]]. Current state: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]]. Sequence and **Successful** criteria: [[SaaS-Milestones]]. Map closeout: [[wip/Post_S4_Foundation_Decision_Closeout]]. S5 closeout: [[wip/S5_closeout]]. S6 closeout: [[wip/S6_closeout]].
+Do not treat a box here as permission to implement. Decision-first: [[Working-Agreement]]. Live map: [[Current-State]]. Sequence and **Successful** criteria: [[SaaS-Milestones]]. Map closeout: [[history/Post_S4_Foundation_Decision_Closeout]]. S5: [[history/S5_closeout]]. S6: [[history/S6_closeout]]. C1: [[history/C1_CRM_Core_Architecture_Return]].
 
 ## Sooner
 
@@ -27,15 +27,15 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 - [x] **Post-S4 leftovers (missing, one-PROD API, extra non-PROD, gated decommission, operator UI)** — Shipped on `working`.
 - [x] **IMM-01–04** — Map B official; retry = continue/resume; display name may be edited; hostname shape `{slug}.{product-domain}` with domain unset. [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]].
 
-- [x] **S5** — Control Plane Productization / Operations Foundation. **Successful** (2026-09-10). Retry UI + owner browser/Docker pass. [[wip/S5_closeout]].
+- [x] **S5** — Control Plane Productization / Operations Foundation. **Successful** (2026-09-10). Retry UI + owner browser/Docker pass. [[history/S5_closeout]].
 
-- [x] **S6** — Fleet Reliability / Lifecycle. **Successful** (2026-09-11). [[wip/S6_closeout]]. [[S6-Fleet-Runbook]].
+- [x] **S6** — Fleet Reliability / Lifecycle. **Successful** (2026-09-11). [[history/S6_closeout]]. [[S6-Fleet-Runbook]].
 
 ## Architecture (C1 code-shipped)
 
 - [x] **D1–D4** — Account vs product instance; wait on MA leads/campaigns/public capture. [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]].
-- [x] **C1 code-shipped** — Workspace + Core layer + frameworks. Sales not started. D1 CP schema unchanged. Do not mark Map B Successful. [[wip/C1_CRM_Core_Architecture_Return]].
+- [x] **Vault project-state protocol** — Canonical set + [[project-state.yaml]] + [[Work-Order-Protocol]]. WIP is not the map. [[SaaS-Decisions#2026-09-11 — Vault is the sole durable project-state system]].
 
 ## Later / not started
 
-- [ ] **S7–S11** — Hosting/security, public exposure, dogfood, second pilot, commercial launch. Product family (Core / MA / Sales / Beauty) is intended **before** production VPS. [[SaaS-Milestones]] sequence not rewritten yet.
+- [ ] **S7–S11** — Hosting/security, public exposure, dogfood, second pilot, commercial launch. Product family (Core / MA / Sales / Beauty) is intended **before** production VPS. C-track is recorded separately in [[SaaS-Milestones]]; S7 was not rewritten. Not authorized.

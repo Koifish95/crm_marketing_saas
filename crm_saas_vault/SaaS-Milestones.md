@@ -13,15 +13,17 @@ tags:
 
 # SaaS milestones
 
-Official post-S4 path: **Map B + ten-decision overlay** ([[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]]). Map closeout: [[wip/Post_S4_Foundation_Decision_Closeout]]. S5 closeout: [[wip/S5_closeout]].
+Live **roadmap** for the platform. Official S-track (historically called Map B) plus a **separate C-track**. Do not mix S IDs with C IDs. Do not reuse an ID for a new meaning.
 
-S0–S4 Successful bodies below are unchanged laptop proofs. From **S5 onward**, this Map B sequence supersedes the 2026-09-08 hostname-first path. That older path is kept under [[#Historical 2026-09-08 map (Map A)]]. Do not rewrite S0–S4 closeouts as though Map B existed then.
+S-track law: [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]]. Evidence: [[history/Post_S4_Foundation_Decision_Closeout]]. S5: [[history/S5_closeout]]. S6: [[history/S6_closeout]].
+
+S0–S4 Successful bodies below are unchanged laptop proofs. From **S5 onward**, this sequence supersedes the 2026-09-08 hostname-first path. That older path is **only** in [[history/Map-A-Milestones]]. Do not rewrite S0–S4 closeouts as though this sequence existed then.
 
 Renzo gym milestones stay in [[Milestones]] as historical evidence. Improving `martial_arts_template` runs in parallel and is not a launch gate unless we promote a change ([[Working-Agreement]]). Real Renzo is not a SaaS customer.
 
 **Successful** is the official acceptance name. Code existing is not Successful.
 
-This note is not permission to start the next implementation. Scott must ask.
+**This note is not permission to start the next implementation.** Next ≠ authorized. Cursor implements only an active [[Work-Order-Protocol|work order]] or Scott’s explicit ask in the current chat.
 
 ## What “launched” means here
 
@@ -34,7 +36,7 @@ Still sales-led, martial arts first. Not Stripe-by-default, not every industry, 
 
 Laptop Strategic Insights data remains disposable test data. Do not build fleet backup merely to protect those laptop volumes. Backup/recovery is designed around production hosting (official S6).
 
-## Status (official Map B)
+## Status (S-track)
 
 | ID | Focus | Status |
 |---|---|---|
@@ -66,7 +68,23 @@ S0 Workspace split
 → S11 External Paying Customer Readiness
 ```
 
-S0–S6 are Successful. Official S7 is not started. Evidence: [[wip/S5_closeout]], [[wip/S6_closeout]].
+S0–S6 are Successful. Official S7 is not started. Evidence: [[history/S5_closeout]], [[history/S6_closeout]].
+
+The Core ADR says product family locally **before** production VPS. That is C-track priority, not a silent rewrite of S7. State both.
+
+## Status (C-track — architecture; separate IDs)
+
+Not S-track. Do not call C2 “S7.” Do not call historical hostname work “S5.”
+
+| ID | Focus | Status |
+|---|---|---|
+| C1 | CRM Core extraction (workspace, `@crm/core`, frameworks) | **Code-shipped** (2026-09-11). Evidence: [[history/C1_CRM_Core_Architecture_Return]] |
+| C2 | Sales vertical as second Core consumer + CP product catalog | Not started |
+| C3 | Beauty vertical after Sales proves Core | Not started |
+| D1 | Account vs Product Instance CP schema | **Accepted**, schema **not shipped** |
+| D2–D4 | Keep MA leads / campaigns / public capture vertical-owned | **Accepted** (wait) |
+
+C1 is not Map B Successful. C2 is not authorized. Plan narrative (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]].
 
 ---
 
@@ -106,7 +124,7 @@ Prove the template is not “only Renzo.”
 
 - [x] **S2 Successful:** A second martial-arts CRM runs in Docker on the laptop, isolated named volumes (`lab-acme-*-sqlite` / `lab-acme-*-assets`), own admin login (not `setup`), `GET /api/health` green, no shared SQLite with Renzo PRODUCTION. Repeatable via [[S2-Hand-Boot-Checklist]].
 
-Evidence: [[wip/S2_closeout]] (definitive handoff). Original Docker proof: [[wip/archive/S2_Docker_Coexist_Evidence]] (image `renzo-acquisition:m10a`). Earlier host-process proof: [[wip/archive/S2_Sprint4_Coexist_Evidence]]. Current operator image: `martial-arts-acquisition:s2`.
+Evidence: [[history/S2_closeout]]. Original Docker proof: [[wip/archive/S2_Docker_Coexist_Evidence]] (image `renzo-acquisition:m10a`). Earlier host-process proof: [[wip/archive/S2_Sprint4_Coexist_Evidence]]. Current operator image: `martial-arts-acquisition:s2`.
 
 ---
 
@@ -120,7 +138,7 @@ Separate ops app. Scope: [[Control-Plane]].
 
 - [x] **S3 Successful:** Open the control app and see environments, up/down (container running **and** `/api/health`), and relaunch without destroying volumes. The list reads “Acme BJJ · PROD · healthy,” not a raw container id.
 
-Status: **Successful** (2026-09-09). App: `control_plane/` at http://127.0.0.1:52100. Evidence: [[wip/S3_closeout]]. Runbook: [[S3-Control-Plane-Runbook]]. S4 is not started.
+Status: **Successful** (2026-09-09). App: `control_plane/` at http://127.0.0.1:52100. Evidence: [[history/S3_closeout]]. Runbook: [[S3-Control-Plane-Runbook]]. S4 is not started.
 
 ---
 
@@ -136,7 +154,7 @@ Operator creates a new environment on demand. Still not public self-serve.
 
 - [x] **S4 Successful:** After a sales agreement, an operator (or a control-plane action) produces a new martial-arts environment that the control plane immediately shows as healthy. Doing it a second time does not require inventing a new procedure.
 
-Status: **Successful** (2026-09-09). Live proof: Strategic Insights Consulting, LLC on 52200/52201. Evidence: [[wip/S4_closeout]]. Runbook: [[S4-Provision-Runbook]]. “S5 is not started” here meant **historical hostname S5** at closeout time. Official S5 is now control-plane productization (below).
+Status: **Successful** (2026-09-09). Live proof: Strategic Insights Consulting, LLC on 52200/52201. Evidence: [[history/S4_closeout]]. Runbook: [[S4-Provision-Runbook]]. “S5 is not started” in that closeout meant **historical hostname S5** at write time. Official S5 is control-plane productization (below). Historical hostname map: [[history/Map-A-Milestones]].
 
 ---
 
@@ -144,7 +162,7 @@ Status: **Successful** (2026-09-09). Live proof: Strategic Insights Consulting, 
 
 Official S5 (Map B). Operator can run the laptop fleet from a multi-page control plane. Not DNS. Not backups.
 
-**Shipped:** shell (Dashboard, Customers, Environments, Hosting Nodes, Settings placeholder); counts + Needs Attention + missing; workspaces; provision at `/customers/new`; Refresh / Relaunch; extra non-PROD; gated decommission; one-PROD API; localhost `accessUrl`s; continue/resume Retry UI; unit/API tests. Evidence: [[wip/archive/S5_Control_Plane_Productization_Status]], [[wip/S5_closeout]].
+**Shipped:** shell (Dashboard, Customers, Environments, Hosting Nodes, Settings placeholder); counts + Needs Attention + missing; workspaces; provision at `/customers/new`; Refresh / Relaunch; extra non-PROD; gated decommission; one-PROD API; localhost `accessUrl`s; continue/resume Retry UI; unit/API tests. Evidence: [[wip/archive/S5_Control_Plane_Productization_Status]], [[history/S5_closeout]].
 
 **Not in this milestone:** DNS/TLS, public hostnames, fleet backup, operator auth, VPS, Beauty, billing, server pagination.
 
@@ -158,7 +176,7 @@ Status: **Successful** (2026-09-10). Owner pass: Scott. Display-name edit is all
 
 Production-oriented backup, restore, and upgrade. Extra non-PROD and gated decommission already shipped in S5 leftovers — they are **not** the remainder of this S6.
 
-**Shipped:** environment Lifecycle tab; same-host zip; gated restore; off-host copy; Explorer reveal; backup-gated local upgrade; Start / Stop / bulk start-stop; running / success / conflict notices for Backup and Copy off-host. Runbook: [[S6-Fleet-Runbook]]. Evidence: [[wip/S6_closeout]]. Status: [[wip/S6_Implementation_Status]].
+**Shipped:** environment Lifecycle tab; same-host zip; gated restore; off-host copy; Explorer reveal; backup-gated local upgrade; Start / Stop / bulk start-stop; running / success / conflict notices for Backup and Copy off-host. Runbook: [[S6-Fleet-Runbook]]. Evidence: [[history/S6_closeout]]. Status: [[history/S6_Implementation_Status]].
 
 **Not in this milestone:** Perfect observability. Multi-region. Protecting disposable laptop SI volumes as if they were production. Image registry (S7).
 
@@ -214,6 +232,22 @@ Sister business is the second real pilot. Beauty template is not started.
 
 ---
 
+## C1 — CRM Core extraction
+
+Status: **Code-shipped** (2026-09-11). Not S-track Successful.
+
+Workspace + `@crm/core` + brand/health/app-env + auth/RBAC/settings/shell frameworks. Martial Arts consumes Core. Control plane still Martial Arts-only. `martial_arts_template/` was not moved to `apps/`. Evidence: [[history/C1_CRM_Core_Architecture_Return]].
+
+## C2 — Sales as second Core consumer
+
+Status: **Not started.** Not authorized.
+
+Sales / Software vertical plus control-plane product catalog. Architecture law: [[ADR-CRM-Core-Vertical-Architecture]]. Narrative plan (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]].
+
+## C3 — Beauty vertical
+
+Status: **Not started.** After Sales proves Core. Sister-as-Beauty is a later business milestone (S10), not an architecture shortcut.
+
 ## After commercial launch (not required for Successful S11)
 
 - Beauty / salon / esthetician variant if not already done in S10
@@ -224,58 +258,15 @@ Sister business is the second real pilot. Beauty template is not started.
 
 ---
 
-## Historical 2026-09-08 map (Map A)
+## Historical maps
 
-Originally approved Successful path. **Superseded from S5 onward** by Map B (2026-09-10). Kept so closeouts stay readable. Do not implement these IDs as the next sprint.
-
-```text
-S5 Hostname / TLS / real login
-→ S6 Backup / upgrade / restore
-→ S7 Owner CRM + sell-with-the-product
-→ S8 First external customer live   ← this was “launched”
-```
-
-### Historical S5 — Reachable customer access
-
-A real user can use that environment from a browser.
-
-**Decide along the way:** Platform subdomain vs customer domain vs both. TLS approach. Do not publish a hostname until the bootstrap `admin` / `setup` password has been changed.
-
-**Not in this milestone:** Apex/www for Renzo. Cloudflare/Caddy locks from the Renzo hosting contract.
-
-- [ ] **Historical S5 Successful:** Customer staff can hit a hostname, sign in with a real password, and run the CRM. A lab customer can do this without touching Renzo’s `app.renzogracieutah.com`.
-
-This work now lives on official **S8**.
-
-### Historical S6 — Fleet operations
-
-Make a live customer survivable.
-
-**Decide along the way:** Where backups live. Who may restore. Lockstep vs per-customer versions. What upgrade and rollback mean. Operator-add extra non-PROD (already decided at the time: S6, not S4 — later superseded; extras shipped in S5 leftovers). Image registry if a second machine needs the same build.
-
-- [ ] **Historical S6 Successful:** Backup and restore work for a customer environment without killing others. A CRM template update can ship to a non-Renzo environment and still show healthy. Off-host copy can be minimum viable; same-host-only is not enough to call a paid customer safe.
-
-Backup/upgrade remainder now lives on official **S6**. Extras/decommission already shipped.
-
-### Historical S7 — Dogfood the owner path
-
-- [ ] **Historical S7 Successful:** The owner has a normal CRM environment **and** control-plane access. A tracking link → form → Lead → follow-up can represent a SaaS prospect. The owner CRM is not a special fork.
-
-Now official **S9**.
-
-### Historical S8 — First external martial-arts customer live
-
-Commercial launch, sales-led, on the 2026-09-08 map.
-
-- [ ] **Historical S8 Successful:** A real academy that is not Renzo Kaysville is running in its own environment, reachable, backed up, visible on the control plane, and you could relaunch it. You did not copy Renzo’s database to create them.
-
-Now official **S11**, and hosting must be the production VPS.
+Superseded 2026-09-08 hostname-first S5–S8: [[history/Map-A-Milestones]]. Do not implement those IDs. Dual-S5 is **resolved**.
 
 ## Hard stops
 
-- Do not start an unstarted milestone’s *implementation* unless Scott asked.
+- Do not start an unstarted milestone’s *implementation* unless an active work order (or Scott’s explicit ask in the current chat) names that ID.
 - Do not invent answers to Renzo [[Open-Questions]].
 - Do not touch Koi-Pi PRODUCTION SQLite.
 - Do not treat this note as a substitute for [[SaaS-Decisions]].
 
-Related: [[SaaS-ToDo]], [[Control-Plane]], [[Home]].
+Related: [[Current-State]], [[SaaS-ToDo]], [[Control-Plane]], [[Home]], [[Work-Order-Protocol]].

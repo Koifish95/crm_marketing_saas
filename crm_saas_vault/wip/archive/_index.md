@@ -124,7 +124,7 @@ Historical Renzo gym evidence. Do not treat as current SaaS spec.
 
 ## SaaS completed / superseded (archived 2026-09-11)
 
-Current orientation: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]]. These files are evidence, not the map.
+Current orientation: [[Current-State]]. These files are evidence, not the map.
 
 - [[wip/archive/Clean_Starting_Point_Current_State|Clean starting point — current state]] (2026-09-10 snapshot)
 - [[wip/archive/Clean_Starting_Point_Return|Clean starting point — return]]
@@ -147,3 +147,5 @@ Current orientation: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]]. T
 - [[wip/archive/SaaS_S0-S8_Discovery_Questions_2026-09-08|S0–S8 discovery questions]]
 - [[wip/archive/SaaS_S0-S8_Discovery_Answers|S0–S8 discovery answers]] (not V1 [[wip/archive/answers]])
 - [[wip/archive/Renzo_to_Generic_Martial_Arts_Sanitization|Renzo → generic Martial Arts sanitization]]
+- [[wip/archive/note|Human QA inbox (Renzo-era scratch)]]
+- [[wip/archive/catches|catches (scratch)]]

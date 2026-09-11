@@ -16,7 +16,7 @@ Laptop-only operator procedure for the S3 control plane. Not a provisioner. Not 
 
 App: `control_plane/` at http://127.0.0.1:52100  
 CRM labs: `martial_arts_template` via `pnpm lab:docker`  
-Handoff: [[wip/S3_closeout]]
+Handoff: [[history/S3_closeout]]
 
 ## Start
 
@@ -80,7 +80,7 @@ Never `down`, `-v`, or prune. Verify with `pnpm lab:docker <slug> get` (markers)
 - Exact registered container names and health URLs only
 - No Docker socket in CRM containers
 - Do not attach `webhosting_renzo_*` or leftover `renzo-*` volumes
-- Extra non-PROD and gated decommission shipped after S3; current map: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]]
+- Extra non-PROD and gated decommission shipped after S3; current map: [[Current-State]]
 
 ## Exclusions
 

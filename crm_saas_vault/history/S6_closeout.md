@@ -18,7 +18,7 @@ Definitive record of Milestone **S6 — Fleet Reliability / Lifecycle** (officia
 
 **S7 was not started.**
 
-Related: [[SaaS-Milestones]], [[Control-Plane]], [[S6-Fleet-Runbook]], [[wip/S6_Implementation_Status]], [[SaaS-Decisions#2026-09-11 — Official S6 is Successful]].
+Related: [[SaaS-Milestones]], [[Control-Plane]], [[S6-Fleet-Runbook]], [[history/S6_Implementation_Status]], [[SaaS-Decisions#2026-09-11 — Official S6 is Successful]].
 
 ## 1. Successful
 

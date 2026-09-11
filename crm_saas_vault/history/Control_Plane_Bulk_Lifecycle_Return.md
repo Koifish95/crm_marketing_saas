@@ -1,10 +1,10 @@
 ---
 type: note
-status: current
+status: historical
 area: saas
 updated: 2026-09-11
 tags:
-  - wip
+  - history
   - saas
   - control-plane
   - handoff
@@ -12,7 +12,9 @@ tags:
 
 # Control Plane bulk lifecycle — return
 
-Bulk Start / Stop on `/environments`, plus a real single-environment Start. **Does not make official S6 Successful.**
+**Historical evidence.** Official S6 was later marked **Successful**. Live map: [[Current-State]]. Eligibility facts were promoted into [[Control-Plane]].
+
+Bulk Start / Stop on `/environments`, plus a real single-environment Start. Written before official S6 Successful.
 
 Spec: Environments table selection, sequential Docker, partial results. Recreate stays on Relaunch. Missing containers stay out of Start.
 
@@ -59,4 +61,4 @@ None material. Stop All is `secondary` plus a confirm checkbox and a count confi
 
 Three commits on `working` after gates. Do not mark S6 Successful.
 
-Related: [[Control-Plane]], [[wip/S6_Implementation_Status]], [[wip/_index]].
+Related: [[Control-Plane]], [[history/S6_Implementation_Status]], [[wip/_index]].
