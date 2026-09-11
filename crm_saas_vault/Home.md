@@ -2,7 +2,7 @@
 type: index
 status: current
 area: overview
-updated: 2026-09-10
+updated: 2026-09-11
 aliases:
   - Start
   - Index
@@ -42,7 +42,7 @@ Renzo notes at the vault root (`Overview`, `Implementation-State`, `Decisions`, 
 
 ## Platform — current understanding
 
-Long-term direction: an ultra-general marketing, lead-generation, and CRM platform for SMBs. First industry variant: Martial Arts. Likely second: Beauty / Salon / Esthetician (not designed yet).
+Long-term direction: an ultra-general marketing, lead-generation, and CRM platform for SMBs. First industry variant: Martial Arts. Architecture sequence: Core → Martial Arts → Sales as second consumer → prove shared abstractions → Beauty as third vertical — locally, before production VPS. Beauty remains the sister-pilot *industry*, not the first architecture-validation vertical.
 
 ```text
 Platform → Industry Template → Customer Instance → Enabled Capabilities → Configuration

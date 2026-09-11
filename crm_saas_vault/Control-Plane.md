@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-10
+updated: 2026-09-11
 aliases:
   - Platform control
   - Control module
@@ -49,6 +49,8 @@ which customers exist
 Headlines still read “Acme BJJ · PROD · healthy,” not a container id. Indexes are tables. Workspaces can Refresh, Relaunch, add extra non-PROD, gated-decommission (volumes stay), and use the **Lifecycle** tab (backup, restore, off-host copy, upgrade — S6 implemented, not Successful). Configuration fields stay read-only. Current state: [[wip/Clean_Starting_Point_Current_State]].
 
 Laptop-only. Local Docker. Health on demand. Acme is seeded; new customers are provisioned. No Docker socket in CRM containers.
+
+Today’s customer row is the commercial account **and** the only product instance. Multi-instance accounts (D1: Smith Holdings → Sales instance + Beauty instance) are **accepted target architecture**, not shipped. See [[Customer-Environment]] and [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]].
 
 ## What it is not
 

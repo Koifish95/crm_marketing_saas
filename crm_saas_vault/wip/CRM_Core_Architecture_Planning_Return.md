@@ -50,14 +50,14 @@ Recommended model: pnpm workspace + `packages/crm-core` Nuxt layer + TS modules;
 
 [[wip/CRM_Core_Extraction_Implementation_Plan]]
 
-## Unresolved owner decisions
+## Owner decisions D1–D4
 
-Four. None block the first extraction sprint.
+**Resolved** 2026-09-11. [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]]. None block C1 / Sprint 1. C1 was **not** started.
 
-1. One Customer, one product family? **Recommend yes.**
-2. Core Lead now vs keep today’s `leads` MA-owned? **Recommend keep MA-owned until Sales.**
-3. Campaigns/events into Core before Sales? **Recommend wait.**
-4. Public capture framework in Core? **Recommend wait.**
+1. **D1 accepted (rejects prior recommendation):** Customer Account → Product Instance → Vertical → Environments. One account may own multiple instances on different verticals. **Not implemented.**
+2. **D2 accepted (wait):** MA `leads` stay MA-owned. Eventual Core name need not be `Lead`.
+3. **D3 accepted (wait):** campaigns/events stay MA-owned.
+4. **D4 accepted (wait):** `/trial`, `/events/[slug]`, `/t/[slug]` stay vertical-owned.
 
 ## Recommended first implementation sprint
 

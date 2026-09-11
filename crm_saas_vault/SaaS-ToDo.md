@@ -35,7 +35,8 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 
 ## Architecture (accepted, not started)
 
-- [ ] **C1 / Sprint 1** — Workspace + thin Core layer + enforcement. Do not start unless Scott asks. [[ADR-CRM-Core-Vertical-Architecture]]. [[wip/CRM_Core_Extraction_Implementation_Plan]].
+- [x] **D1–D4** — Account vs product instance; wait on MA leads/campaigns/public capture. [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]].
+- [ ] **C1 / Sprint 1** — Workspace + thin Core layer + enforcement. Scope unchanged. Do not start unless Scott asks. [[ADR-CRM-Core-Vertical-Architecture]]. [[wip/CRM_Core_Extraction_Implementation_Plan]].
 
 ## Later / not started
 

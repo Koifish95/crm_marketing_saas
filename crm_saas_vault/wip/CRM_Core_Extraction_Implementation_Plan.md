@@ -60,18 +60,18 @@ This document is not permission to implement. Scott must authorize the first ext
 | Branding | `shared/utils/brand.ts`, `runtimeConfig.public` | **Obvious Core** + **configuration** | Env-driven; defaults say “Martial Arts Acquisition”. |
 | Health / app-env | `server/api/health.get.ts`, `shared/utils/app-env.ts`, `AppEnvBanner` | **Obvious Core** | Identity + health contract. Later carry product/Core versions (ADR-26). |
 | Record workspace helper | `AppRecordWorkspace.vue`, `shared/utils/record-workspace.ts` | **Obvious Core** | UI primitive, not domain. |
-| Campaigns / tracking / content / assets / marketing tasks | `campaigns*`, `content*`, `assets`, `marketing_tasks`, `server/services/campaigns.ts` | **Likely Core, needs Sales validation** | Tables are mostly generic. `destinationPath` default `/trial` is MA. Do not promote before Sales uses them. |
+| Campaigns / tracking / content / assets / marketing tasks | `campaigns*`, `content*`, `assets`, `marketing_tasks`, `server/services/campaigns.ts` | **Martial Arts vertical (D3 — wait)** | Stay MA-owned. `/trial` default. Promote only after Sales exists and the checklist passes. |
 | Follow-up task engine | `follow_up_tasks`, `server/services/follow-up.ts` | **Likely Core, needs Sales validation** | Engine is generic; rows are tied to `leadId` / `trialId` / events. |
 | Notes / status history | `lead_notes`, `lead_status_history` | **Likely Core, needs Sales validation** | Pattern is reusable; tables are lead-scoped. |
 | Attribution / UTM | lead + registration UTM columns, `public-attribution.ts` | **Likely Core, needs Sales validation** | Generic marketing. |
-| Acquisition events | `acquisition_events*` | **Likely Core, needs Sales validation** | Event object is generic; batch process creates MA households; tracking allows `/trial`. |
+| Acquisition events | `acquisition_events*` | **Martial Arts vertical (D3 — wait)** | Event batch creates MA households; tracking allows `/trial`. Sales states requirements first. |
 | Meta ads sync | `meta_*` tables, `server/services/meta.ts` | **Unclear / likely never Core** | Integration, not a CRM primitive. Keep MA (or a later optional package) until a second vertical needs the same Meta model. |
 | Household / `leads` + `lead_lines` | schema + `server/services/leads.ts`, `lead-lines.ts`, `staff-household.ts` | **Martial Arts vertical** | Required `programId`, trial statuses, conversion/pricing columns, SELF/CHILD/SPOUSE. Not a generic lead. |
 | Trials / intro / public `/trial` | `trials`, `intro_availability_*`, `public-trial.ts`, `app/pages/trial.vue` | **Martial Arts vertical** | Gym intro workflow. |
 | Programs / memberships / household pricing / forecast | `programs`, `membership_offerings`, `household_pricing_rules`, `forecast.ts` | **Martial Arts vertical** | Seed codes `ADULT_BJJ`, `KIDS_BJJ`. |
 | Conversion / lost outcomes | `conversions`, `lead_line_lost_outcomes` | **Martial Arts vertical** | Gym join. |
 | Compensation | `compensation_*`, trial/event tied | **Martial Arts vertical** until Sales has the same ledger concept | Premature Core would freeze MA rules. |
-| Public lead capture framework | `/trial`, `/events/[slug]`, `/t/[slug]` | **Unclear — recommend wait** | Surfaces are MA destinations. |
+| Public lead capture framework | `/trial`, `/events/[slug]`, `/t/[slug]` | **Martial Arts vertical (D4 — wait)** | No Core public-capture framework yet. Compare after Sales has a real public workflow. |
 | Docker / migrate+seed / compose | `Dockerfile`, `runtime-init`, provision compose | **Infrastructure / runtime** | Product build concern, not Core domain. |
 | CP registry / S6 backup | `control_plane/` | **Infrastructure** | Not CRM Core. |
 
@@ -281,15 +281,15 @@ Later Sales decisions (pipeline stages, quoting, territories, email) stay flagge
 
 | Change | When |
 |---|---|
-| Customer keeps product/vertical (`industry_template` → catalog id) | With first non-MA image (C2) |
+| Product Instance owns vertical (`industry_template` moves off the account row) | With first non-MA image / multi-instance work (C2+). **Not C1.** |
 | Environment columns: product version, Core version, git SHA (image already `expected_image`) | Same sprint as image identity |
-| Provision form: product picker | When catalog has ≥2 entries |
+| Provision form: pick or create Product Instance + vertical | When catalog has ≥2 entries or a second instance is allowed |
 | `ensureLocalImage` / compose file keyed by product | Same |
-| Backfill existing rows to `martial-arts` | Migration, same sprint |
+| Backfill: each existing `customers` row → one Martial Arts Product Instance | Migration, later |
 | Health/metadata showing product/Core versions | When CRM health exposes them |
 | S6 backup/upgrade | Stay env-scoped; already product-agnostic |
 
-**Unresolved:** may one Customer own two verticals? Recommendation: **no**. Does not block C1.
+**D1 accepted:** one account may own multiple instances on different verticals. That model is **target**, not shipped. Does not expand or block C1.
 
 ---
 
@@ -330,16 +330,18 @@ Later Sales decisions (pipeline stages, quoting, territories, email) stay flagge
 
 ---
 
-## 18. Decisions still required
+## 18. Owner decisions (resolved 2026-09-11)
 
-None of these block **sprint 1** (workspace + empty layer + enforcement).
+None of these were ever a C1 blocker. They are **accepted**. Do not reopen unless implementation evidence contradicts them. ADR: [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]].
 
-| # | Question | Evidence | Recommendation | Consequence | Blocks sprint 1? |
-|---|---|---|---|---|---|
-| D1 | One Customer, one product family? | [Customer-Environment] puts industry template on Customer; ADR-18 forbids casual switch | **Yes — one product per Customer** until an explicit conversion process | Simpler CP; SI cannot add a Beauty env under the same customer | No |
-| D2 | Core Lead now, or keep today’s `leads` MA-owned? | `leads.programId` required; trial statuses; `lead_lines` | **Keep MA-owned until Sales** | Sales will invent its own contact/opportunity; later promotion if they match | No |
-| D3 | Campaigns/events into Core before Sales? | Generic tables; `/trial` default; event batch creates households | **Wait for Sales** | Temporary duplication if Sales needs campaigns | No |
-| D4 | Public capture framework in Core? | `/trial` and event slugs are MA destinations | **Wait** | Sales gets its own public form first | No |
+| # | Decision | Status | Blocks C1 / Sprint 1? |
+|---|---|---|---|
+| D1 | Customer Account → Product Instance → Vertical → Environments. One account may own multiple instances on different verticals. Each instance has exactly one vertical. **Not implemented.** | **Accepted** (rejected the earlier “one customer = one product” recommendation) | No |
+| D2 | Keep MA `leads` / `lead_lines` / trials MA-owned. Do not promote into Core. Sales builds its own model. Eventual Core name need not be `Lead`. | **Accepted** (wait) | No |
+| D3 | Keep campaigns and acquisition events MA-owned until Sales exists. | **Accepted** (wait) | No |
+| D4 | Keep `/trial`, `/events/[slug]`, `/t/[slug]` vertical-owned. No Core public-capture framework yet. | **Accepted** (wait) | No |
+
+Promotion path after Sales exists: compare real implementations → identify a common contract → Core-promotion checklist → promote only if justified. Temporary duplication is acceptable.
 
 ---
 

@@ -78,7 +78,7 @@ Repository verification required
 
 ## Current next decision
 
-Official path: [[SaaS-Milestones]] Map B. S0–S5 are Successful. Official **S6** is implemented, **not Successful** until Scott’s browser/Docker pass. CRM Core + vertical architecture is **Accepted** ([[ADR-CRM-Core-Vertical-Architecture]]); extraction is **not started**. Plan: [[wip/CRM_Core_Extraction_Implementation_Plan]]. Do not extract Core or start Sales/Beauty/S7 unless Scott asks.
+Official path: [[SaaS-Milestones]] Map B. S0–S5 are Successful. Official **S6** is implemented, **not Successful** until Scott’s browser/Docker pass. CRM Core + vertical architecture is **Accepted**. D1–D4 are **accepted** ([[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]]). Extraction / C1 is **not started**. Plan: [[wip/CRM_Core_Extraction_Implementation_Plan]]. Do not extract Core or start Sales/Beauty/S7 unless Scott asks.
 
 **Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 

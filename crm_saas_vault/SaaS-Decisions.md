@@ -25,6 +25,25 @@ Decision: what we chose
 
 ---
 
+## 2026-09-11 — D1–D4: account vs product instance; wait on Core domain
+
+Status: accepted
+
+Context: Planning listed D1–D4 as unresolved. Scott decided. This does **not** implement Control Plane schema, extract Core, or start C1. Full Core ADR: [[ADR-CRM-Core-Vertical-Architecture]]. Domain: [[Customer-Environment]].
+
+Decision:
+
+- **D1:** Reject “one Customer = one product family.” Target hierarchy is Customer Account / Organization → Business / Product Instance → Vertical → Environments. One account may own multiple instances; each instance has exactly one vertical; all of that instance’s environments share that vertical; PROD and DEV under one instance may not be different verticals. Switching verticals is not a normal env config change. Cross-product conversion is a future explicit migration. Do not add billing/account-management features merely because the account level exists. **Not implemented** — today’s `customers` row is still the account and the only product instance.
+- **D2:** Wait. Keep Martial Arts `leads` / `lead_lines` / trials MA-owned. Do not promote them into Core. Sales builds its own contact/opportunity model. Compare after two implementations. The eventual Core name need not be `Lead`.
+- **D3:** Wait. Keep campaigns and acquisition events MA-owned (`/trial` destinations, household-creating event process). Sales states its own requirements first.
+- **D4:** Wait. Keep `/trial`, `/events/[slug]`, `/t/[slug]` vertical-owned. No generic Core public-capture framework yet.
+
+Rule: diverge first; abstract after demonstrated commonality and the Core-promotion checklist. Sequence: Core → Martial Arts → Sales as second consumer → prove shared abstractions → Beauty → then production VPS.
+
+Source: Scott 2026-09-11
+
+---
+
 ## 2026-09-11 — CRM Core + vertical architecture
 
 Status: accepted

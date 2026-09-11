@@ -20,7 +20,7 @@ CRM Core is shared infrastructure consumed by independently built vertical produ
 
 ## 2. Status
 
-**Accepted** (2026-09-11). Owner-approved in the architectural discussion recorded by [wip/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]. Implementation has **not** started. Extraction plan: [wip/CRM_Core_Extraction_Implementation_Plan]. Pointer: [SaaS-Decisions#2026-09-11 — CRM Core + vertical architecture].
+**Accepted** (2026-09-11). Owner-approved in the architectural discussion recorded by [wip/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]. D1–D4 resolved the same day: [SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]. Implementation has **not** started. Extraction plan: [wip/CRM_Core_Extraction_Implementation_Plan]. Pointer: [SaaS-Decisions#2026-09-11 — CRM Core + vertical architecture].
 
 ## 3. Date
 
@@ -87,7 +87,9 @@ Do not create intermediate packages shared by only some verticals (`sales_beauty
 - Verticals may **not** add vertical-specific columns to Core-owned tables (ADR-08). No `household_id` or `stylist_id` on a Core lead. Use vertical tables, joins, or extension tables when the concept deserves them — do not auto-create extension tables for every difference.
 - Core and vertical schema may coexist in the same customer/environment SQLite database.
 
-**Repository fact that constrains extraction:** there is no `households` table. Household is `leads` + `lead_lines`. `leads.programId` is required. Lead `status` includes trial states. Do not extract today’s `leads` row into Core until Sales proves a shared contact/lead abstraction. Recommendation (not a silent decision): keep `leads` / `lead_lines` / `trials` Martial Arts-owned for the first extractions.
+**Accepted (D2):** keep today’s `leads` / `lead_lines` / `trials` Martial Arts-owned. Do not promote them into Core. Household is not a table; `leads.programId` is required; lead `status` includes trial states. Sales builds its own contact/opportunity concepts. After two real implementations, compare and promote only a justified shared abstraction. That name need not be `Lead`.
+
+**Accepted (D3, D4):** campaigns, acquisition events, and public capture (`/trial`, `/events/[slug]`, `/t/[slug]`) stay Martial Arts-owned until Sales exists and the promotion checklist passes. Temporary duplication is preferred to premature Core.
 
 ## 9. UI ownership rules
 
@@ -126,7 +128,7 @@ Do not create intermediate packages shared by only some verticals (`sales_beauty
 - Core uses semver (ADR-14): PATCH compatible fix; MINOR backward-compatible capability; MAJOR breaking contract/schema/API.
 - Only the current Core major is supported long-term. When a new major ships, verticals get an explicit migration window. No indefinite multi-major support (ADR-15).
 - Every deployable product image eventually carries: vertical identity, product version, Core version, immutable build/Git id (ADR-26). Control plane records/displays these independently. Do not use a combined version string as the only truth.
-- Product identity is first-class and selected at provision time (ADR-18). Do not infer it only from image names. An existing customer cannot casually switch Martial Arts → Sales/Beauty. Cross-product conversion is a future explicit process — not in this ADR’s implementation.
+- Product identity is first-class and selected when a **Business / Product Instance** is created (ADR-18, D1). Do not infer it only from image names. An instance cannot casually switch Martial Arts → Sales/Beauty. Cross-product conversion is a future explicit process — not implemented here.
 
 ## 14. Testing / regression contract
 
@@ -165,10 +167,25 @@ Sales is intentionally before Beauty.
 
 ## 16. Product identity direction
 
-Control plane must eventually treat product/vertical as first-class (ADR-18):
+**Accepted (D1):** distinguish the commercial relationship from a CRM/product deployment. Target:
 
 ```text
-Customer: Strategic Insights
+Customer Account / Organization
+    ↓
+Business / Product Instance     (exactly one vertical)
+    ↓
+Vertical Product
+    ↓
+Environments (PROD, DEV, optional extras — same vertical)
+```
+
+One account may own multiple instances on different verticals (Smith Holdings → Smith Software / Sales and Smith Aesthetics / Beauty). PROD and DEV under one instance may not be different verticals. Vertical switching is not a normal environment setting.
+
+Control plane must eventually treat product/vertical as first-class on the **Product Instance** (ADR-18):
+
+```text
+Customer Account: Smith Holdings
+Product Instance: Smith Software
 Product: Sales
 Environment: PROD
 Product Version: 1.3.0
@@ -177,9 +194,9 @@ Image: crm-sales:1.3.0
 Build/Git SHA: <immutable id>
 ```
 
-**Recommendation (does not silently decide the open fork):** product/vertical identity stays on **Customer** (today: `industry_template`; [Customer-Environment] already says this). **Environment** records deploy identity (product version, Core version, image, git SHA). One Customer, one product family, until an explicit conversion process exists.
+**Environment** records deploy identity (product version, Core version, image, git SHA).
 
-Existing customers default to Martial Arts. Provision form selects product only after a second catalog entry exists.
+**Current repository fact (not yet this model):** `customers` is both the account and the only product instance; `industry_template` sits on that row; provision always writes `martial-arts`; exactly one PROD per customer row. See [Customer-Environment]. Do not implement the split in C1.
 
 ## 17. Architecture-proven finish line
 
@@ -203,7 +220,7 @@ Then stop treating Core extraction as an open-ended refactor. Beauty is the thir
 - Official Map B S7 (hosting/VPS) waits until the product family exists locally. S6 owner pass can finish independently; do not start S7 on this ADR.
 - [Home] “likely second vertical is Beauty” and [SaaS-Milestones] S10 (Beauty/sister) are historical sequencing, not a license to build Beauty before Sales.
 - Backlog item “when to extract a shared CRM core” is answered: after this ADR, when Scott authorizes the first extraction sprint.
-- Control plane provision remains Martial Arts-only until a product catalog exists.
+- Control plane provision remains Martial Arts-only until a product catalog exists. Multi-instance accounts are target architecture, not shipped.
 - Laptop SI data stays disposable. S6 backups are production-shaped fleet ops, not a reason to treat SI as durable.
 
 ## 19. Benefits
@@ -244,15 +261,16 @@ Deferred to [wip/CRM_Core_Extraction_Implementation_Plan] and later owner author
 - Nuxt layer vs extra workspace packages as Core grows.
 - When to rename `martial_arts_template` → `apps/martial-arts`.
 - Image name cutover from `martial-arts-acquisition:s4` to `crm-martial-arts:<version>`.
-- Exact Sales contact/opportunity schema.
 - Beauty domain.
-- Control plane product catalog UI.
-- Whether one Customer may ever own two product families (recommend no; owner may override).
-- Whether a thin Core lead/contact is introduced after Sales, or never.
+- Control plane product-instance catalog UI and when to split `customers` into account + instance rows.
+- Exact Sales contact/opportunity names after Sales exists (D2: not assumed to be `Lead`).
+- Whether campaigns, events, or public capture later pass the promotion checklist (D3–D4: wait).
 
 ## 23. Supersedes / conflicts-with
 
 Does **not** supersede S0–S5 Successful closeouts, IMM-01–04, S4 provision decisions, or S6 NEAR-01–03.
+
+**D1 supersedes** the planning recommendation “one Customer = one product family” and the S1 wording that industry template and “exactly one PROD” live on Customer as the permanent model. Those remain **current implementation facts**. Target: one PROD per Product Instance; industry/vertical on the instance. [SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain].
 
 **Conflicts / sequencing (record, do not erase):**
 
