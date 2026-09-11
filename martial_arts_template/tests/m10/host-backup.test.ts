@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { sqliteFilePath } from '../../server/database'
 import { createHostBackup, listHostBackups, pruneHostBackups, readBackupStatus, restoreHostBackup } from '../../server/services/host-backup'
 import { BACKUP_RETENTION_DAYS, backupStamp, nextScheduledBackupMs } from '../../shared/utils/backup'
-import { APP_ENV_ISOLATION_MARKERS, isolationMarkerFileName } from '../../shared/utils/app-env'
+import { APP_ENV_ISOLATION_MARKERS, isolationMarkerFileName } from '@crm/core/shared/utils/app-env'
 import { DomainError } from '../../server/services/errors'
 import { openTestDatabase } from '../helpers/db'
 

@@ -9,7 +9,7 @@ import {
 } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { AppEnv } from '../../shared/utils/app-env'
+import type { AppEnv } from '@crm/core/shared/utils/app-env'
 import {
   BACKUP_RETENTION_DAYS,
   DEFAULT_HOST_BACKUP_DIR,

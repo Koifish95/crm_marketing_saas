@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { migrateDatabase } from '../../server/database/migrate'
 import { seedDatabase } from '../../drizzle/seed'
-import { APP_ENV_ISOLATION_MARKERS, isolationMarkerFileName } from '../../shared/utils/app-env'
+import { APP_ENV_ISOLATION_MARKERS, isolationMarkerFileName } from '@crm/core/shared/utils/app-env'
 import { readLabIsolation, stampLabIsolation } from '../../scripts/lab-isolation'
 
 const original = {

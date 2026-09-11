@@ -12,7 +12,7 @@ import {
 import { hashStaffPassword } from '../server/services/password'
 import { utcNowMs } from '../shared/utils/time'
 import { loadLocalEnv } from '../server/utils/load-env'
-import { readAppEnv } from '../shared/utils/app-env'
+import { readAppEnv } from '@crm/core/shared/utils/app-env'
 
 export const BOOTSTRAP_PASSWORD_REQUIRED
   = 'NUXT_AUTH_PASSWORD is required to seed an admin user. Seed will not invent a default password.'

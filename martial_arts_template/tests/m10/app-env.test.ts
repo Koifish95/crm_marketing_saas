@@ -13,7 +13,7 @@ import {
   impliedHostPort,
   isRenzoPublicHostname,
   publicHostnameForEnv,
-} from '../../shared/utils/app-env'
+} from '@crm/core/shared/utils/app-env'
 import { BOOTSTRAP_PASSWORD_REQUIRED, getBootstrapAdmin } from '../../drizzle/seed'
 
 const original = {

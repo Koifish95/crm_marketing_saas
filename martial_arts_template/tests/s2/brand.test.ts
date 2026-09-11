@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_APP_NAME, publicBrand } from '../../shared/utils/brand'
+import { DEFAULT_APP_NAME, publicBrand } from '@crm/core/shared/utils/brand'
 
 describe('S2 public brand', () => {
   it('defaults to a generic martial-arts name, not Renzo', () => {

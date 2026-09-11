@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { APP_ENV_LABELS, isNonProductionAppEnv, type AppEnv } from '#shared/utils/app-env'
+import { APP_ENV_LABELS, isNonProductionAppEnv, type AppEnv } from '@crm/core/shared/utils/app-env'
 
 const config = useRuntimeConfig()
 const appEnv = computed(() => config.public.appEnv as AppEnv)

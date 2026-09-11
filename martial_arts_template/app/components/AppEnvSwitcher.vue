@@ -5,7 +5,7 @@ import {
   currentAppEnvFromLocation,
   environmentSwitcherHref,
   type AppEnv,
-} from '#shared/utils/app-env'
+} from '@crm/core/shared/utils/app-env'
 
 withDefaults(defineProps<{
   inverted?: boolean

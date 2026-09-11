@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm'
-import { readAppEnv } from '../../shared/utils/app-env'
+import { coreHealthBody } from '@crm/core/shared/utils/health'
 import { useDb } from '../database'
 
 export default defineEventHandler(async () => {
@@ -7,11 +7,9 @@ export default defineEventHandler(async () => {
   const db = useDb()
   await db.run(sql`select 1`)
 
-  return {
-    ok: true,
-    app: config.public.appName,
-    timezone: config.public.timezone,
-    database: 'reachable' as const,
-    appEnv: readAppEnv(),
-  }
+  return coreHealthBody({
+    appName: String(config.public.appName || ''),
+    timezone: String(config.public.timezone || ''),
+    database: 'reachable',
+  })
 })

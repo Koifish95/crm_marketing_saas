@@ -111,7 +111,7 @@ export function environmentSwitcherUrl(input: {
   return `${protocol}//${input.hostname}:${input.port}${path}`
 }
 
-export function normalizeHostname(hostname: string): string {
+export function normalizeHostname(hostname: string) {
   return hostname.trim().toLowerCase().replace(/\.$/, '')
 }
 
@@ -129,16 +129,16 @@ export function appEnvForHostname(hostname: string): AppEnv | null {
   return null
 }
 
-export function isConfiguredPublicHostname(hostname: string): boolean {
+export function isConfiguredPublicHostname(hostname: string) {
   return appEnvForHostname(hostname) !== null
 }
 
 /** @deprecated Use isConfiguredPublicHostname. Kept so old imports fail loudly if missed. */
-export function isRenzoPublicHostname(hostname: string): boolean {
+export function isRenzoPublicHostname(hostname: string) {
   return isConfiguredPublicHostname(hostname)
 }
 
-export function publicHostnameForEnv(env: AppEnv): string {
+export function publicHostnameForEnv(env: AppEnv) {
   return APP_ENV_PUBLIC_HOSTS[env]
 }
 

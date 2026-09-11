@@ -29,7 +29,7 @@ import {
   isIsolationMarkerFileName,
   readAppEnv,
   type AppEnv,
-} from '../../shared/utils/app-env'
+} from '@crm/core/shared/utils/app-env'
 import { BUSINESS_TIMEZONE, denverParts, utcNowMs } from '../../shared/utils/time'
 import { getDatabaseUrl, sqliteFilePath } from '../database'
 import { uploadsDirectory } from './assets'

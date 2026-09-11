@@ -1,5 +1,5 @@
 import { addCalendarDays, BUSINESS_TIMEZONE, denverParts, denverWallToUtc, denverYmd } from './time'
-import type { AppEnv } from './app-env'
+import type { AppEnv } from '@crm/core/shared/utils/app-env'
 
 export const BACKUP_RETENTION_DAYS = 14
 export const BACKUP_SCHEDULE_HOUR = 2

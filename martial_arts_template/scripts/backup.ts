@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readdirSync, rmSync, statSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { APP_ENV_HOST_PORTS, APP_ENVS, type AppEnv } from '../shared/utils/app-env'
+import { APP_ENV_HOST_PORTS, APP_ENVS, type AppEnv } from '@crm/core/shared/utils/app-env'
 import { BACKUP_RETENTION_DAYS, BACKUP_SCHEDULE_HOUR, BACKUP_SCHEDULE_MINUTE, BACKUP_SCHEDULE_TIMEZONE, nextScheduledBackupMs } from '../shared/utils/backup'
 import { createHostBackup, listHostBackups, pruneHostBackups, readBackupStatus, recordBackupStatus, restoreHostBackup, hostBackupRoot } from '../server/services/host-backup'
 

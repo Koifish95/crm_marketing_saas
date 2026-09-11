@@ -1,4 +1,4 @@
-import { readAppEnv } from '../../shared/utils/app-env'
+import { readAppEnv } from '@crm/core/shared/utils/app-env'
 
 export default defineNitroPlugin(() => {
   const appEnv = readAppEnv()

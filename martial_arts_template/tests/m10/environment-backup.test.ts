@@ -17,7 +17,7 @@ import {
   validateBackupArchive,
 } from '../../server/services/environment-backup'
 import { DomainError } from '../../server/services/errors'
-import { APP_ENV_ISOLATION_MARKERS, isolationMarkerFileName } from '../../shared/utils/app-env'
+import { APP_ENV_ISOLATION_MARKERS, isolationMarkerFileName } from '@crm/core/shared/utils/app-env'
 import { openTestDatabase } from '../helpers/db'
 
 const original = {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { APP_ENV_LABELS, type AppEnv } from '#shared/utils/app-env'
+import { APP_ENV_LABELS, type AppEnv } from '@crm/core/shared/utils/app-env'
 
 definePageMeta({
   layout: 'internal',

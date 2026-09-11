@@ -10,7 +10,7 @@ import {
   isolationMarkerFileName,
   readAppEnv,
   type AppEnv,
-} from '../shared/utils/app-env'
+} from '@crm/core/shared/utils/app-env'
 
 export const LAB_SLUGS = ['lab-acme-prod', 'lab-acme-dev'] as const
 export type LabSlug = (typeof LAB_SLUGS)[number]

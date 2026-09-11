@@ -3,5 +3,12 @@
   "type": "module",
   "private": true,
   "version": "0.0.0",
-  "main": "./nuxt.config.ts"
+  "main": "./nuxt.config.ts",
+  "exports": {
+    ".": "./nuxt.config.ts",
+    "./shared/utils/brand": "./shared/utils/brand.ts",
+    "./shared/utils/app-env": "./shared/utils/app-env.ts",
+    "./shared/utils/health": "./shared/utils/health.ts",
+    "./shared/utils/identity": "./shared/utils/identity.ts"
+  }
 }

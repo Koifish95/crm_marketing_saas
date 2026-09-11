@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { readAppEnv } from '../../shared/utils/app-env'
+import { readAppEnv } from '@crm/core/shared/utils/app-env'
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).optional(),

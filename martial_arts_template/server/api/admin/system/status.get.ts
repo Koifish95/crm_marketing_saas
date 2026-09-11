@@ -1,6 +1,6 @@
 import { defineEventHandler } from 'h3'
-import { publicBrand } from '../../../../shared/utils/brand'
-import { readAppEnv } from '../../../../shared/utils/app-env'
+import { publicBrand } from '@crm/core/shared/utils/brand'
+import { readAppEnv } from '@crm/core/shared/utils/app-env'
 import {
   isRestartEnabled,
   processUptimeSeconds,

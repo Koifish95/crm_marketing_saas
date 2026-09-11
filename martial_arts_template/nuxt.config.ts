@@ -1,6 +1,6 @@
 import tailwindcss from '@tailwindcss/vite'
 import { isForbiddenPort, PREFERRED_PORT } from './scripts/listen-port.mjs'
-import { publicBrand } from './shared/utils/brand'
+import { publicBrand } from '@crm/core/shared/utils/brand'
 
 const brand = publicBrand(process.env)
 
