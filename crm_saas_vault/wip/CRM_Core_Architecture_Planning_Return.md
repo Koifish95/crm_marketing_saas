@@ -102,4 +102,4 @@ No `martial_arts_template/` or `control_plane/` application changes.
 
 ## Confirmation
 
-No Core extraction, repository restructure, Sales implementation, Beauty implementation, product-aware provisioning, VPS, DNS/TLS, or other new milestone implementation was started.
+This file is the **planning** return. C1 implementation later shipped; see [[wip/C1_CRM_Core_Architecture_Return]]. Sales, Beauty, D1 CP schema, and C2 were still not started as of that return.

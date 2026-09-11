@@ -11,7 +11,7 @@ tags:
 
 # CRM Core extraction — implementation plan
 
-Documentation only. No extraction has started. ADR: [[ADR-CRM-Core-Vertical-Architecture]]. Prompt: [[wip/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]]. Return: [[wip/CRM_Core_Architecture_Planning_Return]].
+C1 units 1–3 are **code-shipped**. Sales is not started. D1 CP schema is unchanged. ADR: [[ADR-CRM-Core-Vertical-Architecture]]. Prompt: [[wip/C1_CRM_Core_Architecture_Cursor_Prompt]]. C1 return: [[wip/C1_CRM_Core_Architecture_Return]]. Planning return: [[wip/CRM_Core_Architecture_Planning_Return]].
 
 Distinguish **repository fact** from **recommendation** throughout.
 
@@ -25,13 +25,13 @@ Treat `martial_arts_template` as the first vertical, not as the platform.
 
 Sales should start after shell/auth/settings are Core-owned — **before** Core is declared finished.
 
-This document is not permission to implement. Scott must authorize the first extraction sprint.
+C1 is implemented. This document is not permission to start C2 / Sales.
 
 ---
 
 ## 2. Current architecture findings
 
-**Fact.** Repo `crm_marketing_saas`, branch `working`, remote `https://github.com/Koifish95/crm_marketing_saas.git`. No root `package.json`. No `pnpm-workspace.yaml`. Two standalone Nuxt 4 + pnpm apps:
+**Fact (C1 shipped).** Repo `crm_marketing_saas`, branch `working`, remote `https://github.com/Koifish95/crm_marketing_saas.git`. Root `pnpm-workspace.yaml` includes `packages/crm-core` and `martial_arts_template`. `control_plane` stays out of the workspace. Two Nuxt 4 apps:
 
 | App | Package | Port | DB |
 |---|---|---|---|
@@ -388,14 +388,14 @@ Avoid one official S-number per file move.
 
 **Rollback:** revert that commit.
 
-**Do not start this sprint until Scott asks.**
+C1 / Sprint 1–3 shipped. See [[wip/C1_CRM_Core_Architecture_Return]].
 
 ---
 
 ## 21. Explicit STOP boundary
 
-This planning task stops here.
+C1 is code-shipped. This plan is not permission to start C2.
 
-Do **not**: extract Core; restructure the repo; create Sales or Beauty apps; change provisioning; start VPS, DNS, TLS, registry, operator-auth redesign, billing, or Renzo work; mark S6 Successful; rewrite S0–S5 closeouts.
+Do **not**: create Sales or Beauty apps; change D1 provisioning schema; start VPS, DNS, TLS, registry, operator-auth redesign, billing, or Renzo work; mark S6 Successful; rewrite Map B; mark Map B Successful.
 
-Next implementation requires a new owner authorization naming C1 / Sprint 1.
+Next implementation requires a new owner authorization naming C2 / Sales.

@@ -21,7 +21,8 @@ Processed source material lives in [[wip/archive/_index|wip/archive/]]. Put new 
 - [[wip/Post_S4_Foundation_Decision_Closeout|Post-S4 foundation decision closeout]] (IMM-01–04; Map B official)
 - [[wip/Milestone_Map_Conflict_Decision|Milestone map conflict — decision for Scott + ChatGPT]] (resolved 2026-09-10)
 - [[wip/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt|CRM Core + vertical architecture — planning prompt]]
-- [[wip/C1_CRM_Core_Architecture_Cursor_Prompt|C1 CRM Core architecture — Cursor prompt]] (authorized)
+- [[wip/C1_CRM_Core_Architecture_Cursor_Prompt|C1 CRM Core architecture — Cursor prompt]] (implemented)
+- [[wip/C1_CRM_Core_Architecture_Return|C1 CRM Core architecture — return]] (code-shipped; Sales not started)
 - [[wip/CRM_Core_Extraction_Implementation_Plan|CRM Core extraction implementation plan]]
 - [[wip/CRM_Core_Architecture_Planning_Return|CRM Core architecture planning return]]
 - [[wip/S6_Fleet_Reliability_Cursor_Prompt|S6 fleet reliability — Cursor prompt]]

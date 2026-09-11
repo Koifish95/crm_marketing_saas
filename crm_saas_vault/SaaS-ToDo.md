@@ -33,10 +33,10 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 
 - [ ] **S6 Successful** — Fleet Reliability / Lifecycle. Code shipped (`76d0f71`). Do not check until Scott’s browser/Docker pass (backup, restore, off-host copy to a real folder, upgrade). [[S6-Fleet-Runbook]].
 
-## Architecture (C1 authorized)
+## Architecture (C1 code-shipped)
 
 - [x] **D1–D4** — Account vs product instance; wait on MA leads/campaigns/public capture. [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]].
-- [ ] **C1 code-shipped** — Workspace + Core layer + frameworks. In progress. Do not mark Map B Successful. [[wip/C1_CRM_Core_Architecture_Cursor_Prompt]].
+- [x] **C1 code-shipped** — Workspace + Core layer + frameworks. Sales not started. D1 CP schema unchanged. Do not mark Map B Successful. [[wip/C1_CRM_Core_Architecture_Return]].
 
 ## Later / not started
 

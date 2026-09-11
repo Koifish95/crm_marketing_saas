@@ -1,6 +1,6 @@
 ---
 type: note
-status: current
+status: implemented
 area: architecture
 updated: 2026-09-11
 tags:
