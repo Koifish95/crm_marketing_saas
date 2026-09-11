@@ -9,8 +9,8 @@
 services:
   app:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: martial_arts_template/Dockerfile
     image: martial-arts-acquisition:s2
     init: true
     restart: unless-stopped

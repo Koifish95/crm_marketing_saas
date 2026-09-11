@@ -5,6 +5,7 @@ import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const repoRoot = resolve(root, '..')
 const IMAGE = 'martial-arts-acquisition:s2'
 const SKIP_TOP = new Set([
   '.git',
@@ -211,7 +212,14 @@ function stageDockerContext() {
   console.info(`[martial-arts] staging Docker context at ${dest}`)
   console.info('[martial-arts] Docker Desktop cannot read OneDrive cloud files from Desktop; copying a local context')
   rmSync(dest, { recursive: true, force: true })
-  cpSync(root, dest, {
+  mkdirSync(join(dest, 'packages'), { recursive: true })
+  copyFileSync(join(repoRoot, 'pnpm-workspace.yaml'), join(dest, 'pnpm-workspace.yaml'))
+  copyFileSync(join(repoRoot, 'package.json'), join(dest, 'package.json'))
+  if (existsSync(join(repoRoot, '.npmrc'))) {
+    copyFileSync(join(repoRoot, '.npmrc'), join(dest, '.npmrc'))
+  }
+  cpSync(join(repoRoot, 'packages', 'crm-core'), join(dest, 'packages', 'crm-core'), { recursive: true })
+  cpSync(root, join(dest, 'martial_arts_template'), {
     recursive: true,
     filter: (src) => {
       const rel = relative(root, src)
@@ -242,9 +250,9 @@ function imageExists() {
 }
 
 function dockerBuild() {
-  const context = process.platform === 'win32' ? stageDockerContext() : root
+  const context = process.platform === 'win32' ? stageDockerContext() : repoRoot
   console.info(`[martial-arts] building ${IMAGE}`)
-  run('docker', ['build', '-t', IMAGE, context])
+  run('docker', ['build', '-t', IMAGE, '-f', 'martial_arts_template/Dockerfile', context])
 }
 
 function prepareImage() {

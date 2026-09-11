@@ -10,4 +10,15 @@ export default withNuxt(
       '@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: true }],
     },
   },
+  {
+    files: ['../packages/crm-core/**/*.{ts,vue,mjs}'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [{
+          group: ['**/martial_arts_template/**', 'martial-arts-acquisition'],
+          message: 'Core must not import Martial Arts.',
+        }],
+      }],
+    },
+  },
 )

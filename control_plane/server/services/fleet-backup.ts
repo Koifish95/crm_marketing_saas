@@ -16,7 +16,7 @@ import { getRegisteredEnvironment, listRegisteredEnvironments } from './registry
 import { restoreSnapshotToEnvironment, snapshotRegisteredEnvironment } from './fleet-backup-snapshot'
 import { extractFleetBackupZip, extractedSqliteDir, extractedUploadsDir } from './fleet-backup-extract'
 import { readFleetBackupManifest, writeFleetBackupZip } from './fleet-backup-zip'
-import { composeArgs, resolveComposeEnvFile, templateRoot } from './docker-relaunch'
+import { composeArgs, repoRoot, resolveComposeEnvFile, templateRoot } from './docker-relaunch'
 import { imageBuildArgs, waitUntilHealthy } from './provision-runtime'
 import { spawnSync } from 'node:child_process'
 
@@ -238,7 +238,7 @@ export async function upgradeRegisteredEnvironment(
   }
   const previousImage = row.expectedImage
   const built = spawnSync('docker', imageBuildArgs(target), {
-    cwd: templateRoot(),
+    cwd: repoRoot(),
     encoding: 'utf8',
     windowsHide: true,
   })

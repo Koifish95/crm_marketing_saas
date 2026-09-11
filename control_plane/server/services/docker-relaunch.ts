@@ -13,6 +13,10 @@ export function templateRoot() {
   return process.env.TEMPLATE_ROOT?.trim() || join(process.cwd(), '..', 'martial_arts_template')
 }
 
+export function repoRoot() {
+  return join(templateRoot(), '..')
+}
+
 export function assertSafeRelaunch(input: {
   slug: string
   composeFile: string

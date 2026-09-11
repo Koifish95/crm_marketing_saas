@@ -5,8 +5,8 @@ name: ${COMPOSE_PROJECT}
 services:
   app:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: martial_arts_template/Dockerfile
     image: ${EXPECTED_IMAGE:-martial-arts-acquisition:s4}
     container_name: ${CONTAINER_NAME}
     init: true

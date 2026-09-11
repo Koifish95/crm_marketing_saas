@@ -1,14 +1,20 @@
 FROM node:22-bookworm-slim AS deps
 RUN corepack enable
-WORKDIR /app
-COPY package.json pnpm-lock.yaml .npmrc ./
-RUN pnpm install --frozen-lockfile
+WORKDIR /src
+COPY pnpm-workspace.yaml package.json .npmrc pnpm-lock.yaml ./
+COPY packages/crm-core/package.json ./packages/crm-core/
+COPY martial_arts_template/package.json martial_arts_template/.npmrc ./martial_arts_template/
+RUN pnpm install --frozen-lockfile --filter martial-arts-acquisition...
 
 FROM node:22-bookworm-slim AS build
 RUN corepack enable
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+WORKDIR /src
+COPY --from=deps /src/node_modules ./node_modules
+COPY --from=deps /src/martial_arts_template/node_modules ./martial_arts_template/node_modules
+COPY packages/crm-core ./packages/crm-core
+COPY martial_arts_template ./martial_arts_template
+COPY pnpm-workspace.yaml package.json .npmrc ./
+WORKDIR /src/martial_arts_template
 RUN node docker/stub-missing-libsql-natives.mjs
 RUN pnpm build
 RUN node node_modules/esbuild/bin/esbuild docker/runtime-init.ts \
@@ -51,15 +57,14 @@ ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=5000
 ENV DRIZZLE_MIGRATIONS_DIR=/app/drizzle/migrations
-COPY --from=build /app/.output ./.output
-COPY --from=build /app/drizzle/migrations ./drizzle/migrations
-COPY --from=build /app/docker/runtime-init.cjs ./docker/runtime-init.cjs
-COPY --from=build /app/docker/db-marker.cjs ./docker/db-marker.cjs
-COPY --from=build /app/docker/backup-scheduler.cjs ./docker/backup-scheduler.cjs
-COPY docker/entrypoint.sh ./docker/entrypoint.sh
-COPY --from=build /app/node_modules/@libsql ./node_modules/@libsql
+COPY --from=build /src/martial_arts_template/.output ./.output
+COPY --from=build /src/martial_arts_template/drizzle/migrations ./drizzle/migrations
+COPY --from=build /src/martial_arts_template/docker/runtime-init.cjs ./docker/runtime-init.cjs
+COPY --from=build /src/martial_arts_template/docker/db-marker.cjs ./docker/db-marker.cjs
+COPY --from=build /src/martial_arts_template/docker/backup-scheduler.cjs ./docker/backup-scheduler.cjs
+COPY martial_arts_template/docker/entrypoint.sh ./docker/entrypoint.sh
+COPY --from=build /src/martial_arts_template/node_modules/@libsql ./node_modules/@libsql
 # Empty data dirs only. Never COPY a sqlite file into the image.
-# Live PRODUCTION on Koi-Pi is the named volume webhosting_renzo_sqlite.
 RUN chmod +x docker/entrypoint.sh \
   && mkdir -p /app/data/sqlite /app/data/uploads \
   && chown -R node:node /app/data /app/docker

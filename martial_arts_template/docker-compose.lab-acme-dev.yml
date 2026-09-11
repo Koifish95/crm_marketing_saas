@@ -4,8 +4,8 @@ name: lab-acme-dev
 services:
   app:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: martial_arts_template/Dockerfile
     image: martial-arts-acquisition:s2
     container_name: lab-acme-dev-app
     init: true

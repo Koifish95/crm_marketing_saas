@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm'
 import type { Database } from '../database'
 import { environments } from '../database/schema'
 import { PROVISIONED_IMAGE } from './provision-contract'
-import { composeArgs, resolveComposeEnvFile, templateRoot } from './docker-relaunch'
+import { composeArgs, repoRoot, resolveComposeEnvFile, templateRoot } from './docker-relaunch'
 import { probeRegisteredHealth } from './health'
 
 export function imageInspectArgs(image = PROVISIONED_IMAGE) {
@@ -11,10 +11,10 @@ export function imageInspectArgs(image = PROVISIONED_IMAGE) {
 }
 
 export function imageBuildArgs(image = PROVISIONED_IMAGE) {
-  return ['build', '-t', image, '.']
+  return ['build', '-t', image, '-f', 'martial_arts_template/Dockerfile', '.']
 }
 
-export function ensureLocalImage(root = templateRoot(), image = PROVISIONED_IMAGE) {
+export function ensureLocalImage(root = repoRoot(), image = PROVISIONED_IMAGE) {
   const inspect = spawnSync('docker', imageInspectArgs(image), {
     cwd: root,
     encoding: 'utf8',

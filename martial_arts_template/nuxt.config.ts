@@ -15,6 +15,7 @@ function listenPort() {
 const port = listenPort()
 
 export default defineNuxtConfig({
+  extends: ['@crm/core'],
   modules: [
     '@nuxt/eslint',
     'nuxt-auth-utils',
