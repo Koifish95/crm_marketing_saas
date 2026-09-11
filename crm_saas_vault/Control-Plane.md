@@ -46,24 +46,26 @@ which customers exist
 → provision a Martial Arts PROD+DEV pair (S4)
 ```
 
-Headlines still read “Acme BJJ · PROD · healthy,” not a container id. Indexes are tables. Workspaces can Refresh, Relaunch, add extra non-PROD, and gated-decommission (volumes stay). Configuration fields stay read-only. Current state: [[wip/Clean_Starting_Point_Current_State]].
+Headlines still read “Acme BJJ · PROD · healthy,” not a container id. Indexes are tables. Workspaces can Refresh, Relaunch, add extra non-PROD, gated-decommission (volumes stay), and use the **Lifecycle** tab (backup, restore, off-host copy, upgrade — S6 implemented, not Successful). Configuration fields stay read-only. Current state: [[wip/Clean_Starting_Point_Current_State]].
 
 Laptop-only. Local Docker. Health on demand. Acme is seeded; new customers are provisioned. No Docker socket in CRM containers.
 
 ## What it is not
 
 - Public hostname / TLS / DNS
-- Upgrades, rollback, backup/restore orchestration
+- Image registry / VPS / operator login
 - Billing, self-service, ThePond replacement
 - Managing external Renzo
 - Operator login (loopback only; required before leaving localhost)
 
-## Implementation (S3 facts)
+## Implementation (S3 facts + S6)
 
 - Own SQLite: `control_plane/data/control-plane.sqlite`
 - Generated UUID ids. Slugs are attributes.
 - Runtime adapter: exact `docker inspect` + compose recreate (`up -d --force-recreate --no-deps app`)
 - Health GET only registered `127.0.0.1` lab URLs
+- Fleet backup zips: gitignored `control_plane/data/backups/{customerId}/{environmentId}/` (14-day retention). Not `control-plane.sqlite`.
+- Environment APIs: `POST .../backup`, `.../restore`, `.../backup/copy`, `.../upgrade`
 - No operator login; loopback bind
 
 ## Safety rule
@@ -72,4 +74,4 @@ Relaunch means: recreate the process, remount the same durable data. Never `dock
 
 ## Next
 
-Official S5 is **Successful** ([[SaaS-Milestones]], [[wip/S5_closeout]]). Public hostname work is official S8 (`{slug}.{product-domain}`; domain unset). Do not start S6 or DNS/TLS unless Scott asks. Do not duplicate `lab-acme` or `strategic-insights` blindly.
+Official S5 is **Successful**. Official S6 (backup / restore / upgrade on the environment Lifecycle tab) is **implemented, not Successful** until Scott’s pass ([[S6-Fleet-Runbook]]). Public hostname work is official S8. Do not start S7 or DNS/TLS unless Scott asks. Do not duplicate `lab-acme` or `strategic-insights` blindly.

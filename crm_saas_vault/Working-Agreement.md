@@ -78,7 +78,7 @@ Repository verification required
 
 ## Current next decision
 
-Official path: [[SaaS-Milestones]] Map B. S0–S5 are Successful. Official **S6** (Fleet Reliability) is **authorized and in progress**. Successful stays unchecked until Scott’s browser pass. Prompt: [[wip/S6_Fleet_Reliability_Cursor_Prompt]]. ADR: [[SaaS-Decisions#2026-09-10 — S6 backup, restore, and upgrade]].
+Official path: [[SaaS-Milestones]] Map B. S0–S5 are Successful. Official **S6** (Fleet Reliability) is **implemented, not Successful** until Scott’s browser/Docker pass. [[S6-Fleet-Runbook]]. [[wip/S6_Implementation_Status]].
 
 **Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 

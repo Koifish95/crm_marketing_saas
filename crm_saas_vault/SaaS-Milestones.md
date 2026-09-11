@@ -66,7 +66,7 @@ S0 Workspace split
 → S11 External Paying Customer Readiness
 ```
 
-S0–S5 are Successful. Do not start S6 unless Scott asks. Evidence: [[wip/S5_closeout]], [[wip/S5_Control_Plane_Productization_Status]].
+S0–S5 are Successful. Official S6 is authorized and implemented, **not Successful** until Scott’s pass. Evidence: [[wip/S5_closeout]], [[wip/S6_Implementation_Status]].
 
 ---
 
@@ -158,7 +158,9 @@ Status: **Successful** (2026-09-10). Owner pass: Scott. Display-name edit is all
 
 Production-oriented backup, restore, and upgrade. Extra non-PROD and gated decommission already shipped in S5 leftovers — they are **not** the remainder of this S6.
 
-**Not in this milestone:** Perfect observability. Multi-region. Protecting disposable laptop SI volumes as if they were production.
+**Shipped (not Successful by itself):** environment Lifecycle tab; same-host zip; gated restore; off-host copy to an existing folder; backup-gated local upgrade. Runbook: [[S6-Fleet-Runbook]]. Status: [[wip/S6_Implementation_Status]].
+
+**Not in this milestone:** Perfect observability. Multi-region. Protecting disposable laptop SI volumes as if they were production. Image registry (S7).
 
 - [ ] **S6 Successful:** Backup and restore work for a customer environment without killing others, designed around **production** hosting. A CRM template update can ship to a non-Renzo environment and still show healthy. Off-host copy is required before a paying customer is safe.
 

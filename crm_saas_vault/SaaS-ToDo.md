@@ -31,7 +31,7 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 
 ## Official S6 (in progress, not Successful)
 
-- [ ] **S6 Successful** — Fleet Reliability / Lifecycle. Authorized 2026-09-10. Backup / restore / upgrade from the control plane. Do not check until Scott’s browser pass. [[wip/S6_Fleet_Reliability_Cursor_Prompt]].
+- [ ] **S6 Successful** — Fleet Reliability / Lifecycle. Code shipped (`76d0f71`). Do not check until Scott’s browser/Docker pass (backup, restore, off-host copy to a real folder, upgrade). [[S6-Fleet-Runbook]].
 
 ## Later / not started
 

@@ -20,7 +20,8 @@ Processed source material lives in [[wip/archive/_index|wip/archive/]]. Put new 
 - [[wip/Clean_Starting_Point_Return|Clean starting point — return]]
 - [[wip/Post_S4_Foundation_Decision_Closeout|Post-S4 foundation decision closeout]] (IMM-01–04; Map B official)
 - [[wip/Milestone_Map_Conflict_Decision|Milestone map conflict — decision for Scott + ChatGPT]] (resolved 2026-09-10)
-- [[wip/S6_Fleet_Reliability_Cursor_Prompt|S6 fleet reliability — Cursor prompt]] (authorized; not Successful)
+- [[wip/S6_Fleet_Reliability_Cursor_Prompt|S6 fleet reliability — Cursor prompt]]
+- [[wip/S6_Implementation_Status|S6 implementation status]] (not Successful)
 - [[wip/S5_closeout|S5 closeout and handoff]] (Successful 2026-09-10)
 - [[wip/S5_Control_Plane_Productization_Status|S5 control-plane productization status]]
 - [[wip/Where_We_Are_Now_Post_S4_2026-09-09|Where we are now — post-S4 handoff]] (superseded for current UI)
