@@ -2,7 +2,7 @@
 type: decision
 status: current
 area: process
-updated: 2026-09-09
+updated: 2026-09-10
 tags:
   - adr
   - saas
@@ -22,6 +22,29 @@ Status: accepted | working decision | superseded
 Context: one or two sentences
 Decision: what we chose
 ```
+
+---
+
+## 2026-09-10 — Map B is the official post-S4 roadmap
+
+Status: accepted
+
+Context: Two S5 definitions sat in [[SaaS-Milestones]] after the 2026-09-09 remap was labeled provisional. Scott resolved IMM-01–04. Briefing: [[wip/Milestone_Map_Conflict_Decision]]. Closeout: [[wip/Post_S4_Foundation_Decision_Closeout]].
+
+Decision:
+
+- **Map B + ten-decision overlay** is the official post-S4 path. From S5 onward it supersedes the 2026-09-08 hostname-first map (Map A). Map A remains historical documentation for S0–S4 history and the originally approved S5–S8 Successful lines. Do not rewrite those closeouts.
+- Official **S5** = Control Plane Productization / Operations Foundation. Substantially implemented. **Not Successful.** Do not mark it Successful to tidy docs.
+- **VPS cutover** and **commercial launch** are separate. VPS cutover establishes production hosting. Commercial launch = first real external customer operational on that VPS and launch-ready (official S11).
+- Laptop/desktop remains development. Current Strategic Insights laptop data remains disposable. Do not build fleet backup merely to protect disposable laptop environments. Backup/recovery is designed around production hosting (official S6).
+- **IMM-02:** Retry = continue/resume the existing provisioning attempt. Preserve resources and volumes. Never silently rebuild. A future rebuild is a separate gated action.
+- **IMM-03:** Display name may be edited now. Slug, timezone, and admin email stay read-only.
+- **IMM-04:** Customer hostname shape is `{slug}.{product-domain}`. The product domain remains unset. Do not invent a domain. Do not implement DNS/TLS yet.
+- Do not start S6 or remaining S5 gap implementation until Scott asks.
+
+This supersedes “launch = first customer on the VPS” as the only launch sentence: that event is the VPS cutover; commercial launch is S11. It also supersedes the ten-decision line that display/timezone/email all stay read-only — display name may be edited.
+
+Source: Scott 2026-09-10
 
 ---
 

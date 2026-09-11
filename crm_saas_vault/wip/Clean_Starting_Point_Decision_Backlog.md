@@ -11,7 +11,7 @@ tags:
 
 # Clean starting point — decision backlog
 
-Unresolved owner/product/architecture decisions that **still matter** after the 2026-09-10 repository audit. Full context: [[wip/Clean_Starting_Point_Current_State]].
+Unresolved owner/product/architecture decisions that **still matter** after the 2026-09-10 repository audit. Full context: [[wip/Clean_Starting_Point_Current_State]]. IMM-01–04 resolved 2026-09-10: [[wip/Post_S4_Foundation_Decision_Closeout]], [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]].
 
 Dropped as already answered by ADRs or code: operator nav/workspaces; provision at Customers → New; Missing ≠ Stopped; one-PROD API; extra non-PROD now; gated decommission; never auto-delete volumes; SI disposable until VPS; laptop then VPS; no operator auth on loopback; Scott-only Platform Administrator for now; no slug edit until DNS; sister is second pilot; do not build Beauty in the leftover slice; launch = first VPS customer; Renzo is not a customer.
 
@@ -21,39 +21,29 @@ Do not treat this list as permission to implement.
 
 # Immediate Decisions
 
-Needed before authorizing the next implementation milestone.
+Needed before authorizing the next implementation milestone. **IMM-01–04 are resolved** (Scott 2026-09-10). Implementation of remaining S5 gaps or S6 still requires a separate ask.
 
-## IMM-01
+## IMM-01 — resolved
 
 - **Decision/question:** What is the next authorized implementation milestone?
-- **Current known context:** [[SaaS-Milestones]] has two S5s. Historical S5 = hostname/TLS (Not started). Tentative S5 = CP productization (first slice + leftovers shipped, not Successful). Working-Agreement still says “S5 only when Scott asks” and “do not start DNS/TLS.”
-- **Recommendation:** Do not auto-start historical S5. Scott/ChatGPT replace or freeze the map using the clean-start baseline. Until then, no new platform milestone.
-- **What it blocks:** Any honest “next sprint” for Cursor.
-- **Can Cursor continue without it?** Yes for docs/tests/hygiene only. **No** for a new feature milestone.
+- **Answer:** Map B + ten-decision overlay is official. Official S5 = Control Plane Productization / Operations Foundation (substantially implemented, not Successful). Do not start S6 or S5 gap implementation on this closeout.
+- **Record:** [[SaaS-Milestones]], [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]].
 
-## IMM-02
+## IMM-02 — resolved
 
 - **Decision/question:** On a failed or partial provision, does Retry mean continue (bring up remaining envs, remount existing volumes) or rebuild (recreate processes/files)? Both?
-- **Current known context:** Code resumes by slug, skips healthy `ready`, re-`up`s the rest, never deletes volumes. Ten decisions left continue-vs-rebuild **unset**. Default already recorded: never auto-delete volumes.
-- **Recommendation:** Continue/resume only. Rebuild only as an explicit gated action later. Do not auto-delete.
-- **What it blocks:** A safe UI retry button; cleanup policy; operator runbook honesty.
-- **Can Cursor continue without it?** Yes, if nobody invents rebuild/cleanup.
+- **Answer:** Continue/resume the existing attempt. Preserve resources and volumes. Never silently rebuild. A future rebuild is a separate gated action.
+- **Still not implemented:** workspace Retry button (S5 acceptance gap).
 
-## IMM-03
+## IMM-03 — resolved
 
 - **Decision/question:** May an operator edit customer display name, timezone, and admin email before DNS exists?
-- **Current known context:** Configuration tabs are read-only. Ten decisions: no slug edit until DNS; other fields stay read-only until this leftover is answered.
-- **Recommendation:** Allow display name now; keep timezone/email read-only until a real edit story exists; never slug.
-- **What it blocks:** Configuration write APIs and UX.
-- **Can Cursor continue without it?** Yes — keep tabs read-only.
+- **Answer:** Display name may be edited now. Slug, timezone, and admin email stay read-only. Display-name edit is **not** an S5 Successful gate.
 
-## IMM-04
+## IMM-04 — resolved (shape only)
 
 - **Decision/question:** What is the product domain and hostname shape (including whether the control plane gets a hostname)?
-- **Current known context:** Informal `labforleads.com` talk is **not** an ADR. Ten decisions: unset. Do not implement DNS/TLS.
-- **Recommendation:** Leave unset until a stable box exists. Laptop HTTP-01 will not stay up.
-- **What it blocks:** Historical S5; writing non-localhost `accessUrl`s.
-- **Can Cursor continue without it?** Yes, unless someone asks for DNS.
+- **Answer:** Customer hostname shape is `{slug}.{product-domain}`. The permanent product domain remains **unset**. Do not invent a domain. Do not implement DNS/TLS. Provider/TLS remain NEAR-07.
 
 ---
 
@@ -213,4 +203,4 @@ Safe to leave until after a map rewrite or after the first VPS customer.
 
 ---
 
-**Count:** 4 immediate + 10 near-term + 8 deferred = **22 unresolved decisions**.
+**Count:** IMM-01–04 resolved. 10 near-term + 8 deferred remain open.

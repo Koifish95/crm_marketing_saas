@@ -2,7 +2,7 @@
 type: index
 status: current
 area: process
-updated: 2026-09-09
+updated: 2026-09-10
 tags:
   - wip
 ---
@@ -18,6 +18,8 @@ Processed source material lives in [[wip/archive/_index|wip/archive/]]. Put new 
 - [[wip/Clean_Starting_Point_Current_State|Clean starting point — current state]] (authoritative 2026-09-10)
 - [[wip/Clean_Starting_Point_Decision_Backlog|Clean starting point — decision backlog]]
 - [[wip/Clean_Starting_Point_Return|Clean starting point — return]]
+- [[wip/Post_S4_Foundation_Decision_Closeout|Post-S4 foundation decision closeout]] (IMM-01–04; Map B official)
+- [[wip/Milestone_Map_Conflict_Decision|Milestone map conflict — decision for Scott + ChatGPT]] (resolved 2026-09-10)
 - [[wip/S5_Control_Plane_Productization_Status|S5 control-plane productization status]]
 - [[wip/Where_We_Are_Now_Post_S4_2026-09-09|Where we are now — post-S4 handoff]] (superseded for current UI)
 - [[wip/S4_closeout|S4 closeout and handoff]]

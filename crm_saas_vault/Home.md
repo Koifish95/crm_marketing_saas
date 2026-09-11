@@ -2,7 +2,7 @@
 type: index
 status: current
 area: overview
-updated: 2026-09-09
+updated: 2026-09-10
 aliases:
   - Start
   - Index
@@ -53,7 +53,7 @@ Control plane is **implemented** as `control_plane/` (http://127.0.0.1:52100): D
 Alignment (evidence, not the map): [[wip/archive/SaaS_Project_Alignment_and_Current_Understanding]].
 
 **Git:** this folder is its own repo; `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).  
-**Milestones:** [[SaaS-Milestones]] S0–S4 Successful. A tentative operator-UI slice of S5 shipped; it is **not** Successful. **Current reconciliation baseline:** [[wip/Clean_Starting_Point_Current_State]]. Do not start DNS/TLS or the next milestone until Scott reviews that baseline. Evidence: [[wip/S4_closeout]], [[wip/S5_Control_Plane_Productization_Status]], [[wip/Post_S4_Ten_Decisions]].
+**Milestones:** [[SaaS-Milestones]] official **Map B**. S0–S4 Successful. Official S5 is Control Plane Productization (substantially implemented, **not Successful**). Closeout: [[wip/Post_S4_Foundation_Decision_Closeout]]. Do not start S6, DNS/TLS, or S5 gap implementation unless Scott asks. Evidence: [[wip/S4_closeout]], [[wip/S5_Control_Plane_Productization_Status]], [[wip/Post_S4_Ten_Decisions]].
 
 **First intended pilots:** Strategic Insights Consulting, LLC is **laptop-provisioned** (S4 proof, not public). Scott’s sister’s business is **not** provisioned.
 
@@ -62,7 +62,7 @@ Alignment (evidence, not the map): [[wip/archive/SaaS_Project_Alignment_and_Curr
 | Note | Contents |
 |---|---|
 | [[Working-Agreement]] | Two tracks, vault vs wip, how we decide |
-| [[SaaS-Milestones]] | S0–S8 launch path; **Successful** is acceptance |
+| [[SaaS-Milestones]] | Official Map B (S0–S11); **Successful** is acceptance |
 | [[Customer-Environment]] | S1 unit: Customer, Environment, node placement |
 | [[SaaS-Decisions]] | SaaS ADR log |
 | [[S2-Hand-Boot-Checklist]] | S2 lab boot (Docker + named lab volumes) |

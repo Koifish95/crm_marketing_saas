@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-09
+updated: 2026-09-10
 aliases:
   - Platform milestones
   - Successful
@@ -13,25 +13,28 @@ tags:
 
 # SaaS milestones
 
-Working map from the current workspace to a **sales-led launched** martial-arts SaaS. Recorded 2026-09-08. This is not permission to start platform implementation. Decisions are made **inside** the milestone they unblock. Do not decide the whole architecture up front.
+Official post-S4 path: **Map B + ten-decision overlay** ([[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]]). Closeout: [[wip/Post_S4_Foundation_Decision_Closeout]].
 
-Renzo gym milestones stay in [[Milestones]] as historical evidence of the source implementation. Improving `martial_arts_template` runs in parallel and is not a launch gate unless we promote a change ([[Working-Agreement]]). Real Renzo is not a SaaS customer.
+S0–S4 Successful bodies below are unchanged laptop proofs. From **S5 onward**, this Map B sequence supersedes the 2026-09-08 hostname-first path. That older path is kept under [[#Historical 2026-09-08 map (Map A)]]. Do not rewrite S0–S4 closeouts as though Map B existed then.
 
-**Successful** is the official acceptance name for each milestone. A milestone is not done because code exists. It is done when **Successful** is true.
+Renzo gym milestones stay in [[Milestones]] as historical evidence. Improving `martial_arts_template` runs in parallel and is not a launch gate unless we promote a change ([[Working-Agreement]]). Real Renzo is not a SaaS customer.
+
+**Successful** is the official acceptance name. Code existing is not Successful.
+
+This note is not permission to start the next implementation. Scott must ask.
 
 ## What “launched” means here
 
-Given current [[SaaS-Decisions]]:
+Two events, not one ([[SaaS-Decisions]]):
 
-- sales-led (not self-service signup);
-- martial arts first;
-- a second customer environment can be created and operated on purpose;
-- the control plane can see and relaunch environments;
-- you can take a paying or commercially offered customer live.
+- **VPS cutover** — production hosting infrastructure exists (dedicated VPS; laptop/desktop stays the development environment until then).
+- **Commercial launch** — the first real external customer is operational on that production VPS and has passed launch-readiness (reachable, backed up for production, on the control plane, relaunchable). That is Successful **S11**, not S5.
 
-It does **not** mean Stripe by default, every industry, a beauty variant, or instant anonymous provisioning.
+Still sales-led, martial arts first. Not Stripe-by-default, not every industry, not Beauty, not self-service signup.
 
-## Status
+Laptop Strategic Insights data remains disposable test data. Do not build fleet backup merely to protect those laptop volumes. Backup/recovery is designed around production hosting (official S6).
+
+## Status (official Map B)
 
 | ID | Focus | Status |
 |---|---|---|
@@ -40,10 +43,13 @@ It does **not** mean Stripe by default, every industry, a beauty variant, or ins
 | S2 | Second martial-arts environment by hand | Successful |
 | S3 | Control plane v1 | Successful |
 | S4 | Sales-led provision | Successful |
-| S5 | Reachable customer access | Not started |
-| S6 | Fleet operations | Not started |
-| S7 | Owner dogfood path | Not started |
-| S8 | First external martial-arts customer live | Not started — this is launch |
+| S5 | Control Plane Productization / Operations Foundation | Substantially implemented. **Not Successful** |
+| S6 | Fleet Reliability / Lifecycle | Not started |
+| S7 | Hosting / Security / Remote Nodes | Not started |
+| S8 | Public Exposure | Not started |
+| S9 | Dogfood / Pilot Readiness | Not started |
+| S10 | Second Pilot / Template Expansion | Not started |
+| S11 | External Paying Customer Readiness | Not started — this is commercial launch |
 
 ```text
 S0 Workspace split
@@ -51,29 +57,16 @@ S0 Workspace split
 → S2 Hand-boot second MA environment
 → S3 Control plane v1
 → S4 Sales-led provision
-→ S5 Hostname / TLS / real login
-→ S6 Backup / upgrade / restore
-→ S7 Owner CRM + sell-with-the-product
-→ S8 First external customer live
+→ S5 Control Plane Productization / Operations Foundation
+→ S6 Fleet Reliability / Lifecycle
+→ S7 Hosting / Security / Remote Nodes
+→ S8 Public Exposure
+→ S9 Dogfood / Pilot Readiness
+→ S10 Second Pilot / Template Expansion
+→ S11 External Paying Customer Readiness
 ```
 
-S0–S4 are Successful.
-
-## Tentative roadmap (pending owner decisions)
-
-Ten forks: [[wip/Post_S4_Ten_Decisions]]. Implementation prompt: [[wip/S5_And_Beyond_Cursor_Prompt]]. Inventory catalog: [[wip/Post_S4_Foundation_Decision_Inventory]]. The following sequence is **provisional**. It does **not** replace the historical S5–S8 map below until formally approved. Do not mark tentative S5 Successful because frontend work or leftovers ship.
-
-| ID | Tentative focus | Status |
-|---|---|---|
-| S5 | Control Plane Productization / Operations Foundation | First slice authorized (operator UI). Not Successful. |
-| S6 | Fleet Reliability / Lifecycle | Not started |
-| S7 | Hosting / Security / Remote Nodes | Not started |
-| S8 | Public Exposure | Not started |
-| S9 | Dogfood / Pilot Readiness | Not started |
-| S10 | Second Pilot / Template Expansion | Not started |
-| S11 | External Paying Customer Readiness | Not started |
-
-Historical map (still the last **approved** Successful path): S5 Hostname / TLS → S6 Backup / upgrade → S7 Owner dogfood → S8 first external customer.
+S0–S4 are Successful. Do not mark S5 Successful to tidy docs. Gaps: [[wip/Post_S4_Foundation_Decision_Closeout]].
 
 Progress: [[wip/S5_Control_Plane_Productization_Status]].
 
@@ -145,67 +138,143 @@ Operator creates a new environment on demand. Still not public self-serve.
 
 - [x] **S4 Successful:** After a sales agreement, an operator (or a control-plane action) produces a new martial-arts environment that the control plane immediately shows as healthy. Doing it a second time does not require inventing a new procedure.
 
-Status: **Successful** (2026-09-09). Live proof: Strategic Insights Consulting, LLC on 52200/52201. Evidence: [[wip/S4_closeout]]. Runbook: [[S4-Provision-Runbook]]. S5 is not started.
+Status: **Successful** (2026-09-09). Live proof: Strategic Insights Consulting, LLC on 52200/52201. Evidence: [[wip/S4_closeout]]. Runbook: [[S4-Provision-Runbook]]. “S5 is not started” here meant **historical hostname S5** at closeout time. Official S5 is now control-plane productization (below).
 
 ---
 
-## S5 — Reachable customer access
+## S5 — Control Plane Productization / Operations Foundation
 
-A real user can use that environment from a browser.
+Official S5 (Map B). Operator can run the laptop fleet from a multi-page control plane. Not DNS. Not backups.
 
-**Decide along the way:** Platform subdomain vs customer domain vs both. TLS approach. Do not publish a hostname until the bootstrap `admin` / `setup` password has been changed ([[SaaS-Decisions#2026-09-09 — S4 owner decisions (password, form, image, secrets, extras)]]).
+**Shipped (not Successful by itself):** shell (Dashboard, Customers, Environments, Hosting Nodes, Settings placeholder); counts + Needs Attention + missing; workspaces; provision at `/customers/new`; Refresh / Relaunch; extra non-PROD; gated decommission; one-PROD API; localhost `accessUrl`s; unit/API tests. Evidence: [[wip/S5_Control_Plane_Productization_Status]].
+
+**Not in this milestone:** DNS/TLS, public hostnames, fleet backup, operator auth, VPS, Beauty, billing, server pagination.
+
+- [ ] **S5 Successful:** An operator can run the laptop fleet from that multi-page control plane with honest status (including missing), search/filter, Refresh/Relaunch, extra non-PROD, gated decommission, one-PROD enforcement, and continue/resume retry — accepted by a real browser pass on http://127.0.0.1:52100.
+
+**Remaining acceptance gaps (do not implement unless Scott asks):**
+
+1. Continue/resume Retry in the UI after create-succeeds / provision-partial-fails (API already resumes; IMM-02 makes the button legal).
+2. Owner acceptance pass: official browser click-through of shell + extras + decommission; live Docker not re-verified after leftovers.
+
+Display-name edit is allowed (IMM-03) but is **not** an S5 Successful gate.
+
+---
+
+## S6 — Fleet Reliability / Lifecycle
+
+Production-oriented backup, restore, and upgrade. Extra non-PROD and gated decommission already shipped in S5 leftovers — they are **not** the remainder of this S6.
+
+**Not in this milestone:** Perfect observability. Multi-region. Protecting disposable laptop SI volumes as if they were production.
+
+- [ ] **S6 Successful:** Backup and restore work for a customer environment without killing others, designed around **production** hosting. A CRM template update can ship to a non-Renzo environment and still show healthy. Off-host copy is required before a paying customer is safe.
+
+Do not start S6 until Scott asks.
+
+---
+
+## S7 — Hosting / Security / Remote Nodes
+
+Operator auth before the control plane leaves localhost. Image story for a second machine / VPS. Remote node communication. Not Pi-first.
+
+**Not in this milestone:** Public customer hostnames (S8). Beauty template.
+
+- [ ] **S7 Successful:** The control plane can leave loopback only with operator login. A second machine can run the same image without copying laptop sqlite. Laptop remains the development environment until VPS cutover.
+
+---
+
+## S8 — Public Exposure
+
+Reachable customer access: hostname shape `{slug}.{product-domain}`, TLS, real (changed) password. Product domain is still unset. Do not invent a domain. Do not implement DNS/TLS yet.
 
 **Not in this milestone:** Apex/www for Renzo. Cloudflare/Caddy locks from the Renzo hosting contract.
 
-- [ ] **S5 Successful:** Customer staff can hit a hostname, sign in with a real password, and run the CRM. A lab customer can do this without touching Renzo’s `app.renzogracieutah.com`.
+- [ ] **S8 Successful:** Customer staff can hit `{slug}.{product-domain}`, sign in with a real password, and run the CRM, without touching `app.renzogracieutah.com`.
 
 ---
 
-## S6 — Fleet operations
+## S9 — Dogfood / Pilot Readiness
 
-Make a live customer survivable.
+Use the product to sell the product on durable (non-disposable) data.
 
-**Decide along the way:** Where backups live. Who may restore. Lockstep vs per-customer versions. What upgrade and rollback mean. Operator-add extra non-PROD (already decided: S6, not S4). Image registry if a second machine needs the same build.
-
-**Not in this milestone:** Perfect observability. Multi-region.
-
-- [ ] **S6 Successful:** Backup and restore work for a customer environment without killing others. A CRM template update can ship to a non-Renzo environment and still show healthy. Off-host copy can be minimum viable; same-host-only is not enough to call a paid customer safe.
+- [ ] **S9 Successful:** The owner has a normal CRM environment **and** control-plane access. A tracking link → form → Lead → follow-up can represent a SaaS prospect. The owner CRM is not a special fork. SI is not treated as that durable CRM while it remains laptop test data.
 
 ---
 
-## S7 — Dogfood the owner path
+## S10 — Second Pilot / Template Expansion
 
-Use the product to sell the product.
+Sister business is the second real pilot. Beauty template is not started.
 
-**Decide along the way:** Is Renzo-the-gym also the platform-owner CRM, or a separate customer? Two identities: platform operator vs CRM user.
-
-**Not in this milestone:** A special forked owner CRM.
-
-- [ ] **S7 Successful:** The owner has a normal CRM environment **and** control-plane access. A tracking link → form → Lead → follow-up can represent a SaaS prospect. The owner CRM is not a special fork.
+- [ ] **S10 Successful:** Second pilot is provisioned on the intended template (Beauty if she cannot wait on Martial Arts). Not a special fork.
 
 ---
 
-## S8 — First external martial-arts customer live
+## S11 — External Paying Customer Readiness
 
-Commercial launch, sales-led.
+**Commercial launch.** First real external customer operational on the production VPS, launch-ready.
 
-**Decide along the way:** How you get paid (invoice, contract, Stripe later — undecided; do not block S1–S4 on it). Support channel. What “we’re live” means legally and operationally. Extra non-PROD for a fee is an S8 commercial concern (invoice/contract is enough to start).
+**Not in this milestone:** Self-service. Stripe required. Multi-location.
 
-**Not in this milestone:** Self-service. Beauty variant. Multi-location.
-
-- [ ] **S8 Successful:** A real academy that is not Renzo Kaysville is running in its own environment, reachable, backed up, visible on the control plane, and you could relaunch it. You did not copy Renzo’s database to create them.
-
-This milestone is **launched**.
+- [ ] **S11 Successful:** A real academy that is not Renzo Kaysville is running on the production VPS, reachable, backed up for production, visible on the control plane, and you could relaunch it. You did not copy Renzo’s database to create them.
 
 ---
 
-## After launch (not required for Successful S8)
+## After commercial launch (not required for Successful S11)
 
-- Beauty / salon / esthetician variant (contrast case)
+- Beauty / salon / esthetician variant if not already done in S10
 - Self-service signup
 - Native Meta publish / full funnel
 - Multi-location
-- VPS migration as a productized path (design stays portable; the move can wait)
+- Productized VPS migration path
+
+---
+
+## Historical 2026-09-08 map (Map A)
+
+Originally approved Successful path. **Superseded from S5 onward** by Map B (2026-09-10). Kept so closeouts stay readable. Do not implement these IDs as the next sprint.
+
+```text
+S5 Hostname / TLS / real login
+→ S6 Backup / upgrade / restore
+→ S7 Owner CRM + sell-with-the-product
+→ S8 First external customer live   ← this was “launched”
+```
+
+### Historical S5 — Reachable customer access
+
+A real user can use that environment from a browser.
+
+**Decide along the way:** Platform subdomain vs customer domain vs both. TLS approach. Do not publish a hostname until the bootstrap `admin` / `setup` password has been changed.
+
+**Not in this milestone:** Apex/www for Renzo. Cloudflare/Caddy locks from the Renzo hosting contract.
+
+- [ ] **Historical S5 Successful:** Customer staff can hit a hostname, sign in with a real password, and run the CRM. A lab customer can do this without touching Renzo’s `app.renzogracieutah.com`.
+
+This work now lives on official **S8**.
+
+### Historical S6 — Fleet operations
+
+Make a live customer survivable.
+
+**Decide along the way:** Where backups live. Who may restore. Lockstep vs per-customer versions. What upgrade and rollback mean. Operator-add extra non-PROD (already decided at the time: S6, not S4 — later superseded; extras shipped in S5 leftovers). Image registry if a second machine needs the same build.
+
+- [ ] **Historical S6 Successful:** Backup and restore work for a customer environment without killing others. A CRM template update can ship to a non-Renzo environment and still show healthy. Off-host copy can be minimum viable; same-host-only is not enough to call a paid customer safe.
+
+Backup/upgrade remainder now lives on official **S6**. Extras/decommission already shipped.
+
+### Historical S7 — Dogfood the owner path
+
+- [ ] **Historical S7 Successful:** The owner has a normal CRM environment **and** control-plane access. A tracking link → form → Lead → follow-up can represent a SaaS prospect. The owner CRM is not a special fork.
+
+Now official **S9**.
+
+### Historical S8 — First external martial-arts customer live
+
+Commercial launch, sales-led, on the 2026-09-08 map.
+
+- [ ] **Historical S8 Successful:** A real academy that is not Renzo Kaysville is running in its own environment, reachable, backed up, visible on the control plane, and you could relaunch it. You did not copy Renzo’s database to create them.
+
+Now official **S11**, and hosting must be the production VPS.
 
 ## Hard stops
 

@@ -10,7 +10,7 @@ tags:
 
 # Post-S4 — ten decisions
 
-Scott’s answers (plan file + Q4 checkboxes). Recorded in [[SaaS-Decisions]]. Implementation prompt: [[wip/S5_And_Beyond_Cursor_Prompt]]. Do not mark tentative S5 Successful.
+Scott’s answers (plan file + Q4 checkboxes). Recorded in [[SaaS-Decisions]]. Implementation prompt: [[wip/S5_And_Beyond_Cursor_Prompt]]. Map B is official as of 2026-09-10 ([[wip/Post_S4_Foundation_Decision_Closeout]]). Official S5 is still **not** Successful.
 
 The 85-item catalog is [[wip/Post_S4_Foundation_Decision_Inventory]]. Operator-shell items 1–10 already shipped.
 

@@ -2,7 +2,7 @@
 type: note
 status: current
 area: saas
-updated: 2026-09-09
+updated: 2026-09-10
 tags:
   - wip
   - saas
@@ -11,17 +11,17 @@ tags:
 
 # S5 control-plane productization status
 
-Authorized first slice of **tentative** S5: operator frontend / operational dashboard foundation.
+Official S5 (Map B): Control Plane Productization / Operations Foundation. **Substantially implemented. Not Successful.** Closeout: [[wip/Post_S4_Foundation_Decision_Closeout]].
 
-**This work does not make tentative S5 Successful.** Milestone sequencing remains pending [[wip/Post_S4_Foundation_Decision_Inventory]]. Historical S5 is still “reachable customer access” in [[SaaS-Milestones]]. Post-UI hardening: [[wip/Control_Plane_Post_Productization_Audit]].
+Do not mark S5 Successful to tidy docs. Remaining gaps: Retry UI (continue/resume) and owner browser/Docker acceptance. Post-UI hardening: [[wip/Control_Plane_Post_Productization_Audit]].
 
-Related: [[wip/post_S4_prompt]], [[wip/Where_We_Are_Now_Post_S4_2026-09-09]], [[wip/S5_And_Beyond_Cursor_Prompt]], [[wip/Post_S4_Ten_Decisions]].
+Related: [[SaaS-Milestones]], [[wip/post_S4_prompt]] (historical authorization), [[wip/S5_And_Beyond_Cursor_Prompt]] (spent leftovers), [[wip/Post_S4_Ten_Decisions]].
 
-## Tentative roadmap
+## Official roadmap
 
 S5 Control Plane Productization → S6 Fleet Reliability → S7 Hosting / Security / Remote Nodes → S8 Public Exposure → S9 Dogfood / Pilot Readiness → S10 Second Pilot / Template Expansion → S11 External Paying Customer Readiness.
 
-Provisional only.
+Map B is official as of 2026-09-10. Do not start S6 unless Scott asks.
 
 ## Frontend architecture
 
@@ -51,7 +51,7 @@ S3 registry, observe, Refresh, Relaunch (never `-v`). S4 provision semantics and
 
 - Foundation inventory is in-repo; unanswered items stay unset.
 - Settings has nothing legitimate to manage yet (placeholder).
-- No customer/environment edit APIs — configuration tabs stay read-only.
+- Display name may be edited (IMM-03); no edit API yet. Slug / timezone / admin email stay read-only.
 
 ## Sprints
 
@@ -69,8 +69,13 @@ Sprints 2–7 landed together in `5c32a8f` after sprint 1 (`f61bcdf`). Hardening
 
 ## Leftovers (2026-09-09)
 
-Missing is a combined status. One PROD is API-enforced. Extra non-PROD and gated decommission (no `-v`) shipped after the ten decisions. Tentative S5 is still **not** Successful.
+Missing is a combined status. One PROD is API-enforced. Extra non-PROD and gated decommission (no `-v`) shipped after the ten decisions. Official S5 is still **not** Successful.
+
+## Remaining S5 gaps
+
+1. Continue/resume Retry in the UI.
+2. Owner acceptance pass (browser + live Docker).
 
 ## Stop
 
-Do not start DNS, public URLs, GoDaddy, TLS, remote nodes, backups, billing, or volume delete.
+Do not start S6, DNS, public URLs, GoDaddy, TLS, remote nodes, backups, billing, or volume delete. Do not implement the S5 gaps unless Scott asks.

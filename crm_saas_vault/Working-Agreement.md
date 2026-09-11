@@ -2,7 +2,7 @@
 type: reference
 status: current
 area: process
-updated: 2026-09-09
+updated: 2026-09-10
 aliases:
   - How we work
   - Vault vs wip
@@ -78,13 +78,18 @@ Repository verification required
 
 ## Current next decision
 
-Launch path: [[SaaS-Milestones]]. S0–S4 are Successful. Next implementation is **S5** only when Scott asks. See [[Control-Plane]] and [[SaaS-Decisions]].
+Official path: [[SaaS-Milestones]] Map B. S0–S4 are Successful. Official **S5** is Control Plane Productization / Operations Foundation: substantially implemented, **not Successful**. Closeout: [[wip/Post_S4_Foundation_Decision_Closeout]].
+
+Next **implementation** waits until Scott authorizes the remaining S5 acceptance gaps (Retry UI and owner browser/Docker pass) or S6. Do not start either on this closeout.
 
 **Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 
 ## What we do not do next
 
-- Start S5 hostnames / TLS unless Scott asks
+- Start S6 (fleet backup/upgrade) unless Scott asks
+- Implement remaining S5 gaps unless Scott asks
+- Start DNS / TLS / public hostnames (official S8)
+- Start VPS cutover, operator auth, or production backup implementation
 - Add `tenant_id` to the CRM
 - Start Stripe, self-service signup, or a beauty-variant design
 - Touch Koi-Pi PRODUCTION SQLite or `Projects/renzo_crm`
