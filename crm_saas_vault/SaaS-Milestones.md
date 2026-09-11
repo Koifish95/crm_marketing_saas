@@ -13,7 +13,7 @@ tags:
 
 # SaaS milestones
 
-Official post-S4 path: **Map B + ten-decision overlay** ([[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]]). Closeout: [[wip/Post_S4_Foundation_Decision_Closeout]].
+Official post-S4 path: **Map B + ten-decision overlay** ([[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]]). Map closeout: [[wip/Post_S4_Foundation_Decision_Closeout]]. S5 closeout: [[wip/S5_closeout]].
 
 S0–S4 Successful bodies below are unchanged laptop proofs. From **S5 onward**, this Map B sequence supersedes the 2026-09-08 hostname-first path. That older path is kept under [[#Historical 2026-09-08 map (Map A)]]. Do not rewrite S0–S4 closeouts as though Map B existed then.
 
@@ -43,7 +43,7 @@ Laptop Strategic Insights data remains disposable test data. Do not build fleet 
 | S2 | Second martial-arts environment by hand | Successful |
 | S3 | Control plane v1 | Successful |
 | S4 | Sales-led provision | Successful |
-| S5 | Control Plane Productization / Operations Foundation | Substantially implemented. **Not Successful** |
+| S5 | Control Plane Productization / Operations Foundation | **Successful** (2026-09-10) |
 | S6 | Fleet Reliability / Lifecycle | Not started |
 | S7 | Hosting / Security / Remote Nodes | Not started |
 | S8 | Public Exposure | Not started |
@@ -66,9 +66,7 @@ S0 Workspace split
 → S11 External Paying Customer Readiness
 ```
 
-S0–S4 are Successful. Do not mark S5 Successful to tidy docs. Gaps: [[wip/Post_S4_Foundation_Decision_Closeout]].
-
-Progress: [[wip/S5_Control_Plane_Productization_Status]].
+S0–S5 are Successful. Do not start S6 unless Scott asks. Evidence: [[wip/S5_closeout]], [[wip/S5_Control_Plane_Productization_Status]].
 
 ---
 
@@ -146,18 +144,13 @@ Status: **Successful** (2026-09-09). Live proof: Strategic Insights Consulting, 
 
 Official S5 (Map B). Operator can run the laptop fleet from a multi-page control plane. Not DNS. Not backups.
 
-**Shipped (not Successful by itself):** shell (Dashboard, Customers, Environments, Hosting Nodes, Settings placeholder); counts + Needs Attention + missing; workspaces; provision at `/customers/new`; Refresh / Relaunch; extra non-PROD; gated decommission; one-PROD API; localhost `accessUrl`s; unit/API tests. Evidence: [[wip/S5_Control_Plane_Productization_Status]].
+**Shipped:** shell (Dashboard, Customers, Environments, Hosting Nodes, Settings placeholder); counts + Needs Attention + missing; workspaces; provision at `/customers/new`; Refresh / Relaunch; extra non-PROD; gated decommission; one-PROD API; localhost `accessUrl`s; continue/resume Retry UI; unit/API tests. Evidence: [[wip/S5_Control_Plane_Productization_Status]], [[wip/S5_closeout]].
 
 **Not in this milestone:** DNS/TLS, public hostnames, fleet backup, operator auth, VPS, Beauty, billing, server pagination.
 
-- [ ] **S5 Successful:** An operator can run the laptop fleet from that multi-page control plane with honest status (including missing), search/filter, Refresh/Relaunch, extra non-PROD, gated decommission, one-PROD enforcement, and continue/resume retry — accepted by a real browser pass on http://127.0.0.1:52100.
+- [x] **S5 Successful:** An operator can run the laptop fleet from that multi-page control plane with honest status (including missing), search/filter, Refresh/Relaunch, extra non-PROD, gated decommission, one-PROD enforcement, and continue/resume retry — accepted by a real browser pass on http://127.0.0.1:52100.
 
-**Remaining acceptance gaps (do not implement unless Scott asks):**
-
-1. Continue/resume Retry in the UI after create-succeeds / provision-partial-fails (API already resumes; IMM-02 makes the button legal).
-2. Owner acceptance pass: official browser click-through of shell + extras + decommission; live Docker not re-verified after leftovers.
-
-Display-name edit is allowed (IMM-03) but is **not** an S5 Successful gate.
+Status: **Successful** (2026-09-10). Owner pass: Scott. Display-name edit is allowed (IMM-03) but was **not** an S5 Successful gate.
 
 ---
 

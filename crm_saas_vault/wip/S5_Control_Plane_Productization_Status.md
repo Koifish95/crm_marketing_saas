@@ -11,9 +11,9 @@ tags:
 
 # S5 control-plane productization status
 
-Official S5 (Map B): Control Plane Productization / Operations Foundation. **Substantially implemented. Not Successful.** Closeout: [[wip/Post_S4_Foundation_Decision_Closeout]].
+Official S5 (Map B): Control Plane Productization / Operations Foundation. **Successful** (2026-09-10). Closeout: [[wip/S5_closeout]].
 
-Do not mark S5 Successful to tidy docs. Remaining gaps: Retry UI (continue/resume) and owner browser/Docker acceptance. Post-UI hardening: [[wip/Control_Plane_Post_Productization_Audit]].
+Retry UI (continue/resume) is implemented. Owner browser/Docker pass accepted by Scott. Post-UI hardening: [[wip/Control_Plane_Post_Productization_Audit]].
 
 Related: [[SaaS-Milestones]], [[wip/post_S4_prompt]] (historical authorization), [[wip/S5_And_Beyond_Cursor_Prompt]] (spent leftovers), [[wip/Post_S4_Ten_Decisions]].
 
@@ -25,7 +25,7 @@ Map B is official as of 2026-09-10. Do not start S6 unless Scott asks.
 
 ## Frontend architecture
 
-Nuxt pages + `layouts/default.vue`. Live data from existing `GET /api/status`. Mutations unchanged (`POST /api/customers`, `POST /api/customers/:id/provision`, `POST /api/environments/:id/relaunch`). Client grouping in `shared/utils/fleet.ts`. No new write APIs.
+Nuxt pages + `layouts/default.vue`. Live data from existing `GET /api/status`. Mutations: `POST /api/customers`, `POST /api/customers/:id/provision`, `POST /api/environments/:id/provision` (Retry, `onlyIds`), `POST /api/environments/:id/relaunch`. Client grouping in `shared/utils/fleet.ts`. No rebuild flag.
 
 Honest derived fields only: customer/node overall = worst env status (`unhealthy` > `unknown` > `missing` > `stopped` > `healthy`); Needs Attention = `unhealthy`, `unknown`, or `missing` (not decommissioned).
 
@@ -37,7 +37,7 @@ Honest derived fields only: customer/node overall = worst env status (`unhealthy
 - `/` operational Dashboard (counts + Needs Attention). No provision form. No full record dump.
 - `/customers` index + `/customers/:id` workspace (Overview / Environments / Configuration, read-only)
 - `/customers/new` S4 provision form (same two POSTs, same fields, resume/retry, redirect to workspace)
-- `/environments` index + `/environments/:id` workspace (Overview / Runtime / Configuration + Refresh + existing Relaunch)
+- `/environments` index + `/environments/:id` workspace (Overview / Runtime / Configuration + Refresh + Retry when failed/provisioning + Relaunch when ready)
 - `/nodes` index + `/nodes/:id` workspace (today: one `laptop` row)
 - `/settings` placeholder
 
@@ -69,13 +69,13 @@ Sprints 2–7 landed together in `5c32a8f` after sprint 1 (`f61bcdf`). Hardening
 
 ## Leftovers (2026-09-09)
 
-Missing is a combined status. One PROD is API-enforced. Extra non-PROD and gated decommission (no `-v`) shipped after the ten decisions. Official S5 is still **not** Successful.
+Missing is a combined status. One PROD is API-enforced. Extra non-PROD and gated decommission (no `-v`) shipped after the ten decisions.
 
 ## Remaining S5 gaps
 
-1. Continue/resume Retry in the UI.
-2. Owner acceptance pass (browser + live Docker).
+1. Continue/resume Retry in the UI — **implemented**.
+2. Owner acceptance pass (browser + live Docker) — **accepted** (Scott 2026-09-10).
 
 ## Stop
 
-Do not start S6, DNS, public URLs, GoDaddy, TLS, remote nodes, backups, billing, or volume delete. Do not implement the S5 gaps unless Scott asks.
+S5 is Successful. Do not start S6, DNS, public URLs, GoDaddy, TLS, remote nodes, backups, billing, or volume delete unless Scott asks.

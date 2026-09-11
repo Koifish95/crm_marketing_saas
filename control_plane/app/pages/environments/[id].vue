@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import { findById } from '~~/shared/utils/fleet'
 import { ENVIRONMENT_TABS } from '~~/shared/utils/nav'
+import { isRetryableLifecycle } from '~~/shared/utils/provision'
 
 const route = useRoute()
 const { error, pending, refreshing, environments, checkedAt, refreshStatus } = await useFleetStatus()
 const tab = ref('overview')
 const relaunching = ref(false)
+const retrying = ref(false)
 const decommissioning = ref(false)
 const confirmDecommission = ref(false)
 const actionError = ref('')
 const environmentId = computed(() => String(route.params.id || ''))
 const env = computed(() => findById(environments.value, environmentId.value))
 const decommissioned = computed(() => env.value?.lifecycleStatus === 'decommissioned')
+const retryable = computed(() => isRetryableLifecycle(env.value?.lifecycleStatus))
 
 useHead({
   title: computed(() => env.value
@@ -32,6 +35,22 @@ async function relaunch() {
     actionError.value = fetchMessage(error, 'Relaunch failed.')
   } finally {
     relaunching.value = false
+  }
+}
+
+async function retryProvision() {
+  if (!env.value) {
+    return
+  }
+  retrying.value = true
+  actionError.value = ''
+  try {
+    await $fetch(`/api/environments/${env.value.id}/provision`, { method: 'POST' })
+    await refreshStatus()
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Retry failed.')
+  } finally {
+    retrying.value = false
   }
 }
 
@@ -85,8 +104,17 @@ async function decommission() {
           Open
         </button>
         <button
+          v-if="retryable"
           type="button"
-          :disabled="relaunching || !env || decommissioned"
+          :disabled="retrying || !env"
+          :aria-busy="retrying"
+          @click="retryProvision"
+        >
+          {{ retrying ? 'Retrying…' : 'Retry' }}
+        </button>
+        <button
+          type="button"
+          :disabled="relaunching || !env || decommissioned || retryable"
           :aria-busy="relaunching"
           @click="relaunch"
         >
@@ -94,6 +122,9 @@ async function decommission() {
         </button>
       </template>
       Last checked {{ checkedAt || '—' }}.
+      <template v-if="retryable">
+        Retry continues the existing provision. It remounts the same volumes. It does not rebuild.
+      </template>
     </AppPageHeader>
     <p
       v-if="actionError"

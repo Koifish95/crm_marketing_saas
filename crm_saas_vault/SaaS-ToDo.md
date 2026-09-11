@@ -14,7 +14,7 @@ tags:
 
 Platform / productization tasks only. Historical Renzo gym checkboxes stay in [[Milestones]] and [[Open-Questions]] and still aggregate on [[ToDo]]. Real Renzo is not a SaaS customer.
 
-Do not treat a box here as permission to implement. Decision-first: [[Working-Agreement]]. Sequence and **Successful** criteria: [[SaaS-Milestones]]. Closeout: [[wip/Post_S4_Foundation_Decision_Closeout]].
+Do not treat a box here as permission to implement. Decision-first: [[Working-Agreement]]. Sequence and **Successful** criteria: [[SaaS-Milestones]]. Map closeout: [[wip/Post_S4_Foundation_Decision_Closeout]]. S5 closeout: [[wip/S5_closeout]].
 
 ## Sooner
 
@@ -27,11 +27,7 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 - [x] **Post-S4 leftovers (missing, one-PROD API, extra non-PROD, gated decommission, operator UI)** — Shipped on `working`.
 - [x] **IMM-01–04** — Map B official; retry = continue/resume; display name may be edited; hostname shape `{slug}.{product-domain}` with domain unset. [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]].
 
-## Official S5 (not Successful)
-
-- [ ] **S5 Successful** — Control Plane Productization / Operations Foundation. Substantially implemented. Two acceptance gaps remain (do not implement unless Scott asks):
-  1. Continue/resume Retry in the UI after partial provision.
-  2. Owner acceptance pass (browser click-through + live Docker re-verify).
+- [x] **S5** — Control Plane Productization / Operations Foundation. **Successful** (2026-09-10). Retry UI + owner browser/Docker pass. [[wip/S5_closeout]].
 
 ## Later / not started
 

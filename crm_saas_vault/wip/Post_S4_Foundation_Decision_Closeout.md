@@ -11,7 +11,7 @@ tags:
 
 # Post-S4 foundation decision closeout
 
-Scott resolved IMM-01–04 and the dual-map conflict on 2026-09-10. This note records the documentation pass. **No new milestone implementation.**
+Scott resolved IMM-01–04 and the dual-map conflict on 2026-09-10. This note records that documentation pass. Official S5 later became **Successful** the same day — see [[wip/S5_closeout]].
 
 ADR: [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]]. Briefing that was answered: [[wip/Milestone_Map_Conflict_Decision]].
 
@@ -20,7 +20,7 @@ ADR: [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]]. Br
 - **Map:** B + ten-decision overlay. Official post-S4 roadmap.
 - **Map A:** Historical documentation for S0–S4 history and the originally approved S5–S8 Successful lines. Do not rewrite those closeouts.
 - **From S5 onward:** Map B supersedes Map A.
-- **Official S5:** Control Plane Productization / Operations Foundation. Substantially implemented. **Not Successful.**
+- **Official S5:** Control Plane Productization / Operations Foundation. Later **Successful** (2026-09-10) — [[wip/S5_closeout]].
 - **IMM-02:** Retry = continue/resume. Preserve volumes. Never silent rebuild. Rebuild later, gated, separate.
 - **IMM-03:** Display name may be edited. Slug, timezone, admin email stay read-only.
 - **IMM-04:** Hostname shape `{slug}.{product-domain}`. Product domain unset. No DNS/TLS now.
@@ -42,7 +42,7 @@ Not rewritten (evidence): `wip/S2_closeout`, `wip/S3_closeout`, `wip/S4_closeout
 
 ```text
 S0–S4 Successful (laptop proofs)
-S5 Control Plane Productization / Operations Foundation  — not Successful
+S5 Control Plane Productization / Operations Foundation  — Successful (later same day)
 S6 Fleet Reliability / Lifecycle
 S7 Hosting / Security / Remote Nodes
 S8 Public Exposure
@@ -60,32 +60,32 @@ S11 External Paying Customer Readiness  — commercial launch
 | ID | Status | Disposition |
 |---|---|---|
 | IMM-01 | Resolved | Map B official. Next implementation not started. |
-| IMM-02 | Resolved | Continue/resume. Retry **UI** still an S5 gap. |
+| IMM-02 | Resolved | Continue/resume. Retry UI implemented. |
 | IMM-03 | Resolved | Display name may be edited (not an S5 gate). Slug/timezone/email read-only. |
 | IMM-04 | Resolved (shape) | `{slug}.{product-domain}`. Domain string unset. NEAR-07 still owns provider/TLS. |
 
 ## Current S5 status
 
-**Substantially implemented. Not Successful.**
+**Successful** (2026-09-10). See [[wip/S5_closeout]].
 
-Shipped: operator shell; Dashboard + Needs Attention + missing; workspaces; `/customers/new`; Refresh/Relaunch; extra non-PROD; gated decommission; one-PROD API; localhost access URLs; unit/API tests.
+Shipped: operator shell; Dashboard + Needs Attention + missing; workspaces; `/customers/new`; Refresh/Relaunch; extra non-PROD; gated decommission; one-PROD API; localhost access URLs; continue/resume Retry UI; owner browser/Docker pass; unit/API tests.
 
 ## Exact remaining S5 acceptance gaps
 
-Do not implement unless Scott separately authorizes.
+None. Both gaps closed:
 
-1. **Continue/resume Retry in the UI** after create-succeeds / provision-partial-fails. API already resumes.
-2. **Owner acceptance pass** — official browser click-through of shell + extras + decommission on http://127.0.0.1:52100; live Docker not re-verified after leftovers.
+1. Continue/resume Retry in the UI — implemented.
+2. Owner acceptance pass — accepted by Scott 2026-09-10.
 
 Not S5 gates: display-name edit; Settings placeholder; pagination; audit log; DNS; backups; auth.
 
 ## Next roadmap decision
 
-Scott must later choose one: authorize S5 gap-close (Retry UI and/or acceptance pass), authorize official S6, or pause. This closeout authorizes **none** of those.
+S5 is Successful. Next implementation is official S6 only if Scott asks. Do not start S6 on this note.
 
 ## QA / document consistency
 
-Grep targets before commit: `tentative roadmap`, `last approved Successful path`, `next implementation is **S5**`, `historical approved map` as live law. Official notes should say Map B is official and S5 is not Successful.
+Official notes should say Map B is official and S5 is Successful. Do not start S6 unless asked.
 
 ## Git
 

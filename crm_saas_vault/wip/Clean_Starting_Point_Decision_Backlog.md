@@ -21,19 +21,19 @@ Do not treat this list as permission to implement.
 
 # Immediate Decisions
 
-Needed before authorizing the next implementation milestone. **IMM-01–04 are resolved** (Scott 2026-09-10). Implementation of remaining S5 gaps or S6 still requires a separate ask.
+Needed before authorizing the next implementation milestone. **IMM-01–04 are resolved** (Scott 2026-09-10). Official S5 is **Successful**. S6 still requires a separate ask.
 
 ## IMM-01 — resolved
 
 - **Decision/question:** What is the next authorized implementation milestone?
-- **Answer:** Map B + ten-decision overlay is official. Official S5 = Control Plane Productization / Operations Foundation (substantially implemented, not Successful). Do not start S6 or S5 gap implementation on this closeout.
+- **Answer:** Map B + ten-decision overlay is official. Official S5 = Control Plane Productization / Operations Foundation — later **Successful** (2026-09-10). Do not start S6 unless asked.
 - **Record:** [[SaaS-Milestones]], [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]].
 
 ## IMM-02 — resolved
 
 - **Decision/question:** On a failed or partial provision, does Retry mean continue (bring up remaining envs, remount existing volumes) or rebuild (recreate processes/files)? Both?
 - **Answer:** Continue/resume the existing attempt. Preserve resources and volumes. Never silently rebuild. A future rebuild is a separate gated action.
-- **Still not implemented:** workspace Retry button (S5 acceptance gap).
+- **Implemented:** workspace Retry on customer and environment workspaces (continue/resume). Owner acceptance pass accepted 2026-09-10.
 
 ## IMM-03 — resolved
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_EXTRA_ENVIRONMENT_FORM, DEFAULT_PROVISION_FORM, extraEnvironmentRequestBody, provisionRequestBody } from '../../shared/utils/provision'
+import { DEFAULT_EXTRA_ENVIRONMENT_FORM, DEFAULT_PROVISION_FORM, customerNeedsRetry, extraEnvironmentRequestBody, isRetryableLifecycle, provisionRequestBody } from '../../shared/utils/provision'
 
 describe('S4 provision payload', () => {
   it('still sends display name, slug, timezone, and admin email', () => {
@@ -23,5 +23,20 @@ describe('S4 provision payload', () => {
     expect(Object.keys(body).sort()).toEqual(['displayName', 'type'])
     expect(body).not.toHaveProperty('hostname')
     expect(DEFAULT_EXTRA_ENVIRONMENT_FORM.type).toBe('DEV')
+  })
+
+  it('treats failed and provisioning as retryable, not ready or decommissioned', () => {
+    expect(isRetryableLifecycle('failed')).toBe(true)
+    expect(isRetryableLifecycle('provisioning')).toBe(true)
+    expect(isRetryableLifecycle('ready')).toBe(false)
+    expect(isRetryableLifecycle('decommissioned')).toBe(false)
+    expect(customerNeedsRetry([
+      { lifecycleStatus: 'ready' },
+      { lifecycleStatus: 'failed' },
+    ])).toBe(true)
+    expect(customerNeedsRetry([
+      { lifecycleStatus: 'ready' },
+      { lifecycleStatus: 'decommissioned' },
+    ])).toBe(false)
   })
 })

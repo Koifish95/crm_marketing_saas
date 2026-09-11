@@ -16,7 +16,7 @@ tags:
 
 Written 2026-09-10 from the repository, Git history, and vault notes on branch `working` at `18a1c0f` (pre-this-handoff tip). This remains the **architecture / “what exists”** baseline.
 
-**Map update (same day, later):** IMM-01–04 are resolved. Official post-S4 path is Map B. See [[wip/Post_S4_Foundation_Decision_Closeout]] and [[SaaS-Milestones]]. Sections below that still say the map was not rewritten or that both S5s are live law are **historical to this audit**.
+**Map update (same day, later):** IMM-01–04 are resolved. Official post-S4 path is Map B. Official S5 is **Successful** ([[wip/S5_closeout]]). See [[wip/Post_S4_Foundation_Decision_Closeout]] and [[SaaS-Milestones]]. Sections below that still say the map was not rewritten, that both S5s are live law, or that S5 is not Successful are **historical to this audit**.
 
 It did **not** implement a new milestone. Related: [[wip/Clean_Starting_Point_Decision_Backlog]], [[wip/Clean_Starting_Point_Return]].
 

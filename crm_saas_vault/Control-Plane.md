@@ -72,4 +72,4 @@ Relaunch means: recreate the process, remount the same durable data. Never `dock
 
 ## Next
 
-Official S5 is Control Plane Productization ([[SaaS-Milestones]]). Substantially implemented; **not Successful**. Closeout: [[wip/Post_S4_Foundation_Decision_Closeout]]. Public hostname work is official S8 (`{slug}.{product-domain}`; domain unset). Do not start S6 or DNS/TLS unless Scott asks. Do not duplicate `lab-acme` or `strategic-insights` blindly.
+Official S5 is **Successful** ([[SaaS-Milestones]], [[wip/S5_closeout]]). Public hostname work is official S8 (`{slug}.{product-domain}`; domain unset). Do not start S6 or DNS/TLS unless Scott asks. Do not duplicate `lab-acme` or `strategic-insights` blindly.

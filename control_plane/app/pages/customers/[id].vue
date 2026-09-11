@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { findById } from '~~/shared/utils/fleet'
 import { CUSTOMER_TABS } from '~~/shared/utils/nav'
-import { DEFAULT_EXTRA_ENVIRONMENT_FORM, EXTRA_ENV_TYPES, extraEnvironmentRequestBody } from '~~/shared/utils/provision'
+import { DEFAULT_EXTRA_ENVIRONMENT_FORM, EXTRA_ENV_TYPES, customerNeedsRetry, extraEnvironmentRequestBody } from '~~/shared/utils/provision'
 
 const route = useRoute()
 const { error, pending, refreshing, summary, checkedAt, refreshStatus } = await useFleetStatus()
@@ -9,6 +9,7 @@ const tab = ref('overview')
 const customerId = computed(() => String(route.params.id || ''))
 const customer = computed(() => findById(summary.value.customers, customerId.value))
 const adding = ref(false)
+const retrying = ref(false)
 const decommissioning = ref(false)
 const confirmDecommission = ref(false)
 const actionError = ref('')
@@ -17,6 +18,23 @@ const allDecommissioned = computed(() => (
   !!customer.value?.environments.length
   && customer.value.environments.every(env => env.lifecycleStatus === 'decommissioned')
 ))
+const canRetry = computed(() => customerNeedsRetry(customer.value?.environments ?? []))
+
+async function retryProvision() {
+  if (!customer.value) {
+    return
+  }
+  retrying.value = true
+  actionError.value = ''
+  try {
+    await $fetch(`/api/customers/${customer.value.id}/provision`, { method: 'POST' })
+    await refreshStatus()
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Retry failed.')
+  } finally {
+    retrying.value = false
+  }
+}
 
 async function addExtra() {
   if (!customer.value) {
@@ -69,8 +87,20 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
           :refreshing="refreshing"
           @refresh="refreshStatus"
         />
+        <button
+          v-if="canRetry"
+          type="button"
+          :disabled="retrying || !customer"
+          :aria-busy="retrying"
+          @click="retryProvision"
+        >
+          {{ retrying ? 'Retrying…' : 'Retry' }}
+        </button>
       </template>
       Last checked {{ checkedAt || '—' }}.
+      <template v-if="canRetry">
+        Retry continues the existing provision. It remounts the same volumes. It does not rebuild.
+      </template>
     </AppPageHeader>
     <AppAsyncPanel
       :pending="pending && !customer"

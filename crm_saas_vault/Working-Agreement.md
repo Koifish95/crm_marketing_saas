@@ -78,16 +78,15 @@ Repository verification required
 
 ## Current next decision
 
-Official path: [[SaaS-Milestones]] Map B. S0–S4 are Successful. Official **S5** is Control Plane Productization / Operations Foundation: substantially implemented, **not Successful**. Closeout: [[wip/Post_S4_Foundation_Decision_Closeout]].
+Official path: [[SaaS-Milestones]] Map B. S0–S5 are Successful. Official **S5** is Control Plane Productization / Operations Foundation. Closeout: [[wip/S5_closeout]].
 
-Next **implementation** waits until Scott authorizes the remaining S5 acceptance gaps (Retry UI and owner browser/Docker pass) or S6. Do not start either on this closeout.
+Next **implementation** waits until Scott authorizes S6. Do not start S6 on this closeout.
 
 **Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 
 ## What we do not do next
 
 - Start S6 (fleet backup/upgrade) unless Scott asks
-- Implement remaining S5 gaps unless Scott asks
 - Start DNS / TLS / public hostnames (official S8)
 - Start VPS cutover, operator auth, or production backup implementation
 - Add `tenant_id` to the CRM

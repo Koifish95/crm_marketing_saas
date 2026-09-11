@@ -39,3 +39,11 @@ export function provisionRequestBody(form: ProvisionForm): ProvisionForm {
     adminEmail: form.adminEmail,
   }
 }
+
+export function isRetryableLifecycle(lifecycleStatus?: string) {
+  return lifecycleStatus === 'failed' || lifecycleStatus === 'provisioning'
+}
+
+export function customerNeedsRetry(environments: readonly { lifecycleStatus?: string }[]) {
+  return environments.some(env => isRetryableLifecycle(env.lifecycleStatus))
+}

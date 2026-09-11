@@ -25,6 +25,22 @@ Decision: what we chose
 
 ---
 
+## 2026-09-10 — Official S5 is Successful
+
+Status: accepted
+
+Context: Official S5 (Control Plane Productization / Operations Foundation) was substantially implemented, then Retry UI shipped, then Scott completed the owner browser/Docker pass on http://127.0.0.1:52100. Closeout: [[wip/S5_closeout]].
+
+Decision:
+
+- Official **S5 is Successful** (2026-09-10). Criteria: laptop fleet operable from the multi-page control plane with honest status, search/filter, Refresh/Relaunch, extra non-PROD, gated decommission, one-PROD enforcement, and continue/resume Retry — owner-accepted in a real browser.
+- This does **not** start S6, DNS/TLS, backups, VPS, auth, Beauty, or billing.
+- Display-name edit remains allowed (IMM-03) and is still not implemented. Settings placeholder remains allowed.
+
+Source: Scott 2026-09-10
+
+---
+
 ## 2026-09-10 — Map B is the official post-S4 roadmap
 
 Status: accepted
@@ -34,13 +50,13 @@ Context: Two S5 definitions sat in [[SaaS-Milestones]] after the 2026-09-09 rema
 Decision:
 
 - **Map B + ten-decision overlay** is the official post-S4 path. From S5 onward it supersedes the 2026-09-08 hostname-first map (Map A). Map A remains historical documentation for S0–S4 history and the originally approved S5–S8 Successful lines. Do not rewrite those closeouts.
-- Official **S5** = Control Plane Productization / Operations Foundation. Substantially implemented. **Not Successful.** Do not mark it Successful to tidy docs.
+- Official **S5** = Control Plane Productization / Operations Foundation. Later the same day this became **Successful** — see [[#2026-09-10 — Official S5 is Successful]].
 - **VPS cutover** and **commercial launch** are separate. VPS cutover establishes production hosting. Commercial launch = first real external customer operational on that VPS and launch-ready (official S11).
 - Laptop/desktop remains development. Current Strategic Insights laptop data remains disposable. Do not build fleet backup merely to protect disposable laptop environments. Backup/recovery is designed around production hosting (official S6).
 - **IMM-02:** Retry = continue/resume the existing provisioning attempt. Preserve resources and volumes. Never silently rebuild. A future rebuild is a separate gated action.
 - **IMM-03:** Display name may be edited now. Slug, timezone, and admin email stay read-only.
 - **IMM-04:** Customer hostname shape is `{slug}.{product-domain}`. The product domain remains unset. Do not invent a domain. Do not implement DNS/TLS yet.
-- Do not start S6 or remaining S5 gap implementation until Scott asks.
+- Do not start S6 until Scott asks. S5 gap implementation is closed by the Successful ADR above.
 
 This supersedes “launch = first customer on the VPS” as the only launch sentence: that event is the VPS cutover; commercial launch is S11. It also supersedes the ten-decision line that display/timezone/email all stay read-only — display name may be edited.
 

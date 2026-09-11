@@ -83,11 +83,29 @@ export async function setLifecycleStatus(db: Database, id: string, lifecycleStat
   await db.update(environments).set({ lifecycleStatus }).where(eq(environments.id, id))
 }
 
-export async function provisionCustomerEnvironments(db: Database, customerId: string, filesRoot?: string, onlyIds?: readonly string[]) {
-  const rows = (await db.select().from(environments))
+export function environmentProvisionGuard(row: { lifecycleStatus: string } | null) {
+  if (!row) {
+    return { statusCode: 404, statusMessage: 'Environment not registered.' }
+  }
+  if (row.lifecycleStatus === 'decommissioned') {
+    return { statusCode: 409, statusMessage: 'Decommissioned environments cannot be retried.' }
+  }
+  return null
+}
+
+export function selectEnvironmentsToProvision<T extends {
+  id: string
+  customerId: string
+  lifecycleStatus: string
+}>(rows: readonly T[], customerId: string, onlyIds?: readonly string[]) {
+  return rows
     .filter(row => row.customerId === customerId)
     .filter(row => row.lifecycleStatus !== 'decommissioned')
     .filter(row => !onlyIds?.length || onlyIds.includes(row.id))
+}
+
+export async function provisionCustomerEnvironments(db: Database, customerId: string, filesRoot?: string, onlyIds?: readonly string[]) {
+  const rows = selectEnvironmentsToProvision(await db.select().from(environments), customerId, onlyIds)
   if (rows.length === 0) {
     throw new Error('No environments to provision.')
   }
