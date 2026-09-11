@@ -27,6 +27,7 @@ Processed source material lives in [[wip/archive/_index|wip/archive/]]. Put new 
 - [[wip/CRM_Core_Architecture_Planning_Return|CRM Core architecture planning return]]
 - [[wip/S6_Fleet_Reliability_Cursor_Prompt|S6 fleet reliability — Cursor prompt]]
 - [[wip/S6_Implementation_Status|S6 implementation status]] (not Successful)
+- [[wip/Control_Plane_Bulk_Lifecycle_Return|Control Plane bulk start/stop — return]]
 - [[wip/S5_closeout|S5 closeout and handoff]] (Successful 2026-09-10)
 - [[wip/S5_Control_Plane_Productization_Status|S5 control-plane productization status]]
 - [[wip/Where_We_Are_Now_Post_S4_2026-09-09|Where we are now — post-S4 handoff]] (superseded for current UI)

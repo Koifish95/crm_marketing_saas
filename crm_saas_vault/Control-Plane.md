@@ -67,7 +67,7 @@ Today’s customer row is the commercial account **and** the only product instan
 - Runtime adapter: exact `docker inspect` + compose recreate (`up -d --force-recreate --no-deps app`)
 - Health GET only registered `127.0.0.1` lab URLs
 - Fleet backup zips: gitignored `control_plane/data/backups/{customerSlug}/{environmentSlug}/{customerSlug}_{environmentSlug}_{yyyy-MM-dd}_{HHmmss}.zip` (14-day retention). Older rows may still point at UUID folders. Each new zip includes `BACKUP.md`. Not `control-plane.sqlite`.
-- Environment APIs: `POST .../backup`, `.../restore`, `.../backup/copy`, `.../backup/reveal`, `.../upgrade`, `.../stop`
+- Environment APIs: `POST .../backup`, `.../restore`, `.../backup/copy`, `.../backup/reveal`, `.../upgrade`, `.../start`, `.../stop`, `.../bulk/start`, `.../bulk/stop`
 - No operator login; loopback bind
 
 ## Safety rule

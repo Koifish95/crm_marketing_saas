@@ -114,6 +114,12 @@ body {
   color: #5b6b7c;
 }
 
+.data-table .select-col,
+.data-table td.select-col {
+  width: 2.2rem;
+  text-transform: none;
+}
+
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));

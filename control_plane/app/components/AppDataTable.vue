@@ -14,6 +14,12 @@ defineProps<{
       <thead>
         <tr>
           <th
+            v-if="$slots.leading"
+            class="select-col"
+          >
+            <slot name="leading" />
+          </th>
+          <th
             v-for="column in columns"
             :key="column"
           >
