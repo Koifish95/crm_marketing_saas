@@ -94,7 +94,10 @@ No `martial_arts_template/` or `control_plane/` application changes.
 
 ## Commit SHA / push status
 
-Filled after commit/push.
+| Item | Value |
+|---|---|
+| Planning commit | `33e116e` |
+| Push | `origin/working` |
 
 ## Confirmation
 
