@@ -29,7 +29,10 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 
 - [x] **S5** — Control Plane Productization / Operations Foundation. **Successful** (2026-09-10). Retry UI + owner browser/Docker pass. [[wip/S5_closeout]].
 
+## Official S6 (in progress, not Successful)
+
+- [ ] **S6 Successful** — Fleet Reliability / Lifecycle. Authorized 2026-09-10. Backup / restore / upgrade from the control plane. Do not check until Scott’s browser pass. [[wip/S6_Fleet_Reliability_Cursor_Prompt]].
+
 ## Later / not started
 
-- [ ] **S6** — Fleet Reliability / Lifecycle (production backup/upgrade). Do not start.
 - [ ] **S7–S11** — Hosting/security, public exposure, dogfood, second pilot, commercial launch. [[SaaS-Milestones]].

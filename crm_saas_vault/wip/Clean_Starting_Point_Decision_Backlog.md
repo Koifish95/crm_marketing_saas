@@ -51,29 +51,20 @@ Needed before authorizing the next implementation milestone. **IMM-01–04 are r
 
 Needed before public exposure, a durable SI, or a real second pilot.
 
-## NEAR-01
+## NEAR-01 — working
 
 - **Decision/question:** What must be backed up, where does it live, what is retention, and can restore run from the control plane?
-- **Current known context:** Template in-app zip exists. CP does not orchestrate. Laptop `pnpm backup:*` is the template triple, not the SI/Acme fleet. Historical S6 Successful requires off-host copy for a paid customer.
-- **Recommendation:** Same-host zip per environment first, then off-host before any paying customer. Show backup status on the environment workspace when that milestone starts.
-- **What it blocks:** External pilot; paying customer; VPS cutover of SI.
-- **Can Cursor continue without it?** Yes — do not start backups until asked.
+- **Working decision (2026-09-10):** Per registered env, CRM sqlite + uploads. Same-host gitignored zip keyed by customer + env + timestamp. Off-host = copy to an operator-pasted existing folder. Retention 14 days. Restore from CP, gated, one env, never `-v`, refuse decommissioned. [[SaaS-Decisions#2026-09-10 — S6 backup, restore, and upgrade]].
 
-## NEAR-02
+## NEAR-02 — working (S6: no registry)
 
 - **Decision/question:** When does a versioned image registry exist, and how does a second machine get the same build?
-- **Current known context:** Local `docker build` of `martial-arts-acquisition:s4`. S4 ADR: registry when a second machine needs the same build.
-- **Recommendation:** Registry as part of the VPS/second-machine milestone, not before more laptop UX.
-- **What it blocks:** Second PC / VPS with the same image; upgrades.
-- **Can Cursor continue without it?** Yes on this laptop.
+- **Working decision (2026-09-10):** No registry in S6. Local `expectedImage` / `docker build` only. Registry remains official S7.
 
-## NEAR-03
+## NEAR-03 — working
 
 - **Decision/question:** How do upgrades and rollbacks work (lockstep vs per-environment; DEV before PROD; backup-before-upgrade)?
-- **Current known context:** `expectedImage` is a string. No CP upgrade action. Architecture allows DEV to run newer than PROD.
-- **Recommendation:** Per-environment; DEV first; refuse upgrade without a backup once backups exist.
-- **What it blocks:** Shipping template changes to a live non-Renzo customer safely.
-- **Can Cursor continue without it?** Yes.
+- **Working decision (2026-09-10):** Per-environment. Non-PROD before PROD when the customer has one (Acme `:s2` lab may be exempt). Refuse upgrade without an S6 backup of that env. Rollback = restore last zip + previous `expectedImage`.
 
 ## NEAR-04
 

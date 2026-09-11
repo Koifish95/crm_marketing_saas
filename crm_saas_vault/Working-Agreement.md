@@ -78,17 +78,15 @@ Repository verification required
 
 ## Current next decision
 
-Official path: [[SaaS-Milestones]] Map B. S0–S5 are Successful. Official **S5** is Control Plane Productization / Operations Foundation. Closeout: [[wip/S5_closeout]].
-
-Next **implementation** waits until Scott authorizes S6. Do not start S6 on this closeout.
+Official path: [[SaaS-Milestones]] Map B. S0–S5 are Successful. Official **S6** (Fleet Reliability) is **authorized and in progress**. Successful stays unchecked until Scott’s browser pass. Prompt: [[wip/S6_Fleet_Reliability_Cursor_Prompt]]. ADR: [[SaaS-Decisions#2026-09-10 — S6 backup, restore, and upgrade]].
 
 **Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 
 ## What we do not do next
 
-- Start S6 (fleet backup/upgrade) unless Scott asks
+- Mark S6 Successful unless Scott accepts the browser/Docker pass
 - Start DNS / TLS / public hostnames (official S8)
-- Start VPS cutover, operator auth, or production backup implementation
+- Start VPS cutover, operator auth, or an image registry (official S7)
 - Add `tenant_id` to the CRM
 - Start Stripe, self-service signup, or a beauty-variant design
 - Touch Koi-Pi PRODUCTION SQLite or `Projects/renzo_crm`

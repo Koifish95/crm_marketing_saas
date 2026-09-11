@@ -25,6 +25,23 @@ Decision: what we chose
 
 ---
 
+## 2026-09-10 — S6 backup, restore, and upgrade
+
+Status: working decision
+
+Context: Official S6 is authorized. NEAR-01–03 were still unset. Prompt: [[wip/S6_Fleet_Reliability_Cursor_Prompt]]. This does **not** mark S6 Successful.
+
+Decision:
+
+- **NEAR-01:** Back up each registered environment’s CRM sqlite + uploads only. Not `control-plane.sqlite`. Not sibling volumes. Same-host gitignored zip keyed by customer id + environment id + timestamp. Off-host = copy that zip to an operator-pasted **existing** folder (no cloud vendor). Retention **14 days**. Restore from the control plane with a gated confirm; one env; never `-v`; refuse decommissioned.
+- **NEAR-02:** No image registry in S6. Local `expectedImage` and `docker build` only.
+- **NEAR-03:** Per-environment upgrade, not lockstep. When a customer has a non-decommissioned non-PROD, upgrade that first; refuse PROD until it is on the target image (Acme `:s2` lab may be documented exempt). Refuse upgrade without an S6 backup of **that** environment. Rollback = restore last zip + previous `expectedImage`.
+- Proof target is a throwaway extra non-PROD or Acme. Strategic Insights laptop data stays disposable. Do not start S7.
+
+Source: Scott 2026-09-10 (S6 execution prompt)
+
+---
+
 ## 2026-09-10 — Official S5 is Successful
 
 Status: accepted
@@ -34,7 +51,7 @@ Context: Official S5 (Control Plane Productization / Operations Foundation) was 
 Decision:
 
 - Official **S5 is Successful** (2026-09-10). Criteria: laptop fleet operable from the multi-page control plane with honest status, search/filter, Refresh/Relaunch, extra non-PROD, gated decommission, one-PROD enforcement, and continue/resume Retry — owner-accepted in a real browser.
-- This does **not** start S6, DNS/TLS, backups, VPS, auth, Beauty, or billing.
+- This did **not** start S6. S6 was authorized later the same day — see [[#2026-09-10 — S6 backup, restore, and upgrade]].
 - Display-name edit remains allowed (IMM-03) and is still not implemented. Settings placeholder remains allowed.
 
 Source: Scott 2026-09-10
@@ -56,7 +73,7 @@ Decision:
 - **IMM-02:** Retry = continue/resume the existing provisioning attempt. Preserve resources and volumes. Never silently rebuild. A future rebuild is a separate gated action.
 - **IMM-03:** Display name may be edited now. Slug, timezone, and admin email stay read-only.
 - **IMM-04:** Customer hostname shape is `{slug}.{product-domain}`. The product domain remains unset. Do not invent a domain. Do not implement DNS/TLS yet.
-- Do not start S6 until Scott asks. S5 gap implementation is closed by the Successful ADR above.
+- S5 gap implementation is closed by the Successful ADR above. S6 is authorized separately — see [[#2026-09-10 — S6 backup, restore, and upgrade]].
 
 This supersedes “launch = first customer on the VPS” as the only launch sentence: that event is the VPS cutover; commercial launch is S11. It also supersedes the ten-decision line that display/timezone/email all stay read-only — display name may be edited.
 

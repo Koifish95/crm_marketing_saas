@@ -44,7 +44,7 @@ Laptop Strategic Insights data remains disposable test data. Do not build fleet 
 | S3 | Control plane v1 | Successful |
 | S4 | Sales-led provision | Successful |
 | S5 | Control Plane Productization / Operations Foundation | **Successful** (2026-09-10) |
-| S6 | Fleet Reliability / Lifecycle | Not started |
+| S6 | Fleet Reliability / Lifecycle | Authorized / in progress. **Not Successful** |
 | S7 | Hosting / Security / Remote Nodes | Not started |
 | S8 | Public Exposure | Not started |
 | S9 | Dogfood / Pilot Readiness | Not started |
@@ -162,7 +162,7 @@ Production-oriented backup, restore, and upgrade. Extra non-PROD and gated decom
 
 - [ ] **S6 Successful:** Backup and restore work for a customer environment without killing others, designed around **production** hosting. A CRM template update can ship to a non-Renzo environment and still show healthy. Off-host copy is required before a paying customer is safe.
 
-Do not start S6 until Scott asks.
+Authorized 2026-09-10 ([[wip/S6_Fleet_Reliability_Cursor_Prompt]]). **Not Successful** until Scott’s browser pass.
 
 ---
 
