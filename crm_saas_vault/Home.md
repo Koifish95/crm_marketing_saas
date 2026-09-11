@@ -55,7 +55,7 @@ Control plane is **implemented** as `control_plane/` (http://127.0.0.1:52100): D
 Alignment (evidence, not the map): [[wip/archive/SaaS_Project_Alignment_and_Current_Understanding]].
 
 **Git:** this folder is its own repo; `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).  
-**Milestones:** [[SaaS-Milestones]] official **Map B**. S0–S5 Successful. Official S6 is authorized and implemented, **not Successful** until Scott’s browser pass. [[S6-Fleet-Runbook]]. **C1 is code-shipped** ([[wip/C1_CRM_Core_Architecture_Return]]). Do not start Sales, C2, S7, or DNS/TLS unless Scott asks.
+**Milestones:** [[SaaS-Milestones]] official **Map B**. S0–S6 Successful. Official S7 is not started. [[S6-Fleet-Runbook]]. **C1 is code-shipped** ([[wip/C1_CRM_Core_Architecture_Return]]). Do not start Sales, C2, S7, or DNS/TLS unless Scott asks.
 
 **First intended pilots:** Strategic Insights Consulting, LLC is **laptop-provisioned** (S4 proof, not public). Scott’s sister’s business is **not** provisioned.
 

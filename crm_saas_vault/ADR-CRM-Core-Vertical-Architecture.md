@@ -41,7 +41,7 @@ crm_marketing_saas/
 
 `martial_arts_template` is a Martial Arts CRM monolith derived from the external Renzo implementation. Control plane `customers.industry_template` is stored but always written as `martial-arts` and is not used to pick image or compose. Provision builds `martial-arts-acquisition:s4` from the template folder.
 
-Scott wants a product family — Martial Arts, Sales / Software, then Beauty — **before** production VPS work. A generic CRM is not a sellable product. Official Map B still lists S7 (hosting/VPS) after S6; this ADR changes that priority. S0–S5 remain Successful. S6 fleet APIs are implemented and **not Successful** until the owner browser pass. This ADR does not mark S6 Successful and does not authorize extraction.
+Scott wants a product family — Martial Arts, Sales / Software, then Beauty — **before** production VPS work. A generic CRM is not a sellable product. Official Map B still lists S7 (hosting/VPS) after S6; this ADR changes that priority. S0–S6 remain Successful. This ADR does not authorize extraction, Sales, Beauty, or S7.
 
 ## 5. Problem
 

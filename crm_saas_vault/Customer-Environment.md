@@ -213,6 +213,6 @@ Domains, TLS, Compose project layout, image registry, node communication mechani
 
 ## Next
 
-[[SaaS-Milestones]] **S2–S5** are Successful. S6 is implemented, not Successful until Scott’s pass. Boot steps: [[S2-Hand-Boot-Checklist]]. Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]]. C1 is code-shipped. D1 account/instance split is **not** implemented. Do not start C2 / Sales unless Scott asks.
+[[SaaS-Milestones]] **S2–S6** are Successful. Boot steps: [[S2-Hand-Boot-Checklist]]. Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]]. Lifecycle: [[S6-Fleet-Runbook]]. C1 is code-shipped. D1 account/instance split is **not** implemented. Do not start C2 / Sales unless Scott asks.
 
 Real Renzo is not a Customer in this model. Strategic Insights Consulting, LLC is laptop-provisioned (S4 proof, not a public hostname). Scott’s sister’s business is not provisioned. The S2 lab `lab-acme` is a proof environment, not a paying customer.

@@ -30,8 +30,8 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 
 | Layer | Status |
 |---|---|
-| Official Map B S0–S5 | **Successful** |
-| Official S6 (fleet backup / restore / upgrade + later start/stop) | **Implemented, not Successful** until Scott’s browser/Docker pass |
+| Official Map B S0–S6 | **Successful** |
+| Official S6 (fleet backup / restore / upgrade + start/stop) | **Successful** (2026-09-11). Closeout: [[wip/S6_closeout]] |
 | CRM Core + vertical ADR | **Accepted** |
 | D1–D4 | **Accepted** (D1 schema **not** shipped) |
 | C1 Core extraction | **Code-shipped** |
@@ -167,7 +167,7 @@ Eligibility: [[wip/Control_Plane_Bulk_Lifecycle_Return]]. Start All / Stop All =
 
 Sales-led. `Customers → New customer` builds `martial-arts-acquisition:s4` from `martial_arts_template/Dockerfile` with **repo-root** context (so the image can `COPY packages/crm-core`). Compose up cwd stays `templateRoot()`.
 
-## Backup / restore (official S6, not Successful)
+## Backup / restore (official S6, Successful)
 
 Lifecycle tab: same-host zip, gated restore, off-host copy to an existing folder, backup-gated local upgrade, Explorer reveal (`POST .../backup/reveal` with `{ backupId }`, path must stay under `data/backups/`). Retention 14 days. Runbook: [[S6-Fleet-Runbook]]. Status: [[wip/S6_Implementation_Status]].
 
@@ -224,8 +224,7 @@ Vault-only. Archives superseded WIP so a fresh agent does not treat 2026-09-10 n
 **Official S-track** ([[SaaS-Milestones]] Map B):
 
 ```text
-S0–S5 Successful
-→ S6 implemented, not Successful
+S0–S6 Successful
 → S7–S11 not started
 ```
 
@@ -259,7 +258,6 @@ A fresh agent must not assume any of these exist:
 - DNS / TLS / public hostnames / production edge
 - Billing, Stripe, self-service signup
 - Remote Control Plane auth (or any CP login)
-- S6 Successful
 - Map B rewritten around Core
 - `martial_arts_template` moved to `apps/`
 - Plugin framework, `tenant_id`, Beauty/Sales images
@@ -293,7 +291,6 @@ Still unresolved (development can continue locally without them): [[wip/Clean_St
 
 | ID | Question | When | Blocks | Continue without? |
 |---|---|---|---|---|
-| S6 Successful | Owner browser/Docker pass | When Scott runs it | Calling S6 Successful | Yes — do not mark it |
 | NEAR-04 | CP auth when leaving localhost | Before off-loopback | Remote CP | Yes on 127.0.0.1 |
 | NEAR-05 | Bootstrap credential delivery | Before public hostname | Safe public exposure | Yes locally |
 | NEAR-06 | Operator audit log | Before shared/remote CP | Multi-operator honesty | Yes |
@@ -312,7 +309,7 @@ C2 start is **not** an open architecture question. It is an authorization questi
 
 **No new implementation is authorized. Await Scott's next instruction.**
 
-Do not infer permission from the extraction plan, S6 runbook, or an old prompt. Do not mark S6 Successful. Do not start Sales, Beauty, D1 CP schema, C2, S7, or DNS/TLS.
+Do not infer permission from the extraction plan, S6 runbook, or an old prompt. Do not start Sales, Beauty, D1 CP schema, C2, S7, or DNS/TLS.
 
 ---
 
@@ -346,7 +343,8 @@ Do not infer permission from the extraction plan, S6 runbook, or an old prompt. 
 | Customer / environment | [[Customer-Environment]] | Target hierarchy vs current rows |
 | Control Plane | [[Control-Plane]] | Operator app scope and APIs |
 | S6 runbook | [[S6-Fleet-Runbook]] | Backup/restore/upgrade procedure |
-| S6 status | [[wip/S6_Implementation_Status]] | Implemented, not Successful |
+| S6 closeout | [[wip/S6_closeout]] | Official S6 Successful evidence |
+| S6 status | [[wip/S6_Implementation_Status]] | Successful (2026-09-11) |
 | Bulk start/stop return | [[wip/Control_Plane_Bulk_Lifecycle_Return]] | Eligibility, sequential Docker, QA |
 | Current ToDo | [[SaaS-ToDo]] | Checkboxes; not permission |
 | Open NEAR/DEF questions | [[wip/Clean_Starting_Point_Decision_Backlog]] | Unresolved only |
@@ -364,7 +362,7 @@ Renzo gym notes at the vault root (`Overview`, `Implementation-State`, `Decision
 
 **Archived (completed / superseded):** Clean Starting Point current-state + return; post-S4 where-we-are + create prompt; `post_S4_prompt`; S5-and-beyond prompt; S3 begin prompt; S6 prompt; C1 prompt; Core planning prompt + planning return; milestone-map briefing; post-S4 ten decisions + 85-item inventory; S3/S4 implementation statuses; S5 productization status; CP post-productization audit; S0–S8 discovery Q&A (answers renamed); Renzo→MA sanitization.
 
-**Retained in `wip/`:** this handoff; S6 status; extraction plan; C1 return; bulk-lifecycle return; decision backlog; S2–S5 closeouts; Map B closeout; `note.md`; `catches.md`.
+**Retained in `wip/`:** this handoff; S6 status + closeout; extraction plan; C1 return; bulk-lifecycle return; decision backlog; S2–S6 closeouts; Map B closeout; `note.md`; `catches.md`.
 
 **Uncertain (left in place):** [[wip/note]], [[wip/catches]] — scratch inbox, still referenced as human QA leftovers.
 
@@ -384,7 +382,7 @@ Then follow its Documentation Map. Do not scan wip/ indiscriminately. Archived f
 
 Before doing anything: inspect git status, branch, and HEAD. Code is implementation truth. ADRs and owner decisions in SaaS-Decisions / ADR-CRM-Core-Vertical-Architecture are architecture truth. Distinguish TARGET architecture from IMPLEMENTED state.
 
-Hard stops: no Renzo / Koi-Pi / webhosting_renzo_*; no docker compose down -v or prune; no Sales, Beauty, C2, D1 CP schema, VPS, DNS/TLS, or S6 Successful unless Scott explicitly asks; no premature Core promotion.
+Hard stops: no Renzo / Koi-Pi / webhosting_renzo_*; no docker compose down -v or prune; no Sales, Beauty, C2, D1 CP schema, VPS, or DNS/TLS unless Scott explicitly asks; no premature Core promotion.
 
 Summarize your understanding back to Scott. If you find a contradiction between code, Git, and docs, say so. Then STOP and wait for Scott’s next instruction. Do not begin implementation automatically.
 ```

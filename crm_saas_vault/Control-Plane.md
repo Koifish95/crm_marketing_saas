@@ -46,7 +46,7 @@ which customers exist
 → provision a Martial Arts PROD+DEV pair (S4)
 ```
 
-Headlines still read “Acme BJJ · PROD · healthy,” not a container id. Indexes are tables. Workspaces can Refresh, Relaunch, add extra non-PROD, gated-decommission (volumes stay), and use the **Lifecycle** tab (backup, restore, off-host copy, upgrade — S6 implemented, not Successful). Configuration fields stay read-only. Start / Stop / bulk start-stop are implemented on `/environments` (not Relaunch). Current state: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]].
+Headlines still read “Acme BJJ · PROD · healthy,” not a container id. Indexes are tables. Workspaces can Refresh, Relaunch, add extra non-PROD, gated-decommission (volumes stay), and use the **Lifecycle** tab (backup, restore, off-host copy, upgrade — S6 Successful). Configuration fields stay read-only. Start / Stop / bulk start-stop are implemented on `/environments` (not Relaunch). Current state: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]].
 
 Laptop-only. Local Docker. Health on demand. Acme is seeded; new customers are provisioned. No Docker socket in CRM containers.
 
@@ -76,4 +76,4 @@ Relaunch means: recreate the process, remount the same durable data. Never `dock
 
 ## Next
 
-Official S5 is **Successful**. Official S6 (backup / restore / upgrade on the environment Lifecycle tab) is **implemented, not Successful** until Scott’s pass ([[S6-Fleet-Runbook]]). Public hostname work is official S8. Do not start S7 or DNS/TLS unless Scott asks. Do not duplicate `lab-acme` or `strategic-insights` blindly.
+Official S5 and S6 are **Successful**. Public hostname work is official S8. Do not start S7 or DNS/TLS unless Scott asks. Do not duplicate `lab-acme` or `strategic-insights` blindly. Runbook: [[S6-Fleet-Runbook]]. Closeout: [[wip/S6_closeout]].

@@ -14,7 +14,7 @@ tags:
 
 Platform / productization tasks only. Historical Renzo gym checkboxes stay in [[Milestones]] and [[Open-Questions]] and still aggregate on [[ToDo]]. Real Renzo is not a SaaS customer.
 
-Do not treat a box here as permission to implement. Decision-first: [[Working-Agreement]]. Current state: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]]. Sequence and **Successful** criteria: [[SaaS-Milestones]]. Map closeout: [[wip/Post_S4_Foundation_Decision_Closeout]]. S5 closeout: [[wip/S5_closeout]].
+Do not treat a box here as permission to implement. Decision-first: [[Working-Agreement]]. Current state: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]]. Sequence and **Successful** criteria: [[SaaS-Milestones]]. Map closeout: [[wip/Post_S4_Foundation_Decision_Closeout]]. S5 closeout: [[wip/S5_closeout]]. S6 closeout: [[wip/S6_closeout]].
 
 ## Sooner
 
@@ -29,9 +29,7 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 
 - [x] **S5** — Control Plane Productization / Operations Foundation. **Successful** (2026-09-10). Retry UI + owner browser/Docker pass. [[wip/S5_closeout]].
 
-## Official S6 (in progress, not Successful)
-
-- [ ] **S6 Successful** — Fleet Reliability / Lifecycle. Code shipped (`76d0f71`). Do not check until Scott’s browser/Docker pass (backup, restore, off-host copy to a real folder, upgrade). [[S6-Fleet-Runbook]].
+- [x] **S6** — Fleet Reliability / Lifecycle. **Successful** (2026-09-11). [[wip/S6_closeout]]. [[S6-Fleet-Runbook]].
 
 ## Architecture (C1 code-shipped)
 

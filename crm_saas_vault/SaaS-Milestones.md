@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-10
+updated: 2026-09-11
 aliases:
   - Platform milestones
   - Successful
@@ -44,7 +44,7 @@ Laptop Strategic Insights data remains disposable test data. Do not build fleet 
 | S3 | Control plane v1 | Successful |
 | S4 | Sales-led provision | Successful |
 | S5 | Control Plane Productization / Operations Foundation | **Successful** (2026-09-10) |
-| S6 | Fleet Reliability / Lifecycle | Authorized / in progress. **Not Successful** |
+| S6 | Fleet Reliability / Lifecycle | **Successful** (2026-09-11) |
 | S7 | Hosting / Security / Remote Nodes | Not started |
 | S8 | Public Exposure | Not started |
 | S9 | Dogfood / Pilot Readiness | Not started |
@@ -66,7 +66,7 @@ S0 Workspace split
 → S11 External Paying Customer Readiness
 ```
 
-S0–S5 are Successful. Official S6 is authorized and implemented, **not Successful** until Scott’s pass. Evidence: [[wip/S5_closeout]], [[wip/S6_Implementation_Status]].
+S0–S6 are Successful. Official S7 is not started. Evidence: [[wip/S5_closeout]], [[wip/S6_closeout]].
 
 ---
 
@@ -158,13 +158,13 @@ Status: **Successful** (2026-09-10). Owner pass: Scott. Display-name edit is all
 
 Production-oriented backup, restore, and upgrade. Extra non-PROD and gated decommission already shipped in S5 leftovers — they are **not** the remainder of this S6.
 
-**Shipped (not Successful by itself):** environment Lifecycle tab; same-host zip; gated restore; off-host copy; Explorer reveal; backup-gated local upgrade; Start / Stop / bulk start-stop. Runbook: [[S6-Fleet-Runbook]]. Status: [[wip/S6_Implementation_Status]]. Current map: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]].
+**Shipped:** environment Lifecycle tab; same-host zip; gated restore; off-host copy; Explorer reveal; backup-gated local upgrade; Start / Stop / bulk start-stop; running / success / conflict notices for Backup and Copy off-host. Runbook: [[S6-Fleet-Runbook]]. Evidence: [[wip/S6_closeout]]. Status: [[wip/S6_Implementation_Status]].
 
 **Not in this milestone:** Perfect observability. Multi-region. Protecting disposable laptop SI volumes as if they were production. Image registry (S7).
 
-- [ ] **S6 Successful:** Backup and restore work for a customer environment without killing others, designed around **production** hosting. A CRM template update can ship to a non-Renzo environment and still show healthy. Off-host copy is required before a paying customer is safe.
+- [x] **S6 Successful:** Backup and restore work for a customer environment without killing others, designed around **production** hosting. A CRM template update can ship to a non-Renzo environment and still show healthy. Off-host copy is required before a paying customer is safe.
 
-Authorized 2026-09-10 ([[wip/archive/S6_Fleet_Reliability_Cursor_Prompt]]). **Not Successful** until Scott’s browser pass.
+Authorized 2026-09-10 ([[wip/archive/S6_Fleet_Reliability_Cursor_Prompt]]). Status: **Successful** (2026-09-11). Owner pass: Scott.
 
 ---
 

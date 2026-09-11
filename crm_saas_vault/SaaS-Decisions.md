@@ -25,6 +25,21 @@ Decision: what we chose
 
 ---
 
+## 2026-09-11 — Official S6 is Successful
+
+Status: accepted
+
+Context: Official S6 (Fleet Reliability / Lifecycle) was implemented, then Scott completed the owner pass (backup, restore, workflows, off-host copy). Last code: Lifecycle running / success / conflict notices and dest-zip 409 (`35b15bf`). Closeout: [[wip/S6_closeout]].
+
+Decision:
+
+- Official **S6 is Successful** (2026-09-11). Criteria: backup and restore for one environment without killing others; template upgrade to a non-Renzo env stays healthy; off-host copy to an existing folder is required and works; existing dest zip is never overwritten.
+- This did **not** start S7, Sales, Beauty, C2, or DNS/TLS.
+
+Source: Scott 2026-09-11
+
+---
+
 ## 2026-09-11 — D1–D4: account vs product instance; wait on Core domain
 
 Status: accepted
