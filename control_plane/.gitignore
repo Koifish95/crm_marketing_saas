@@ -17,3 +17,4 @@ logs
 /data/*.db-wal
 /data/*.db-shm
 /data/provisioned/
+/data/backups/

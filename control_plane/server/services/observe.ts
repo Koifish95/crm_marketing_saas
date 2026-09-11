@@ -1,10 +1,12 @@
 import type { Database } from '../database'
 import { inspectRegisteredContainer, type RuntimeState } from './docker-runtime'
+import { latestBackupsByEnvironment, summarizeBackup } from './fleet-backup'
 import { combineStatus, probeRegisteredHealth } from './health'
 import { environmentHeadline, listRegisteredEnvironments } from './registry'
 
 export async function observeRegisteredEnvironments(db: Database) {
   const rows = await listRegisteredEnvironments(db)
+  const backups = await latestBackupsByEnvironment(db)
   const registeredNames = rows.map(row => row.containerName)
   const registeredHealth = rows.map(row => row.healthUrl)
   const views = []
@@ -13,7 +15,8 @@ export async function observeRegisteredEnvironments(db: Database) {
     const health = runtime === 'running'
       ? await probeRegisteredHealth(row.healthUrl, registeredHealth)
       : { ok: false as const, error: 'not running' }
-    views.push(toEnvironmentView(row, runtime, health.ok, health.error))
+    const last = backups.get(row.id)
+    views.push(toEnvironmentView(row, runtime, health.ok, health.error, last ? summarizeBackup(last) : null))
   }
   return views
 }
@@ -23,6 +26,7 @@ export function toEnvironmentView(
   runtime: RuntimeState,
   healthOk: boolean,
   healthError?: string,
+  lastBackup: ReturnType<typeof summarizeBackup> | null = null,
 ) {
   const status = combineStatus(runtime, runtime === 'running' ? healthOk : null)
   return {
@@ -54,5 +58,6 @@ export function toEnvironmentView(
     runtime,
     healthOk,
     healthError,
+    lastBackup,
   }
 }

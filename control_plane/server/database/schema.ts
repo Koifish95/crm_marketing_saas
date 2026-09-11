@@ -48,3 +48,18 @@ export const environments = sqliteTable('environments', {
   uniqueIndex('environments_container_unique').on(table.containerName),
   index('environments_customer_id_idx').on(table.customerId),
 ])
+
+export const environmentBackups = sqliteTable('environment_backups', {
+  id: text('id').primaryKey(),
+  environmentId: text('environment_id').notNull().references(() => environments.id),
+  customerId: text('customer_id').notNull(),
+  createdAt: text('created_at').notNull(),
+  bytes: integer('bytes').notNull(),
+  zipPath: text('zip_path').notNull(),
+  sqliteFilename: text('sqlite_filename').notNull(),
+  offhostPath: text('offhost_path'),
+  offhostCopiedAt: text('offhost_copied_at'),
+  previousExpectedImage: text('previous_expected_image'),
+}, table => [
+  index('environment_backups_environment_id_idx').on(table.environmentId),
+])

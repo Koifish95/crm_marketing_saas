@@ -9,6 +9,12 @@ const tab = ref('overview')
 const relaunching = ref(false)
 const retrying = ref(false)
 const decommissioning = ref(false)
+const backingUp = ref(false)
+const restoring = ref(false)
+const copying = ref(false)
+const upgrading = ref(false)
+const confirmRestore = ref(false)
+const destinationDir = ref('')
 const confirmDecommission = ref(false)
 const actionError = ref('')
 const environmentId = computed(() => String(route.params.id || ''))
@@ -51,6 +57,76 @@ async function retryProvision() {
     actionError.value = fetchMessage(error, 'Retry failed.')
   } finally {
     retrying.value = false
+  }
+}
+
+async function backupEnvironment() {
+  if (!env.value) {
+    return
+  }
+  backingUp.value = true
+  actionError.value = ''
+  try {
+    await $fetch(`/api/environments/${env.value.id}/backup`, { method: 'POST' })
+    await refreshStatus()
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Backup failed.')
+  } finally {
+    backingUp.value = false
+  }
+}
+
+async function copyOffhost() {
+  if (!env.value) {
+    return
+  }
+  copying.value = true
+  actionError.value = ''
+  try {
+    await $fetch(`/api/environments/${env.value.id}/backup/copy`, {
+      method: 'POST',
+      body: { destinationDir: destinationDir.value },
+    })
+    await refreshStatus()
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Off-host copy failed.')
+  } finally {
+    copying.value = false
+  }
+}
+
+async function restoreEnvironment() {
+  if (!env.value || !confirmRestore.value) {
+    return
+  }
+  restoring.value = true
+  actionError.value = ''
+  try {
+    await $fetch(`/api/environments/${env.value.id}/restore`, {
+      method: 'POST',
+      body: { confirm: true },
+    })
+    await refreshStatus()
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Restore failed.')
+  } finally {
+    restoring.value = false
+  }
+}
+
+async function upgradeEnvironment() {
+  if (!env.value) {
+    return
+  }
+  upgrading.value = true
+  actionError.value = ''
+  try {
+    await $fetch(`/api/environments/${env.value.id}/upgrade`, { method: 'POST' })
+    await refreshStatus()
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Upgrade failed.')
+  } finally {
+    upgrading.value = false
   }
 }
 
@@ -194,6 +270,91 @@ async function decommission() {
           <dt>Access URL</dt>
           <dd><AppAccessLink :href="env?.accessUrl" /></dd>
         </dl>
+      </section>
+      <section
+        v-else-if="tab === 'lifecycle'"
+        id="panel-lifecycle"
+        role="tabpanel"
+        aria-labelledby="tab-lifecycle"
+      >
+        <p class="muted">
+          Backup and restore replace this environment’s data only. Siblings stay. Volumes are not deleted. Retry continues provision; upgrade is a separate gated action.
+        </p>
+        <dl class="dl">
+          <dt>Last backup</dt>
+          <dd>{{ env?.lastBackup?.createdAt || 'none' }}</dd>
+          <dt>Size</dt>
+          <dd>{{ env?.lastBackup ? `${env.lastBackup.bytes} bytes` : '—' }}</dd>
+          <dt>Same-host zip</dt>
+          <dd>{{ env?.lastBackup?.zipPath || '—' }}</dd>
+          <dt>Off-host copy</dt>
+          <dd>{{ env?.lastBackup?.offhostPath || 'not copied' }}</dd>
+        </dl>
+        <div class="card">
+          <button
+            type="button"
+            :disabled="backingUp || !env || decommissioned"
+            :aria-busy="backingUp"
+            @click="backupEnvironment"
+          >
+            {{ backingUp ? 'Backing up…' : 'Backup' }}
+          </button>
+        </div>
+        <form
+          class="card"
+          @submit.prevent="copyOffhost"
+        >
+          <label>
+            Off-host folder
+            <input
+              v-model="destinationDir"
+              placeholder="Existing folder path"
+            >
+          </label>
+          <button
+            type="submit"
+            :disabled="copying || !env || decommissioned || !destinationDir.trim()"
+            :aria-busy="copying"
+          >
+            {{ copying ? 'Copying…' : 'Copy off-host' }}
+          </button>
+        </form>
+        <form
+          class="card"
+          @submit.prevent="restoreEnvironment"
+        >
+          <p>
+            Restore replaces this environment’s data from the latest zip. Siblings stay. It never runs compose down -v.
+          </p>
+          <label>
+            <input
+              v-model="confirmRestore"
+              type="checkbox"
+            >
+            I understand this replaces this environment’s data.
+          </label>
+          <button
+            type="submit"
+            class="secondary"
+            :disabled="!confirmRestore || restoring || !env || decommissioned"
+            :aria-busy="restoring"
+          >
+            {{ restoring ? 'Restoring…' : 'Restore' }}
+          </button>
+        </form>
+        <div class="card">
+          <p class="muted">
+            Upgrade rebuilds the local image and remounts the same volumes. Requires an S6 backup of this environment. Non-PROD first when the customer has one.
+          </p>
+          <button
+            type="button"
+            :disabled="upgrading || !env || decommissioned"
+            :aria-busy="upgrading"
+            @click="upgradeEnvironment"
+          >
+            {{ upgrading ? 'Upgrading…' : 'Upgrade' }}
+          </button>
+        </div>
       </section>
       <section
         v-else

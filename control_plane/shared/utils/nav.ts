@@ -25,5 +25,6 @@ export const CUSTOMER_TABS = [
 export const ENVIRONMENT_TABS = [
   { id: 'overview', label: 'Overview' },
   { id: 'runtime', label: 'Runtime / Health' },
+  { id: 'lifecycle', label: 'Lifecycle' },
   { id: 'configuration', label: 'Configuration' },
 ] as const

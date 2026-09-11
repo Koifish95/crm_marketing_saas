@@ -27,6 +27,6 @@ describe('operator shell navigation', () => {
 
   it('defines the existing workspace tabs', () => {
     expect(CUSTOMER_TABS.map(tab => tab.id)).toEqual(['overview', 'environments', 'configuration'])
-    expect(ENVIRONMENT_TABS.map(tab => tab.id)).toEqual(['overview', 'runtime', 'configuration'])
+    expect(ENVIRONMENT_TABS.map(tab => tab.id)).toEqual(['overview', 'runtime', 'lifecycle', 'configuration'])
   })
 })

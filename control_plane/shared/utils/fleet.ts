@@ -23,6 +23,14 @@ export type FleetEnvironment = {
   runtime: string
   healthOk: boolean
   healthError?: string
+  lastBackup?: {
+    id: string
+    createdAt: string
+    bytes: number
+    zipPath: string
+    offhostPath?: string | null
+    offhostCopiedAt?: string | null
+  } | null
   customer: {
     id: string
     slug: string
