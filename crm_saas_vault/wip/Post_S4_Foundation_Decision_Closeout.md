@@ -91,6 +91,6 @@ Grep targets before commit: `tentative roadmap`, `last approved Successful path`
 
 | Item | Value |
 |---|---|
-| Commit SHA | *filled after commit* |
+| Commit SHA | `dcaaa10` (`dcaaa10ce8428f79418a9df633c26e93b11c9470`) |
 | Push | *filled after push* |
 | Scope | Vault planning notes only. No `control_plane/` code. |
