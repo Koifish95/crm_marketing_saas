@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-10
+updated: 2026-09-11
 tags:
   - wip
   - saas
@@ -131,9 +131,9 @@ Safe to leave until after a map rewrite or after the first VPS customer.
 ## DEF-01
 
 - **Decision/question:** When to extract a shared CRM core and build the Beauty template for the sister pilot?
-- **Current known context:** Sister is the second real pilot. Beauty is not to be built in the leftover slice. Still Beauty laptop row (if still present) is not a template decision.
-- **Recommendation:** Second Martial Arts customer first if she can wait; otherwise a dedicated Beauty milestone after the map rewrite.
-- **What it blocks:** Sister as a Beauty customer; second industry.
+- **Current known context:** Sister is the second real pilot. Beauty is not to be built in the leftover slice. Still Beauty laptop row (if still present) is not a template decision. **2026-09-11:** Core timing is answered by [[ADR-CRM-Core-Vertical-Architecture]] — establish Core, migrate Martial Arts incrementally, prove with Sales, then Beauty. Extraction is not started. Sister-as-Beauty remains a later business milestone (Map B S10), after the architecture-proven finish line.
+- **Recommendation:** Do not build Beauty to “get the architecture.” Follow [[wip/CRM_Core_Extraction_Implementation_Plan]] C1–C3 when Scott asks.
+- **What it blocks:** Sister as a Beauty customer; second industry product.
 - **Can Cursor continue without it?** Yes.
 
 ## DEF-02

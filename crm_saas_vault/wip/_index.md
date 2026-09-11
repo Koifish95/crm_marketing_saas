@@ -2,7 +2,7 @@
 type: index
 status: current
 area: process
-updated: 2026-09-10
+updated: 2026-09-11
 tags:
   - wip
 ---
@@ -20,6 +20,9 @@ Processed source material lives in [[wip/archive/_index|wip/archive/]]. Put new 
 - [[wip/Clean_Starting_Point_Return|Clean starting point — return]]
 - [[wip/Post_S4_Foundation_Decision_Closeout|Post-S4 foundation decision closeout]] (IMM-01–04; Map B official)
 - [[wip/Milestone_Map_Conflict_Decision|Milestone map conflict — decision for Scott + ChatGPT]] (resolved 2026-09-10)
+- [[wip/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt|CRM Core + vertical architecture — planning prompt]]
+- [[wip/CRM_Core_Extraction_Implementation_Plan|CRM Core extraction implementation plan]] (docs only; not started)
+- [[wip/CRM_Core_Architecture_Planning_Return|CRM Core architecture planning return]]
 - [[wip/S6_Fleet_Reliability_Cursor_Prompt|S6 fleet reliability — Cursor prompt]]
 - [[wip/S6_Implementation_Status|S6 implementation status]] (not Successful)
 - [[wip/S5_closeout|S5 closeout and handoff]] (Successful 2026-09-10)

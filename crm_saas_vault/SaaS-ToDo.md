@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-10
+updated: 2026-09-11
 aliases:
   - SaaS tasks
 tags:
@@ -33,6 +33,10 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 
 - [ ] **S6 Successful** — Fleet Reliability / Lifecycle. Code shipped (`76d0f71`). Do not check until Scott’s browser/Docker pass (backup, restore, off-host copy to a real folder, upgrade). [[S6-Fleet-Runbook]].
 
+## Architecture (accepted, not started)
+
+- [ ] **C1 / Sprint 1** — Workspace + thin Core layer + enforcement. Do not start unless Scott asks. [[ADR-CRM-Core-Vertical-Architecture]]. [[wip/CRM_Core_Extraction_Implementation_Plan]].
+
 ## Later / not started
 
-- [ ] **S7–S11** — Hosting/security, public exposure, dogfood, second pilot, commercial launch. [[SaaS-Milestones]].
+- [ ] **S7–S11** — Hosting/security, public exposure, dogfood, second pilot, commercial launch. Product family (Core / MA / Sales / Beauty) is intended **before** production VPS. [[SaaS-Milestones]] sequence not rewritten yet.

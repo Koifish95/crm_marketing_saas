@@ -2,7 +2,7 @@
 type: decision
 status: current
 area: process
-updated: 2026-09-10
+updated: 2026-09-11
 tags:
   - adr
   - saas
@@ -22,6 +22,23 @@ Status: accepted | working decision | superseded
 Context: one or two sentences
 Decision: what we chose
 ```
+
+---
+
+## 2026-09-11 — CRM Core + vertical architecture
+
+Status: accepted
+
+Context: Scott approved CRM Core as shared infrastructure consumed by Martial Arts, Sales / Software, then Beauty. The repository is still a Martial Arts monolith plus a Martial Arts-only control plane. Prompt: [[wip/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]]. This does **not** authorize extraction, Sales, Beauty, or VPS work.
+
+Decision:
+
+- Full ADR: [[ADR-CRM-Core-Vertical-Architecture]]. Implementation plan: [[wip/CRM_Core_Extraction_Implementation_Plan]].
+- Core is not a sellable Generic CRM. Composition, not inheritance or forks. Separate product images. One-way dependency: Vertical → Core only.
+- Conservative Core membership and a promotion gate. Incremental Martial Arts extraction. Sales before Beauty, early enough to challenge Core.
+- Product family locally before production VPS. Do not start S7 on this ADR. Do not mark S6 Successful.
+
+Source: Scott 2026-09-11 (architecture discussion + planning prompt)
 
 ---
 

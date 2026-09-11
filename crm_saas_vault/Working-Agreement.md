@@ -2,7 +2,7 @@
 type: reference
 status: current
 area: process
-updated: 2026-09-10
+updated: 2026-09-11
 aliases:
   - How we work
   - Vault vs wip
@@ -78,15 +78,16 @@ Repository verification required
 
 ## Current next decision
 
-Official path: [[SaaS-Milestones]] Map B. S0–S5 are Successful. Official **S6** (Fleet Reliability) is **implemented, not Successful** until Scott’s browser/Docker pass. [[S6-Fleet-Runbook]]. [[wip/S6_Implementation_Status]].
+Official path: [[SaaS-Milestones]] Map B. S0–S5 are Successful. Official **S6** is implemented, **not Successful** until Scott’s browser/Docker pass. CRM Core + vertical architecture is **Accepted** ([[ADR-CRM-Core-Vertical-Architecture]]); extraction is **not started**. Plan: [[wip/CRM_Core_Extraction_Implementation_Plan]]. Do not extract Core or start Sales/Beauty/S7 unless Scott asks.
 
 **Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 
 ## What we do not do next
 
 - Mark S6 Successful unless Scott accepts the browser/Docker pass
+- Extract CRM Core, create Sales/Beauty apps, or move `martial_arts_template` until Scott authorizes C1 / Sprint 1
 - Start DNS / TLS / public hostnames (official S8)
-- Start VPS cutover, operator auth, or an image registry (official S7)
+- Start VPS cutover, operator auth, or an image registry (official S7) — product family locally first
 - Add `tenant_id` to the CRM
 - Start Stripe, self-service signup, or a beauty-variant design
 - Touch Koi-Pi PRODUCTION SQLite or `Projects/renzo_crm`
