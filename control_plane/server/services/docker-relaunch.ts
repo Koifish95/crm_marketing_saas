@@ -95,6 +95,22 @@ export function composeStopArgs(input: {
   return args
 }
 
+export function composeStartArgs(input: {
+  envFile: string
+  composeFile: string
+  composeProject?: string
+}) {
+  const args = ['compose', '--env-file', input.envFile, '-f', input.composeFile]
+  if (input.composeProject) {
+    args.push('-p', input.composeProject)
+  }
+  args.push('start', 'app')
+  if (args.some(part => FORBIDDEN.some(token => part === token || part.includes(token)))) {
+    throw new Error('Refusing a forbidden Docker argument.')
+  }
+  return args
+}
+
 export function composeArgs(input: {
   envFile: string
   composeFile: string
@@ -171,6 +187,33 @@ export function stopCommand(input: {
   }
 }
 
+export function startCommand(input: {
+  slug: string
+  composeFile: string
+  envFileLocal: string
+  envFileExample: string
+  composeProject?: string
+  root?: string
+  filesRoot?: string
+}) {
+  assertSafeRelaunch(input)
+  const root = input.root ?? templateRoot()
+  const envFile = resolveComposeEnvFile({
+    envFileLocal: input.envFileLocal,
+    envFileExample: input.envFileExample,
+    root,
+    filesRoot: input.filesRoot,
+  })
+  return {
+    cwd: root,
+    args: composeStartArgs({
+      envFile,
+      composeFile: input.composeFile,
+      composeProject: input.composeProject,
+    }),
+  }
+}
+
 export function decommissionCommand(input: {
   slug: string
   composeFile: string
@@ -240,6 +283,29 @@ export function stopRegisteredEnvironment(input: {
   })
   if (result.status !== 0) {
     throw new Error(result.stderr?.trim() || result.stdout?.trim() || 'Stop failed.')
+  }
+  return {
+    slug: input.slug,
+    args: command.args,
+    stdout: result.stdout,
+  }
+}
+
+export function startRegisteredEnvironment(input: {
+  slug: string
+  composeFile: string
+  envFileLocal: string
+  envFileExample: string
+  composeProject?: string
+}) {
+  const command = startCommand(input)
+  const result = spawnSync('docker', command.args, {
+    cwd: command.cwd,
+    encoding: 'utf8',
+    windowsHide: true,
+  })
+  if (result.status !== 0) {
+    throw new Error(result.stderr?.trim() || result.stdout?.trim() || 'Start failed.')
   }
   return {
     slug: input.slug,

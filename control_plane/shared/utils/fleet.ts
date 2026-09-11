@@ -183,6 +183,105 @@ export function findById<T extends { id: string }>(rows: readonly T[], id: strin
   return rows.find(row => row.id === id) ?? null
 }
 
+export function isBlockedLifecycle(lifecycleStatus?: string) {
+  return lifecycleStatus === 'decommissioned'
+    || lifecycleStatus === 'provisioning'
+    || lifecycleStatus === 'failed'
+}
+
+export function isStartableEnvironment(env: { status: CombinedStatus, lifecycleStatus?: string }) {
+  if (isBlockedLifecycle(env.lifecycleStatus)) {
+    return false
+  }
+  return env.status === 'stopped'
+}
+
+export function isStoppableEnvironment(env: { status: CombinedStatus, runtime?: string, lifecycleStatus?: string }) {
+  if (env.lifecycleStatus === 'decommissioned') {
+    return false
+  }
+  if (env.runtime === 'running') {
+    return true
+  }
+  return env.status === 'healthy' || env.status === 'unhealthy'
+}
+
+export type BulkLifecycleScope = 'selected' | 'all'
+export type BulkLifecycleOutcome = 'ok' | 'skipped' | 'failed'
+export type BulkLifecyclePlanItem = {
+  id: string
+  slug: string
+  outcome: 'run' | BulkLifecycleOutcome
+  message: string
+}
+
+export function planBulkLifecycle(input: {
+  action: 'start' | 'stop'
+  scope: BulkLifecycleScope
+  ids?: readonly string[]
+  environments: readonly FleetEnvironment[]
+}): BulkLifecyclePlanItem[] {
+  const eligible = input.action === 'start' ? isStartableEnvironment : isStoppableEnvironment
+  const verb = input.action === 'start' ? 'start' : 'stop'
+  if (input.scope === 'all') {
+    return input.environments
+      .filter(env => eligible(env))
+      .map(env => ({ id: env.id, slug: env.slug, outcome: 'run' as const, message: '' }))
+  }
+  const planned: BulkLifecyclePlanItem[] = []
+  for (const id of [...new Set(input.ids || [])]) {
+    const env = findById(input.environments, id)
+    if (!env) {
+      planned.push({ id, slug: id, outcome: 'failed', message: 'Environment not registered.' })
+      continue
+    }
+    if (env.lifecycleStatus === 'decommissioned') {
+      planned.push({
+        id,
+        slug: env.slug,
+        outcome: 'failed',
+        message: `Decommissioned environments cannot be ${verb === 'start' ? 'started' : 'stopped'}.`,
+      })
+      continue
+    }
+    if (!eligible(env)) {
+      planned.push({ id, slug: env.slug, outcome: 'skipped', message: `Not eligible to ${verb}.` })
+      continue
+    }
+    planned.push({ id, slug: env.slug, outcome: 'run', message: '' })
+  }
+  return planned
+}
+
+export function toggleVisibleSelection(
+  selected: readonly string[],
+  visibleIds: readonly string[],
+  checked: boolean,
+) {
+  const visible = new Set(visibleIds)
+  if (checked) {
+    return [...new Set([...selected, ...visibleIds])]
+  }
+  return selected.filter(id => !visible.has(id))
+}
+
+export function allVisibleSelected(selected: readonly string[], visibleIds: readonly string[]) {
+  return visibleIds.length > 0 && visibleIds.every(id => selected.includes(id))
+}
+
+export function formatBulkNotice(
+  action: 'start' | 'stop',
+  results: readonly { outcome: string, slug?: string, id?: string, message?: string }[],
+) {
+  const verb = action === 'start' ? 'started' : 'stopped'
+  const ok = results.filter(row => row.outcome === 'ok').length
+  const skipped = results.filter(row => row.outcome === 'skipped').length
+  const failed = results.filter(row => row.outcome === 'failed')
+  const first = failed[0]
+  const detail = first ? ` — ${first.slug || first.id}: ${first.message || 'failed'}` : ''
+  return `${ok} ${verb}, ${skipped} skipped, ${failed.length} failed${detail}`
+}
+
 export const FLEET_STATUS_KEY = 'fleet-status'
 export const FLEET_HEALTH_POLL_MS = 3000
 export const FLEET_HEALTH_POLL_ATTEMPTS = 20

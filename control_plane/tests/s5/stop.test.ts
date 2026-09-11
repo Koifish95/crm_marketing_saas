@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { combineStatus } from '../../server/services/health'
-import { relaunchCommand, stopCommand } from '../../server/services/docker-relaunch'
+import { relaunchCommand, startCommand, stopCommand } from '../../server/services/docker-relaunch'
 
 describe('environment stop contract', () => {
   it('targets one compose project and keeps the relaunch start path', () => {
@@ -18,6 +18,11 @@ describe('environment stop contract', () => {
     expect(stop.args).toContain('lab-acme-dev')
     expect(stop.args).not.toContain('lab-acme-prod')
     expect(stop.args.join(' ')).not.toMatch(/-v|prune|down|\brm\b/)
+    const start = startCommand(input)
+    expect(start.args.at(-2)).toBe('start')
+    expect(start.args.at(-1)).toBe('app')
+    expect(start.args.join(' ')).not.toMatch(/-v|prune|down|\brm\b|force-recreate/)
+    expect(start.args.join(' ')).not.toMatch(/sqlite|assets/)
     expect(relaunchCommand(input).args).toEqual(expect.arrayContaining(['up', '-d', '--force-recreate', '--no-deps', 'app']))
   })
 

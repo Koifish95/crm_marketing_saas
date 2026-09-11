@@ -1,5 +1,19 @@
 import { describe, expect, it } from 'vitest'
-import { filterByQuery, filterEnvironments, groupCustomers, groupNodes, summarizeFleet, worstStatus, type FleetEnvironment } from '../../shared/utils/fleet'
+import {
+  allVisibleSelected,
+  filterByQuery,
+  filterEnvironments,
+  formatBulkNotice,
+  groupCustomers,
+  groupNodes,
+  isStartableEnvironment,
+  isStoppableEnvironment,
+  planBulkLifecycle,
+  summarizeFleet,
+  toggleVisibleSelection,
+  worstStatus,
+  type FleetEnvironment,
+} from '../../shared/utils/fleet'
 
 function env(partial: Partial<FleetEnvironment> & Pick<FleetEnvironment, 'id' | 'status' | 'type'>): FleetEnvironment {
   return {
@@ -127,5 +141,118 @@ describe('fleet grouping', () => {
     expect(filterEnvironments(rows, '', 'DEV')).toHaveLength(6)
     expect(filterEnvironments(rows, 'Shop 11', '')).toHaveLength(1)
     expect(filterEnvironments(rows, 'missing', 'PROD')).toHaveLength(0)
+  })
+})
+
+describe('fleet lifecycle eligibility', () => {
+  it('starts only stopped registered rows and never missing, unknown, or retryable', () => {
+    expect(isStartableEnvironment(env({ id: 's', status: 'stopped', type: 'DEV', runtime: 'exited' }))).toBe(true)
+    expect(isStartableEnvironment(env({ id: 'h', status: 'healthy', type: 'PROD' }))).toBe(false)
+    expect(isStartableEnvironment(env({ id: 'm', status: 'missing', type: 'DEV', runtime: 'missing' }))).toBe(false)
+    expect(isStartableEnvironment(env({ id: 'u', status: 'unknown', type: 'DEV', runtime: 'unknown' }))).toBe(false)
+    expect(isStartableEnvironment(env({
+      id: 'd',
+      status: 'stopped',
+      type: 'DEV',
+      lifecycleStatus: 'decommissioned',
+    }))).toBe(false)
+    expect(isStartableEnvironment(env({
+      id: 'p',
+      status: 'stopped',
+      type: 'DEV',
+      lifecycleStatus: 'provisioning',
+    }))).toBe(false)
+    expect(isStartableEnvironment(env({
+      id: 'f',
+      status: 'stopped',
+      type: 'DEV',
+      lifecycleStatus: 'failed',
+    }))).toBe(false)
+  })
+
+  it('stops running healthy or unhealthy rows and skips stopped, missing, unknown, and decommissioned', () => {
+    expect(isStoppableEnvironment(env({ id: 'h', status: 'healthy', type: 'PROD', runtime: 'running' }))).toBe(true)
+    expect(isStoppableEnvironment(env({ id: 'u', status: 'unhealthy', type: 'DEV', runtime: 'running' }))).toBe(true)
+    expect(isStoppableEnvironment(env({ id: 's', status: 'stopped', type: 'DEV', runtime: 'exited' }))).toBe(false)
+    expect(isStoppableEnvironment(env({ id: 'm', status: 'missing', type: 'DEV', runtime: 'missing' }))).toBe(false)
+    expect(isStoppableEnvironment(env({ id: 'k', status: 'unknown', type: 'DEV', runtime: 'unknown' }))).toBe(false)
+    expect(isStoppableEnvironment(env({
+      id: 'd',
+      status: 'healthy',
+      type: 'PROD',
+      lifecycleStatus: 'decommissioned',
+    }))).toBe(false)
+  })
+})
+
+describe('environments selection', () => {
+  it('header-selects only currently visible ids and can uncheck just those', () => {
+    expect(toggleVisibleSelection(['hidden'], ['a', 'b'], true)).toEqual(['hidden', 'a', 'b'])
+    expect(toggleVisibleSelection(['hidden', 'a', 'b'], ['a', 'b'], false)).toEqual(['hidden'])
+    expect(allVisibleSelected(['a', 'b'], ['a', 'b'])).toBe(true)
+    expect(allVisibleSelected(['a'], ['a', 'b'])).toBe(false)
+    expect(allVisibleSelected([], [])).toBe(false)
+  })
+
+  it('does not keep invisible ids when the operator starts from an empty selection after a filter change', () => {
+    expect(toggleVisibleSelection([], ['visible-only'], true)).toEqual(['visible-only'])
+    expect(allVisibleSelected(['stale-hidden'], ['visible-only'])).toBe(false)
+  })
+})
+
+describe('bulk lifecycle plan', () => {
+  const rows = [
+    env({ id: 'run-start', status: 'stopped', type: 'DEV', slug: 'acme-dev', runtime: 'exited' }),
+    env({ id: 'run-stop', status: 'healthy', type: 'PROD', slug: 'acme-prod', runtime: 'running' }),
+    env({ id: 'missing', status: 'missing', type: 'DEV', slug: 'acme-missing', runtime: 'missing' }),
+    env({
+      id: 'gone',
+      status: 'stopped',
+      type: 'DEV',
+      slug: 'acme-gone',
+      lifecycleStatus: 'decommissioned',
+    }),
+  ]
+
+  it('Start All and Stop All use eligible registry rows, not a client id list', () => {
+    expect(planBulkLifecycle({
+      action: 'start',
+      scope: 'all',
+      ids: ['run-stop'],
+      environments: rows,
+    }).map(row => row.id)).toEqual(['run-start'])
+    expect(planBulkLifecycle({
+      action: 'stop',
+      scope: 'all',
+      ids: ['run-start'],
+      environments: rows,
+    }).map(row => row.id)).toEqual(['run-stop'])
+  })
+
+  it('selected ids stay selected-only; unknown ids fail without aborting the rest', () => {
+    const planned = planBulkLifecycle({
+      action: 'start',
+      scope: 'selected',
+      ids: ['missing-id', 'run-start', 'gone', 'run-stop'],
+      environments: rows,
+    })
+    expect(planned.map(row => [row.id, row.outcome])).toEqual([
+      ['missing-id', 'failed'],
+      ['run-start', 'run'],
+      ['gone', 'failed'],
+      ['run-stop', 'skipped'],
+    ])
+    expect(planned.find(row => row.id === 'missing-id')?.message).toMatch(/not registered/i)
+    expect(planned.find(row => row.id === 'gone')?.message).toMatch(/decommissioned/i)
+  })
+
+  it('formats a partial-result banner with the first failure', () => {
+    expect(formatBulkNotice('start', [
+      { outcome: 'ok', slug: 'acme-dev' },
+      { outcome: 'ok', slug: 'acme-uat' },
+      { outcome: 'ok', slug: 'acme-stage' },
+      { outcome: 'skipped', slug: 'acme-prod' },
+      { outcome: 'failed', slug: 'Acme BJJ DEV', message: 'container gone' },
+    ])).toBe('3 started, 1 skipped, 1 failed — Acme BJJ DEV: container gone')
   })
 })

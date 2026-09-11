@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { findById, pollFleetUntilHealthy, type FleetStatusResponse } from '~~/shared/utils/fleet'
+import { findById, isStartableEnvironment, isStoppableEnvironment, pollFleetUntilHealthy, type FleetStatusResponse } from '~~/shared/utils/fleet'
 import { formatBackupCreatedAt, formatBackupSize } from '~~/shared/utils/fleet-backup'
 import { ENVIRONMENT_TABS } from '~~/shared/utils/nav'
 import { isRetryableLifecycle } from '~~/shared/utils/provision'
@@ -16,6 +16,7 @@ const copying = ref(false)
 const revealing = ref(false)
 const upgrading = ref(false)
 const stopping = ref(false)
+const starting = ref(false)
 const confirmRestore = ref(false)
 const confirmStop = ref(false)
 const destinationDir = ref('')
@@ -26,12 +27,8 @@ const environmentId = computed(() => String(route.params.id || ''))
 const env = computed(() => findById(environments.value, environmentId.value))
 const decommissioned = computed(() => env.value?.lifecycleStatus === 'decommissioned')
 const retryable = computed(() => isRetryableLifecycle(env.value?.lifecycleStatus))
-const canStop = computed(() => Boolean(
-  env.value
-  && !decommissioned.value
-  && env.value.status !== 'stopped'
-  && env.value.status !== 'missing',
-))
+const canStop = computed(() => Boolean(env.value && isStoppableEnvironment(env.value)))
+const canStart = computed(() => Boolean(env.value && isStartableEnvironment(env.value)))
 
 useHead({
   title: computed(() => env.value
@@ -71,6 +68,38 @@ async function relaunch() {
   }
 }
 
+async function startEnvironment() {
+  if (!env.value || starting.value || !canStart.value) {
+    return
+  }
+  starting.value = true
+  actionError.value = ''
+  actionNotice.value = 'Starting this environment. Same volumes and identity. This is not Relaunch.'
+  try {
+    const result = await $fetch<FleetStatusResponse>(`/api/environments/${env.value.id}/start`, { method: 'POST' })
+    if (result.checkedAt && result.environments) {
+      applyStatus({ checkedAt: result.checkedAt, environments: result.environments })
+    }
+    if (env.value?.status !== 'healthy') {
+      actionNotice.value = 'Waiting for the app health check…'
+      const outcome = await pollFleetUntilHealthy({
+        isHealthy: () => findById(environments.value, environmentId.value)?.status === 'healthy',
+        refresh: refreshStatus,
+      })
+      if (outcome === 'timeout') {
+        actionNotice.value = 'Start finished, but health did not come up yet. Use Refresh to check again.'
+        return
+      }
+    }
+    actionNotice.value = `Start finished. Status is ${env.value?.status || 'unknown'}.`
+  } catch (error) {
+    actionNotice.value = ''
+    actionError.value = fetchMessage(error, 'Start failed.')
+  } finally {
+    starting.value = false
+  }
+}
+
 async function stopEnvironment() {
   if (!env.value || !confirmStop.value || stopping.value) {
     return
@@ -93,7 +122,7 @@ async function stopEnvironment() {
         return
       }
     }
-    actionNotice.value = 'Environment stopped. Persistent volumes stay. Use Relaunch to start it again.'
+    actionNotice.value = 'Environment stopped. Persistent volumes stay. Use Start to resume it.'
   } catch (error) {
     actionNotice.value = ''
     actionError.value = fetchMessage(error, 'Stop failed.')
@@ -404,12 +433,25 @@ async function decommission() {
           <dt>Off-host copy</dt>
           <dd>{{ env?.lastBackup?.offhostPath || 'not copied' }}</dd>
         </dl>
+        <div class="card">
+          <p>
+            Start resumes this registered environment with the same image, volumes, ports, and identity. It does not rebuild. Missing containers need Relaunch.
+          </p>
+          <button
+            type="button"
+            :disabled="starting || !canStart"
+            :aria-busy="starting"
+            @click="startEnvironment"
+          >
+            {{ starting ? 'Starting…' : 'Start' }}
+          </button>
+        </div>
         <form
           class="card"
           @submit.prevent="stopEnvironment"
         >
           <p>
-            Stop halts this environment’s process only. Volumes, backups, and identity stay. This is not Decommission. Use Relaunch to start it again.
+            Stop halts this environment’s process only. Volumes, backups, and identity stay. This is not Decommission. Use Start to resume it.
           </p>
           <label>
             <input
