@@ -10,12 +10,15 @@ import { environmentBackups } from '../../server/database/schema'
 import { listRegisteredEnvironments } from '../../server/services/registry'
 import {
   environmentBackupGuard,
+  existingBackupFileMessage,
   findSqliteFilename,
   fleetBackupFileName,
   fleetBackupReadme,
   fleetBackupRelativeDir,
   formatBackupCreatedAt,
+  formatBackupCreatedNotice,
   formatBackupSize,
+  formatOffhostCopyNotice,
   FLEET_BACKUP_README,
   FLEET_BACKUP_RETENTION_DAYS,
   prodUpgradeBlocked,
@@ -24,6 +27,8 @@ import {
 import { extractFleetBackupZip, extractedSqliteDir } from '../../server/services/fleet-backup-extract'
 import {
   assertRevealableZipPath,
+  assertZipPathAvailable,
+  copyEnvironmentBackupOffhost,
   FleetBackupError,
   isPathInsideBackupRoot,
   revealBackupCommand,
@@ -214,5 +219,117 @@ describe('S6 fleet backup contract', () => {
     expect(readme).toContain('Acme BJJ')
     expect(readme).toContain('lab-acme-dev')
     expect(readme).toContain('env-1')
+  })
+
+  it('formats operator backup and off-host copy notices', () => {
+    expect(existingBackupFileMessage('Backup', 'lab-acme_lab-acme-dev_2026-09-11_132246.zip'))
+      .toBe('Backup not created: a backup with this filename already exists.')
+    expect(existingBackupFileMessage('Off-host copy', 'lab-acme_lab-acme-dev_2026-09-11_132246.zip'))
+      .toBe('Off-host copy not created: a backup with this filename already exists.')
+    expect(formatBackupCreatedNotice({
+      zipPath: 'C:\\backups\\lab-acme_lab-acme-dev_2026-09-11_132246.zip',
+      createdAt: 'Sep 11, 2026, 1:22:46 PM MDT',
+    })).toBe('Backup created. lab-acme_lab-acme-dev_2026-09-11_132246.zip · Sep 11, 2026, 1:22:46 PM MDT · C:\\backups\\lab-acme_lab-acme-dev_2026-09-11_132246.zip')
+    expect(formatOffhostCopyNotice({
+      zipPath: 'C:\\backups\\lab-acme_lab-acme-dev_2026-09-11_132246.zip',
+      offhostPath: 'D:\\offhost\\lab-acme_lab-acme-dev_2026-09-11_132246.zip',
+    })).toBe('Off-host copy finished. lab-acme_lab-acme-dev_2026-09-11_132246.zip is at D:\\offhost\\lab-acme_lab-acme-dev_2026-09-11_132246.zip.')
+  })
+
+  it('keeps second-precision names and only appends milliseconds on collision', () => {
+    const createdAt = '2026-09-11T19:22:46.544Z'
+    expect(resolveFleetBackupFileName(
+      'lab-acme',
+      'lab-acme-dev',
+      createdAt,
+      'America/Denver',
+      () => false,
+    )).toBe('lab-acme_lab-acme-dev_2026-09-11_132246.zip')
+    expect(resolveFleetBackupFileName(
+      'lab-acme',
+      'lab-acme-dev',
+      createdAt,
+      'America/Denver',
+      name => name === 'lab-acme_lab-acme-dev_2026-09-11_132246.zip',
+    )).toBe('lab-acme_lab-acme-dev_2026-09-11_132246544.zip')
+  })
+
+  it('refuses backup when both second-precision and millisecond names exist', () => {
+    const root = join(tmpdir(), `fleet-backup-collide-${randomUUID()}`)
+    mkdirSync(root, { recursive: true })
+    const createdAt = '2026-09-11T19:22:46.544Z'
+    const second = join(root, fleetBackupFileName('lab-acme', 'lab-acme-dev', createdAt, 'America/Denver'))
+    const ms = join(root, fleetBackupFileName('lab-acme', 'lab-acme-dev', createdAt, 'America/Denver', true))
+    writeFileSync(second, 'first')
+    writeFileSync(ms, 'second')
+    const resolved = resolveFleetBackupFileName(
+      'lab-acme',
+      'lab-acme-dev',
+      createdAt,
+      'America/Denver',
+      name => name === 'lab-acme_lab-acme-dev_2026-09-11_132246.zip' || name === 'lab-acme_lab-acme-dev_2026-09-11_132246544.zip',
+    )
+    expect(resolved).toBe('lab-acme_lab-acme-dev_2026-09-11_132246544.zip')
+    try {
+      assertZipPathAvailable(join(root, resolved), 'Backup')
+      expect.unreachable()
+    } catch (error) {
+      expect(error).toBeInstanceOf(FleetBackupError)
+      expect((error as FleetBackupError).statusCode).toBe(409)
+      expect((error as FleetBackupError).message).toBe(
+        'Backup not created: a backup with this filename already exists.',
+      )
+    }
+    expect(readFileSync(second, 'utf8')).toBe('first')
+    expect(readFileSync(ms, 'utf8')).toBe('second')
+    rmSync(root, { recursive: true, force: true })
+  })
+
+  it('refuses a second off-host copy when the dest zip already exists', async () => {
+    const root = join(tmpdir(), `fleet-copy-${randomUUID()}`)
+    const dest = join(root, 'offhost')
+    mkdirSync(join(root, 'data', 'backups', 'lab-acme', 'lab-acme-dev'), { recursive: true })
+    mkdirSync(dest, { recursive: true })
+    const url = `file:${join(root, 'control-plane.sqlite').replaceAll('\\', '/')}`
+    await migrateDatabase(url)
+    await seedRegistry(url)
+    const { client, db } = createDb(url)
+    const rows = await listRegisteredEnvironments(db)
+    const dev = rows.find(row => row.slug === 'lab-acme-dev')
+    expect(dev).toBeTruthy()
+    const zipPath = join(root, 'data', 'backups', 'lab-acme', 'lab-acme-dev', 'lab-acme_lab-acme-dev_2026-09-11_132246.zip')
+    writeFileSync(zipPath, 'same-host-zip')
+    await db.insert(environmentBackups).values({
+      id: randomUUID(),
+      environmentId: dev!.id,
+      customerId: dev!.customer.id,
+      createdAt: '2026-09-11T19:22:46.544Z',
+      bytes: 13,
+      zipPath,
+      sqliteFilename: 'crm.sqlite',
+      offhostPath: null,
+      offhostCopiedAt: null,
+      previousExpectedImage: dev!.expectedImage,
+    })
+    const first = await copyEnvironmentBackupOffhost(db, dev!.id, dest)
+    expect(readFileSync(first.offhostPath!, 'utf8')).toBe('same-host-zip')
+    writeFileSync(first.offhostPath!, 'do-not-overwrite')
+    try {
+      await copyEnvironmentBackupOffhost(db, dev!.id, dest)
+      expect.unreachable()
+    } catch (error) {
+      expect(error).toBeInstanceOf(FleetBackupError)
+      expect((error as FleetBackupError).statusCode).toBe(409)
+      expect((error as FleetBackupError).message).toBe(
+        'Off-host copy not created: a backup with this filename already exists.',
+      )
+    }
+    expect(readFileSync(first.offhostPath!, 'utf8')).toBe('do-not-overwrite')
+    client.close()
+    try {
+      rmSync(root, { recursive: true, force: true })
+    } catch {
+      // sqlite unlock can lag on Windows
+    }
   })
 })

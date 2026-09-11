@@ -1,12 +1,13 @@
 import { randomUUID } from 'node:crypto'
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
-import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
+import { constants, copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { tmpdir } from 'node:os'
 import { and, desc, eq } from 'drizzle-orm'
 import type { Database } from '../database'
 import { environmentBackups, environments } from '../database/schema'
 import {
   environmentBackupGuard,
+  existingBackupFileMessage,
   fleetBackupRelativeDir,
   FLEET_BACKUP_RETENTION_DAYS,
   prodUpgradeBlocked,
@@ -39,6 +40,13 @@ function requireEnvironment(row: Awaited<ReturnType<typeof getRegisteredEnvironm
     throw new FleetBackupError(guard.statusMessage, guard.statusCode)
   }
   return row!
+}
+
+export function assertZipPathAvailable(zipPath: string, action: 'Backup' | 'Off-host copy') {
+  if (existsSync(zipPath)) {
+    throw new FleetBackupError(existingBackupFileMessage(action, basename(zipPath)), 409)
+  }
+  return zipPath
 }
 
 export async function listEnvironmentBackups(db: Database, environmentId: string) {
@@ -99,7 +107,7 @@ export async function backupRegisteredEnvironment(db: Database, id: string, file
     row.customer.timezone,
     name => existsSync(join(dir, name)),
   )
-  const zipPath = join(dir, zipName)
+  const zipPath = assertZipPathAvailable(join(dir, zipName), 'Backup')
   try {
     const written = await writeFleetBackupZip({
       zipPath,
@@ -151,8 +159,18 @@ export async function copyEnvironmentBackupOffhost(
   if (!dest || !existsSync(dest) || !statSync(dest).isDirectory()) {
     throw new FleetBackupError('Off-host destination folder does not exist.', 400)
   }
-  const target = join(dest, latest.zipPath.split(/[/\\]/).at(-1) || `${row.id}.zip`)
-  copyFileSync(latest.zipPath, target)
+  const target = assertZipPathAvailable(
+    join(dest, latest.zipPath.split(/[/\\]/).at(-1) || `${row.id}.zip`),
+    'Off-host copy',
+  )
+  try {
+    copyFileSync(latest.zipPath, target, constants.COPYFILE_EXCL)
+  } catch (error) {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'EEXIST') {
+      throw new FleetBackupError(existingBackupFileMessage('Off-host copy', basename(target)), 409)
+    }
+    throw error
+  }
   const copiedAt = new Date().toISOString()
   await db.update(environmentBackups)
     .set({ offhostPath: target, offhostCopiedAt: copiedAt })

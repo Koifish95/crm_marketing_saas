@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { findById, isStartableEnvironment, isStoppableEnvironment, pollFleetUntilHealthy, type FleetStatusResponse } from '~~/shared/utils/fleet'
-import { formatBackupCreatedAt, formatBackupSize } from '~~/shared/utils/fleet-backup'
+import {
+  formatBackupCreatedAt,
+  formatBackupCreatedNotice,
+  formatBackupSize,
+  formatOffhostCopyNotice,
+  type FleetBackupSummary,
+} from '~~/shared/utils/fleet-backup'
 import { ENVIRONMENT_TABS } from '~~/shared/utils/nav'
 import { isRetryableLifecycle } from '~~/shared/utils/provision'
 
@@ -149,16 +155,24 @@ async function retryProvision() {
 }
 
 async function backupEnvironment() {
-  if (!env.value) {
+  if (!env.value || backingUp.value) {
     return
   }
   backingUp.value = true
   actionError.value = ''
-  actionNotice.value = ''
+  actionNotice.value = 'Creating the same-host backup…'
   try {
-    await $fetch(`/api/environments/${env.value.id}/backup`, { method: 'POST' })
+    const result = await $fetch<{ backup: FleetBackupSummary }>(`/api/environments/${env.value.id}/backup`, {
+      method: 'POST',
+    })
     await refreshStatus()
+    const timezone = env.value.customer.timezone
+    actionNotice.value = formatBackupCreatedNotice({
+      zipPath: result.backup.zipPath,
+      createdAt: formatBackupCreatedAt(result.backup.createdAt, timezone),
+    })
   } catch (error) {
+    actionNotice.value = ''
     actionError.value = fetchMessage(error, 'Backup failed.')
   } finally {
     backingUp.value = false
@@ -186,19 +200,21 @@ async function revealBackup() {
 }
 
 async function copyOffhost() {
-  if (!env.value) {
+  if (!env.value || copying.value) {
     return
   }
   copying.value = true
   actionError.value = ''
-  actionNotice.value = ''
+  actionNotice.value = 'Copying the backup zip to the off-host folder…'
   try {
-    await $fetch(`/api/environments/${env.value.id}/backup/copy`, {
+    const result = await $fetch<{ backup: FleetBackupSummary }>(`/api/environments/${env.value.id}/backup/copy`, {
       method: 'POST',
       body: { destinationDir: destinationDir.value },
     })
     await refreshStatus()
+    actionNotice.value = formatOffhostCopyNotice(result.backup)
   } catch (error) {
+    actionNotice.value = ''
     actionError.value = fetchMessage(error, 'Off-host copy failed.')
   } finally {
     copying.value = false

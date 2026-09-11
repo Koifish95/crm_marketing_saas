@@ -105,6 +105,22 @@ function formatCompactBytes(bytes: number) {
   return `${trimZeros(mb.toFixed(mb >= 10 ? 0 : 1))} MB`
 }
 
+export function backupZipFileName(zipPath: string) {
+  return zipPath.split(/[/\\]/).pop() || zipPath
+}
+
+export function existingBackupFileMessage(action: 'Backup' | 'Off-host copy', _fileName?: string) {
+  return `${action} not created: a backup with this filename already exists.`
+}
+
+export function formatBackupCreatedNotice(backup: { zipPath: string, createdAt: string }) {
+  return `Backup created. ${backupZipFileName(backup.zipPath)} · ${backup.createdAt} · ${backup.zipPath}`
+}
+
+export function formatOffhostCopyNotice(backup: { zipPath: string, offhostPath?: string | null }) {
+  return `Off-host copy finished. ${backupZipFileName(backup.zipPath)} is at ${backup.offhostPath}.`
+}
+
 export function formatBackupSize(bytes: number) {
   const gb = bytes / 1e9
   const gbText = `${trimZeros(gb >= 0.01 ? gb.toFixed(3) : gb.toFixed(6))} GB`
