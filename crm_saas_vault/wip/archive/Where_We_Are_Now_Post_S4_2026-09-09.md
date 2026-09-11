@@ -1,6 +1,6 @@
 ---
 type: note
-status: current
+status: superseded
 area: process
 updated: 2026-09-09
 aliases:
@@ -14,6 +14,8 @@ tags:
 ---
 
 # Where we are now — post-S4 architecture and project-state handoff
+
+**Historical 2026-09-09 snapshot.** Current orientation: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]].
 
 Written 2026-09-09 from the repository, Git history, and current vault notes. This is a **reconciliation handoff** for Scott and ChatGPT before any milestone reorganization.
 

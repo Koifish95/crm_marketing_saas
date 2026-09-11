@@ -13,9 +13,9 @@ tags:
 
 Official S5 (Map B): Control Plane Productization / Operations Foundation. **Successful** (2026-09-10). Closeout: [[wip/S5_closeout]].
 
-Retry UI (continue/resume) is implemented. Owner browser/Docker pass accepted by Scott. Post-UI hardening: [[wip/Control_Plane_Post_Productization_Audit]].
+Retry UI (continue/resume) is implemented. Owner browser/Docker pass accepted by Scott. Post-UI hardening: [[wip/archive/Control_Plane_Post_Productization_Audit]].
 
-Related: [[SaaS-Milestones]], [[wip/post_S4_prompt]] (historical authorization), [[wip/S5_And_Beyond_Cursor_Prompt]] (spent leftovers), [[wip/Post_S4_Ten_Decisions]].
+Related: [[SaaS-Milestones]], [[wip/archive/post_S4_prompt]] (historical authorization), [[wip/archive/S5_And_Beyond_Cursor_Prompt]] (spent leftovers), [[wip/archive/Post_S4_Ten_Decisions]].
 
 ## Official roadmap
 

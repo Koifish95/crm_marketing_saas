@@ -60,7 +60,7 @@ Before changing code, read in order:
 8. `crm_saas_vault/Control-Plane.md`
 9. `crm_saas_vault/SaaS-ToDo.md`
 10. `crm_saas_vault/wip/answers.md` — S3.2, S3.3, S3.20, S3.28–S3.30 already Answered; do not re-ask
-11. `crm_saas_vault/wip/Renzo_to_Generic_Martial_Arts_Sanitization.md` — naming after S2
+11. `crm_saas_vault/wip/archive/Renzo_to_Generic_Martial_Arts_Sanitization.md` — naming after S2
 12. These implementation files (do not “audit the whole template”):
     - `martial_arts_template/scripts/lab-docker.mjs`
     - `martial_arts_template/docker-compose.lab-acme-prod.yml`
@@ -421,7 +421,7 @@ Never scan Docker and insert whatever is there.
 
 # 16. Suggested sprint plan (commit breakpoints)
 
-Follow Working-Agreement. Each sprint: do the work, QA, commit **only that sprint’s files**, push `working`, update `wip/S3_Implementation_Status.md`.
+Follow Working-Agreement. Each sprint: do the work, QA, commit **only that sprint’s files**, push `working`, update `wip/archive/S3_Implementation_Status.md`.
 
 Do not expand a sprint into CRM refactors or S4.
 
@@ -430,7 +430,7 @@ Do not expand a sprint into CRM refactors or S4.
 - Confirm git (`working`, origin).
 - Inspect only the files in §1.
 - Create `control_plane/` Nuxt skeleton, 127.0.0.1:52100, own gitignore for `data/`.
-- Create `crm_saas_vault/wip/S3_Implementation_Status.md` (stack, adapter, health, deviations).
+- Create `crm_saas_vault/wip/archive/S3_Implementation_Status.md` (stack, adapter, health, deviations).
 
 QA → commit → push.
 
@@ -480,7 +480,7 @@ QA → commit → push.
 ## Sprint 7 — Runbook + acceptance + closeout
 
 - Write `crm_saas_vault/S3-Control-Plane-Runbook.md`.
-- Finish `wip/S3_Implementation_Status.md` and `wip/S3_closeout.md` (same thoroughness as `wip/S2_closeout.md`).
+- Finish `wip/archive/S3_Implementation_Status.md` and `wip/S3_closeout.md` (same thoroughness as `wip/S2_closeout.md`).
 - Update `SaaS-Milestones.md`, `SaaS-ToDo.md`, `Control-Plane.md` if implementation clarifies architecture.
 - Add ADRs to `SaaS-Decisions.md` **only** for genuine new durable choices.
 - Mark S3 Successful only after the §18 live proof.
@@ -583,7 +583,7 @@ Do not promote lab ports or `m10a` names into SaaS law.
 
 **WIP**
 
-- Maintain `crm_saas_vault/wip/S3_Implementation_Status.md` every sprint.
+- Maintain `crm_saas_vault/wip/archive/S3_Implementation_Status.md` every sprint.
 - On Successful, write `crm_saas_vault/wip/S3_closeout.md` comparable to `wip/S2_closeout.md`: objective, starting state, architecture, data model, adapter, health, UI, registration, relaunch proof, QA, SHAs, lab-only assumptions, debt, S4 not started, criterion table.
 
 Distinguish: durable decisions vs S3 facts vs lab defaults vs deferred work.

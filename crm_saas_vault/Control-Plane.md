@@ -13,7 +13,7 @@ tags:
 
 # Control plane
 
-S3 and S4 **Successful**. Operator app: `control_plane/` at http://127.0.0.1:52100 — multi-page shell (Dashboard, Customers, Environments, Hosting Nodes, Settings). Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]] (`Customers → New customer`). Frontend status: [[wip/S5_Control_Plane_Productization_Status]]. Hardening audit: [[wip/Control_Plane_Post_Productization_Audit]]. Handoffs: [[wip/S3_closeout]], [[wip/S4_closeout]].
+S3 and S4 **Successful**. Operator app: `control_plane/` at http://127.0.0.1:52100 — multi-page shell (Dashboard, Customers, Environments, Hosting Nodes, Settings). Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]] (`Customers → New customer`). Current state: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]]. Historical frontend status: [[wip/archive/S5_Control_Plane_Productization_Status]]. Historical audit: [[wip/archive/Control_Plane_Post_Productization_Audit]]. Handoffs: [[wip/S3_closeout]], [[wip/S4_closeout]].
 
 It is not another customer admin page and not the platform owner's CRM.
 
@@ -46,7 +46,7 @@ which customers exist
 → provision a Martial Arts PROD+DEV pair (S4)
 ```
 
-Headlines still read “Acme BJJ · PROD · healthy,” not a container id. Indexes are tables. Workspaces can Refresh, Relaunch, add extra non-PROD, gated-decommission (volumes stay), and use the **Lifecycle** tab (backup, restore, off-host copy, upgrade — S6 implemented, not Successful). Configuration fields stay read-only. Current state: [[wip/Clean_Starting_Point_Current_State]].
+Headlines still read “Acme BJJ · PROD · healthy,” not a container id. Indexes are tables. Workspaces can Refresh, Relaunch, add extra non-PROD, gated-decommission (volumes stay), and use the **Lifecycle** tab (backup, restore, off-host copy, upgrade — S6 implemented, not Successful). Configuration fields stay read-only. Start / Stop / bulk start-stop are implemented on `/environments` (not Relaunch). Current state: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]].
 
 Laptop-only. Local Docker. Health on demand. Acme is seeded; new customers are provisioned. No Docker socket in CRM containers.
 

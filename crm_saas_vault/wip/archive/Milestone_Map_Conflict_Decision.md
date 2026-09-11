@@ -17,7 +17,7 @@ tags:
 **Purpose:** Clarify which roadmap is official so Cursor can be given a next milestone (or told to pause).  
 **Do not** treat this note as permission to implement remaining S5 gaps or S6.
 
-Authoritative “what exists in the repo” (not the map): [[wip/Clean_Starting_Point_Current_State]].  
+Authoritative “what exists in the repo” (not the map): [[wip/archive/Clean_Starting_Point_Current_State]].  
 Open decision list: [[wip/Clean_Starting_Point_Decision_Backlog]] (**IMM-01** is this question).  
 Repo: `crm_marketing_saas`, branch `working` (not `main`). Remote: https://github.com/Koifish95/crm_marketing_saas.git.
 
@@ -41,11 +41,11 @@ Three different stories are all still “current” in the vault:
    [[Working-Agreement]] still says: next implementation is S5 only when Scott asks — and that S5 means hostnames.
 
 2. **Provisional 2026-09-09 remap** — S5 = control-plane productization, S6 = fleet reliability, S8 = public URLs, launch deferred into later S-numbers.  
-   Written in [[wip/post_S4_prompt]]. Copied into [[SaaS-Milestones]] as “Tentative roadmap (pending owner decisions).”  
+   Written in [[wip/archive/post_S4_prompt]]. Copied into [[SaaS-Milestones]] as “Tentative roadmap (pending owner decisions).”  
    That prompt **explicitly** said: do not erase the prior roadmap until the replacement is formally approved.
 
 3. **2026-09-09 evening overlay (ten decisions)** — not a third full map. It changed a few forks: extras/decommission now; launch = first customer on a VPS; SI is laptop test data until then; no DNS yet; no backup work before VPS cutover.  
-   Recorded in [[wip/Post_S4_Ten_Decisions]] and accepted in [[SaaS-Decisions]]. Code followed this overlay.
+   Recorded in [[wip/archive/Post_S4_Ten_Decisions]] and accepted in [[SaaS-Decisions]]. Code followed this overlay.
 
 The **2026-09-10 clean-start notes** are later still. They documented the collision and **refused** to pick a winner or rewrite the milestone file. They said: Scott reviews this baseline before any new platform milestone.
 
@@ -59,13 +59,13 @@ So the newest *writing* did not resolve the newest *remap*. The remap is later t
 |---|---|---|
 | 2026-09-08 | [[SaaS-Milestones]] recorded S0–S8. S5 Successful = staff hit a **hostname**, real password, run CRM. S8 Successful = first external academy live = **launched**. | **Approved Successful path** |
 | 2026-09-09 | S2, S3, S4 closed Successful (laptop proofs). Historical S5–S8 remain “Not started.” | Approved path unchanged |
-| 2026-09-09 | [[wip/post_S4_prompt]]: “We are reorganizing the post-S4 roadmap.” Tentative S5–S11. Inventory ([[wip/Post_S4_Foundation_Decision_Inventory]]) not fully resolved. Development may continue only on tentative-S5 operator UI. | **Newer remap, explicitly not approved yet** |
+| 2026-09-09 | [[wip/archive/post_S4_prompt]]: “We are reorganizing the post-S4 roadmap.” Tentative S5–S11. Inventory ([[wip/archive/Post_S4_Foundation_Decision_Inventory]]) not fully resolved. Development may continue only on tentative-S5 operator UI. | **Newer remap, explicitly not approved yet** |
 | 2026-09-09 | Operator shell shipped (Dashboard / Customers / Environments / Nodes / Settings). Tentative S5 first slice. **Do not mark Successful.** | Code ahead of historical S5 |
-| 2026-09-09 evening | Scott answers ten forks. Leftover prompt [[wip/S5_And_Beyond_Cursor_Prompt]]. Missing status, one-PROD API, extra non-PROD, gated decommission. | Overlay on the remap; leftovers **spent** |
+| 2026-09-09 evening | Scott answers ten forks. Leftover prompt [[wip/archive/S5_And_Beyond_Cursor_Prompt]]. Missing status, one-PROD API, extra non-PROD, gated decommission. | Overlay on the remap; leftovers **spent** |
 | 2026-09-10 | Clean starting point (current state + 22-decision backlog + return). Tiny runbook/ToDo fixes. **Map not rewritten.** | Latest audit; IMM-01 left open |
 
 Approximate leftover commits on `working` (implementation, not the map):  
-`f61bcdf` / `5c32a8f` / `a3b9efe` (operator shell), `f1fb22f` (missing + one PROD), `520cbe8` (extra non-PROD), `cfe47a9` (decommission), `592a137` / `18a1c0f` (notes). Clean-start handoff later (`1cc99fe` / SHA note in [[wip/Clean_Starting_Point_Return]]).
+`f61bcdf` / `5c32a8f` / `a3b9efe` (operator shell), `f1fb22f` (missing + one PROD), `520cbe8` (extra non-PROD), `cfe47a9` (decommission), `592a137` / `18a1c0f` (notes). Clean-start handoff later (`1cc99fe` / SHA note in [[wip/archive/Clean_Starting_Point_Return]]).
 
 `main` is still the first commit only. Do not plan from `main`.
 
@@ -97,7 +97,7 @@ Along the way (old text): extras UI was “S6, not S4”; image registry if a se
 
 **S8 Successful:** Real academy that is not Renzo Kaysville, reachable, backed up, on the CP, relaunchable. Did not copy Renzo’s database. **This milestone is launched** on this map.
 
-### Map B — Tentative remap (2026-09-09 [[wip/post_S4_prompt]])
+### Map B — Tentative remap (2026-09-09 [[wip/archive/post_S4_prompt]])
 
 ```text
 S0–S4                                 Completed (same laptop proofs)
@@ -127,7 +127,7 @@ Same IDs **S5–S8** mean **different work** than Map A.
 
 ## 5. Overlay that already changed some forks (ten decisions, 2026-09-09)
 
-Accepted in [[SaaS-Decisions]]. Full answers: [[wip/Post_S4_Ten_Decisions]].
+Accepted in [[SaaS-Decisions]]. Full answers: [[wip/archive/Post_S4_Ten_Decisions]].
 
 | Topic | Decision |
 |---|---|
@@ -167,7 +167,7 @@ Laptop lab. Control plane: http://127.0.0.1:52100 (`control_plane/`). CRM image:
 
 **Not fully re-verified 2026-09-10:** live Docker inspect; official browser click-through of extras/decommission. Still Beauty, LLC was seen on the laptop fleet in an earlier QA pass — undocumented lab row, **not** a Beauty/sister decision.
 
-The leftover prompt [[wip/S5_And_Beyond_Cursor_Prompt]] is **spent**. Some lines in it are already stale (e.g. it still said missing maps to stopped when written). Do not re-run it as if open.
+The leftover prompt [[wip/archive/S5_And_Beyond_Cursor_Prompt]] is **spent**. Some lines in it are already stale (e.g. it still said missing maps to stopped when written). Do not re-run it as if open.
 
 ---
 
@@ -183,7 +183,7 @@ The leftover prompt [[wip/S5_And_Beyond_Cursor_Prompt]] is **spent**. Some lines
 
 5. **Working-Agreement vs remap.** Agreement still: do not start hostname S5 unless Scott asks. Remap’s next *implementation* after the operator slice is fleet reliability, not DNS.
 
-6. **[[wip/post_S4_prompt]] never finished its own job.** It authorized UI while the 85-item inventory stayed unresolved, and it forbade deleting Map A until a formal approval that never came.
+6. **[[wip/archive/post_S4_prompt]] never finished its own job.** It authorized UI while the 85-item inventory stayed unresolved, and it forbade deleting Map A until a formal approval that never came.
 
 7. **Path / branch noise (minor).** Notes often say `C:\Users\Scoy9\Projects\...`; clean-start recorded actual checkout `Desktop\Projects\...`. Product branch is `working`, not `main`.
 

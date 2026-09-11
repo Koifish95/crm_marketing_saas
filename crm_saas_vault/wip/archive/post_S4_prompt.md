@@ -2,7 +2,7 @@ We are reorganizing the post-S4 roadmap.
 
 Scott and ChatGPT are currently working through:
 
-`crm_saas_vault/wip/Post_S4_Foundation_Decision_Inventory.md`
+`crm_saas_vault/wip/archive/Post_S4_Foundation_Decision_Inventory.md`
 
 That decision inventory is NOT fully resolved yet.
 
@@ -490,7 +490,7 @@ Clearly distinguish browser-tested behavior from API/unit-tested behavior.
 
 Create:
 
-`crm_saas_vault/wip/S5_Control_Plane_Productization_Status.md`
+`crm_saas_vault/wip/archive/S5_Control_Plane_Productization_Status.md`
 
 Record:
 
@@ -545,7 +545,7 @@ At completion, return a concise chat summary with:
 - commit SHAs;
 - push status;
 - unresolved owner decisions encountered;
-- path to `crm_saas_vault/wip/S5_Control_Plane_Productization_Status.md`.
+- path to `crm_saas_vault/wip/archive/S5_Control_Plane_Productization_Status.md`.
 
 The detailed implementation report belongs in the Markdown file.
 

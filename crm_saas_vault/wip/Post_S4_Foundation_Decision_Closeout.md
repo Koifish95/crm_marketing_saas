@@ -13,7 +13,7 @@ tags:
 
 Scott resolved IMM-01–04 and the dual-map conflict on 2026-09-10. This note records that documentation pass. Official S5 later became **Successful** the same day — see [[wip/S5_closeout]].
 
-ADR: [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]]. Briefing that was answered: [[wip/Milestone_Map_Conflict_Decision]].
+ADR: [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]]. Briefing that was answered: [[wip/archive/Milestone_Map_Conflict_Decision]].
 
 ## Decisions accepted
 
@@ -34,9 +34,9 @@ ADR: [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]]. Br
 - [[Working-Agreement]] — next decision / do-not-start
 - [[SaaS-ToDo]] — official S5 gaps; S6+ later
 - [[wip/Clean_Starting_Point_Decision_Backlog]] — IMM-01–04 resolved
-- [[Home]], [[Control-Plane]], [[wip/S5_Control_Plane_Productization_Status]], [[wip/Milestone_Map_Conflict_Decision]], [[wip/_index]] — live “next S5” wording aligned
+- [[Home]], [[Control-Plane]], [[wip/archive/S5_Control_Plane_Productization_Status]], [[wip/archive/Milestone_Map_Conflict_Decision]], [[wip/_index]] — live “next S5” wording aligned
 
-Not rewritten (evidence): `wip/S2_closeout`, `wip/S3_closeout`, `wip/S4_closeout`, `wip/post_S4_prompt`.
+Not rewritten (evidence): `wip/S2_closeout`, `wip/S3_closeout`, `wip/S4_closeout`, `wip/archive/post_S4_prompt`.
 
 ## New official roadmap
 

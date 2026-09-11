@@ -11,7 +11,7 @@ tags:
 
 # S5 and beyond — Cursor prompt
 
-Authority: Scott’s answers in [[wip/Post_S4_Ten_Decisions]] plus Q4 checkboxes (one PROD, extra non-PROD now, decommission before VPS launch). Catalog: [[wip/Post_S4_Foundation_Decision_Inventory]]. Do not re-litigate operator-shell items 1–10.
+Authority: Scott’s answers in [[wip/archive/Post_S4_Ten_Decisions]] plus Q4 checkboxes (one PROD, extra non-PROD now, decommission before VPS launch). Catalog: [[wip/archive/Post_S4_Foundation_Decision_Inventory]]. Do not re-litigate operator-shell items 1–10.
 
 **Do not mark tentative S5 Successful** because leftovers or extras ship. Historical S5 (hostname/TLS) is still unset. Launch = first customer on the VPS.
 

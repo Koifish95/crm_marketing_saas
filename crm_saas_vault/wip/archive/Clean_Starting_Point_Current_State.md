@@ -1,6 +1,6 @@
 ---
 type: note
-status: current
+status: superseded
 area: process
 updated: 2026-09-10
 aliases:
@@ -14,13 +14,15 @@ tags:
 
 # Clean starting point — current state
 
+**Historical 2026-09-10 snapshot.** Do not treat this file as current law. Fresh-agent orientation: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]].
+
 Written 2026-09-10 from the repository, Git history, and vault notes on branch `working` at `18a1c0f` (pre-this-handoff tip). This remains the **architecture / “what exists”** baseline.
 
 **Map update (same day, later):** IMM-01–04 are resolved. Official post-S4 path is Map B. Official S5 is **Successful** ([[wip/S5_closeout]]). See [[wip/Post_S4_Foundation_Decision_Closeout]] and [[SaaS-Milestones]]. Sections below that still say the map was not rewritten, that both S5s are live law, or that S5 is not Successful are **historical to this audit**.
 
-It did **not** implement a new milestone. Related: [[wip/Clean_Starting_Point_Decision_Backlog]], [[wip/Clean_Starting_Point_Return]].
+It did **not** implement a new milestone. Related: [[wip/Clean_Starting_Point_Decision_Backlog]], [[wip/archive/Clean_Starting_Point_Return]].
 
-Older post-S4 handoff [[wip/Where_We_Are_Now_Post_S4_2026-09-09]] is **Superseded** for current UI/ops claims. Keep it as historical evidence of the pre-productization laptop state.
+Older post-S4 handoff [[wip/archive/Where_We_Are_Now_Post_S4_2026-09-09]] is **Superseded** for current UI/ops claims. Keep it as historical evidence of the pre-productization laptop state.
 
 ## How to read labels
 
@@ -786,10 +788,10 @@ Beauty extraction and shared CRM core; extra-env commercial pricing; billing pro
 
 | Document | Recommendation |
 |---|---|
-| [[wip/Where_We_Are_Now_Post_S4_2026-09-09]] | **Superseded** by this file. Keep historical |
-| [[wip/S5_Control_Plane_Productization_Status]] | Still useful for sprint SHAs; leftover “still to do” extras/decommission are **Superseded** |
-| [[wip/Control_Plane_Post_Productization_Audit]] | Historical QA evidence; extras/decommission listed as deferred — **Superseded** |
-| [[wip/S5_And_Beyond_Cursor_Prompt]] | Leftover sprints shipped; do not re-run as if open |
+| [[wip/archive/Where_We_Are_Now_Post_S4_2026-09-09]] | **Superseded** by this file. Keep historical |
+| [[wip/archive/S5_Control_Plane_Productization_Status]] | Still useful for sprint SHAs; leftover “still to do” extras/decommission are **Superseded** |
+| [[wip/archive/Control_Plane_Post_Productization_Audit]] | Historical QA evidence; extras/decommission listed as deferred — **Superseded** |
+| [[wip/archive/S5_And_Beyond_Cursor_Prompt]] | Leftover sprints shipped; do not re-run as if open |
 | [[SaaS-Milestones]] S3 “S4 is not started”; dual S5 tables | Stay historical until Scott/ChatGPT reorganize; do not rewrite Successful text here |
 | [[S3-Control-Plane-Runbook]] SI/sister/decommission exclusions | Update or mark superseded by this file |
 | [[S4-Provision-Runbook]] “No extra-environment button” | Tiny correction applied with this handoff |

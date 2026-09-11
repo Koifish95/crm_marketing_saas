@@ -65,7 +65,7 @@ Official line still requires Docker + isolated volumes. Checkbox **unchecked**.
 ## Morning confirms
 
 1. Accept Nitro + `data/lab-acme-*` as S2 Successful, **or** require a Docker volume pass before ticking the box.
-2. Leftover uncommitted S1 vault files still in the tree: `Control-Plane.md`, `Conventions.md`, `SaaS-Decisions.md`, `Working-Agreement.md`, `wip/answers.md`, `wip/SaaS_S0-S8_Discovery_Questions_2026-09-08.md`. Not part of these sprints.
+2. Leftover uncommitted S1 vault files still in the tree: `Control-Plane.md`, `Conventions.md`, `SaaS-Decisions.md`, `Working-Agreement.md`, `wip/answers.md`, `wip/archive/SaaS_S0-S8_Discovery_Questions_2026-09-08.md`. Not part of these sprints.
 3. Do not start S3 until Scott asks.
 4. Lab processes may still be listening on 52040/52050; stop them if the laptop should be idle.
 

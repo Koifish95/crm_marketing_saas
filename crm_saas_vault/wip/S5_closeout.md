@@ -18,7 +18,7 @@ Definitive record of Milestone **S5 — Control Plane Productization / Operation
 
 **S6 was not started.**
 
-Related: [[SaaS-Milestones]], [[Control-Plane]], [[wip/S5_Control_Plane_Productization_Status]], [[SaaS-Decisions#2026-09-10 — Official S5 is Successful]].
+Related: [[SaaS-Milestones]], [[Control-Plane]], [[wip/archive/S5_Control_Plane_Productization_Status]], [[SaaS-Decisions#2026-09-10 — Official S5 is Successful]].
 
 ## 1. Successful
 

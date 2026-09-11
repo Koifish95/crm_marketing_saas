@@ -1,6 +1,6 @@
 ---
 type: note
-status: current
+status: superseded
 area: process
 updated: 2026-09-10
 tags:
@@ -11,11 +11,13 @@ tags:
 
 # Clean starting point — execution return
 
+**Historical.** Current orientation: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]].
+
 Reconciliation executed 2026-09-10 on branch `working`. No new feature milestone was started.
 
 ## Files created
 
-- [[wip/Clean_Starting_Point_Current_State]]
+- [[wip/archive/Clean_Starting_Point_Current_State]]
 - [[wip/Clean_Starting_Point_Decision_Backlog]]
 - this note
 
@@ -47,7 +49,7 @@ Read-only Docker inspect was **not** performed this session (tooling blocked). L
 ## Major contradictions found
 
 - Dual S5 definitions (hostname/TLS vs control-plane productization)
-- [[wip/Where_We_Are_Now_Post_S4_2026-09-09]] still describes a single-page form+cards CP — **superseded**
+- [[wip/archive/Where_We_Are_Now_Post_S4_2026-09-09]] still describes a single-page form+cards CP — **superseded**
 - Runbooks/ToDo still said extras/decommission were future after they shipped
 - S2 Successful text says admin login is not `setup`; later ADRs use `setup` + force-change for **new** S4 envs
 - `main` is not the product branch

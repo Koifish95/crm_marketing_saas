@@ -78,7 +78,7 @@ Repository verification required
 
 ## Current next decision
 
-Official path: [[SaaS-Milestones]] Map B. S0–S5 are Successful. Official **S6** is implemented, **not Successful** until Scott’s browser/Docker pass. CRM Core + vertical architecture is **Accepted**. D1–D4 are **accepted**. **C1 is code-shipped** ([[wip/C1_CRM_Core_Architecture_Return]]). Do not start Sales, Beauty, C2, D1 CP schema, or S7 unless Scott asks.
+Orientation: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]]. Official path: [[SaaS-Milestones]] Map B. S0–S5 are Successful. Official **S6** is implemented, **not Successful** until Scott’s browser/Docker pass. CRM Core + vertical architecture is **Accepted**. D1–D4 are **accepted**. **C1 is code-shipped** ([[wip/C1_CRM_Core_Architecture_Return]]). **No new implementation is authorized.** Await Scott. Do not start Sales, Beauty, C2, D1 CP schema, or S7 unless Scott asks.
 
 **Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 

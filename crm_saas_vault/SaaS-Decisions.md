@@ -48,7 +48,7 @@ Source: Scott 2026-09-11
 
 Status: accepted
 
-Context: Scott approved CRM Core as shared infrastructure consumed by Martial Arts, Sales / Software, then Beauty. The repository is still a Martial Arts monolith plus a Martial Arts-only control plane. Prompt: [[wip/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]]. This does **not** authorize extraction, Sales, Beauty, or VPS work.
+Context: Scott approved CRM Core as shared infrastructure consumed by Martial Arts, Sales / Software, then Beauty. The repository is still a Martial Arts monolith plus a Martial Arts-only control plane. Prompt: [[wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]]. This does **not** authorize extraction, Sales, Beauty, or VPS work.
 
 Decision:
 
@@ -65,7 +65,7 @@ Source: Scott 2026-09-11 (architecture discussion + planning prompt)
 
 Status: working decision
 
-Context: Official S6 is authorized. NEAR-01–03 were still unset. Prompt: [[wip/S6_Fleet_Reliability_Cursor_Prompt]]. This does **not** mark S6 Successful.
+Context: Official S6 is authorized. NEAR-01–03 were still unset. Prompt: [[wip/archive/S6_Fleet_Reliability_Cursor_Prompt]]. This does **not** mark S6 Successful.
 
 Decision:
 
@@ -98,7 +98,7 @@ Source: Scott 2026-09-10
 
 Status: accepted
 
-Context: Two S5 definitions sat in [[SaaS-Milestones]] after the 2026-09-09 remap was labeled provisional. Scott resolved IMM-01–04. Briefing: [[wip/Milestone_Map_Conflict_Decision]]. Closeout: [[wip/Post_S4_Foundation_Decision_Closeout]].
+Context: Two S5 definitions sat in [[SaaS-Milestones]] after the 2026-09-09 remap was labeled provisional. Scott resolved IMM-01–04. Briefing: [[wip/archive/Milestone_Map_Conflict_Decision]]. Closeout: [[wip/Post_S4_Foundation_Decision_Closeout]].
 
 Decision:
 
@@ -121,7 +121,7 @@ Source: Scott 2026-09-10
 
 Status: accepted
 
-Context: Scott answered the high-leverage post-S4 forks. Full text: [[wip/Post_S4_Ten_Decisions]]. Prompt: [[wip/S5_And_Beyond_Cursor_Prompt]].
+Context: Scott answered the high-leverage post-S4 forks. Full text: [[wip/archive/Post_S4_Ten_Decisions]]. Prompt: [[wip/archive/S5_And_Beyond_Cursor_Prompt]].
 
 Decision:
 
@@ -217,7 +217,7 @@ Decision:
 
 S3 Successful remains: human-readable environments, container running **and** `/api/health`, relaunch without `-v`. Not in S3: create/provision, domains, billing, ThePond replacement.
 
-Source: Scott 2026-09-09; [[wip/answers]] S3.2, S3.3, S3.20, S3.28–S3.30
+Source: Scott 2026-09-09; [[wip/archive/SaaS_S0-S8_Discovery_Answers]] S3.2, S3.3, S3.20, S3.28–S3.30
 
 ---
 
@@ -238,7 +238,7 @@ Decision:
 - **USD only** through S8.
 - **Household** is a Martial Arts template concept, not Platform core.
 
-Source: Scott 2026-09-09; [[wip/answers]]
+Source: Scott 2026-09-09; [[wip/archive/SaaS_S0-S8_Discovery_Answers]]
 
 ---
 
@@ -276,7 +276,7 @@ Source: 2026-09-09 acceptance; later closeout naming
 
 Status: accepted
 
-Context: S1 discovery questions in [[wip/answers]] were resolved. Scott accepted the remaining S1 answers as hard decisions. This records the environment unit so [[Control-Plane]] v1 has a concrete object to list and relaunch.
+Context: S1 discovery questions in [[wip/archive/SaaS_S0-S8_Discovery_Answers]] were resolved. Scott accepted the remaining S1 answers as hard decisions. This records the environment unit so [[Control-Plane]] v1 has a concrete object to list and relaunch.
 
 Decision:
 
@@ -290,7 +290,7 @@ Decision:
 
 S1 is **Successful**. Do not begin S2 implementation from this decision.
 
-Source: Scott 2026-09-08; [[wip/SaaS_S0-S8_Discovery_Questions_2026-09-08]]; [[wip/answers]]
+Source: Scott 2026-09-08; [[wip/archive/SaaS_S0-S8_Discovery_Questions_2026-09-08]]; [[wip/archive/SaaS_S0-S8_Discovery_Answers]]
 
 ---
 

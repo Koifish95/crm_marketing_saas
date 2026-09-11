@@ -37,8 +37,8 @@ Related evidence (do not treat as the map):
 - Overnight host-process proof: [[wip/archive/S2_Overnight_Status]], [[wip/archive/S2_Sprint4_Coexist_Evidence]]
 - Official Docker proof (original names): [[wip/archive/S2_Docker_Coexist_Evidence]]
 - Seed / brand audit: [[wip/archive/S2_Renzo_Hardcode_Audit]]
-- Later naming + `/trial` hide: [[wip/Renzo_to_Generic_Martial_Arts_Sanitization]]
-- Discovery answers: [[wip/answers]]
+- Later naming + `/trial` hide: [[wip/archive/Renzo_to_Generic_Martial_Arts_Sanitization]]
+- Discovery answers: [[wip/archive/SaaS_S0-S8_Discovery_Answers]]
 - Durable ADRs: [[SaaS-Decisions]]
 - Status map: [[SaaS-Milestones]]
 
@@ -60,7 +60,7 @@ From [[SaaS-Milestones]] S2 (locked as the acceptance name):
 
 ### Discovery acceptance (S2.43–S2.50)
 
-From [[wip/answers]] — all must become yes:
+From [[wip/archive/SaaS_S0-S8_Discovery_Answers]] — all must become yes:
 
 | ID | Criterion |
 |---|---|
@@ -134,7 +134,7 @@ Laptop leftover volumes named `renzo-prod-*` / `renzo-stage-*` / `renzo-dev-*` m
 
 ### Discovery posture
 
-[[wip/answers]] S2 questions were mostly recommendations until 2026-09-09. S2 implementation started from the overnight plan + [[wip/archive/S2_Renzo_Hardcode_Audit]], not from a finished product ADR. Scott’s remaining product answers were promoted **after** Successful, in the pre-S3 closeout.
+[[wip/archive/SaaS_S0-S8_Discovery_Answers]] S2 questions were mostly recommendations until 2026-09-09. S2 implementation started from the overnight plan + [[wip/archive/S2_Renzo_Hardcode_Audit]], not from a finished product ADR. Scott’s remaining product answers were promoted **after** Successful, in the pre-S3 closeout.
 
 ---
 
@@ -321,7 +321,7 @@ After `pnpm db:setup` on an **empty** sqlite with `NUXT_AUTH_PASSWORD` set:
 |---|---|
 | Programs | Adult BJJ + Kids BJJ active; Striking + Wrestling inactive seasonal |
 | Lead sources | Instagram, Facebook, Walk-in, Referral, Website, Phone, Other |
-| Lost reasons | Not interested, Price, Schedule, Location, No response, Joined another gym, Not ready, Other. [[wip/answers]] S2.18 said “Joined another gym” was not required; seed still includes it. |
+| Lost reasons | Not interested, Price, Schedule, Location, No response, Joined another gym, Not ready, Other. [[wip/archive/SaaS_S0-S8_Discovery_Answers]] S2.18 said “Joined another gym” was not required; seed still includes it. |
 | Offerings / household prices | Empty |
 | Intro availability | Empty (`intro-seed.ts` not called) |
 | Campaigns / events | None |
@@ -556,7 +556,7 @@ Renzo-**derived names** *were* used in the original proof image (`renzo-acquisit
 
 ## 16. Later cleanup: Renzo → generic Martial Arts sanitization
 
-**Layer 4. After S2 Successful.** Commit `6c2ac38` (2026-09-09). Artifact: [[wip/Renzo_to_Generic_Martial_Arts_Sanitization]].
+**Layer 4. After S2 Successful.** Commit `6c2ac38` (2026-09-09). Artifact: [[wip/archive/Renzo_to_Generic_Martial_Arts_Sanitization]].
 
 This pass did **not** reopen S2 and did **not** start S3.
 
@@ -666,7 +666,7 @@ Labs recreated onto **existing** `lab-acme-*` volumes (no `-v`, no prune). Image
 |---|---|
 | `martial_arts_template/server/api/public/trial-status.get.ts` | `{ published }` |
 | `martial_arts_template/tests/s2/public-trial-visibility.test.ts` | Empty vs published vs disabled |
-| `crm_saas_vault/wip/Renzo_to_Generic_Martial_Arts_Sanitization.md` | Naming / boundary artifact |
+| `crm_saas_vault/wip/archive/Renzo_to_Generic_Martial_Arts_Sanitization.md` | Naming / boundary artifact |
 | `crm_saas_vault/wip/archive/` | Former `crm_saas_vault/archive/` plus finished WIP |
 
 ### Materially changed (S2 and/or closeout)
@@ -790,7 +790,7 @@ These were convenient for the laptop proof. They are **not** platform law.
 - Lab Compose still uses `crm.sqlite` inside the volume while the template default is `app.sqlite`
 - Isolation keys still say `m10a`
 - `Implementation-State.md` and several Renzo evidence notes still describe the gym implementation, not this SaaS map
-- [[wip/answers]] “Suggested next action” still tells a reviewer to stop before S2 — stale inbox text
+- [[wip/archive/SaaS_S0-S8_Discovery_Answers]] “Suggested next action” still tells a reviewer to stop before S2 — stale inbox text
 - `AGENTS.md` still mentions public `/trial` as a default staff-doc path; runtime now 404s until availability is published
 - Lost-reason seed includes `JOINED_ELSEWHERE` (“Joined another gym”) even though S2.18 said that row was not required
 - No browser QA of `/trial` hide
@@ -914,7 +914,7 @@ Current operator image: `martial-arts-acquisition:s2` (revalidated on the same v
 
 Host Nitro coexist (2026-09-08) is supporting evidence only.
 
-Pre-S3 closeout (vault hygiene, boundary ADR, generic naming, `/trial` hide) happened **after** Successful and is recorded in [[wip/Renzo_to_Generic_Martial_Arts_Sanitization]]. It did not reopen S2.
+Pre-S3 closeout (vault hygiene, boundary ADR, generic naming, `/trial` hide) happened **after** Successful and is recorded in [[wip/archive/Renzo_to_Generic_Martial_Arts_Sanitization]]. It did not reopen S2.
 
 ---
 
@@ -926,7 +926,7 @@ Explicit:
 - No control-plane Compose, image, or registry database
 - No observe/relaunch UI
 - No provisioner
-- S3 owner decisions are **recorded only** ([[SaaS-Decisions#2026-09-09 — S3 v1 owner decisions]]; [[wip/answers]] S3.2 / S3.3 / S3.20 / S3.28–S3.30)
+- S3 owner decisions are **recorded only** ([[SaaS-Decisions#2026-09-09 — S3 v1 owner decisions]]; [[wip/archive/SaaS_S0-S8_Discovery_Answers]] S3.2 / S3.3 / S3.20 / S3.28–S3.30)
 - [[SaaS-ToDo]] / [[SaaS-Milestones]]: S3 remains “not started — implement when Scott asks”
 
 Next implementation, **only when Scott asks**: S3 observe + relaunch against the existing `lab-acme` environments.

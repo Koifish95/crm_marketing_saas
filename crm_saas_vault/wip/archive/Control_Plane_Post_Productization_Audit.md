@@ -11,7 +11,7 @@ tags:
 
 # Control plane post-productization audit
 
-Hardening/QA after the tentative S5 operator frontend. **Does not make tentative S5 Successful.** Inventory: [[wip/Post_S4_Foundation_Decision_Inventory]]. Status: [[wip/S5_Control_Plane_Productization_Status]].
+Hardening/QA after the tentative S5 operator frontend. **Does not make tentative S5 Successful.** Inventory: [[wip/archive/Post_S4_Foundation_Decision_Inventory]]. Status: [[wip/archive/S5_Control_Plane_Productization_Status]].
 
 ## Current UI / application structure
 
@@ -108,7 +108,7 @@ Backup/restore, upgrades, rollback, image registry, remote nodes, node agents, c
 
 ## Files changed (hardening)
 
-`control_plane/app/**` (layout, pages, new shared components, CSS, `useFleetStatus`), `control_plane/shared/utils/{fleet,nav,provision}.ts`, `control_plane/tests/s5/*`, `crm_saas_vault/{Home,Control-Plane,S3-Control-Plane-Runbook,S4-Provision-Runbook}.md`, `crm_saas_vault/wip/S5_Control_Plane_Productization_Status.md`, this note.
+`control_plane/app/**` (layout, pages, new shared components, CSS, `useFleetStatus`), `control_plane/shared/utils/{fleet,nav,provision}.ts`, `control_plane/tests/s5/*`, `crm_saas_vault/{Home,Control-Plane,S3-Control-Plane-Runbook,S4-Provision-Runbook}.md`, `crm_saas_vault/wip/archive/S5_Control_Plane_Productization_Status.md`, this note.
 
 Did **not** commit sqlite, `data/provisioned/`, `.env`, or the inventory file body beyond linking it.
 

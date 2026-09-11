@@ -57,9 +57,9 @@ Start with documentation, then inspect implementation.
 
 At minimum read, if present:
 
-1. `crm_saas_vault/wip/Clean_Starting_Point_Current_State.md`
+1. `crm_saas_vault/wip/archive/Clean_Starting_Point_Current_State.md`
 2. `crm_saas_vault/wip/Clean_Starting_Point_Decision_Backlog.md`
-3. `crm_saas_vault/wip/Clean_Starting_Point_Return.md`
+3. `crm_saas_vault/wip/archive/Clean_Starting_Point_Return.md`
 4. `crm_saas_vault/Home.md`
 5. `crm_saas_vault/Working-Agreement.md`
 6. `crm_saas_vault/SaaS-Milestones.md`
@@ -1203,7 +1203,7 @@ The first implementation sprint should be small enough to QA, commit, and revert
 
 Create:
 
-`crm_saas_vault/wip/CRM_Core_Architecture_Planning_Return.md`
+`crm_saas_vault/wip/archive/CRM_Core_Architecture_Planning_Return.md`
 
 Document:
 

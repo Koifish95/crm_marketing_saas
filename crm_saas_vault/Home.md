@@ -48,7 +48,9 @@ Long-term direction: an ultra-general marketing, lead-generation, and CRM platfo
 Platform → Industry Template → Customer Instance → Enabled Capabilities → Configuration
 ```
 
-Control plane is **implemented** as `control_plane/` (http://127.0.0.1:52100): Dashboard, Customers, Environments, Hosting Nodes. It shows up/down, relaunches without destroying data, and provisions a Martial Arts PROD+DEV pair from **Customers → New customer**. Details: [[Control-Plane]]. Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]]. Audit: [[wip/Control_Plane_Post_Productization_Audit]].
+**Fresh agent / current state:** [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]].
+
+Control plane is **implemented** as `control_plane/` (http://127.0.0.1:52100): Dashboard, Customers, Environments, Hosting Nodes. It shows up/down, relaunches without destroying data, and provisions a Martial Arts PROD+DEV pair from **Customers → New customer**. Details: [[Control-Plane]]. Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]]. Historical audit: [[wip/archive/Control_Plane_Post_Productization_Audit]].
 
 Alignment (evidence, not the map): [[wip/archive/SaaS_Project_Alignment_and_Current_Understanding]].
 
@@ -72,6 +74,7 @@ Alignment (evidence, not the map): [[wip/archive/SaaS_Project_Alignment_and_Curr
 | [[SaaS-ToDo]] | Open platform tasks |
 | [[Control-Plane]] | Platform control app — v1 scope |
 | [[Conventions]] | How notes, links, and promotions work |
+| [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11\|Current state / fresh-agent handoff]] | What exists now; what not to restart |
 | [[wip/_index\|WIP inbox]] | Direct Scott ↔ Cursor communication |
 
 ## Renzo CRM evidence (historical / external)

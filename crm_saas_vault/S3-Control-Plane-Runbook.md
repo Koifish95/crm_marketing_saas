@@ -80,7 +80,7 @@ Never `down`, `-v`, or prune. Verify with `pnpm lab:docker <slug> get` (markers)
 - Exact registered container names and health URLs only
 - No Docker socket in CRM containers
 - Do not attach `webhosting_renzo_*` or leftover `renzo-*` volumes
-- Extra non-PROD and gated decommission shipped after S3; see [[wip/Clean_Starting_Point_Current_State]]
+- Extra non-PROD and gated decommission shipped after S3; current map: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]]
 
 ## Exclusions
 

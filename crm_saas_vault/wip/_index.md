@@ -11,38 +11,36 @@ tags:
 
 `crm_saas_vault/wip/` is direct Scott ↔ Cursor communication. Do not treat it as the project map. How we work: [[Working-Agreement]]. Start: [[Home]].
 
-Processed source material lives in [[wip/archive/_index|wip/archive/]]. Put new drafts here; move them to archive when the work they belong to is done.
+Processed and superseded material lives in [[wip/archive/_index|wip/archive/]]. Do not read the archive as current law.
 
-## Active SaaS
+## Current / Start Here
 
-- [[wip/Clean_Starting_Point_Current_State|Clean starting point — current state]] (authoritative 2026-09-10)
-- [[wip/Clean_Starting_Point_Decision_Backlog|Clean starting point — decision backlog]]
-- [[wip/Clean_Starting_Point_Return|Clean starting point — return]]
-- [[wip/Post_S4_Foundation_Decision_Closeout|Post-S4 foundation decision closeout]] (IMM-01–04; Map B official)
-- [[wip/Milestone_Map_Conflict_Decision|Milestone map conflict — decision for Scott + ChatGPT]] (resolved 2026-09-10)
-- [[wip/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt|CRM Core + vertical architecture — planning prompt]]
-- [[wip/C1_CRM_Core_Architecture_Cursor_Prompt|C1 CRM Core architecture — Cursor prompt]] (implemented)
-- [[wip/C1_CRM_Core_Architecture_Return|C1 CRM Core architecture — return]] (code-shipped; Sales not started)
-- [[wip/CRM_Core_Extraction_Implementation_Plan|CRM Core extraction implementation plan]]
-- [[wip/CRM_Core_Architecture_Planning_Return|CRM Core architecture planning return]]
-- [[wip/S6_Fleet_Reliability_Cursor_Prompt|S6 fleet reliability — Cursor prompt]]
-- [[wip/S6_Implementation_Status|S6 implementation status]] (not Successful)
-- [[wip/Control_Plane_Bulk_Lifecycle_Return|Control Plane bulk start/stop — return]]
-- [[wip/S5_closeout|S5 closeout and handoff]] (Successful 2026-09-10)
-- [[wip/S5_Control_Plane_Productization_Status|S5 control-plane productization status]]
-- [[wip/Where_We_Are_Now_Post_S4_2026-09-09|Where we are now — post-S4 handoff]] (superseded for current UI)
-- [[wip/S4_closeout|S4 closeout and handoff]]
-- [[wip/S4_Implementation_Status|S4 implementation status]]
-- [[wip/S3_closeout|S3 closeout and handoff]] (definitive S3 record)
-- [[wip/S3_Implementation_Status|S3 implementation status]]
-- [[wip/Begin_S3_Control_Plane_v1_Cursor_Prompt_2026-09-09|S3 execution prompt]]
-- [[wip/S2_closeout|S2 closeout and handoff]]
-- [[wip/answers|S0–S8 discovery answers]]
-- [[wip/SaaS_S0-S8_Discovery_Questions_2026-09-08|S0–S8 discovery questions]]
-- [[wip/Renzo_to_Generic_Martial_Arts_Sanitization|Renzo → generic Martial Arts sanitization]]
+- [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11|Current state and fresh-agent handoff]] (**primary orientation**)
+- [[Working-Agreement]]
+- [[Home]]
+- [[ADR-CRM-Core-Vertical-Architecture]]
+- [[SaaS-Milestones]] (official Map B)
+
+## Active Work
+
+Nothing is authorized to implement next. Await Scott.
+
+- Official S6 is **implemented, not Successful** — [[wip/S6_Implementation_Status]], [[S6-Fleet-Runbook]]
+- C1 is **code-shipped**; C2 / Sales are **not started** — [[wip/C1_CRM_Core_Architecture_Return]]
+- Open NEAR/DEF questions only — [[wip/Clean_Starting_Point_Decision_Backlog]] (IMM-01–04 are resolved)
+
+## Current Supporting Context
+
+- [[wip/CRM_Core_Extraction_Implementation_Plan|CRM Core extraction plan]] (C2+; not a license to start)
+- [[wip/Control_Plane_Bulk_Lifecycle_Return|Control Plane bulk start/stop return]]
+- [[wip/Post_S4_Foundation_Decision_Closeout|Map B closeout]]
+- [[wip/S5_closeout|S5 closeout]] (Successful)
+- [[wip/S4_closeout|S4 closeout]]
+- [[wip/S3_closeout|S3 closeout]]
+- [[wip/S2_closeout|S2 closeout]]
 - [[wip/note|Human QA inbox]]
 - [[wip/catches|catches]] (scratch)
 
-## Processed (do not treat as the map)
+## Archive
 
-S2 evidence, alignment drafts, and Renzo M4–M10 handoffs: [[wip/archive/_index]].
+Historical and completed prompts, statuses, and superseded “current state” notes: [[wip/archive/_index]].

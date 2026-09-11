@@ -15,10 +15,10 @@ Handoff for Scott → ChatGPT. Planning complete. **No architecture refactor and
 
 ## Documentation reviewed
 
-- [[wip/Clean_Starting_Point_Current_State]], [[wip/Clean_Starting_Point_Decision_Backlog]], [[wip/Clean_Starting_Point_Return]]
+- [[wip/archive/Clean_Starting_Point_Current_State]], [[wip/Clean_Starting_Point_Decision_Backlog]], [[wip/archive/Clean_Starting_Point_Return]]
 - [[Home]], [[Working-Agreement]], [[SaaS-Milestones]], [[SaaS-Decisions]], [[Customer-Environment]], [[Control-Plane]], [[SaaS-ToDo]]
-- [[wip/Post_S4_Foundation_Decision_Closeout]], [[wip/S5_closeout]], [[wip/S5_Control_Plane_Productization_Status]], [[wip/S6_Implementation_Status]]
-- Prompt: [[wip/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]]
+- [[wip/Post_S4_Foundation_Decision_Closeout]], [[wip/S5_closeout]], [[wip/archive/S5_Control_Plane_Productization_Status]], [[wip/S6_Implementation_Status]]
+- Prompt: [[wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]]
 
 ## Repository areas inspected
 
@@ -82,7 +82,7 @@ Checked imports/schema/workflows against Core-candidate lists; MA-only candidate
 
 - `crm_saas_vault/ADR-CRM-Core-Vertical-Architecture.md` (created)
 - `crm_saas_vault/wip/CRM_Core_Extraction_Implementation_Plan.md` (created)
-- `crm_saas_vault/wip/CRM_Core_Architecture_Planning_Return.md` (this file)
+- `crm_saas_vault/wip/archive/CRM_Core_Architecture_Planning_Return.md` (this file)
 - `crm_saas_vault/SaaS-Decisions.md` (pointer)
 - `crm_saas_vault/Working-Agreement.md` (current next)
 - `crm_saas_vault/wip/_index.md`

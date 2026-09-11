@@ -2,7 +2,7 @@
 type: index
 status: current
 area: process
-updated: 2026-09-09
+updated: 2026-09-11
 tags:
   - wip
   - archive
@@ -121,3 +121,29 @@ Historical Renzo gym evidence. Do not treat as current SaaS spec.
 - [[wip/archive/M10B_Local_Backup_Retention_and_Restore_Cursor_Prompt_2026-09-06|M10B backup prompt]]
 - [[wip/archive/M10B_Local_Backup_Retention_and_Restore_Implementation_Handoff_2026-09-06|M10B backup handoff]]
 - [[wip/archive/RENZO_WEHOSTING_POND_AGENT|WebHosting + The Pond work order]]
+
+## SaaS completed / superseded (archived 2026-09-11)
+
+Current orientation: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]]. These files are evidence, not the map.
+
+- [[wip/archive/Clean_Starting_Point_Current_State|Clean starting point — current state]] (2026-09-10 snapshot)
+- [[wip/archive/Clean_Starting_Point_Return|Clean starting point — return]]
+- [[wip/archive/Where_We_Are_Now_Post_S4_2026-09-09|Where we are now — post-S4]]
+- [[wip/archive/Create_Post_S4_Where_We_Are_Now_Prompt|Create post-S4 where-we-are prompt]]
+- [[wip/archive/post_S4_prompt|post-S4 prompt]]
+- [[wip/archive/S5_And_Beyond_Cursor_Prompt|S5-and-beyond leftovers prompt]]
+- [[wip/archive/Begin_S3_Control_Plane_v1_Cursor_Prompt_2026-09-09|S3 execution prompt]]
+- [[wip/archive/S6_Fleet_Reliability_Cursor_Prompt|S6 fleet reliability prompt]]
+- [[wip/archive/C1_CRM_Core_Architecture_Cursor_Prompt|C1 execution prompt]]
+- [[wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt|Core ADR planning prompt]]
+- [[wip/archive/CRM_Core_Architecture_Planning_Return|Core architecture planning return]]
+- [[wip/archive/Milestone_Map_Conflict_Decision|Milestone map conflict briefing]]
+- [[wip/archive/Post_S4_Ten_Decisions|Post-S4 ten decisions]]
+- [[wip/archive/Post_S4_Foundation_Decision_Inventory|Post-S4 85-item inventory]]
+- [[wip/archive/S3_Implementation_Status|S3 implementation status]]
+- [[wip/archive/S4_Implementation_Status|S4 implementation status]]
+- [[wip/archive/S5_Control_Plane_Productization_Status|S5 productization status]]
+- [[wip/archive/Control_Plane_Post_Productization_Audit|Control Plane post-productization audit]]
+- [[wip/archive/SaaS_S0-S8_Discovery_Questions_2026-09-08|S0–S8 discovery questions]]
+- [[wip/archive/SaaS_S0-S8_Discovery_Answers|S0–S8 discovery answers]] (not V1 [[wip/archive/answers]])
+- [[wip/archive/Renzo_to_Generic_Martial_Arts_Sanitization|Renzo → generic Martial Arts sanitization]]

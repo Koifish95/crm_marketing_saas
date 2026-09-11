@@ -59,7 +59,7 @@ At minimum review:
 -   `crm_saas_vault/SaaS-ToDo.md`
 -   `crm_saas_vault/wip/S2_closeout.md`
 -   `crm_saas_vault/wip/S3_closeout.md`
--   `crm_saas_vault/wip/S3_Implementation_Status.md`
+-   `crm_saas_vault/wip/archive/S3_Implementation_Status.md`
 -   `crm_saas_vault/S3-Control-Plane-Runbook.md`
 -   all S4 planning/status/closeout/evidence documents
 -   `control_plane/`

@@ -11,7 +11,7 @@ tags:
 # SaaS S0–S8 discovery answers
 
 **Date:** 2026-09-08  
-**Questions:** [[wip/SaaS_S0-S8_Discovery_Questions_2026-09-08]]  
+**Questions:** [[wip/archive/SaaS_S0-S8_Discovery_Questions_2026-09-08]]  
 **Purpose:** Answer from existing decisions and documented direction. This file is `wip` communication, not a substitute for [[SaaS-Decisions]] until promoted.
 
 ## How to read this

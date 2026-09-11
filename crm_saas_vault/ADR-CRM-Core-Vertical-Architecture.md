@@ -14,13 +14,15 @@ tags:
 
 # ADR — CRM Core + Vertical Product Architecture
 
+**Current implementation (2026-09-11):** C1 is **code-shipped** — `pnpm-workspace.yaml`, `packages/crm-core` (`@crm/core`), Martial Arts consumes Core, architecture import tests exist. See [[wip/C1_CRM_Core_Architecture_Return]] and [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]]. Sections 2 and 4 below still describe the **pre-C1** repository (no workspace, no Core). That is historical context for the decision, not current repo fact. Do not “establish Core” again. C2 / Sales / D1 schema are **not** started.
+
 ## 1. Title
 
 CRM Core is shared infrastructure consumed by independently built vertical products.
 
 ## 2. Status
 
-**Accepted** (2026-09-11). Owner-approved in the architectural discussion recorded by [wip/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]. D1–D4 resolved the same day: [SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]. Implementation has **not** started. Extraction plan: [wip/CRM_Core_Extraction_Implementation_Plan]. Pointer: [SaaS-Decisions#2026-09-11 — CRM Core + vertical architecture].
+**Accepted** (2026-09-11). Owner-approved in the architectural discussion recorded by [wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]. D1–D4 resolved the same day: [SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]. Implementation has **not** started. Extraction plan: [wip/CRM_Core_Extraction_Implementation_Plan]. Pointer: [SaaS-Decisions#2026-09-11 — CRM Core + vertical architecture].
 
 ## 3. Date
 
@@ -283,10 +285,10 @@ Preserved in force: retry = continue/resume; display name editable; slug/timezon
 
 ## 24. References
 
-- Prompt: [wip/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]
+- Prompt: [wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]
 - Plan: [wip/CRM_Core_Extraction_Implementation_Plan]
-- Return: [wip/CRM_Core_Architecture_Planning_Return]
-- Current state: [wip/Clean_Starting_Point_Current_State], [Home], [Working-Agreement]
+- Return: [wip/archive/CRM_Core_Architecture_Planning_Return]
+- Current state: [wip/archive/Clean_Starting_Point_Current_State], [Home], [Working-Agreement]
 - Roadmap: [SaaS-Milestones], [wip/Post_S4_Foundation_Decision_Closeout]
 - Domain unit: [Customer-Environment]
 - Operator app: [Control-Plane]

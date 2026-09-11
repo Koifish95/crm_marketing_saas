@@ -14,7 +14,7 @@ tags:
 
 C1 units 1–3 are **code-shipped** on `working`. Sales is **not** started. D1 Control Plane schema is **unchanged**. Map B is **not** Successful. C2 is **not** started.
 
-Prompt: [[wip/C1_CRM_Core_Architecture_Cursor_Prompt]]. Plan: [[wip/CRM_Core_Extraction_Implementation_Plan]]. ADR: [[ADR-CRM-Core-Vertical-Architecture]].
+Prompt: [[wip/archive/C1_CRM_Core_Architecture_Cursor_Prompt]]. Plan: [[wip/CRM_Core_Extraction_Implementation_Plan]]. ADR: [[ADR-CRM-Core-Vertical-Architecture]].
 
 ## Shipped
 

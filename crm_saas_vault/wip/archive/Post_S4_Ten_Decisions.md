@@ -10,9 +10,9 @@ tags:
 
 # Post-S4 — ten decisions
 
-Scott’s answers (plan file + Q4 checkboxes). Recorded in [[SaaS-Decisions]]. Implementation prompt: [[wip/S5_And_Beyond_Cursor_Prompt]]. Map B is official as of 2026-09-10 ([[wip/Post_S4_Foundation_Decision_Closeout]]). Official S5 is still **not** Successful.
+Scott’s answers (plan file + Q4 checkboxes). Recorded in [[SaaS-Decisions]]. Implementation prompt: [[wip/archive/S5_And_Beyond_Cursor_Prompt]]. Map B is official as of 2026-09-10 ([[wip/Post_S4_Foundation_Decision_Closeout]]). Official S5 is still **not** Successful.
 
-The 85-item catalog is [[wip/Post_S4_Foundation_Decision_Inventory]]. Operator-shell items 1–10 already shipped.
+The 85-item catalog is [[wip/archive/Post_S4_Foundation_Decision_Inventory]]. Operator-shell items 1–10 already shipped.
 
 ---
 
@@ -98,4 +98,4 @@ Answer: Unset. Informal `labforleads.com` talk is not an ADR. Do not implement D
 
 ## After answers
 
-Accepted choices are in [[SaaS-Decisions]]. Next implementation: [[wip/S5_And_Beyond_Cursor_Prompt]].
+Accepted choices are in [[SaaS-Decisions]]. Next implementation: [[wip/archive/S5_And_Beyond_Cursor_Prompt]].

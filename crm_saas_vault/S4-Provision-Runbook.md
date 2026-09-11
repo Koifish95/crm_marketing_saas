@@ -49,4 +49,4 @@ The same slug does not create a second customer. **Provision** again resumes Fai
 
 ## Exclusions
 
-S5 hostnames, billing, Pi/SSH, hard-delete of volumes, Beauty / sister-business. Current map: [[wip/Clean_Starting_Point_Current_State]].
+S5 hostnames, billing, Pi/SSH, hard-delete of volumes, Beauty / sister-business. Current map: [[wip/Current_State_and_Fresh_Agent_Handoff_2026-09-11]].
