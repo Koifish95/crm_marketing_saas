@@ -48,5 +48,5 @@ DNS/TLS, public hostnames, fleet backup, operator auth, VPS, Beauty, billing, se
 | Item | Value |
 |---|---|
 | Commit SHA | `3c992b5` (`3c992b5ce561c899292996eeac16a5223265e448`) |
-| Push | *filled after push* |
+| Push | `origin/working` at `d91c25e` (2026-09-10) |
 | Scope | Retry UI in `control_plane/` plus vault Successful record. No secrets, sqlite, or `data/provisioned/`. |
