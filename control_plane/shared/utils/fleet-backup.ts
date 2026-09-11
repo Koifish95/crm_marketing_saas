@@ -1,15 +1,149 @@
 export const FLEET_BACKUP_RETENTION_DAYS = 14
 export const FLEET_BACKUP_MANIFEST = 'manifest.json'
+export const FLEET_BACKUP_README = 'BACKUP.md'
 export const FLEET_BACKUP_SQLITE_PREFIX = 'sqlite/'
 export const FLEET_BACKUP_UPLOADS_PREFIX = 'uploads/'
 
-export function fleetBackupRelativeDir(customerId: string, environmentId: string) {
-  return `data/backups/${customerId}/${environmentId}`
+function assertBackupSlug(value: string, label: string) {
+  if (!isSafeBackupName(value)) {
+    throw new Error(`Refusing ${label} ${value}.`)
+  }
 }
 
-export function fleetBackupFileName(environmentId: string, createdAt: string) {
-  const stamp = createdAt.replaceAll(':', '').replaceAll('.', '').replaceAll('-', '')
-  return `${environmentId}-${stamp}.zip`
+function formatPart(parts: Intl.DateTimeFormatPart[], type: Intl.DateTimeFormatPartTypes) {
+  return parts.find(part => part.type === type)?.value || ''
+}
+
+export function fleetBackupLocalStamp(createdAt: string, timeZone: string, includeMs = false) {
+  const date = new Date(createdAt)
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).formatToParts(date)
+  const stamp = [
+    formatPart(parts, 'year'),
+    '-',
+    formatPart(parts, 'month'),
+    '-',
+    formatPart(parts, 'day'),
+    '_',
+    formatPart(parts, 'hour'),
+    formatPart(parts, 'minute'),
+    formatPart(parts, 'second'),
+  ].join('')
+  if (!includeMs) {
+    return stamp
+  }
+  return `${stamp}${String(date.getUTCMilliseconds()).padStart(3, '0')}`
+}
+
+export function fleetBackupRelativeDir(customerSlug: string, environmentSlug: string) {
+  assertBackupSlug(customerSlug, 'customer slug')
+  assertBackupSlug(environmentSlug, 'environment slug')
+  return `data/backups/${customerSlug}/${environmentSlug}`
+}
+
+export function fleetBackupFileName(
+  customerSlug: string,
+  environmentSlug: string,
+  createdAt: string,
+  timeZone: string,
+  includeMs = false,
+) {
+  assertBackupSlug(customerSlug, 'customer slug')
+  assertBackupSlug(environmentSlug, 'environment slug')
+  const stamp = fleetBackupLocalStamp(createdAt, timeZone, includeMs)
+  return `${customerSlug}_${environmentSlug}_${stamp}.zip`
+}
+
+export function resolveFleetBackupFileName(
+  customerSlug: string,
+  environmentSlug: string,
+  createdAt: string,
+  timeZone: string,
+  exists: (name: string) => boolean,
+) {
+  const name = fleetBackupFileName(customerSlug, environmentSlug, createdAt, timeZone)
+  if (!exists(name)) {
+    return name
+  }
+  return fleetBackupFileName(customerSlug, environmentSlug, createdAt, timeZone, true)
+}
+
+export function formatBackupCreatedAt(createdAt: string, timeZone: string) {
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
+    timeZoneName: 'short',
+  }).format(new Date(createdAt))
+}
+
+function trimZeros(value: string) {
+  return value.replace(/\.?0+$/, '')
+}
+
+function formatCompactBytes(bytes: number) {
+  if (bytes < 1024) {
+    return `${bytes} B`
+  }
+  const kb = bytes / 1024
+  if (kb < 1024) {
+    return `${kb >= 10 ? Math.round(kb) : trimZeros(kb.toFixed(1))} KB`
+  }
+  const mb = kb / 1024
+  return `${trimZeros(mb.toFixed(mb >= 10 ? 0 : 1))} MB`
+}
+
+export function formatBackupSize(bytes: number) {
+  const gb = bytes / 1e9
+  const gbText = `${trimZeros(gb >= 0.01 ? gb.toFixed(3) : gb.toFixed(6))} GB`
+  if (gb < 0.01) {
+    return `${gbText} (${formatCompactBytes(bytes)})`
+  }
+  return gbText
+}
+
+export function fleetBackupReadme(input: {
+  customerDisplayName: string
+  customerSlug: string
+  customerId: string
+  environmentDisplayName: string
+  environmentSlug: string
+  environmentType: string
+  environmentId: string
+  createdAt: string
+  timeZone: string
+  containerName: string
+  sqliteFilename: string
+  zipFileName: string
+}) {
+  return [
+    '# Fleet backup',
+    '',
+    `- Customer: ${input.customerDisplayName} (\`${input.customerSlug}\`)`,
+    `- Customer ID: ${input.customerId}`,
+    `- Environment: ${input.environmentDisplayName} (\`${input.environmentSlug}\`)`,
+    `- Environment ID: ${input.environmentId}`,
+    `- Type: ${input.environmentType}`,
+    `- Created: ${formatBackupCreatedAt(input.createdAt, input.timeZone)}`,
+    `- Created UTC: ${input.createdAt}`,
+    `- Time zone: ${input.timeZone}`,
+    `- Container: ${input.containerName}`,
+    `- SQLite file: ${input.sqliteFilename}`,
+    `- Zip file: ${input.zipFileName}`,
+    '',
+  ].join('\n')
 }
 
 export function isSafeBackupName(value: string) {

@@ -1,16 +1,16 @@
 import { randomUUID } from 'node:crypto'
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
-import { isAbsolute, join } from 'node:path'
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { tmpdir } from 'node:os'
-import { desc, eq } from 'drizzle-orm'
+import { and, desc, eq } from 'drizzle-orm'
 import type { Database } from '../database'
 import { environmentBackups, environments } from '../database/schema'
 import {
   environmentBackupGuard,
-  fleetBackupFileName,
   fleetBackupRelativeDir,
   FLEET_BACKUP_RETENTION_DAYS,
   prodUpgradeBlocked,
+  resolveFleetBackupFileName,
 } from '../../shared/utils/fleet-backup'
 import { getRegisteredEnvironment, listRegisteredEnvironments } from './registry'
 import { restoreSnapshotToEnvironment, snapshotRegisteredEnvironment } from './fleet-backup-snapshot'
@@ -18,7 +18,7 @@ import { extractFleetBackupZip, extractedSqliteDir, extractedUploadsDir } from '
 import { readFleetBackupManifest, writeFleetBackupZip } from './fleet-backup-zip'
 import { composeArgs, repoRoot, resolveComposeEnvFile, templateRoot } from './docker-relaunch'
 import { imageBuildArgs, waitUntilHealthy } from './provision-runtime'
-import { spawnSync } from 'node:child_process'
+import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
 
 export class FleetBackupError extends Error {
   statusCode: number
@@ -89,10 +89,17 @@ export async function backupRegisteredEnvironment(db: Database, id: string, file
     registeredNames: registered,
   })
   const createdAt = new Date().toISOString()
-  const relativeDir = fleetBackupRelativeDir(row.customer.id, row.id)
-  const zipName = fleetBackupFileName(row.id, createdAt)
-  const zipPath = join(filesRoot, relativeDir, zipName)
-  mkdirSync(join(filesRoot, relativeDir), { recursive: true })
+  const relativeDir = fleetBackupRelativeDir(row.customer.slug, row.slug)
+  const dir = join(filesRoot, relativeDir)
+  mkdirSync(dir, { recursive: true })
+  const zipName = resolveFleetBackupFileName(
+    row.customer.slug,
+    row.slug,
+    createdAt,
+    row.customer.timezone,
+    name => existsSync(join(dir, name)),
+  )
+  const zipPath = join(dir, zipName)
   try {
     const written = await writeFleetBackupZip({
       zipPath,
@@ -100,7 +107,14 @@ export async function backupRegisteredEnvironment(db: Database, id: string, file
       sqliteFilename: snapshot.sqliteFilename,
       uploadsDir: snapshot.uploadsDir,
       customerId: row.customer.id,
+      customerSlug: row.customer.slug,
+      customerDisplayName: row.customer.displayName,
       environmentId: row.id,
+      environmentSlug: row.slug,
+      environmentDisplayName: row.displayName,
+      environmentType: row.type,
+      containerName: row.containerName,
+      timeZone: row.customer.timezone,
       createdAt,
     })
     const record = {
@@ -272,6 +286,74 @@ export async function upgradeRegisteredEnvironment(
     expectedImage: target,
     backupId: latest.id,
   }
+}
+
+export function isPathInsideBackupRoot(zipPath: string, filesRoot = process.cwd()) {
+  const root = resolve(fleetBackupRoot(filesRoot))
+  const resolved = resolve(zipPath)
+  const rel = relative(root, resolved)
+  return Boolean(rel) && !rel.startsWith('..') && !rel.split(sep).includes('..') && !isAbsolute(rel)
+}
+
+export function assertRevealableZipPath(zipPath: string, filesRoot = process.cwd()) {
+  const resolved = resolve(zipPath)
+  if (!isPathInsideBackupRoot(resolved, filesRoot)) {
+    throw new FleetBackupError('Backup zip is outside the same-host backup store.', 403)
+  }
+  if (!existsSync(resolved) || !statSync(resolved).isFile()) {
+    throw new FleetBackupError('Backup zip is missing.', 404)
+  }
+  return resolved
+}
+
+export function revealBackupCommand(platform: NodeJS.Platform, zipPath: string) {
+  if (platform === 'win32') {
+    return { command: 'explorer.exe', args: [`/select,${zipPath}`] }
+  }
+  if (platform === 'darwin') {
+    return { command: 'open', args: ['-R', zipPath] }
+  }
+  return { command: 'xdg-open', args: [dirname(zipPath)] }
+}
+
+export function openBackupInExplorer(
+  zipPath: string,
+  platform: NodeJS.Platform = process.platform,
+  spawnFn: typeof spawn = spawn,
+) {
+  const { command, args } = revealBackupCommand(platform, zipPath)
+  const child: ChildProcess = spawnFn(command, args, {
+    detached: true,
+    stdio: 'ignore',
+    windowsHide: false,
+  })
+  child.unref()
+  return { command, args }
+}
+
+export async function revealEnvironmentBackup(
+  db: Database,
+  id: string,
+  backupId: string,
+  options: {
+    filesRoot?: string
+    open?: (zipPath: string) => { command: string, args: string[] }
+  } = {},
+) {
+  const row = requireEnvironment(await getRegisteredEnvironment(db, id))
+  const idValue = backupId.trim()
+  if (!idValue) {
+    throw new FleetBackupError('backupId is required.', 400)
+  }
+  const [backup] = await db.select().from(environmentBackups)
+    .where(and(eq(environmentBackups.id, idValue), eq(environmentBackups.environmentId, row.id)))
+    .limit(1)
+  if (!backup) {
+    throw new FleetBackupError('Backup is not registered for this environment.', 404)
+  }
+  const zipPath = assertRevealableZipPath(backup.zipPath, options.filesRoot)
+  const opened = (options.open || openBackupInExplorer)(zipPath)
+  return { zipPath, backupId: backup.id, command: opened.command, args: opened.args }
 }
 
 export function summarizeBackup(row: {
