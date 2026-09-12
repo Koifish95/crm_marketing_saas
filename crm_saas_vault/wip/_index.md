@@ -17,13 +17,15 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-None. Await Scott.
+None. Await Scott. Sales **implementation** is not authorized.
 
 When a work order exists, it is the only **authorized implementation** file that should live here besides this index (plus its return until promotion).
 
 ## Current communication (not a work order)
 
-- [[wip/Pre_Development_Product_Architecture_Decision_Worksheet]] — Scott checkbox worksheet for Sales/Core pre-development decisions. **Decision/discovery only.** Checking boxes does not authorize implementation.
+- [[wip/WO-2026-09-11-sales-predev-audit-return]] — Sales pre-development architecture audit return (`status: done`). Investigation evidence for ChatGPT. **Not** the live map. **Not** implementation authorization.
+- [[wip/WO-2026-09-11-sales-predev-audit]] — matching work order (`status: done`).
+- [[wip/Pre_Development_Product_Architecture_Decision_Worksheet]] — Scott checkbox worksheet. Clerical completion boxes ticked after the audit. Checking boxes still does **not** authorize implementation.
 
 ## Do not put here
 

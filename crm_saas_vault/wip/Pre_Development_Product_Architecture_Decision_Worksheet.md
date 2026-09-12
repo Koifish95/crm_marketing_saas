@@ -692,7 +692,7 @@ NEAR-04–10 (CP auth, credential delivery, audit log, DNS, published ports, SI 
 
 If Scott believes one deferred item **must** be decided now:
 
-- [ ] None — leave the table deferred
+- [x] None — leave the table deferred
 - [ ] Promote one item into a new decision — name it in notes
 
 **Scott notes:**
@@ -703,26 +703,26 @@ If Scott believes one deferred item **must** be decided now:
 
 ## Scott Approval Summary
 
-- [ ] Decision 1 complete — next product objective
-- [ ] Decision 2 complete — audit vs more Core extraction
-- [ ] Decision 3 complete — product before schema
-- [ ] Decision 4 complete — vertical-owned default
-- [ ] Decision 5 complete — minimum domain
-- [ ] Decision 6 complete — workflow
-- [ ] Decision 7 complete — consume existing Core only
-- [ ] Decision 8 complete — D1 timing
-- [ ] Decision 9 complete — first-slice success criteria
-- [ ] Decision 10 complete — compare after first slice
-- [ ] Decision 11 complete — Sales vs S9 vs SI
-- [ ] Decision 12 complete — slice ID vs C2
-- [ ] Decision 13 complete — local runtime shape
-- [ ] All blocking decisions complete
+- [x] Decision 1 complete — next product objective
+- [x] Decision 2 complete — audit vs more Core extraction
+- [x] Decision 3 complete — product before schema
+- [x] Decision 4 complete — vertical-owned default
+- [x] Decision 5 complete — minimum domain
+- [x] Decision 6 complete — workflow
+- [x] Decision 7 complete — consume existing Core only
+- [x] Decision 8 complete — D1 timing
+- [x] Decision 9 complete — first-slice success criteria
+- [x] Decision 10 complete — compare after first slice
+- [x] Decision 11 complete — Sales vs S9 vs SI
+- [x] Decision 12 complete — slice ID vs C2
+- [x] Decision 13 complete — local runtime shape
+- [x] All blocking decisions complete
 
 ### Development authorization
 
 These boxes authorize **planning**, not product implementation.
 
-- [ ] DECISIONS COMPLETE — Planning may proceed to the next **pre-development** step (expected: a **read-only architecture-audit** [[Work-Order-Protocol]] work order, then a **separate** implementation work order if Scott wants Sales code).
+- [x] DECISIONS COMPLETE — Planning may proceed to the next **pre-development** step (expected: a **read-only architecture-audit** [[Work-Order-Protocol]] work order, then a **separate** implementation work order if Scott wants Sales code).
 - [ ] NOT READY — Additional discussion required.
 
 Do **not** treat either box as “Cursor may now implement Sales / C2 / D1 / S7.”

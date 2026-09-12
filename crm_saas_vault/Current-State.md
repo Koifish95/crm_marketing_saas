@@ -33,8 +33,9 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | D1–D4 | **Accepted** (D1 schema **not** shipped) |
 | C1 Core extraction | **Code-shipped**. Evidence: [[history/C1_CRM_Core_Architecture_Return]] |
 | C2 / Sales / Beauty / S7–S11 | **Not started** |
+| Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. Conclusion: **READY FOR SALES IMPLEMENTATION WORK ORDER**. Recommended first slice ID: **C2A** (new C-track row; do not reuse C2). No Sales package exists yet. |
 
-**Authorized work:** none. Await Scott. A roadmap “next” row is not permission. See [[Working-Agreement]] and [[Work-Order-Protocol]].
+**Authorized work:** none. The Sales audit work order is **done**. A Sales **implementation** work order has not been authorized. A roadmap “next” row is not permission. See [[Working-Agreement]] and [[Work-Order-Protocol]].
 
 Lockfile: [[project-state.yaml]].
 
@@ -135,7 +136,7 @@ Exact `docker inspect` + compose. Combined status: container running **and** `/a
 
 Do not assume any of these exist:
 
-- Sales / Software vertical
+- Sales / Software vertical (audit complete; implementation not started; recommended local shape `sales_template/` / `sales-crm` / :5040 — not created)
 - Beauty vertical (sister business is the intended second **pilot**, not a shipped product)
 - Completed generic Lead model in Core
 - Generic Campaign / Event framework
