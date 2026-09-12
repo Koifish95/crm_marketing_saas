@@ -39,6 +39,7 @@ crm_marketing_saas
         |
         +-- Generic platform
         +-- Martial Arts template
+        +-- Sales template (C2A Successful; local only)
         +-- future industry templates (Beauty later)
         +-- Customer instances: Strategic Insights (pilot), sister's business (pilot), then others
 ```
@@ -82,7 +83,7 @@ Renzo notes at the vault root (`Overview`, `Implementation-State`, `Milestones`,
 
 ## Where development stands
 
-Official S-track S0–S6 **Successful**. C1 **code-shipped**. Official S7, C2, Sales, Beauty, D1 schema, DNS/TLS: **not started**. **No active work order.** Await Scott.
+Official S-track S0–S6 **Successful**. C1 **code-shipped**. C2A **Successful**. Official S7, C2, Beauty, D1 schema, DNS/TLS: **not started**. **No active work order.** Await Scott.
 
 Details: [[Current-State]]. Lockfile: [[project-state.yaml]].
 

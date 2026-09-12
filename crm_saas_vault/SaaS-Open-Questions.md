@@ -29,7 +29,7 @@ Do not treat a row here as permission to implement. [[Working-Agreement]]. Histo
 | NEAR-01 | Per-env CRM sqlite + uploads. Same-host gitignored zip. Off-host = copy to an existing folder. Retention 14 days. Restore gated, one env, never `-v`. |
 | NEAR-02 | No image registry in S6. Registry remains official S7. |
 | NEAR-03 | Per-environment upgrade. Non-PROD before PROD when the customer has one (Acme `:s2` lab may be exempt). Refuse upgrade without an S6 backup of that env. |
-| DEF-01 (Core timing) | Core ADR accepted. **C1 code-shipped.** Do not establish Core again. Beauty waits; Sales is C2 when authorized. |
+| DEF-01 (Core timing) | Core ADR accepted. **C1 code-shipped.** **C2A Successful.** Do not establish Core again. Beauty waits; C2 (CP catalog) when authorized. C2A success does not authorize C2. |
 
 ---
 

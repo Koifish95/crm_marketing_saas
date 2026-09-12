@@ -32,11 +32,11 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | CRM Core + vertical ADR | **Accepted** |
 | D1–D4 | **Accepted** (D1 schema **not** shipped) |
 | C1 Core extraction | **Code-shipped**. Evidence: [[history/C1_CRM_Core_Architecture_Return]] |
-| C2A Thin Sales consumer | **Code-shipped** (2026-09-11). Local `sales_template/` / `sales-crm` on :5040. Not Successful. Not C2. Evidence: [[wip/WO-2026-09-11-sales-thin-slice-return]] |
+| C2A Thin Sales consumer | **Successful** (2026-09-11). Owner-accepted after browser QA at http://localhost:5040. Local `sales_template/` / `sales-crm`. Not C2. Evidence: [[history/C2A_closeout]] |
 | C2 / Beauty / S7–S11 | **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 
-**Authorized work:** none. C2A is code-shipped and waiting on Scott’s owner acceptance. Do not start C2, D1, Beauty, S7, Core promotion, or SI migration. See [[Working-Agreement]] and [[Work-Order-Protocol]].
+**Authorized work:** none. C2A Successful does **not** authorize C2, SI Sales refinement, Core promotion, D1, Beauty, S7, or SI migration. See [[Working-Agreement]] and [[Work-Order-Protocol]].
 
 Lockfile: [[project-state.yaml]].
 
@@ -100,13 +100,13 @@ Full gym CRM derived from Renzo: households as `leads` + `lead_lines`, trials, i
 
 Local: http://localhost:5030 (`pnpm dev`). Laptop Docker PRODUCTION `:5000`, STAGE `:5010`, DEV `:5020`.
 
-### Sales vertical (`sales_template/`) — C2A code-shipped
+### Sales vertical (`sales_template/`) — C2A Successful
 
-Second Core consumer. Package `sales-crm` (`private: true`). Extends `@crm/core`. Local only: http://localhost:5040 (`pnpm dev`). SQLite `sales_template/data/app.sqlite`. Fresh Drizzle journal starting `0000_wide_cyclops` (did **not** copy MA `0000`–`0020`).
+Second working local consumer of `@crm/core`. Package `sales-crm` (`private: true`). Extends `@crm/core`. Local only: http://localhost:5040 (`pnpm dev`). SQLite `sales_template/data/app.sqlite`. Fresh Drizzle journal starting `0000_wide_cyclops` (did **not** copy MA `0000`–`0020`).
 
-UI noun **Company** (table `sales_accounts`) plus Contacts, Opportunities, Activities. Provisional stages: `open` → `in_progress` → `won` | `lost`. Permissions `VIEW_SALES` / `MANAGE_SALES`. No Docker. No Control Plane Sales product or provisioning. Strategic Insights is the intended first customer and has **not** been migrated.
+Thin domain: **Company** / Sales Account (`sales_accounts`), Contacts, Opportunities, provisional pipeline stages (`open` → `in_progress` → `won` | `lost`), Activities / Tasks, Won / Lost. Permissions `VIEW_SALES` / `MANAGE_SALES`. No Docker. No Control Plane Sales product or provisioning. Strategic Insights is the intended first real-world Sales customer/design target and has **not** been migrated or cut over.
 
-Return: [[wip/WO-2026-09-11-sales-thin-slice-return]].
+Owner-accepted 2026-09-11. Closeout: [[history/C2A_closeout]]. Implementation return: [[history/WO-2026-09-11-sales-thin-slice-return]].
 
 ### CRM Core (`packages/crm-core`)
 
@@ -175,6 +175,7 @@ Link, do not re-litigate. Index: [[SaaS-Decisions]].
 | Official S-track; S0–S6 Successful | [[SaaS-Milestones]], [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]] |
 | S6 backup/restore/upgrade | [[SaaS-Decisions#2026-09-10 — S6 backup, restore, and upgrade]] |
 | Core + vertical architecture | [[ADR-CRM-Core-Vertical-Architecture]] |
+| C2A thin Sales consumer Successful | [[SaaS-Decisions#2026-09-11 — Official C2A is Successful]] |
 | D1–D4 | [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]] |
 | Customer / environment unit | [[Customer-Environment]] |
 | Never `-v` / prune / Renzo volumes | [[Control-Plane]] |

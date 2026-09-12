@@ -19,15 +19,23 @@ durable_docs_updated:
 
 # C2A — Thin Sales consumer return
 
-**Not the live map.** Live map: [[Current-State]]. C2 is **not** this slice and was **not** redefined.
+**Not the live map.** Live map: [[Current-State]]. Successful closeout: [[history/C2A_closeout]]. C2 is **not** this slice and was **not** redefined.
 
 ---
 
-## Executive result
+## Owner acceptance (2026-09-11)
+
+Scott completed the browser owner-acceptance pass at http://localhost:5040 and confirmed the Sales application/navigation plus Company, Contact, Opportunity/pipeline, and Activity workflow.
+
+C2A is **Successful**. This file remains implementation evidence. Closing C2A does **not** authorize C2, SI Sales refinement, Core promotion, D1, Control Plane Sales provisioning, Beauty, S7/VPS, DNS/TLS, billing, or SI migration.
+
+---
+
+## Executive result (at code-ship)
 
 `C2A CODE-SHIPPED — READY FOR OWNER ACCEPTANCE`
 
-C2A is **not** Successful. Scott still needs a browser owner pass. Do not start C2, Core promotion, SI migration, Beauty, D1, Control Plane Sales provisioning, or S7.
+That was the result when this return was first written. Owner acceptance landed afterward; see [[history/C2A_closeout]].
 
 ---
 
@@ -297,7 +305,7 @@ Core still correctly owns services, schema contracts, shell layout, nav/settings
 - Production image-tag cutover
 - Strategic Insights migration / cutover / QuickBooks / SI invoicing-proposals-retainers
 - Final pipeline business-stage terminology
-- C2A **Successful** (owner acceptance still required)
+- C2, SI Sales refinement, Core promotion, D1, Beauty, S7, and SI migration (still unauthorized after C2A Successful)
 
 ---
 
@@ -350,17 +358,16 @@ Scott, on the laptop:
 9. Optionally create a staff user on `/users`.
 10. Confirm Martial Arts still starts independently on http://localhost:5030 (`pnpm dev` in `martial_arts_template/`) and is unchanged as a gym CRM.
 
-Do not mark C2A **Successful** in durable notes until this pass is done.
+Owner checklist **completed** by Scott on 2026-09-11. See [[history/C2A_closeout]].
 
 ---
 
 ## Handoff to ChatGPT
 
-- **C2A is code-shipped** on `working`. Feature SHA `89d336afd0cb9cb1b9dccc2362e5b60b03d93d44`.
-- **Owner acceptance is ready.** Scott’s browser pass is the next product step. Do not mark Successful without him.
-- **Unresolved owner decisions:** none that block this slice. Before SI migration, the `OWNER INPUT REQUIRED` list above still stands. Pipeline **business** names remain deferred.
+- **C2A is Successful** (2026-09-11) after Scott’s browser QA at http://localhost:5040. Feature SHA `89d336afd0cb9cb1b9dccc2362e5b60b03d93d44`. Closeout: [[history/C2A_closeout]].
+- **Next step is product/architecture planning** for the next Sales phase. Scott + ChatGPT decide. Nothing is authorized by this closeout.
+- **Unresolved owner decisions:** none that block C2A. Before SI migration, the `OWNER INPUT REQUIRED` list above still stands. Pipeline **business** names remain deferred.
 - **Core-promotion candidates:** auth pages/handlers, users/security pages, settings index, App* primitives, listen/run scripts. Do not promote them without a new work order.
-- **Recommended next architecture/product step:** Scott accepts C2A in the browser, then ChatGPT and Scott choose among (a) SI-facing Sales refinement, (b) C2 CP catalog + provision, (c) a later Core-promotion work order. None of those are authorized now.
-- **Still deferred:** C2, D1 schema, CP Sales provisioning, Beauty, S7/VPS, DNS/TLS, billing, SI cutover, MA `apps/` move, generic Core CRM entities.
+- **Still deferred / not authorized:** C2, SI-facing Sales refinement, Core promotion, D1 schema, CP Sales provisioning, Beauty, S7/VPS, DNS/TLS, billing, SI cutover, MA `apps/` move, generic Core CRM entities.
 
 **STOP.**

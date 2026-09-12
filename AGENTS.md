@@ -28,7 +28,7 @@ Implement platform work only when:
 
 If `project-state.yaml` has `authorization.active_work_order: null` and Scott did not ask in this chat: summarize understanding and **stop**.
 
-Do not start S7, C2, Sales, Beauty, D1 schema, VPS, or DNS/TLS because they are “next” on the roadmap.
+Do not start S7, C2, SI Sales refinement, Core promotion, Beauty, D1 schema, VPS, or DNS/TLS because they are “next” on the roadmap. C2A Successful does not authorize those.
 
 ## Canonical set
 
@@ -47,6 +47,7 @@ Do not start S7, C2, Sales, Beauty, D1 schema, VPS, or DNS/TLS because they are 
 | Control plane | `crm_saas_vault/Control-Plane.md` |
 | Customer / environment | `crm_saas_vault/Customer-Environment.md` |
 | Martial Arts template agents | `martial_arts_template/AGENTS.md` |
+| Sales template agents | `sales_template/AGENTS.md` |
 | Renzo gym evidence (not SaaS law) | `Implementation-State.md`, `Milestones.md`, `Architecture.md`, `Decisions.md` |
 
 Renzo notes at the vault root are **historical evidence** of the source implementation. `Architecture.md` is the Renzo/source stack. Platform architecture is `Platform-Architecture.md`. Never reuse a milestone ID for a new meaning.

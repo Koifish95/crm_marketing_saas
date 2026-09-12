@@ -6,7 +6,7 @@ updated: 2026-09-11
 repo: crm_marketing_saas
 branch: working
 remote: https://github.com/Koifish95/crm_marketing_saas.git
-head_at_write: "89d336afd0cb9cb1b9dccc2362e5b60b03d93d44"
+head_at_write: "beff7e41d690723fd2b9a94eff76480bb866f94f"
 
 canonical:
   bootstrap: Home.md
@@ -27,6 +27,7 @@ tracks:
     authorized: null
   c:
     last_shipped: C2A
+    last_successful: C2A
     next: C2
     authorized: null
   d:
@@ -55,10 +56,13 @@ notes:
   wip_is_not_the_map: true
   chatgpt_is_not_the_record: true
   sales_predev_audit: complete
-  c2a: code_shipped
+  c2a: successful
+  c2a_owner_accepted: 2026-09-11
   c2a_path: sales_template
   c2a_package: sales-crm
   c2a_port: 5040
   do_not_reuse_c2_for_thin_slice: true
   c2_includes_cp_catalog: true
+  c2_not_authorized_by_c2a: true
   si_not_migrated: true
+  si_intended_first_sales_customer: true

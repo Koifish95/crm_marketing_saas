@@ -25,6 +25,22 @@ Decision: what we chose
 
 ---
 
+## 2026-09-11 — Official C2A is Successful
+
+Status: accepted
+
+Context: C2A (thin local Sales consumer of `@crm/core`) was implemented on `working`, then Scott completed the browser owner-acceptance pass at http://localhost:5040. He confirmed the Sales application/navigation and the Company, Contact, Opportunity/pipeline, and Activity workflow. Closeout: [[history/C2A_closeout]]. Implementation: `89d336a`.
+
+Decision:
+
+- Official **C2A is Successful** (2026-09-11). `sales_template/` / `sales-crm` is the second working local Core consumer. Thin domain: Company / Sales Account, Contacts, Opportunities, provisional stages (`open` → `in_progress` → `won` | `lost`), Activities / Tasks, Won / Lost.
+- Strategic Insights remains the intended first real-world Sales customer/design target and has **not** been migrated or cut over.
+- Existing **C2** is unchanged and **not started**. C2A success does **not** authorize C2, SI-facing Sales refinement, Core promotion, D1, Control Plane Sales provisioning, Beauty, S7/VPS, DNS/TLS, billing, or SI migration.
+
+Source: Scott 2026-09-11 (owner acceptance in the current Cursor chat)
+
+---
+
 ## 2026-09-11 — Vault is the sole durable project-state system
 
 Status: accepted

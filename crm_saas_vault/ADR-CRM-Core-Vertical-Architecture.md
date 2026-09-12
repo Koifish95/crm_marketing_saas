@@ -14,7 +14,7 @@ tags:
 
 # ADR — CRM Core + Vertical Product Architecture
 
-**Current implementation (2026-09-11):** C1 is **code-shipped** — `pnpm-workspace.yaml`, `packages/crm-core` (`@crm/core`), Martial Arts consumes Core, architecture import tests exist. See [[history/C1_CRM_Core_Architecture_Return]] and [[Current-State]]. Sections 2 and 4 below still describe the **pre-C1** repository (no workspace, no Core). That is historical context for the decision, not current repo fact. Do not “establish Core” again. C2 / Sales / D1 schema are **not** started.
+**Current implementation (2026-09-11):** C1 is **code-shipped** — `pnpm-workspace.yaml`, `packages/crm-core` (`@crm/core`), Martial Arts consumes Core, architecture import tests exist. C2A is **Successful** — `sales_template/` / `sales-crm` is the second local Core consumer. See [[history/C1_CRM_Core_Architecture_Return]], [[history/C2A_closeout]], and [[Current-State]]. Sections 2 and 4 below still describe the **pre-C1** repository (no workspace, no Core). That is historical context for the decision, not current repo fact. Do not “establish Core” again. C2 (CP catalog) / D1 schema are **not** started. C2A success does not authorize C2.
 
 ## 1. Title
 
@@ -22,7 +22,7 @@ CRM Core is shared infrastructure consumed by independently built vertical produ
 
 ## 2. Status
 
-**Accepted** (2026-09-11). Owner-approved in the architectural discussion recorded by [wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]. D1–D4 resolved the same day: [SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]. **C1 is code-shipped.** C2 / Sales / D1 schema are not started. Extraction plan (not a license): [history/CRM_Core_Extraction_Implementation_Plan]. Pointer: [SaaS-Decisions#2026-09-11 — CRM Core + vertical architecture]. Live map: [Current-State].
+**Accepted** (2026-09-11). Owner-approved in the architectural discussion recorded by [wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]. D1–D4 resolved the same day: [SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]. **C1 is code-shipped.** **C2A is Successful.** C2 / D1 schema are not started. Extraction plan (not a license): [history/CRM_Core_Extraction_Implementation_Plan]. Pointer: [SaaS-Decisions#2026-09-11 — CRM Core + vertical architecture]. Live map: [Current-State].
 
 ## 3. Date
 
