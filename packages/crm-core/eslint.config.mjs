@@ -5,7 +5,7 @@ export default [
       'no-restricted-imports': ['error', {
         patterns: [
           {
-            group: ['**/martial_arts_template/**', 'martial_arts_template', '**/sales/**', '**/beauty/**'],
+            group: ['**/martial_arts_template/**', 'martial_arts_template', '**/sales_template/**', 'sales-crm', '**/sales/**', '**/beauty/**'],
             message: 'Core must not import a vertical.',
           },
         ],

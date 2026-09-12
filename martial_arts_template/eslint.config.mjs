@@ -15,8 +15,8 @@ export default withNuxt(
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [{
-          group: ['**/martial_arts_template/**', 'martial-arts-acquisition'],
-          message: 'Core must not import Martial Arts.',
+          group: ['**/martial_arts_template/**', 'martial-arts-acquisition', '**/sales_template/**', 'sales-crm'],
+          message: 'Core must not import a vertical.',
         }],
       }],
     },

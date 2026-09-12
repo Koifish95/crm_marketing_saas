@@ -1,0 +1,47 @@
+{
+  "name": "sales-crm",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "node scripts/run-nuxt.mjs dev",
+    "preview": "node scripts/run-nuxt.mjs preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "typecheck": "nuxt typecheck",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx server/database/migrate.ts",
+    "db:seed": "tsx drizzle/seed.ts",
+    "db:setup": "pnpm db:migrate && pnpm db:seed",
+    "db:studio": "drizzle-kit studio",
+    "test": "vitest run"
+  },
+  "packageManager": "pnpm@10.34.4",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@crm/core": "workspace:*",
+    "@adonisjs/hash": "^10.1.1",
+    "@libsql/client": "^0.17.4",
+    "@libsql/linux-x64-gnu": "0.5.29",
+    "@libsql/win32-x64-msvc": "0.5.29",
+    "@tailwindcss/vite": "^4.3.3",
+    "drizzle-orm": "^0.45.2",
+    "nuxt": "^4.5.2",
+    "nuxt-auth-utils": "^0.5.30",
+    "tailwindcss": "^4.3.3",
+    "vue": "^3.5.41",
+    "vue-router": "^5.2.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.17.0",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^10.9.1",
+    "tsx": "^4.23.12",
+    "typescript": "^5.9.2",
+    "vitest": "^4.1.11",
+    "vue-tsc": "^3.3.11"
+  }
+}
