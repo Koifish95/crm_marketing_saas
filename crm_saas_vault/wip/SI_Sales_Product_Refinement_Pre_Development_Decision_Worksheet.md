@@ -100,13 +100,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — Next phase = usable SI sales/acquisition CRM. Not the entire eventual product. Not C2/CP provision.
+- [x] APPROVE — Next phase = usable SI sales/acquisition CRM. Not the entire eventual product. Not C2/CP provision.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. Turn Sales from the C2A architectural proof into a usable Strategic Insights sales/acquisition CRM without attempting the entire eventual Sales product. C2/Control Plane remains out of scope.
 
 ---
 
@@ -136,13 +136,13 @@ Same as ChatGPT. Pair with Decisions 3–5 and 26–29.
 
 ### Scott decision
 
-- [ ] APPROVE — Capture on actionable interest. Do not require a Company first.
+- [x] APPROVE — Capture on actionable interest. Do not require a Company first.
 - [ ] REJECT — Keep Company-first capture (C2A shape).
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. A prospect may enter Sales when there is enough information to represent actionable commercial interest. Company is not required first.
 
 ---
 
@@ -168,13 +168,13 @@ Same as ChatGPT. UI noun (Lead vs Prospect) is Decision 29.
 
 ### Scott decision
 
-- [ ] APPROVE — Sales-owned Lead/prospect. Do not reuse MA Household Lead. Do not promote into Core yet.
+- [x] APPROVE — Sales-owned Lead/prospect. Do not reuse MA Household Lead. Do not promote into Core yet.
 - [ ] REJECT — Stay on Company + Contact + Opportunity only.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. First-class Sales-owned Lead. Do not reuse Martial Arts Household Lead. Do not promote generic Lead into Core.
 
 ---
 
@@ -200,13 +200,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — Lead.Company is optional until qualification.
+- [x] APPROVE — Lead.Company is optional until qualification.
 - [ ] REJECT — Every Lead must have a Company.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. A Lead may exist without a Company.
 
 ---
 
@@ -248,20 +248,20 @@ Same as ChatGPT, with explicit Convert + retained Lead history as above.
 
 ### Scott decision
 
-- [ ] APPROVE — Explicit Convert creates only needed Company / Contact / Opportunity. Keep Lead as history. Do not copy MA conversion.
+- [x] APPROVE — Explicit Convert creates only needed Company / Contact / Opportunity. Keep Lead as history. Do not copy MA conversion.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Also check if you want:**
 
-- [ ] Convert is staff-initiated (recommended)
+- [x] Convert is staff-initiated (recommended)
 - [ ] Convert is automatic when a stage is selected
 - [ ] Lead is archived/hidden after convert
-- [ ] Lead remains visible and linked after convert (recommended)
+- [x] Lead remains visible and linked after convert (recommended)
 
 **Scott notes:**
 
->
+> APPROVE Cursor's recommendation. Explicit staff-triggered Convert Lead action. Creates/associates Company where applicable, Contact where applicable, and Opportunity. Retain the original Lead as historical evidence and link it to the resulting records.
 
 ---
 
@@ -306,23 +306,23 @@ This is owner business process **and** a schema fork. Scott must choose.
 **Stage ownership (pick one):**
 
 - [ ] APPROVE CHATGPT RECOMMENDATION — One pipeline list on Opportunity (New … Won/Lost). Lead may exist but does not have its own stages.
-- [ ] APPROVE CURSOR RECOMMENDATION — Split: Lead New/Contacted/Qualified; Opportunity Proposal/Decision/Won/Lost (adjust if notes say otherwise).
+- [x] APPROVE CURSOR RECOMMENDATION — Split: Lead New/Contacted/Qualified; Opportunity Proposal/Decision/Won/Lost (adjust if notes say otherwise).
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Include these stages** (check all that apply; add names in notes):
 
-- [ ] New
-- [ ] Contacted
-- [ ] Qualified
-- [ ] Proposal / Quote
-- [ ] Decision
-- [ ] Won
-- [ ] Lost
-- [ ] Other / rename / reorder — See Scott notes.
+- [x] New
+- [x] Contacted
+- [x] Qualified
+- [x] Proposal / Quote
+- [x] Decision
+- [x] Won
+- [x] Lost
+- [x] Other / rename / reorder — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE Cursor's qualified recommendation, not ChatGPT's single Opportunity pipeline. Lead lifecycle: New → Contacted → Qualified → Convert (explicit staff action). Opportunity lifecycle: Proposal / Quote → Decision → Won | Lost. Do not place New/Contacted/Qualified onto Opportunity. Exact technical status representation may be refined during Work Order planning; preserve the domain distinction.
 
 ---
 
@@ -351,7 +351,7 @@ Same as ChatGPT. Default technical behavior if Scott picks a commitment event: W
 **Won means (pick one):**
 
 - [ ] Verbal / written commitment to buy (no invoice required)
-- [ ] Signed agreement / SOW / engagement letter
+- [x] Signed agreement / SOW / engagement letter
 - [ ] First invoice sent
 - [ ] First payment received
 - [ ] Kickoff scheduled
@@ -359,12 +359,12 @@ Same as ChatGPT. Default technical behavior if Scott picks a commitment event: W
 
 **Also:**
 
-- [ ] Won is staff-asserted only (recommended for this phase)
+- [x] Won is staff-asserted only (recommended for this phase)
 - [ ] System may auto-Won from another event (name it in notes)
 
 **Scott notes:**
 
->
+> Won = signed agreement / SOW representing commitment to purchase. Do not require invoice issuance, payment receipt, or kickoff. Won remains an explicit staff action unless later automation is separately authorized.
 
 ---
 
@@ -390,23 +390,23 @@ Same as ChatGPT. Suggested first categories (Scott can edit): timing, budget, we
 
 **Lost means:**
 
-- [ ] APPROVE — Intentionally closed without a sale.
+- [x] APPROVE — Intentionally closed without a sale.
 
 **Loss reason:**
 
-- [ ] APPROVE CHATGPT / CURSOR — Required structured category + optional notes
+- [x] APPROVE CHATGPT / CURSOR — Required structured category + optional notes
 - [ ] Required free-text only
 - [ ] Optional notes only
 - [ ] No reason captured in this phase
 
 **Also:**
 
-- [ ] Won/Lost are terminal until an explicit Reopen action
+- [x] Won/Lost are terminal until an explicit Reopen action
 - [ ] Staff may freely change any stage including Won ↔ Lost (C2A behavior)
 
 **Scott notes:**
 
->
+> Required structured loss reason plus optional notes. If Other is selected, require explanatory text. Initial reasons: Budget, Timing, Chose another provider, No longer needed, Could not reach, Not a fit, Other. Won/Lost are terminal until staff explicitly reopens the Opportunity.
 
 ---
 
@@ -432,24 +432,24 @@ Same as ChatGPT. Keep Sales-owned. Related record: Lead and/or Opportunity (and 
 
 ### Scott decision
 
-- [ ] APPROVE — Operational activity queue as listed (owner, type, due, status, related record, notes, completion, overdue/upcoming).
+- [x] APPROVE — Operational activity queue as listed (owner, type, due, status, related record, notes, completion, overdue/upcoming).
 - [ ] REJECT — Keep C2A stub Activities.
 - [ ] MODIFY — See Scott notes.
 
 **Include these fields/behaviors:**
 
-- [ ] Owner (user)
-- [ ] Type (call, email, meeting, task, other)
-- [ ] Due date/time
-- [ ] Status (open / completed; optional cancelled)
-- [ ] Related Lead and/or Opportunity
-- [ ] Notes
-- [ ] Overdue / upcoming visibility
-- [ ] Other — See Scott notes.
+- [x] Owner (user)
+- [x] Type (call, email, meeting, task, other)
+- [x] Due date/time
+- [x] Status (open / completed; optional cancelled)
+- [x] Related Lead and/or Opportunity
+- [x] Notes
+- [x] Overdue / upcoming visibility
+- [x] Other — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. Real Sales-owned operational queue. Also require due-today visibility. Initial activity types: Call, Email, Meeting, Task, Other. Do not reuse Martial Arts FollowUpTask directly.
 
 ---
 
@@ -473,21 +473,21 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — Chronological notes/history, Sales-owned, on the primary commercial records. No Core promotion now.
+- [x] APPROVE — Chronological notes/history, Sales-owned, on the primary commercial records. No Core promotion now.
 - [ ] REJECT — Keep a single notes blob.
 - [ ] MODIFY — See Scott notes.
 
 **Attach history to:**
 
-- [ ] Lead
-- [ ] Company
-- [ ] Contact
-- [ ] Opportunity
+- [x] Lead
+- [x] Company
+- [x] Contact
+- [x] Opportunity
 - [ ] Activity (if distinct from activity notes)
 
 **Scott notes:**
 
->
+> APPROVE. Chronological Sales-owned notes/history on Lead, Company, Contact, and Opportunity. Activities may retain their own contextual notes. Do not authorize Core promotion merely because Martial Arts has similar functionality.
 
 ---
 
@@ -513,13 +513,13 @@ Approve ChatGPT’s yes, with the qualification above.
 
 ### Scott decision
 
-- [ ] APPROVE — Company and Opportunity become coherent workspaces using Core chrome; Sales-owned content; no Core promotion of MA selector/tabs now.
+- [x] APPROVE — Company and Opportunity become coherent workspaces using Core chrome; Sales-owned content; no Core promotion of MA selector/tabs now.
 - [ ] REJECT — Keep C2A CRUD pages.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE Cursor's qualified recommendation. Use existing Core AppRecordWorkspace where appropriate. Sales owns workspace-specific tabs/content. Do not import Martial Arts workspace components. Do not perform speculative workspace promotion into Core.
 
 ---
 
@@ -545,13 +545,13 @@ Same as ChatGPT. Operational landing: open Opportunities (and overdue activities
 
 ### Scott decision
 
-- [ ] APPROVE — Opportunity = primary sales-work record. Company = relationship/account. Contacts = people.
+- [x] APPROVE — Opportunity = primary sales-work record. Company = relationship/account. Contacts = people.
 - [ ] REJECT — Company is the primary daily workspace.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. Opportunity is the primary day-to-day sales-work record. Company is the durable commercial/account relationship. Contact represents people associated with that relationship. Lead represents pre-opportunity commercial interest.
 
 ---
 
@@ -575,21 +575,21 @@ Same as ChatGPT. Suggested minimum: `source` (structured), optional `referralNam
 
 ### Scott decision
 
-- [ ] APPROVE — Sales-owned attribution on Lead (copy to Opportunity on convert). No MA campaign reuse.
+- [x] APPROVE — Sales-owned attribution on Lead (copy to Opportunity on convert). No MA campaign reuse.
 - [ ] REJECT — No attribution in this phase.
 - [ ] MODIFY — See Scott notes.
 
 **Capture:**
 
-- [ ] Source (structured list)
-- [ ] Channel
-- [ ] Referral name/person
-- [ ] Campaign / tracking note (text, not Campaign entity)
+- [x] Source (structured list)
+- [x] Channel
+- [x] Referral name/person
+- [x] Campaign / tracking note (text, not Campaign entity)
 - [ ] Other — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. Capture useful source/attribution. First implementation Sales-owned. Do not automatically reuse Martial Arts Campaign/Event attribution structures. Timing: Slice B (Decision 26).
 
 ---
 
@@ -615,13 +615,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — No Campaign domain in this phase. Attribution only.
+- [x] APPROVE — No Campaign domain in this phase. Attribution only.
 - [ ] REJECT — Include Sales Campaigns now.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. Do not implement Sales Campaign management in this refinement phase. Capture attribution/source first. Campaign architecture remains a later comparison/decision.
 
 ---
 
@@ -647,13 +647,13 @@ Same as ChatGPT. Defer public capture to a later Work Order after the internal w
 
 ### Scott decision
 
-- [ ] APPROVE — No public capture in the first refinement slice.
+- [x] APPROVE — No public capture in the first refinement slice.
 - [ ] REJECT — Include a thin public form now.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. Do not include public lead-capture forms in the first internal refinement slice. First establish the internal Lead → conversion → Opportunity → follow-up → outcome workflow. Public capture can feed that workflow later.
 
 ---
 
@@ -681,21 +681,21 @@ Small Sales-owned Offer/Service list; Opportunity has optional `offerId` + overr
 
 ### Scott decision
 
-- [ ] APPROVE — Minimal Sales-owned Offer/Service list; Opportunity references it. No billing/catalog infrastructure.
+- [x] APPROVE — Minimal Sales-owned Offer/Service list; Opportunity references it. No billing/catalog infrastructure.
 - [ ] REJECT — Free-text Opportunity name is enough for this phase.
 - [ ] MODIFY — See Scott notes.
 
 **Offer fields to include:**
 
-- [ ] Name
-- [ ] Short description
-- [ ] Default price / amount
-- [ ] Active/inactive
-- [ ] Other — See Scott notes.
+- [x] Name
+- [x] Short description
+- [x] Default price / amount
+- [x] Active/inactive
+- [x] Other — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE a minimal Sales-owned Service/Offer concept: Name, Description, Default price/value, Pricing type (one-time | recurring), Active/inactive, and Opportunity association/selection. Do not expand into billing, Stripe, taxes, accounting, invoicing, complex price books, or CP product catalog. Timing: Slice B (Decision 26).
 
 ---
 
@@ -723,13 +723,13 @@ Keep one-time estimated value in this phase unless Scott checks recurring. If SI
 
 - [ ] One-time estimated value only (already in C2A; keep/use it)
 - [ ] Recurring monthly value only
-- [ ] Both one-time and monthly
+- [x] Both one-time and monthly
 - [ ] Another structure — See Scott notes.
 - [ ] No monetary value in this phase
 
 **Scott notes:**
 
->
+> Support both one-time value and monthly recurring revenue (MRR). Example: $3,000 one-time implementation/project value and $500/month recurring service value, or both when appropriate. This is Sales opportunity valuation. It does not authorize billing/invoicing. Slice A retains/uses existing one-time amountCents; one-time + MRR enhancements are Slice B (Decision 26).
 
 ---
 
@@ -757,12 +757,12 @@ Defer generation. Allow optional proposal metadata on the Opportunity if Scott w
 
 - [ ] APPROVE CHATGPT / CURSOR — Pipeline stage only; no proposal-generation subsystem.
 - [ ] Support proposal metadata/status (sent date, amount, link/note) without generation
-- [ ] Require proposal functionality (draft/send/track) in this slice
+- [x] Require proposal functionality (draft/send/track) in this slice
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> OWNER OVERRIDE. Scott rejected deferring proposal generation. **Build proposal generation.** This is an approved Slice B product requirement (Decision 26), not Slice A, and is **not authorized for implementation yet**. Before Slice B, bound generation so it does not silently expand into billing, accounting, e-signature, or a document-management platform unless separately decided. ChatGPT/Cursor text above remains the historical recommendation.
 
 ---
 
@@ -788,13 +788,13 @@ Same as ChatGPT, with the three-state lifecycle above.
 
 ### Scott decision
 
-- [ ] APPROVE — Company lifecycle prospect / customer / inactive. Won may mark customer. No service-delivery product.
+- [x] APPROVE — Company lifecycle prospect / customer / inactive. Won may mark customer. No service-delivery product.
 - [ ] REJECT — Keep Company.active only.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. Company should have its own lifecycle/status (prospect / customer / inactive). Won may mark the Company as customer. Sales-owned; do not automatically become a Core customer-status concept or a service-delivery product. Timing: Slice B (Decision 26).
 
 ---
 
@@ -818,22 +818,22 @@ Same as ChatGPT. Check the metrics Scott actually wants below.
 
 ### Scott decision
 
-- [ ] APPROVE — Operational dashboard only; no BI project.
+- [x] APPROVE — Operational dashboard only; no BI project.
 
 **Include:**
 
-- [ ] Open opportunities
-- [ ] Pipeline value
-- [ ] Overdue activities
-- [ ] Upcoming activities
-- [ ] Won (count / value)
-- [ ] Lost (count / value)
-- [ ] Source / attribution summary
-- [ ] Other — See Scott notes.
+- [x] Open opportunities
+- [x] Pipeline value
+- [x] Overdue activities
+- [x] Upcoming activities
+- [x] Won (count / value)
+- [x] Lost (count / value)
+- [x] Source / attribution summary
+- [x] Other — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. Operational Sales dashboard/home only; not a BI project. Include all listed metrics plus conversion count (Leads converted to Opportunities) and due-today activities. Timing: Slice B (Decision 26).
 
 ---
 
@@ -857,7 +857,7 @@ Same as ChatGPT. Also allow Company owner later if useful; not required if Oppor
 
 ### Scott decision
 
-- [ ] APPROVE — Owner on Leads, Opportunities, and Activities via Core users.
+- [x] APPROVE — Owner on Leads, Opportunities, and Activities via Core users.
 - [ ] REJECT — No ownership in this phase.
 - [ ] MODIFY — See Scott notes.
 
@@ -868,7 +868,7 @@ Same as ChatGPT. Also allow Company owner later if useful; not required if Oppor
 
 **Scott notes:**
 
->
+> APPROVE. Keep/extend owner on Lead, Opportunity, and Activity via Core users. Do not add a Core ownership/assignment engine. Do not add Company/Contact owners in this phase unless a later Work Order requires them.
 
 ---
 
@@ -892,24 +892,24 @@ Same as ChatGPT. Observe the list; promote only via a later Work Order.
 
 ### Scott decision
 
-- [ ] APPROVE — Observe these comparison targets. No promotion authorized.
+- [x] APPROVE — Observe these comparison targets. No promotion authorized.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Observe:**
 
-- [ ] Primary Record Workspace
-- [ ] Task / activity mechanics
-- [ ] Notes / history
-- [ ] Ownership
-- [ ] Attribution primitives
-- [ ] Status / timeline UI
-- [ ] Reusable selectors
+- [x] Primary Record Workspace
+- [x] Task / activity mechanics
+- [x] Notes / history
+- [x] Ownership
+- [x] Attribution primitives
+- [x] Status / timeline UI
+- [x] Reusable selectors
 - [ ] Other — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. Observe existing Core/MA surfaces. Reuse only by explicit later decision. Do not import Martial Arts components wholesale. Do not perform speculative Core promotion.
 
 ---
 
@@ -933,13 +933,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — No SI migration/cutover in this refinement phase.
+- [x] APPROVE — No SI migration/cutover in this refinement phase.
 - [ ] REJECT — Include migration now.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. This is Sales product refinement, not SI data/app migration. SI remains a later target. Do not include SI import, mapping, or cutover in this phase.
 
 ---
 
@@ -963,13 +963,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — Do not begin C2 / CP Sales provisioning in this phase.
+- [x] APPROVE — Do not begin C2 / CP Sales provisioning in this phase.
 - [ ] REJECT — Begin C2 first.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. C2 remains blocked until Sales is a real vertical. Completing this worksheet does not authorize C2 or Control Plane Sales provisioning.
 
 ---
 
@@ -1010,13 +1010,13 @@ Approve ChatGPT’s success definition. Bound the first implementation Work Orde
 
 ### Scott decision
 
-- [ ] APPROVE — Success = manage SI core acquisition/sales inside Sales without a spreadsheet for that core workflow. Not every SI function.
+- [x] APPROVE — Success = manage SI core acquisition/sales inside Sales without a spreadsheet for that core workflow. Not every SI function.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE. Success means Scott could realistically manage Strategic Insights’ core acquisition and sales process inside Sales CRM without an external spreadsheet for that core workflow. It does not mean every SI business function must exist.
 
 ---
 
@@ -1045,19 +1045,41 @@ C2A was a thin slice on purpose. The prior architecture worksheet split **audit 
 **Two implementation Work Orders after this worksheet** (still not authorized by checking boxes):
 
 1. **Slice A (must hit Decision 25):** Lead (optional Company) + convert + stage model from Decision 6 + Opportunity/Company workspaces + activity queue + notes/history + ownership + Won/Lost reasons. Keep/use existing one-time `amountCents`.
-2. **Slice B (after A is usable):** Offers (16), attribution UI (13), dashboard metrics (20), Company lifecycle (19), proposal metadata if chosen (18).
+2. **Slice B (after A is usable):** Offers (16), one-time + MRR value (17), attribution UI (13), dashboard metrics (20), Company lifecycle (19), **proposal generation** (18 — product approved for Slice B; not Slice A; not authorized until a Slice B Work Order).
 
 Public capture, Campaigns, C2, SI migration stay out.
 
 ### Scott decision
 
-- [ ] APPROVE CURSOR RECOMMENDATION — Slice A then Slice B as above. Only A is the next implementation WO after reconciliation.
+- [x] APPROVE CURSOR RECOMMENDATION — Slice A then Slice B as above. Only A is the next implementation WO after reconciliation.
 - [ ] APPROVE ONE WORK ORDER — Implement all approved items from this worksheet in a single later WO (except deferred table).
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE CURSOR. Split into Slice A then Slice B. Only Slice A is the next implementation Work Order after ChatGPT reconciliation. Checking these boxes does not authorize Slice A.
+
+Slice A = Sales backbone:
+- Lead entity
+- Lead conversion
+- Opportunity pipeline
+- Won / Lost
+- Loss reason
+- Activities
+- Notes / history
+- Opportunity/Company workspaces
+- Owner / assignment
+- Existing one-time `amountCents` (no MRR/offers yet)
+
+Slice B:
+- Offers / services
+- One-time + MRR value
+- Source / attribution UI
+- Dashboard / metrics
+- Company lifecycle
+- **Proposal generation** (Decision 18 — approved product requirement for Slice B, not Slice A, not authorized until a Slice B Work Order)
+
+Public capture, Campaigns, C2, and SI migration remain out of both slices.
 
 ---
 
@@ -1086,13 +1108,13 @@ Placeholder Companies are simpler for reporting (“all deals hang off an accoun
 
 ### Scott decision
 
-- [ ] APPROVE CURSOR RECOMMENDATION — Opportunity always has a Company; create one at convert if needed (person-named account allowed).
+- [x] APPROVE CURSOR RECOMMENDATION — Opportunity always has a Company; create one at convert if needed (person-named account allowed).
 - [ ] ALLOW OPPORTUNITY WITHOUT COMPANY — Make accountId optional.
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE CURSOR. On convert, create a person-named Company if needed, a default Contact, and an Opportunity. Manual Company/Contact linking can come later. Do not require staff to pick or create Company/Contact before conversion in Slice A. Do not make Opportunity.accountId optional.
 
 ---
 
@@ -1118,7 +1140,7 @@ Require a **display name** (person or org) **and at least one** of: phone, email
 
 **A Lead may be saved when it has:**
 
-- [ ] APPROVE CURSOR — Display name + at least one of phone / email / reachability note
+- [x] APPROVE CURSOR — Display name + at least one of phone / email / reachability note
 - [ ] Name only
 - [ ] Name + email required
 - [ ] Name + phone required
@@ -1126,7 +1148,7 @@ Require a **display name** (person or org) **and at least one** of: phone, email
 
 **Scott notes:**
 
->
+> APPROVE CURSOR. Minimum Lead identity is a display name plus at least one of phone, email, or a reachability note. Other fields remain optional. Do not over-specify required fields before implementation.
 
 ---
 
@@ -1150,13 +1172,13 @@ UI noun **Lead**. Table `sales_leads`.
 
 ### Scott decision
 
-- [ ] APPROVE CURSOR — UI noun Lead (`sales_leads`)
+- [x] APPROVE CURSOR — UI noun Lead (`sales_leads`)
 - [ ] UI noun Prospect (`sales_leads` table still)
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVE CURSOR. UI noun is Lead. Persistence table/entity is `sales_leads`. This avoids collision with Martial Arts `leads` and matches existing Sales table naming.
 
 ---
 
@@ -1181,58 +1203,58 @@ None of the following is pulled into the next Sales refinement unless Scott expl
 | Speculative Core promotion | Decision 22 observe-only |
 | Public lead-capture forms | Decision 15 |
 | Sales Campaign domain | Decision 14 |
-| Proposal-generation subsystem | Decision 18 default |
+| Proposal-generation subsystem | Decision 18 owner override: **approved for Slice B**, not authorized, not Slice A. Bound later so it does not become billing, accounting, e-sign, or a document platform.
 | Final production deployment architecture | After VPS |
 
 NEAR-04–10 remain open in [[SaaS-Open-Questions]] and **do not** block local Sales refinement.
 
 If Scott believes one deferred item **must** be decided now:
 
-- [ ] None — leave the table deferred
+- [x] None — leave the table deferred
 - [ ] Promote one item into a new decision — name it in notes
 
 **Scott notes:**
 
->
+> None — leave the table deferred. Proposal generation is **not** promoted into Slice A. It is an approved Slice B product requirement (Decisions 18 and 26), still not authorized, still not a current Work Order.
 
 ---
 
 ## Scott approval summary
 
-- [ ] Decision 1 complete — next-phase objective
-- [ ] Decision 2 complete — when a prospect enters
-- [ ] Decision 3 complete — Sales-owned Lead
-- [ ] Decision 4 complete — Lead Company optional
-- [ ] Decision 5 complete — conversion
-- [ ] Decision 6 complete — pipeline stages (owner input)
-- [ ] Decision 7 complete — Won definition (owner input)
-- [ ] Decision 8 complete — Lost definition (owner input)
-- [ ] Decision 9 complete — follow-up queue
-- [ ] Decision 10 complete — notes/history
-- [ ] Decision 11 complete — record workspace
-- [ ] Decision 12 complete — primary sales record
-- [ ] Decision 13 complete — attribution
-- [ ] Decision 14 complete — no Campaigns
-- [ ] Decision 15 complete — no public capture in first slice
-- [ ] Decision 16 complete — offers (owner input)
-- [ ] Decision 17 complete — monetary value (owner input)
-- [ ] Decision 18 complete — proposals (owner input)
-- [ ] Decision 19 complete — Company lifecycle
-- [ ] Decision 20 complete — dashboard metrics
-- [ ] Decision 21 complete — ownership
-- [ ] Decision 22 complete — Core-promotion observe-only
-- [ ] Decision 23 complete — no SI migration
-- [ ] Decision 24 complete — no C2
-- [ ] Decision 25 complete — success definition
-- [ ] Decision 26 complete — Work Order size
-- [ ] Decision 27 complete — Opportunity vs Company
-- [ ] Decision 28 complete — Lead minimum fields
-- [ ] Decision 29 complete — UI noun
-- [ ] Deferred table reviewed
+- [x] Decision 1 complete — next-phase objective
+- [x] Decision 2 complete — when a prospect enters
+- [x] Decision 3 complete — Sales-owned Lead
+- [x] Decision 4 complete — Lead Company optional
+- [x] Decision 5 complete — conversion
+- [x] Decision 6 complete — pipeline stages (owner input)
+- [x] Decision 7 complete — Won definition (owner input)
+- [x] Decision 8 complete — Lost definition (owner input)
+- [x] Decision 9 complete — follow-up queue
+- [x] Decision 10 complete — notes/history
+- [x] Decision 11 complete — record workspace
+- [x] Decision 12 complete — primary sales record
+- [x] Decision 13 complete — attribution
+- [x] Decision 14 complete — no Campaigns
+- [x] Decision 15 complete — no public capture in first slice
+- [x] Decision 16 complete — offers (owner input)
+- [x] Decision 17 complete — monetary value (owner input)
+- [x] Decision 18 complete — proposals (owner input)
+- [x] Decision 19 complete — Company lifecycle
+- [x] Decision 20 complete — dashboard metrics
+- [x] Decision 21 complete — ownership
+- [x] Decision 22 complete — Core-promotion observe-only
+- [x] Decision 23 complete — no SI migration
+- [x] Decision 24 complete — no C2
+- [x] Decision 25 complete — success definition
+- [x] Decision 26 complete — Work Order size
+- [x] Decision 27 complete — Opportunity vs Company
+- [x] Decision 28 complete — Lead minimum fields
+- [x] Decision 29 complete — UI noun
+- [x] Deferred table reviewed
 
 ### Planning readiness
 
-- [ ] DECISIONS COMPLETE — Ready for ChatGPT/Cursor pre-development reconciliation.
+- [x] DECISIONS COMPLETE — Ready for ChatGPT/Cursor pre-development reconciliation.
 - [ ] NOT READY — Additional owner discussion required.
 
 **Decision completion does not authorize implementation.**
