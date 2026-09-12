@@ -9,7 +9,7 @@ import '../../lib/register-sales-shell'
 describe('C2A registration contracts', () => {
   it('composes Core admin nav with Sales items', () => {
     const staff = listNavItems({ role: 'STAFF', accessRights: ['VIEW_SALES'] }).map(item => item.label)
-    expect(staff).toEqual(['Dashboard', 'Leads', 'Companies', 'Contacts', 'Opportunities', 'Activities'])
+    expect(staff).toEqual(['Dashboard', 'Leads', 'Companies', 'Contacts', 'Opportunities', 'Activities', 'Campaigns', 'Offers'])
 
     const admin = listNavItems({ role: 'ADMIN' }).map(item => item.label)
     expect(admin).toEqual([
@@ -19,6 +19,8 @@ describe('C2A registration contracts', () => {
       'Contacts',
       'Opportunities',
       'Activities',
+      'Campaigns',
+      'Offers',
       'Users',
       'Security activity',
       'Settings',
@@ -32,6 +34,6 @@ describe('C2A registration contracts', () => {
   })
 
   it('registers Sales settings sections only', () => {
-    expect(listSettingsSections().map(section => section.to)).toEqual(['/settings/access'])
+    expect(listSettingsSections().map(section => section.to)).toEqual(['/settings/access', '/settings/intake'])
   })
 })

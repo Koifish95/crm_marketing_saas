@@ -6,7 +6,7 @@ import { throwDomain } from '../../utils/api'
 import { requireSalesAccess } from '../../utils/auth'
 
 export default defineEventHandler(async (event) => {
-  await requireSalesAccess(event, 'MANAGE_SALES')
+  const user = await requireSalesAccess(event, 'MANAGE_SALES')
   const id = Number(getRouterParam(event, 'id'))
   if (!Number.isInteger(id) || id < 1) {
     throw createError({ statusCode: 400, message: 'Invalid opportunity id.' })
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Invalid opportunity.' })
   }
   try {
-    return await updateOpportunity(useDb(), id, parsed.data)
+    return await updateOpportunity(useDb(), id, parsed.data, user.id)
   } catch (error) {
     throwDomain(error)
   }

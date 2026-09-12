@@ -3,10 +3,11 @@ import { seedAccessFramework } from '@crm/core/server/services/access-rights'
 import { hashStaffPassword } from '@crm/core/server/services/password'
 import { readAppEnv } from '@crm/core/shared/utils/app-env'
 import { createDb, getDatabaseUrl } from '../server/database'
-import { salesAccounts, salesActivities, salesContacts, salesLeads, salesOpportunities, users, userRoles, userTypes, userTypeRoles } from '../server/database/schema'
+import { salesAccounts, salesActivities, salesContacts, salesLeads, salesOpportunities, salesOpportunityLines, users, userRoles, userTypes, userTypeRoles } from '../server/database/schema'
 import { SEEDED_USER_ROLES, SEEDED_USER_ROLE_RIGHTS } from '../shared/utils/access-rights'
 import { loadLocalEnv } from '../server/utils/load-env'
 import { utcNowMs } from '../shared/utils/time'
+import { ensureSeededSources } from '../server/services/acquisition'
 
 export const BOOTSTRAP_PASSWORD_REQUIRED
   = 'NUXT_AUTH_PASSWORD is required to seed an admin user. Seed will not invent a default password.'
@@ -74,6 +75,7 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
       userRoles: SEEDED_USER_ROLES,
       roleRights: SEEDED_USER_ROLE_RIGHTS,
     })
+    await ensureSeededSources(db)
 
     const [staffType] = await db.select().from(userTypes).where(eq(userTypes.code, 'STAFF')).limit(1)
     const [salesRole] = await db.select().from(userRoles).where(eq(userRoles.code, 'SALES_USER')).limit(1)
@@ -94,6 +96,7 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
         name: 'Northwind Advisors',
         notes: 'Demo company for local Sales development. Not Strategic Insights data.',
         active: true,
+        lifecycle: 'prospect',
         createdAt,
         updatedAt: createdAt,
       })
@@ -128,13 +131,26 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
           primaryContactId: contact?.id ?? null,
           name: 'Advisory retainer',
           amountCents: 1200000,
+          mrrCents: 0,
           stage: 'proposal_quote',
           ownerUserId: owner.id,
-          notes: 'Demo one-time estimated value. MRR waits for Slice B.',
+          notes: 'Demo one-time estimated value stored as a commercial line.',
           createdAt,
           updatedAt: createdAt,
         })
         const [opportunity] = await db.select().from(salesOpportunities).limit(1)
+        if (opportunity) {
+          await db.insert(salesOpportunityLines).values({
+            opportunityId: opportunity.id,
+            offerId: null,
+            description: opportunity.name,
+            quantity: 1,
+            pricingType: 'one_time',
+            unitPriceCents: 1200000,
+            createdAt,
+            updatedAt: createdAt,
+          })
+        }
         await db.insert(salesActivities).values({
           accountId: account.id,
           contactId: contact?.id ?? null,

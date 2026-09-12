@@ -9,7 +9,7 @@ import {
   hasRole,
   isPasswordChangeAllowedPath,
   type SessionUser,
-} from '@crm/core/server/services/authorization'
+} from '../services/authorization'
 import { requireAccessRight as assertAccessRight } from '@crm/core/server/services/access-rights'
 import { DomainError } from '@crm/core/server/services/errors'
 import type { AccessRight } from '../../shared/utils/access-rights'

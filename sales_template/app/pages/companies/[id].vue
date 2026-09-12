@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { COMPANY_LIFECYCLES, companyLifecycleLabel } from '#shared/utils/catalog'
+
 definePageMeta({
   layout: 'internal',
   middleware: ['auth', 'sales'],
@@ -12,6 +14,7 @@ type Company = {
   name: string
   notes: string | null
   active: boolean
+  lifecycle: string
 }
 type Contact = { id: number, firstName: string, lastName: string }
 type Opportunity = { id: number, name: string, stage: string }
@@ -35,6 +38,7 @@ useHead({
 const name = ref('')
 const notes = ref('')
 const active = ref(true)
+const lifecycle = ref('prospect')
 const saving = ref(false)
 const notice = ref('')
 const formError = ref('')
@@ -46,6 +50,7 @@ watch(company, (value) => {
   name.value = value.name
   notes.value = value.notes || ''
   active.value = value.active
+  lifecycle.value = value.lifecycle || 'prospect'
 }, { immediate: true })
 
 async function save() {
@@ -55,7 +60,7 @@ async function save() {
   try {
     await $fetch(`/api/companies/${id.value}`, {
       method: 'PATCH',
-      body: { name: name.value, notes: notes.value, active: active.value },
+      body: { name: name.value, notes: notes.value, active: active.value, lifecycle: lifecycle.value },
     })
     await refresh()
     await refreshContacts()
@@ -79,6 +84,9 @@ async function save() {
       <h1 class="record-identity-name">
         {{ company?.name || 'Company' }}
       </h1>
+      <p class="record-meta">
+        {{ company ? companyLifecycleLabel(company.lifecycle) : '' }}
+      </p>
     </template>
     <AppAlert v-if="error || formError">
       {{ formError || 'Could not load this company.' }}
@@ -111,12 +119,26 @@ async function save() {
           rows="3"
         />
       </AppField>
+      <AppField label="Lifecycle">
+        <select
+          v-model="lifecycle"
+          class="control"
+        >
+          <option
+            v-for="code in COMPANY_LIFECYCLES"
+            :key="code"
+            :value="code"
+          >
+            {{ companyLifecycleLabel(code) }}
+          </option>
+        </select>
+      </AppField>
       <label class="touch-row">
         <input
           v-model="active"
           type="checkbox"
         >
-        Active
+        Active record
       </label>
       <AppButton
         type="submit"

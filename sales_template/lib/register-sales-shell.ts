@@ -48,6 +48,22 @@ registerNavItems([
     order: 50,
     visible: salesVisible,
   },
+  {
+    id: 'sales-campaigns',
+    to: '/campaigns',
+    label: 'Campaigns',
+    match: '/campaigns',
+    order: 55,
+    visible: salesVisible,
+  },
+  {
+    id: 'sales-offers',
+    to: '/offers',
+    label: 'Offers',
+    match: '/offers',
+    order: 58,
+    visible: salesVisible,
+  },
 ])
 
 registerSettingsSections([
@@ -57,5 +73,12 @@ registerSettingsSections([
     title: 'Access',
     description: 'Sales Access Rights registered on CRM Core.',
     order: 10,
+  },
+  {
+    id: 'sales-intake',
+    to: '/settings/intake',
+    title: 'Public intake',
+    description: 'Enable or disable the public inquiry form and edit its configuration.',
+    order: 20,
   },
 ])

@@ -22,11 +22,26 @@ type Lead = {
   convertedAccountId: number | null
   convertedContactId: number | null
   convertedOpportunityId: number | null
+  sourceId: number | null
+  campaignId: number | null
+  sourceDetail: string | null
+  sourceName: string | null
+  campaignName: string | null
+  capturedSourceName: string | null
+  capturedCampaignName: string | null
+  capturedTrackingLinkLabel: string | null
+  capturedAt: string | Date | null
+  intakeCompanyName: string | null
+  possibleDuplicateLeadId: number | null
 }
 type Company = { id: number, name: string }
+type Source = { id: number, name: string, code: string, active: boolean }
+type Campaign = { id: number, name: string }
 
 const { data: assignees } = await useFetch<Assignee[]>('/api/assignees')
 const { data: companies } = await useFetch<Company[]>('/api/companies')
+const { data: sources } = await useFetch<Source[]>('/api/sources')
+const { data: campaigns } = await useFetch<Campaign[]>('/api/campaigns')
 const { data: lead, error, pending, refresh } = await useFetch<Lead>(() => `/api/leads/${id.value}`)
 
 useHead({
@@ -38,6 +53,10 @@ const email = ref('')
 const phone = ref('')
 const reachabilityNote = ref('')
 const ownerUserId = ref('')
+const sourceId = ref('')
+const campaignId = ref('')
+const sourceDetail = ref('')
+const intakeCompanyName = ref('')
 const saving = ref(false)
 const converting = ref(false)
 const notice = ref('')
@@ -52,6 +71,10 @@ watch(lead, (value) => {
   phone.value = value.phone || ''
   reachabilityNote.value = value.reachabilityNote || ''
   ownerUserId.value = value.ownerUserId ? String(value.ownerUserId) : ''
+  sourceId.value = value.sourceId ? String(value.sourceId) : ''
+  campaignId.value = value.campaignId ? String(value.campaignId) : ''
+  sourceDetail.value = value.sourceDetail || ''
+  intakeCompanyName.value = value.intakeCompanyName || ''
 }, { immediate: true })
 
 const converted = computed(() => lead.value?.stage === 'converted')
@@ -69,6 +92,10 @@ async function save() {
         phone: phone.value || null,
         reachabilityNote: reachabilityNote.value || null,
         ownerUserId: ownerUserId.value ? Number(ownerUserId.value) : undefined,
+        sourceId: sourceId.value ? Number(sourceId.value) : null,
+        campaignId: campaignId.value ? Number(campaignId.value) : null,
+        sourceDetail: sourceDetail.value || null,
+        intakeCompanyName: intakeCompanyName.value || null,
       },
     })
     await refresh()
@@ -177,6 +204,16 @@ function companyName(accountId: number | null) {
         Opportunity
       </NuxtLink>
     </div>
+    <AppAlert
+      v-if="lead?.possibleDuplicateLeadId"
+      tone="warning"
+    >
+      Possible duplicate of
+      <NuxtLink :to="`/leads/${lead.possibleDuplicateLeadId}`">
+        Lead #{{ lead.possibleDuplicateLeadId }}
+      </NuxtLink>
+      . Review only — nothing was auto-merged.
+    </AppAlert>
     <form
       v-if="lead"
       class="form-measure space-y-4"
@@ -215,6 +252,66 @@ function companyName(accountId: number | null) {
           :disabled="converted"
         />
       </AppField>
+      <AppField label="Submitted company name">
+        <input
+          v-model="intakeCompanyName"
+          class="control"
+        >
+      </AppField>
+      <AppField label="Current source">
+        <select
+          v-model="sourceId"
+          class="control"
+        >
+          <option value="">
+            None
+          </option>
+          <option
+            v-for="source in sources"
+            :key="source.id"
+            :value="String(source.id)"
+          >
+            {{ source.name }}{{ source.active ? '' : ' (inactive)' }}
+          </option>
+        </select>
+      </AppField>
+      <AppField label="Current campaign">
+        <select
+          v-model="campaignId"
+          class="control"
+        >
+          <option value="">
+            None
+          </option>
+          <option
+            v-for="item in campaigns"
+            :key="item.id"
+            :value="String(item.id)"
+          >
+            {{ item.name }}
+          </option>
+        </select>
+      </AppField>
+      <AppField
+        label="Source detail"
+        hint="Required when Source is Other"
+      >
+        <input
+          v-model="sourceDetail"
+          class="control"
+        >
+      </AppField>
+      <p
+        v-if="lead.capturedSourceName || lead.capturedTrackingLinkLabel"
+        class="text-sm text-muted"
+      >
+        Original captured:
+        {{ lead.capturedSourceName || 'No source' }}
+        · {{ lead.capturedCampaignName || 'No campaign' }}
+        <span v-if="lead.capturedTrackingLinkLabel">
+          · {{ lead.capturedTrackingLinkLabel }}
+        </span>
+      </p>
       <AppField label="Owner">
         <select
           v-model="ownerUserId"

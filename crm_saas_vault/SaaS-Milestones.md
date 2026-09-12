@@ -81,12 +81,13 @@ Not S-track. Do not call C2 “S7.” Do not call historical hostname work “S5
 | C1 | CRM Core extraction (workspace, `@crm/core`, frameworks) | **Code-shipped** (2026-09-11). Evidence: [[history/C1_CRM_Core_Architecture_Return]] |
 | C2A | Thin Sales consumer (local Core consumer; no CP catalog) | **Successful** (2026-09-11). Evidence: [[history/C2A_closeout]]. Not C2. |
 | C2B | SI Sales Refinement Slice A (Lead, convert, Opportunity workflow) | **Successful** (2026-09-12). Not Slice B. Not C2. Evidence: [[history/C2B_closeout]] |
+| SI Sales B1 | Commercial model + acquisition foundation | **Code-shipped** (2026-09-12). Owner acceptance pending. Not Successful. Not B2. Not C2. Return: [[wip/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]] |
 | C2 | Sales vertical as second Core consumer + CP product catalog | Not started |
 | C3 | Beauty vertical after Sales proves Core | Not started |
 | D1 | Account vs Product Instance CP schema | **Accepted**, schema **not shipped** |
 | D2–D4 | Keep MA leads / campaigns / public capture vertical-owned | **Accepted** (wait) |
 
-C1 is not Map B Successful. C2A is **Successful** (not C2). C2B Slice A is **Successful** (not Slice B, not C2). C2 is not started and is **not** authorized by C2A or C2B. Plan narrative (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]].
+C1 is not Map B Successful. C2A is **Successful** (not C2). C2B Slice A is **Successful** (not Slice B, not C2). SI Sales B1 is **code-shipped** pending owner acceptance (not Successful, not B2, not C2). C2 is not started and is **not** authorized by C2A, C2B, or B1. Plan narrative (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]].
 
 ---
 
@@ -250,13 +251,19 @@ First local Sales CRM vertical consuming `@crm/core`, with Sales-owned CRM domai
 
 Status: **Successful** (2026-09-12). Owner-accepted after Scott’s browser QA at http://localhost:5040. Not S-track. Not C2. Not Slice B. C2B success does **not** authorize Slice B, C2, Core promotion, or SI migration.
 
-First operational SI sales workflow backbone on the C2A Sales app: Lead, explicit Convert, Opportunity Proposal/Quote → Decision → Won|Lost, activities, notes/history, ownership, Company/Opportunity workspaces. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. Journal `0001_thankful_lyja`. Feature `1ac18e4`. Proposal generation, offers, MRR, attribution UI, dashboard expansion, and Company lifecycle remain unshipped Slice B work. Slice B is the next Sales product-refinement candidate and is **not yet authorized**. Evidence: [[history/C2B_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-11-si-sales-slice-a]]. Implementation return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. Decisions: [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]].
+First operational SI sales workflow backbone on the C2A Sales app: Lead, explicit Convert, Opportunity Proposal/Quote → Decision → Won|Lost, activities, notes/history, ownership, Company/Opportunity workspaces. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. Journal `0001_thankful_lyja`. Feature `1ac18e4`. Evidence: [[history/C2B_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-11-si-sales-slice-a]]. Implementation return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. Decisions: [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]].
+
+## SI Sales B1 — Commercial model + acquisition foundation
+
+Status: **Code-shipped** (2026-09-12). Owner acceptance **pending**. Not S-track. Not C2. Not B2. Not Successful.
+
+Sales-owned Sources, Campaigns (no primary source), Campaign+Source Tracking Links, captured/current attribution, configuration-driven public intake (`/inquire`, `/t/{token}`), Offers, Opportunity commercial lines (one-time + MRR), Company lifecycle, `won_at` / `lost_at`, baseline reporting. Journal `0002_cheerful_firebrand`. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. B2 (proposals/PDF/e-sign) is **not authorized**. Evidence: [[wip/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]]. Work order: [[wip/WO-2026-09-12-si-sales-b1-commercial-acquisition]]. Decisions: [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]].
 
 ## C2 — Sales as second Core consumer
 
 Status: **Not started.** Not authorized.
 
-Sales / Software vertical plus control-plane product catalog. Architecture law: [[ADR-CRM-Core-Vertical-Architecture]]. Narrative plan (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]]. C2’s historical meaning is unchanged; C2A and C2B do not replace it.
+Sales / Software vertical plus control-plane product catalog. Architecture law: [[ADR-CRM-Core-Vertical-Architecture]]. Narrative plan (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]]. C2’s historical meaning is unchanged; C2A, C2B, and B1 do not replace it.
 
 ## C3 — Beauty vertical
 

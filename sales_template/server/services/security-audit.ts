@@ -11,6 +11,8 @@ export type SecurityAction
     | 'LOGOUT'
     | 'USER_CREATED'
     | 'PASSWORD_CHANGED'
+    | 'PUBLIC_INTAKE_REJECTED'
+    | 'PUBLIC_INTAKE_THROTTLED'
 
 export type SecurityResult = 'SUCCESS' | 'FAILURE' | 'DENIED'
 

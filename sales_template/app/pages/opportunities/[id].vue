@@ -7,6 +7,8 @@ import {
   opportunityStageLabel,
   type OpportunityStage,
 } from '#shared/utils/pipeline'
+import { formatUsdFromCents } from '#shared/utils/money'
+import { OFFER_PRICING_TYPES, offerPricingTypeLabel } from '#shared/utils/catalog'
 
 definePageMeta({
   layout: 'internal',
@@ -26,17 +28,45 @@ type Opportunity = {
   sourceLeadId: number | null
   name: string
   amountCents: number | null
+  mrrCents: number | null
   stage: OpportunityStage
   ownerUserId: number | null
   lossReason: string | null
   lossNotes: string | null
   notes: string | null
+  sourceId: number | null
+  campaignId: number | null
+  sourceDetail: string | null
+  sourceName: string | null
+  campaignName: string | null
+  capturedSourceName: string | null
+  capturedCampaignName: string | null
+  capturedTrackingLinkLabel: string | null
+  wonAt: string | Date | null
+  lostAt: string | Date | null
 }
+type Line = {
+  id: number
+  description: string
+  quantity: number
+  pricingType: string
+  unitPriceCents: number
+  oneTimeCents: number
+  mrrCents: number
+  offerId: number | null
+}
+type Offer = { id: number, name: string, pricingType: string, defaultUnitPriceCents: number, active: boolean }
+type Source = { id: number, name: string }
+type Campaign = { id: number, name: string }
 type Activity = { id: number, description: string, status: string }
 
 const { data: companies } = await useFetch<Company[]>('/api/companies')
 const { data: assignees } = await useFetch<Assignee[]>('/api/assignees')
+const { data: sources } = await useFetch<Source[]>('/api/sources')
+const { data: campaigns } = await useFetch<Campaign[]>('/api/campaigns')
+const { data: offers } = await useFetch<Offer[]>('/api/offers', { query: { active: 'true' } })
 const { data: opportunity, error, pending, refresh } = await useFetch<Opportunity>(() => `/api/opportunities/${id.value}`)
+const { data: lines, refresh: refreshLines } = await useFetch<Line[]>(() => `/api/opportunities/${id.value}/lines`)
 const { data: contacts } = await useFetch<Contact[]>('/api/contacts', {
   query: computed(() => ({ accountId: opportunity.value ? String(opportunity.value.accountId) : undefined })),
 })
@@ -50,12 +80,19 @@ useHead({
 
 const name = ref('')
 const notes = ref('')
-const amount = ref('')
 const primaryContactId = ref('')
 const ownerUserId = ref('')
+const sourceId = ref('')
+const campaignId = ref('')
+const sourceDetail = ref('')
 const lossReason = ref('budget')
 const lossNotes = ref('')
 const activityDescription = ref('')
+const lineDescription = ref('')
+const lineQuantity = ref('1')
+const linePrice = ref('')
+const lineType = ref('one_time')
+const lineOfferId = ref('')
 const saving = ref(false)
 const notice = ref('')
 const formError = ref('')
@@ -66,9 +103,11 @@ watch(opportunity, (value) => {
   }
   name.value = value.name
   notes.value = value.notes || ''
-  amount.value = value.amountCents != null ? String(value.amountCents / 100) : ''
   primaryContactId.value = value.primaryContactId ? String(value.primaryContactId) : ''
   ownerUserId.value = value.ownerUserId ? String(value.ownerUserId) : ''
+  sourceId.value = value.sourceId ? String(value.sourceId) : ''
+  campaignId.value = value.campaignId ? String(value.campaignId) : ''
+  sourceDetail.value = value.sourceDetail || ''
   lossReason.value = value.lossReason || 'budget'
   lossNotes.value = value.lossNotes || ''
 }, { immediate: true })
@@ -80,16 +119,17 @@ async function save(nextStage?: 'proposal_quote' | 'decision') {
   notice.value = ''
   saving.value = true
   try {
-    const dollars = amount.value.trim()
     await $fetch(`/api/opportunities/${id.value}`, {
       method: 'PATCH',
       body: {
         name: name.value,
         notes: notes.value,
-        amountCents: dollars ? Math.round(Number(dollars) * 100) : null,
         stage: nextStage,
         primaryContactId: primaryContactId.value ? Number(primaryContactId.value) : null,
         ownerUserId: ownerUserId.value ? Number(ownerUserId.value) : undefined,
+        sourceId: sourceId.value ? Number(sourceId.value) : null,
+        campaignId: campaignId.value ? Number(campaignId.value) : null,
+        sourceDetail: sourceDetail.value || null,
       },
     })
     await refresh()
@@ -165,6 +205,36 @@ async function addActivity() {
   }
 }
 
+async function addLine() {
+  formError.value = ''
+  try {
+    await $fetch(`/api/opportunities/${id.value}/lines`, {
+      method: 'POST',
+      body: {
+        offerId: lineOfferId.value ? Number(lineOfferId.value) : undefined,
+        description: lineDescription.value || undefined,
+        quantity: Number(lineQuantity.value || '1'),
+        pricingType: lineType.value,
+        unitPriceCents: linePrice.value ? Math.round(Number(linePrice.value) * 100) : undefined,
+      },
+    })
+    lineDescription.value = ''
+    linePrice.value = ''
+    lineOfferId.value = ''
+    await refreshLines()
+    await refresh()
+  } catch (caught: unknown) {
+    const err = caught as { data?: { message?: string } }
+    formError.value = err.data?.message || 'Could not add line.'
+  }
+}
+
+async function removeLine(lineId: number) {
+  await $fetch(`/api/opportunities/${id.value}/lines/${lineId}`, { method: 'DELETE' })
+  await refreshLines()
+  await refresh()
+}
+
 function companyName() {
   return companies.value?.find(row => row.id === opportunity.value?.accountId)?.name
 }
@@ -188,6 +258,8 @@ function companyName() {
         >
           {{ companyName() }}
         </NuxtLink>
+        · {{ formatUsdFromCents(opportunity?.amountCents ?? 0) }} one-time
+        · {{ formatUsdFromCents(opportunity?.mrrCents ?? 0) }} MRR
       </p>
     </template>
     <AppAlert v-if="error || formError">
@@ -232,15 +304,66 @@ function companyName() {
         </select>
       </AppField>
       <AppField
-        label="Amount (USD)"
-        hint="One-time estimated value. MRR waits for Slice B."
+        label="Current source"
+      >
+        <select
+          v-model="sourceId"
+          class="control"
+        >
+          <option value="">
+            None
+          </option>
+          <option
+            v-for="source in sources"
+            :key="source.id"
+            :value="String(source.id)"
+          >
+            {{ source.name }}
+          </option>
+        </select>
+      </AppField>
+      <AppField label="Current campaign">
+        <select
+          v-model="campaignId"
+          class="control"
+        >
+          <option value="">
+            None
+          </option>
+          <option
+            v-for="item in campaigns"
+            :key="item.id"
+            :value="String(item.id)"
+          >
+            {{ item.name }}
+          </option>
+        </select>
+      </AppField>
+      <AppField
+        label="Source detail"
+        hint="Required when Source is Other"
       >
         <input
-          v-model="amount"
+          v-model="sourceDetail"
           class="control"
-          inputmode="decimal"
         >
       </AppField>
+      <p
+        v-if="opportunity.capturedSourceName || opportunity.capturedTrackingLinkLabel"
+        class="text-sm text-muted"
+      >
+        Original captured:
+        {{ opportunity.capturedSourceName || 'No source' }}
+        · {{ opportunity.capturedCampaignName || 'No campaign' }}
+        <span v-if="opportunity.capturedTrackingLinkLabel">
+          · {{ opportunity.capturedTrackingLinkLabel }}
+        </span>
+      </p>
+      <p class="text-sm">
+        One-time {{ formatUsdFromCents(opportunity.amountCents ?? 0) }}
+        · MRR {{ formatUsdFromCents(opportunity.mrrCents ?? 0) }}
+        (from lines; quantity × monthly unit price)
+      </p>
       <AppField label="Owner">
         <select
           v-model="ownerUserId"
@@ -356,6 +479,89 @@ function companyName() {
             Source Lead
           </NuxtLink>
         </p>
+        <AppPanel title="Commercial lines">
+          <form
+            class="mb-4 grid gap-2 sm:grid-cols-2"
+            @submit.prevent="addLine"
+          >
+            <AppField label="Offer">
+              <select
+                v-model="lineOfferId"
+                class="control"
+              >
+                <option value="">
+                  Custom line
+                </option>
+                <option
+                  v-for="offer in offers"
+                  :key="offer.id"
+                  :value="String(offer.id)"
+                >
+                  {{ offer.name }}
+                </option>
+              </select>
+            </AppField>
+            <AppField label="Description">
+              <input
+                v-model="lineDescription"
+                class="control"
+              >
+            </AppField>
+            <AppField label="Qty">
+              <input
+                v-model="lineQuantity"
+                class="control"
+                type="number"
+                min="1"
+              >
+            </AppField>
+            <AppField label="Type">
+              <select
+                v-model="lineType"
+                class="control"
+              >
+                <option
+                  v-for="type in OFFER_PRICING_TYPES"
+                  :key="type"
+                  :value="type"
+                >
+                  {{ offerPricingTypeLabel(type) }}
+                </option>
+              </select>
+            </AppField>
+            <AppField label="Quoted unit price (USD)">
+              <input
+                v-model="linePrice"
+                class="control"
+                inputmode="decimal"
+              >
+            </AppField>
+            <div class="self-end">
+              <AppButton type="submit">
+                Add line
+              </AppButton>
+            </div>
+          </form>
+          <ul class="space-y-2 text-sm">
+            <li
+              v-for="line in lines"
+              :key="line.id"
+              class="flex flex-wrap items-center justify-between gap-2"
+            >
+              <span>
+                {{ line.quantity }} × {{ line.description }}
+                · {{ offerPricingTypeLabel(line.pricingType) }}
+                · {{ formatUsdFromCents(line.unitPriceCents) }}
+              </span>
+              <AppButton
+                variant="subtle"
+                @click="removeLine(line.id)"
+              >
+                Remove
+              </AppButton>
+            </li>
+          </ul>
+        </AppPanel>
         <AppPanel title="Activities">
           <form
             class="mb-3 flex gap-2"

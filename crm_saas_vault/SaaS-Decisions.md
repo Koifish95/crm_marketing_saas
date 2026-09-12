@@ -25,6 +25,23 @@ Decision: what we chose
 
 ---
 
+## 2026-09-12 — SI Sales B1 is code-shipped (not Successful)
+
+Status: working decision
+
+Context: Scott authorized WO-2026-09-12-si-sales-b1-commercial-acquisition. Cursor implemented B1 on `working` from `83506fc`. Owner browser acceptance has not happened.
+
+Decision:
+
+- SI Sales **B1 is code-shipped** (2026-09-12) in `sales_template/` / `sales-crm` on port 5040. Journal `0002_cheerful_firebrand`.
+- Shipped: controlled Sources, Campaigns (no primary source), Campaign+Source Tracking Links, captured/current attribution, configuration-driven public intake, Offers, Opportunity commercial lines (one-time + MRR), Company lifecycle, `won_at` / `lost_at`, baseline reporting.
+- B1 is **not Successful**. Do not mark a milestone Successful until Scott accepts.
+- **B2 is not authorized** (proposals/PDF/versioning/e-sign/portal/form builder). Existing **C2** is unchanged and **not started**. B1 does **not** authorize C2, Core promotion, D1, Control Plane Sales provisioning, Beauty, S7/VPS, DNS/TLS, billing, or SI migration.
+
+Source: Work Order [[wip/WO-2026-09-12-si-sales-b1-commercial-acquisition]] and return [[wip/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]]
+
+---
+
 ## 2026-09-12 — Official C2B is Successful
 
 Status: accepted

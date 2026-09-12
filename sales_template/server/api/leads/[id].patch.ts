@@ -6,7 +6,7 @@ import { throwDomain } from '../../utils/api'
 import { requireSalesAccess } from '../../utils/auth'
 
 export default defineEventHandler(async (event) => {
-  await requireSalesAccess(event, 'MANAGE_SALES')
+  const user = await requireSalesAccess(event, 'MANAGE_SALES')
   const id = Number(getRouterParam(event, 'id'))
   if (!Number.isInteger(id) || id < 1) {
     throw createError({ statusCode: 400, message: 'Invalid lead id.' })
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: parsed.error.issues[0]?.message || 'Invalid lead.' })
   }
   try {
-    return await updateLead(useDb(), id, parsed.data)
+    return await updateLead(useDb(), id, parsed.data, user.id)
   } catch (error) {
     throwDomain(error)
   }

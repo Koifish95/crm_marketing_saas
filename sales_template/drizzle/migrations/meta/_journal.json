@@ -15,6 +15,13 @@
       "when": 1789187497127,
       "tag": "0001_thankful_lyja",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1789233106145,
+      "tag": "0002_cheerful_firebrand",
+      "breakpoints": true
     }
   ]
 }

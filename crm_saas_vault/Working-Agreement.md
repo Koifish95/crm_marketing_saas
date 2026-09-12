@@ -125,7 +125,7 @@ Repository verification required
 
 ## Current next decision
 
-Orientation: [[Current-State]]. Official S-track: [[SaaS-Milestones]]. S0–S6 are Successful. Official **S7** is not started. CRM Core + vertical architecture is **Accepted**. D1–D4 are **accepted**. **C1 is code-shipped**. **C2A is Successful**. **C2B Slice A is Successful**. **No active work order.** Await Scott. Do not start Slice B, C2, Core promotion, Beauty, D1 CP schema, or S7 unless Scott asks. Slice B is the next Sales product-refinement candidate and is **not yet authorized**.
+Orientation: [[Current-State]]. Official S-track: [[SaaS-Milestones]]. S0–S6 are Successful. Official **S7** is not started. CRM Core + vertical architecture is **Accepted**. D1–D4 are **accepted**. **C1 is code-shipped**. **C2A is Successful**. **C2B Slice A is Successful**. **SI Sales B1 is code-shipped** pending owner acceptance. **No active work order.** Await Scott. Do not start B2, C2, Core promotion, Beauty, D1 CP schema, or S7 unless Scott asks.
 
 **Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 
@@ -133,7 +133,7 @@ Orientation: [[Current-State]]. Official S-track: [[SaaS-Milestones]]. S0–S6 a
 
 ## What we do not do next
 
-- Start Slice B, C2, Core promotion, Beauty, D1 Control Plane schema, or VPS/S7
+- Start B2 (proposals/PDF/e-sign/portal), C2, Core promotion, Beauty, D1 Control Plane schema, or VPS/S7
 - Move `martial_arts_template` to `apps/` in C1 (C1 already shipped without that move)
 - Start DNS / TLS / public hostnames (official S8)
 - Start VPS cutover, operator auth, or an image registry (official S7) — product family locally first

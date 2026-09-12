@@ -26,7 +26,14 @@ import {
   type OpportunityStage,
 } from '../../shared/utils/pipeline'
 import { activityQueueBucket, type ActivityQueueBucket } from '../../shared/utils/queue'
+import { isCompanyLifecycle, type CompanyLifecycle } from '../../shared/utils/catalog'
 import { utcNowMs } from '../../shared/utils/time'
+import {
+  formatAttributionChange,
+  resolveAttributionInput,
+  type AttributionSnapshot,
+} from './acquisition'
+import { addOpportunityLine } from './commercial'
 
 function now() {
   return new Date(utcNowMs())
@@ -72,10 +79,13 @@ export async function listAssignees(db: Database) {
   return rows.filter(row => row.active)
 }
 
-export async function listCompanies(db: Database, filters: { search?: string, active?: boolean } = {}) {
+export async function listCompanies(db: Database, filters: { search?: string, active?: boolean, lifecycle?: string } = {}) {
   const rows = await db.select().from(salesAccounts).orderBy(salesAccounts.name)
   return rows.filter((row) => {
     if (filters.active != null && row.active !== filters.active) {
+      return false
+    }
+    if (filters.lifecycle && row.lifecycle !== filters.lifecycle) {
       return false
     }
     if (filters.search) {
@@ -92,12 +102,22 @@ export async function getCompany(db: Database, id: number) {
   return requireAccount(db, id)
 }
 
-export async function createCompany(db: Database, input: { name: string, notes?: string, active?: boolean }) {
+export async function createCompany(db: Database, input: {
+  name: string
+  notes?: string
+  active?: boolean
+  lifecycle?: CompanyLifecycle
+}) {
+  const lifecycle = input.lifecycle ?? 'prospect'
+  if (!isCompanyLifecycle(lifecycle)) {
+    throw new DomainError('Unknown company lifecycle.')
+  }
   const createdAt = now()
   await db.insert(salesAccounts).values({
     name: input.name.trim(),
     notes: blankToNull(input.notes),
     active: input.active ?? true,
+    lifecycle,
     createdAt,
     updatedAt: createdAt,
   })
@@ -112,6 +132,7 @@ export async function updateCompany(db: Database, id: number, input: {
   name?: string
   notes?: string | null
   active?: boolean
+  lifecycle?: CompanyLifecycle
 }) {
   await requireAccount(db, id)
   const patch: Partial<typeof salesAccounts.$inferInsert> = { updatedAt: now() }
@@ -123,6 +144,12 @@ export async function updateCompany(db: Database, id: number, input: {
   }
   if (input.active !== undefined) {
     patch.active = input.active
+  }
+  if (input.lifecycle !== undefined) {
+    if (!isCompanyLifecycle(input.lifecycle)) {
+      throw new DomainError('Unknown company lifecycle.')
+    }
+    patch.lifecycle = input.lifecycle
   }
   await db.update(salesAccounts).set(patch).where(eq(salesAccounts.id, id))
   return requireAccount(db, id)
@@ -227,6 +254,64 @@ function assertLeadIdentity(input: {
   return displayName
 }
 
+function capturedFromResolved(resolved: Awaited<ReturnType<typeof resolveAttributionInput>>, capturedAt: Date): AttributionSnapshot {
+  return {
+    sourceId: resolved.sourceId,
+    campaignId: resolved.campaignId,
+    sourceDetail: resolved.sourceDetail,
+    sourceName: resolved.sourceName,
+    campaignName: resolved.campaignName,
+    capturedSourceId: resolved.sourceId,
+    capturedCampaignId: resolved.campaignId,
+    capturedTrackingLinkId: null,
+    capturedAt,
+    capturedSourceName: resolved.sourceName,
+    capturedCampaignName: resolved.campaignName,
+    capturedTrackingLinkLabel: null,
+  }
+}
+
+function attributionFieldsFromLead(lead: typeof salesLeads.$inferSelect): AttributionSnapshot {
+  return {
+    sourceId: lead.sourceId,
+    campaignId: lead.campaignId,
+    sourceDetail: lead.sourceDetail,
+    sourceName: lead.sourceName,
+    campaignName: lead.campaignName,
+    capturedSourceId: lead.capturedSourceId,
+    capturedCampaignId: lead.capturedCampaignId,
+    capturedTrackingLinkId: lead.capturedTrackingLinkId,
+    capturedAt: lead.capturedAt,
+    capturedSourceName: lead.capturedSourceName,
+    capturedCampaignName: lead.capturedCampaignName,
+    capturedTrackingLinkLabel: lead.capturedTrackingLinkLabel,
+  }
+}
+
+async function writeAttributionHistory(
+  db: Database,
+  recordKind: NoteRecordKind,
+  recordId: number,
+  from: { sourceName: string | null, campaignName: string | null, sourceDetail: string | null },
+  to: { sourceName: string | null, campaignName: string | null, sourceDetail: string | null },
+  authorUserId: number | null,
+) {
+  if (
+    from.sourceName === to.sourceName
+    && from.campaignName === to.campaignName
+    && from.sourceDetail === to.sourceDetail
+  ) {
+    return
+  }
+  await db.insert(salesNotes).values({
+    recordKind,
+    recordId,
+    body: formatAttributionChange(from, to),
+    authorUserId,
+    createdAt: now(),
+  })
+}
+
 export async function listLeads(db: Database, filters: {
   search?: string
   stage?: string
@@ -267,11 +352,17 @@ export async function createLead(db: Database, input: {
   phone?: string
   reachabilityNote?: string
   accountId?: number
-  ownerUserId: number
+  ownerUserId?: number | null
   stage?: Exclude<LeadStage, 'converted'>
+  sourceId?: number | null
+  campaignId?: number | null
+  sourceDetail?: string | null
+  intakeCompanyName?: string | null
 }) {
   const displayName = assertLeadIdentity(input)
-  await requireOwner(db, input.ownerUserId)
+  if (input.ownerUserId) {
+    await requireOwner(db, input.ownerUserId)
+  }
   if (input.accountId) {
     await requireAccount(db, input.accountId)
   }
@@ -280,6 +371,27 @@ export async function createLead(db: Database, input: {
     throw new DomainError('Unknown Lead stage.')
   }
   const createdAt = now()
+  const resolved = await resolveAttributionInput(db, {
+    sourceId: input.sourceId,
+    campaignId: input.campaignId,
+    sourceDetail: input.sourceDetail,
+  })
+  const captured = resolved.sourceId || resolved.campaignId
+    ? capturedFromResolved(resolved, createdAt)
+    : {
+        sourceId: null,
+        campaignId: null,
+        sourceDetail: null,
+        sourceName: null,
+        campaignName: null,
+        capturedSourceId: null,
+        capturedCampaignId: null,
+        capturedTrackingLinkId: null,
+        capturedAt: null,
+        capturedSourceName: null,
+        capturedCampaignName: null,
+        capturedTrackingLinkLabel: null,
+      }
   await db.insert(salesLeads).values({
     displayName,
     email: blankToNull(input.email),
@@ -287,7 +399,9 @@ export async function createLead(db: Database, input: {
     reachabilityNote: blankToNull(input.reachabilityNote),
     accountId: input.accountId ?? null,
     stage,
-    ownerUserId: input.ownerUserId,
+    ownerUserId: input.ownerUserId ?? null,
+    intakeCompanyName: blankToNull(input.intakeCompanyName),
+    ...captured,
     createdAt,
     updatedAt: createdAt,
   })
@@ -304,9 +418,13 @@ export async function updateLead(db: Database, id: number, input: {
   phone?: string | null
   reachabilityNote?: string | null
   accountId?: number | null
-  ownerUserId?: number
+  ownerUserId?: number | null
   stage?: Exclude<LeadStage, 'converted'>
-}) {
+  sourceId?: number | null
+  campaignId?: number | null
+  sourceDetail?: string | null
+  intakeCompanyName?: string | null
+}, actorUserId?: number) {
   const current = await getLead(db, id)
   if (current.stage === 'converted' && input.stage) {
     throw new DomainError('Converted Leads stay Converted. They remain visible as history.')
@@ -346,6 +464,40 @@ export async function updateLead(db: Database, id: number, input: {
   if (input.stage !== undefined) {
     patch.stage = input.stage
   }
+  if (input.intakeCompanyName !== undefined) {
+    patch.intakeCompanyName = blankToNull(input.intakeCompanyName)
+  }
+  if (input.sourceId !== undefined || input.campaignId !== undefined || input.sourceDetail !== undefined) {
+    const resolved = await resolveAttributionInput(db, {
+      sourceId: input.sourceId === undefined ? current.sourceId : input.sourceId,
+      campaignId: input.campaignId === undefined ? current.campaignId : input.campaignId,
+      sourceDetail: input.sourceDetail === undefined ? current.sourceDetail : input.sourceDetail,
+    })
+    patch.sourceId = resolved.sourceId
+    patch.campaignId = resolved.campaignId
+    patch.sourceDetail = resolved.sourceDetail
+    patch.sourceName = resolved.sourceName
+    patch.campaignName = resolved.campaignName
+    if (!current.capturedAt && !current.capturedSourceId) {
+      patch.capturedSourceId = resolved.sourceId
+      patch.capturedCampaignId = resolved.campaignId
+      patch.capturedAt = now()
+      patch.capturedSourceName = resolved.sourceName
+      patch.capturedCampaignName = resolved.campaignName
+    }
+    await writeAttributionHistory(db, 'lead', id, current, resolved, actorUserId ?? null)
+    if (current.convertedOpportunityId) {
+      await db.update(salesOpportunities).set({
+        sourceId: resolved.sourceId,
+        campaignId: resolved.campaignId,
+        sourceDetail: resolved.sourceDetail,
+        sourceName: resolved.sourceName,
+        campaignName: resolved.campaignName,
+        updatedAt: now(),
+      }).where(eq(salesOpportunities.id, current.convertedOpportunityId))
+      await writeAttributionHistory(db, 'opportunity', current.convertedOpportunityId, current, resolved, actorUserId ?? null)
+    }
+  }
   await db.update(salesLeads).set(patch).where(eq(salesLeads.id, id))
   return getLead(db, id)
 }
@@ -360,7 +512,7 @@ export async function convertLead(db: Database, id: number, actorUserId: number)
 
   let account = lead.accountId ? await requireAccount(db, lead.accountId) : null
   if (!account) {
-    account = await createCompany(db, { name: lead.displayName })
+    account = await createCompany(db, { name: lead.intakeCompanyName?.trim() || lead.displayName })
   }
 
   let contact = null
@@ -385,6 +537,7 @@ export async function convertLead(db: Database, id: number, actorUserId: number)
     name: lead.displayName,
     ownerUserId,
     sourceLeadId: lead.id,
+    ...attributionFieldsFromLead(lead),
   })
 
   const convertedAt = now()
@@ -460,6 +613,18 @@ export async function createOpportunity(db: Database, input: {
   notes?: string
   ownerUserId: number
   sourceLeadId?: number
+  sourceId?: number | null
+  campaignId?: number | null
+  sourceDetail?: string | null
+  sourceName?: string | null
+  campaignName?: string | null
+  capturedSourceId?: number | null
+  capturedCampaignId?: number | null
+  capturedTrackingLinkId?: number | null
+  capturedAt?: Date | null
+  capturedSourceName?: string | null
+  capturedCampaignName?: string | null
+  capturedTrackingLinkLabel?: string | null
 }) {
   await requireAccount(db, input.accountId)
   await requireOwner(db, input.ownerUserId)
@@ -472,15 +637,40 @@ export async function createOpportunity(db: Database, input: {
     throw new DomainError('Unknown pipeline stage.')
   }
   const createdAt = now()
+  const resolved = input.sourceLeadId
+    ? null
+    : await resolveAttributionInput(db, {
+        sourceId: input.sourceId,
+        campaignId: input.campaignId,
+        sourceDetail: input.sourceDetail,
+      })
+  const attribution = input.sourceLeadId
+    ? {
+        sourceId: input.sourceId ?? null,
+        campaignId: input.campaignId ?? null,
+        sourceDetail: input.sourceDetail ?? null,
+        sourceName: input.sourceName ?? null,
+        campaignName: input.campaignName ?? null,
+        capturedSourceId: input.capturedSourceId ?? null,
+        capturedCampaignId: input.capturedCampaignId ?? null,
+        capturedTrackingLinkId: input.capturedTrackingLinkId ?? null,
+        capturedAt: input.capturedAt ?? null,
+        capturedSourceName: input.capturedSourceName ?? null,
+        capturedCampaignName: input.capturedCampaignName ?? null,
+        capturedTrackingLinkLabel: input.capturedTrackingLinkLabel ?? null,
+      }
+    : capturedFromResolved(resolved!, createdAt)
   await db.insert(salesOpportunities).values({
     accountId: input.accountId,
     primaryContactId: input.primaryContactId ?? null,
     sourceLeadId: input.sourceLeadId ?? null,
     name: input.name.trim(),
-    amountCents: input.amountCents ?? null,
+    amountCents: 0,
+    mrrCents: 0,
     stage,
     ownerUserId: input.ownerUserId,
     notes: blankToNull(input.notes),
+    ...attribution,
     createdAt,
     updatedAt: createdAt,
   })
@@ -488,6 +678,16 @@ export async function createOpportunity(db: Database, input: {
     .where(and(eq(salesOpportunities.accountId, input.accountId), eq(salesOpportunities.createdAt, createdAt)))
     .orderBy(desc(salesOpportunities.id))
     .limit(1)
+  if (input.amountCents && input.amountCents > 0) {
+    await addOpportunityLine(db, {
+      opportunityId: created!.id,
+      description: input.name.trim(),
+      quantity: 1,
+      pricingType: 'one_time',
+      unitPriceCents: input.amountCents,
+    })
+    return getOpportunity(db, created!.id)
+  }
   return created!
 }
 
@@ -495,11 +695,13 @@ export async function updateOpportunity(db: Database, id: number, input: {
   accountId?: number
   primaryContactId?: number | null
   name?: string
-  amountCents?: number | null
   stage?: OpportunityStage
   notes?: string | null
   ownerUserId?: number
-}) {
+  sourceId?: number | null
+  campaignId?: number | null
+  sourceDetail?: string | null
+}, actorUserId?: number) {
   const current = await getOpportunity(db, id)
   if ((current.stage === 'won' || current.stage === 'lost') && input.stage && input.stage !== current.stage) {
     throw new DomainError('Won and Lost are terminal. Use Reopen first.')
@@ -529,9 +731,6 @@ export async function updateOpportunity(db: Database, id: number, input: {
   if (input.name !== undefined) {
     patch.name = input.name.trim()
   }
-  if (input.amountCents !== undefined) {
-    patch.amountCents = input.amountCents
-  }
   if (input.stage !== undefined) {
     patch.stage = input.stage
   }
@@ -540,6 +739,26 @@ export async function updateOpportunity(db: Database, id: number, input: {
   }
   if (input.ownerUserId !== undefined) {
     patch.ownerUserId = input.ownerUserId
+  }
+  if (input.sourceId !== undefined || input.campaignId !== undefined || input.sourceDetail !== undefined) {
+    const resolved = await resolveAttributionInput(db, {
+      sourceId: input.sourceId === undefined ? current.sourceId : input.sourceId,
+      campaignId: input.campaignId === undefined ? current.campaignId : input.campaignId,
+      sourceDetail: input.sourceDetail === undefined ? current.sourceDetail : input.sourceDetail,
+    })
+    patch.sourceId = resolved.sourceId
+    patch.campaignId = resolved.campaignId
+    patch.sourceDetail = resolved.sourceDetail
+    patch.sourceName = resolved.sourceName
+    patch.campaignName = resolved.campaignName
+    if (!current.capturedAt && !current.capturedSourceId) {
+      patch.capturedSourceId = resolved.sourceId
+      patch.capturedCampaignId = resolved.campaignId
+      patch.capturedAt = now()
+      patch.capturedSourceName = resolved.sourceName
+      patch.capturedCampaignName = resolved.campaignName
+    }
+    await writeAttributionHistory(db, 'opportunity', id, current, resolved, actorUserId ?? null)
   }
   await db.update(salesOpportunities).set(patch).where(eq(salesOpportunities.id, id))
   return getOpportunity(db, id)
@@ -553,12 +772,22 @@ export async function markOpportunityWon(db: Database, id: number) {
   if (current.stage === 'lost') {
     throw new DomainError('Won and Lost are terminal. Use Reopen first.')
   }
+  const closedAt = now()
   await db.update(salesOpportunities).set({
     stage: 'won',
     lossReason: null,
     lossNotes: null,
-    updatedAt: now(),
+    wonAt: closedAt,
+    lostAt: null,
+    updatedAt: closedAt,
   }).where(eq(salesOpportunities.id, id))
+  const company = await requireAccount(db, current.accountId)
+  if (company.lifecycle === 'prospect') {
+    await db.update(salesAccounts).set({
+      lifecycle: 'customer',
+      updatedAt: closedAt,
+    }).where(eq(salesAccounts.id, company.id))
+  }
   return getOpportunity(db, id)
 }
 
@@ -581,6 +810,8 @@ export async function markOpportunityLost(db: Database, id: number, input: { los
     stage: 'lost',
     lossReason: input.lossReason as LossReason,
     lossNotes: notes,
+    lostAt: now(),
+    wonAt: null,
     updatedAt: now(),
   }).where(eq(salesOpportunities.id, id))
   return getOpportunity(db, id)
@@ -595,6 +826,8 @@ export async function reopenOpportunity(db: Database, id: number) {
     stage: 'decision',
     lossReason: null,
     lossNotes: null,
+    wonAt: null,
+    lostAt: null,
     updatedAt: now(),
   }).where(eq(salesOpportunities.id, id))
   return getOpportunity(db, id)
