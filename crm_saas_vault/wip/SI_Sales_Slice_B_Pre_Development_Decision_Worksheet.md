@@ -32,14 +32,16 @@ Prior completed twin: [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision
 | Date | 2026-09-12 |
 | Repository | `Koifish95/crm_marketing_saas` |
 | Branch | `working` |
-| HEAD SHA at write | `aff6e84` (`aff6e84b5da7762b783b7e9f91b9f780d8a84fe2`) |
+| HEAD SHA at this owner-review write | `f46cb32` (`f46cb32816ce5289a58624a486faed75840b62fa`) |
+| Prior worksheet write | `aff6e84` (C2B Successful closeout) |
 | Lockfile `head_at_write` | `1ac18e4` in [[project-state.yaml]] — Slice A implementation SHA |
 | S-track | S0–S6 **Successful**. S7–S11 **not started** |
 | C-track | C1 **code-shipped**. C2A **Successful**. C2B **Successful**. C2 / C3 **not started**. D1–D4 **accepted**; D1 schema **not shipped** |
 | C2B status | **Successful** (2026-09-12). Evidence: [[history/C2B_closeout]] |
-| Implementation authorization | **None.** `authorization.active_work_order: null`. Slice B is **not authorized** |
+| Implementation authorization | **None.** `authorization.active_work_order: null`. Slice B / B1 / B2 are **not authorized** |
 | Purpose | Settle SI Sales Slice B product/architecture decisions before any implementation Work Order |
 | This document | **Decision / discovery only** |
+| Owner-review state | First owner-review pass recorded 2026-09-12. **Not** DECISIONS COMPLETE. Public acquisition decisions 52+ require Scott’s review. |
 
 ---
 
@@ -65,7 +67,7 @@ Lead (optional Company) → New / Contacted / Qualified → Convert Lead
 - Activities, chronological `sales_notes`, owners on Lead/Opportunity/Activity.
 - Company and Opportunity workspaces via Core `AppRecordWorkspace`.
 - Dashboard: six counts (companies, contacts, open/won/lost opportunities, open activities). No pipeline value, MRR, overdue queue, source, or campaign.
-- No Offer table. No commercial line items. No Source/Campaign tables. No proposal entity, files, or generator. No email delivery. No public capture. No PDF library.
+- No Offer table. No commercial line items. No Source/Campaign tables. No tracking links. No proposal entity, files, or generator. No email delivery. No public capture. No PDF library. Sales does not call `registerPublicPaths`; only `/` and `/login` are public via Core defaults. Authenticated pages use `middleware: auth`.
 - `markOpportunityWon` sets `stage='won'` and `updatedAt`. There is **no** `won_at` / `lost_at`.
 - Opportunities can be created directly, not only by Lead conversion.
 - Demo seed remains Northwind Advisors, not Strategic Insights data.
@@ -76,6 +78,14 @@ Unshipped Slice B work already named in [[Current-State]] and the C2B closeout: 
 
 This worksheet also **reopens Campaigns** because Scott now requires campaign-level attribution and performance, not only a free-text campaign note.
 
+**Owner-review 2026-09-12 further changed acquisition scope:** Decision 13 now **requires Campaign tracking links**, and Decision 42 now **requires public Sales lead intake in B1**. Intended path:
+
+```text
+Campaign + Source → Tracking Link → Public Intake Form → Lead → Conversion → Opportunity → Won/Lost
+```
+
+Martial Arts / Renzo-derived public `/t/[slug]` → `/trial` is **behavioral evidence only**. Sales must not import MA domain components. Public-intake Decisions 52+ below bound the Sales adaptation. They are **not** yet owner-approved.
+
 ### What architecture already constrains
 
 - Sales-owned CRM entities. Do not promote Lead/Campaign/public capture/Offers/Proposals into Core. D2–D4. ADR: diverge first; abstract after two real implementations.
@@ -85,7 +95,7 @@ This worksheet also **reopens Campaigns** because Scott now requires campaign-le
 
 ### What is explicitly deferred unless this worksheet promotes it
 
-C2, D1 schema, SI migration, public capture, billing/Stripe/invoicing/QuickBooks, service delivery, Beauty, S7/VPS, DNS/TLS, Core promotion, MA → `apps/` move. See the deferred table at the end.
+C2, D1 schema, SI migration, billing/Stripe/invoicing/QuickBooks, service delivery, Beauty, S7/VPS, DNS/TLS, Core promotion, MA → `apps/` move. **Public Sales intake and Campaign tracking links are no longer deferred** (Decisions 13 and 42, owner-review 2026-09-12). See the deferred table at the end.
 
 ### Old decision being reopened
 
@@ -105,7 +115,7 @@ Prior Decision 13 (source attribution as Sales-owned fields, including a campaig
 
 Recommended / default choices are listed first so Scott can approve by checking one box.
 
-Decisions that need Scott’s business judgment even when Cursor agrees: **6 (source list), 7 (campaign fields/budget), 13 (tracking links), 18 (discounts), 29 (e-signature), 32 (lifecycle nouns), 39/47/48 (metric dates), 44 (B1/B2 split), 45 (campaign/source cardinality), 49 (MRR × quantity).**
+Owner-review 2026-09-12 recorded Scott’s explicit answers for Decisions **6, 7, 13, 18, 29, 32, 39, 42, 44, 45, 47, 48, 49**. Aligned ChatGPT/Cursor recommendations with no remaining owner choice were auto-approved. **Decisions 52+ (public acquisition boundary) are new and still require Scott.**
 
 ---
 
@@ -144,13 +154,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — Slice B = pre-sale commercial engine (offers, value, attribution/campaigns, proposals, reporting, Company lifecycle). Not delivery/billing/C2.
+- [x] APPROVE — Slice B = pre-sale commercial engine (offers, value, attribution/campaigns, proposals, reporting, Company lifecycle). Not delivery/billing/C2.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice.
 
 ---
 
@@ -176,13 +186,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — Stop at commercial close + Company customer transition. Listed items stay out.
+- [x] APPROVE — Stop at commercial close + Company customer transition. Listed items stay out.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -212,13 +222,13 @@ Same as ChatGPT. Bound it to **primary** Source + optional Campaign (Decision 8)
 
 ### Scott decision
 
-- [ ] APPROVE — First-class primary attribution and reporting. Not a note-only field.
+- [x] APPROVE — First-class primary attribution and reporting. Not a note-only field.
 - [ ] REJECT — Keep Slice A (no attribution UI).
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -244,13 +254,13 @@ Same as ChatGPT. Smallest Campaign: named marketing effort with lifecycle + prim
 
 ### Scott decision
 
-- [ ] APPROVE — Reopen Decision 14. Include a bounded Sales-owned Campaign in Slice B for attribution/reporting.
+- [x] APPROVE — Reopen Decision 14. Include a bounded Sales-owned Campaign in Slice B for attribution/reporting.
 - [ ] REJECT — Keep the old deferral. Source + free-text campaign note only.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -276,13 +286,13 @@ Same as ChatGPT. Cardinality of Campaign → Source is Decision 45.
 
 ### Scott decision
 
-- [ ] APPROVE — Distinct Source vs Campaign. Source without Campaign is allowed.
+- [x] APPROVE — Distinct Source vs Campaign. Source without Campaign is allowed.
 - [ ] REJECT — Single combined origin field.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -308,28 +318,28 @@ Same as ChatGPT. Seed the suggested list unless Scott unchecks items. Staff with
 
 ### Scott decision
 
-- [ ] APPROVE — Controlled Sources table + Other requires detail. No free-text Source.
+- [x] APPROVE — Controlled Sources table + Other requires detail. No free-text Source.
 - [ ] REJECT — Free-text Source is enough.
 - [ ] MODIFY — See Scott notes.
 
 **Initial source list:**
 
-- [ ] Referral
-- [ ] Website / Organic
-- [ ] Facebook
-- [ ] Instagram
-- [ ] Google
-- [ ] Email
-- [ ] Cold Outreach
-- [ ] Networking / Event
-- [ ] Existing Customer
-- [ ] Partner
-- [ ] Other (requires detail)
+- [x] Referral
+- [x] Website / Organic
+- [x] Facebook
+- [x] Instagram
+- [x] Google
+- [x] Email
+- [x] Cold Outreach
+- [x] Networking / Event
+- [x] Existing Customer
+- [x] Partner
+- [x] Other (requires detail)
 - [ ] Add/remove — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVED 2026-09-12. Sales-owned controlled Sources table, not free text. Seed the listed set. `Other` requires source detail. Users with Sales-management rights (`MANAGE_SALES`) may add/deactivate Sources later. Do not build a large source-administration subsystem.
 
 ---
 
@@ -353,18 +363,20 @@ Do not build complex campaign budgeting, ad-platform synchronization, content ca
 
 ### Cursor recommendation
 
-Sales-owned `sales_campaigns`: name, description, status (`draft` \| `active` \| `completed` \| `archived`), optional startsAt/endsAt, optional primarySourceId, optional budgetCents, timestamps. No slug, no collaborators, no tracking-link requirement.
+Sales-owned `sales_campaigns`: name, description, status (`draft` \| `active` \| `completed` \| `archived`), optional startsAt/endsAt, optional budgetCents, timestamps. No slug, no collaborators.
+
+**Owner-review reconciliation (Decision 45):** Do **not** keep `primarySourceId` on Campaign. A Campaign may span multiple Sources. Source is recorded on the Lead (and on each Tracking Link). Campaign-level Primary Source has no remaining useful semantics and would contradict Decision 45.
 
 ### Scott decision
 
-- [ ] APPROVE CURSOR — Bounded Campaign fields as above. Optional budget. No MA clone.
+- [x] APPROVE CURSOR — Bounded Campaign fields as above. Optional budget. No MA clone.
 - [ ] APPROVE CHATGPT LIST AS WRITTEN — Include active/inactive *and* lifecycle if both are listed.
 - [ ] OMIT BUDGET FROM V1
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVED 2026-09-12 — Cursor version, reconciled with Decision 45. Campaign fields: Name; Description/objective; Status; Start date; End date; optional budget; created/updated timestamps. Lifecycle Draft / Active / Completed / Archived. Do **not** add a redundant active/inactive boolean. Do **not** store a Campaign-level Primary Source. Multi-source association happens via tracking links and Lead attribution (Decisions 13, 45, 53).
 
 ---
 
@@ -388,13 +400,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — Primary Source + optional Campaign + optional detail. No multi-touch.
+- [x] APPROVE — Primary Source + optional Campaign + optional detail. No multi-touch.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -418,13 +430,13 @@ Same as ChatGPT, plus Decision 46 for no-Lead Opportunities.
 
 ### Scott decision
 
-- [ ] APPROVE — Lead holds primary attribution for converted deals. Public capture still deferred.
+- [x] APPROVE — Lead holds primary attribution for converted deals. Public capture still deferred.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12 for “Lead is the normal attribution origin.” The original “public capture still deferred” clause on this checkbox is **superseded by Decision 42** (public Sales intake now required in B1). Lead remains the origin record that public intake will create.
 
 ---
 
@@ -448,13 +460,13 @@ On convert, copy onto Opportunity: `sourceId`, `campaignId` (nullable), `sourceD
 
 ### Scott decision
 
-- [ ] APPROVE — Carry IDs **and** name snapshots onto Opportunity at convert. Keep source Lead link.
+- [x] APPROVE — Carry IDs **and** name snapshots onto Opportunity at convert. Keep source Lead link.
 - [ ] IDs ONLY — Join live Source/Campaign rows; accept rename/archive effects.
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -478,13 +490,13 @@ Same as ChatGPT. History note required. No version table. Corrections allowed af
 
 ### Scott decision
 
-- [ ] APPROVE — Staff may correct attribution; write a history note; no version table.
+- [x] APPROVE — Staff may correct attribution; write a history note; no version table.
 - [ ] FREEZE AFTER WON — Corrections allowed only before Won.
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -508,13 +520,13 @@ Ship Campaign/Source performance as a Sales-owned report using those metrics. No
 
 ### Scott decision
 
-- [ ] APPROVE — Listed Campaign/Source metrics. No accounting-grade ROI.
+- [x] APPROVE — Listed Campaign/Source metrics. No accounting-grade ROI.
 - [ ] REJECT — Counts only (Leads / Opportunities / Won).
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -538,13 +550,21 @@ Include a lightweight Campaign tracking-link concept **only if it can be useful 
 
 ### Scott decision
 
+- [x] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 - [ ] APPROVE CURSOR RECOMMENDATION — No tracking-link table in Slice B. Manual attribution now.
 - [ ] APPROVE CHATGPT RECOMMENDATION — Create a lightweight tracking-link data model now, without public forms.
-- [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> MODIFIED BY OWNER 2026-09-12. Campaign tracking links **are required** as part of the intended acquisition workflow. They are not deferred merely because public intake did not previously exist.
+
+> Intended real-world path: Marketing outreach/post/ad → clickable tracking link → public intake → Sales Lead. Distribution examples: Instagram, Facebook, Meta ads, other social posts, other outreach/marketing surfaces where a URL can be provided.
+
+> The tracking mechanism must preserve Campaign and Source/channel so reporting can connect acquisition activity to Leads, Opportunities, Won/Lost, one-time value, and MRR. A tracking link may encode a specific Campaign + Source combination (Decision 45).
+
+> Study standalone `renzo_crm` / Martial Arts `/t/[slug]` → public intake as **behavioral evidence only**. Do not import Martial Arts domain components into Sales, do not assume gym intake fields fit SI, do not clone blindly, and do not promote MA code into Core without separate authorization. Adapt the acquisition pattern to the generic/SI Sales domain. Exact public boundary: Decisions 52+.
+
+**Owner-review Cursor update:** Original Cursor recommendation to defer tracking links is **withdrawn given Decision 42**. Tracking links without public intake were dead schema; with public intake in B1 they are the attribution mechanism. New model: Decision 53.
 
 ---
 
@@ -570,13 +590,13 @@ Same as ChatGPT. Opportunity association is via **line items** (Decision 16), no
 
 ### Scott decision
 
-- [ ] APPROVE — Sales-owned Offer catalog. Not Core. Not billing/inventory.
+- [x] APPROVE — Sales-owned Offer catalog. Not Core. Not billing/inventory.
 - [ ] REJECT — Keep free-text Opportunity name only.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -600,14 +620,14 @@ Same as ChatGPT. Offer.pricingType = `one_time` \| `monthly`. No combined type. 
 
 ### Scott decision
 
-- [ ] APPROVE — One-time and monthly Offer types. Compose mixed deals with multiple lines. No annual/usage/tiered.
+- [x] APPROVE — One-time and monthly Offer types. Compose mixed deals with multiple lines. No annual/usage/tiered.
 - [ ] ADD ANNUAL NOW
 - [ ] ADD COMBINED OFFER TYPE
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -631,13 +651,13 @@ Same as ChatGPT. `sales_opportunity_lines` belong to the Opportunity (working co
 
 ### Scott decision
 
-- [ ] APPROVE — Multiple Offer lines per Opportunity.
+- [x] APPROVE — Multiple Offer lines per Opportunity.
 - [ ] REJECT — One Offer per Opportunity.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -661,13 +681,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — Offer defaults; line stores quoted price; Offer edits do not rewrite existing lines.
+- [x] APPROVE — Offer defaults; line stores quoted price; Offer edits do not rewrite existing lines.
 - [ ] REJECT — Always live-link to current Offer price.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -691,13 +711,13 @@ No discount engine and **no discount field** in v1. Staff set the quoted unit pr
 
 ### Scott decision
 
-- [ ] APPROVE CURSOR RECOMMENDATION — Price override only. No discount field/engine.
+- [x] APPROVE CURSOR RECOMMENDATION — Price override only. No discount field/engine.
 - [ ] APPROVE CHATGPT OPTIONAL DISCOUNT — Simple optional line- or proposal-level discount display, still no coupons/approvals.
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVED 2026-09-12 — Cursor recommendation. Quoted price overrides only. Offer supplies the default; Opportunity commercial line stores the actual quoted price. No discount engine/field in B1. No coupons, discount rules, or discount approval workflows unless separately authorized later.
 
 ---
 
@@ -723,12 +743,12 @@ Same as ChatGPT. Store derived Opportunity totals from lines (Decision 20).
 
 ### Scott decision
 
-- [ ] CONFIRM — Both one-time value and MRR on the Opportunity.
+- [x] CONFIRM — Both one-time value and MRR on the Opportunity.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -754,13 +774,13 @@ Same as ChatGPT. Derive totals from lines. No header override. Migrate existing 
 
 ### Scott decision
 
-- [ ] APPROVE — Derive one-time + MRR from lines. Migrate existing `amountCents` into a one-time line. No header override.
+- [x] APPROVE — Derive one-time + MRR from lines. Migrate existing `amountCents` into a one-time line. No header override.
 - [ ] KEEP HEADER OVERRIDE — Lines plus a manual Opportunity amount override.
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -784,13 +804,13 @@ Same as ChatGPT. Slice B Offers are monthly, so quoted terms = MRR with no conve
 
 ### Scott decision
 
-- [ ] APPROVE — Recurring metric is MRR. No separate ARR source of truth.
+- [x] APPROVE — Recurring metric is MRR. No separate ARR source of truth.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -816,12 +836,12 @@ Same as ChatGPT. Binding product requirement. Split Work Orders if needed; do no
 
 ### Scott decision
 
-- [ ] CONFIRM — Proposal generation remains in Slice B. Do not reduce to metadata-only.
+- [x] CONFIRM — Proposal generation remains in Slice B. Do not reduce to metadata-only.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -845,13 +865,13 @@ Same as ChatGPT. `sales_proposals.opportunityId`. One current pointer (or status
 
 ### Scott decision
 
-- [ ] APPROVE — Proposal belongs to Opportunity. Multiple versions; one current.
+- [x] APPROVE — Proposal belongs to Opportunity. Multiple versions; one current.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -875,13 +895,13 @@ Same content list. One SI-branded template. No tax. No template editor.
 
 ### Scott decision
 
-- [ ] APPROVE — Listed contents. No tax/invoicing. One branded template, not a template CMS.
+- [x] APPROVE — Listed contents. No tax/invoicing. One branded template, not a template CMS.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -905,13 +925,13 @@ Same as ChatGPT. See Decision 50 for table split.
 
 ### Scott decision
 
-- [ ] APPROVE — Issued proposal lines are snapshots. Offer/Opportunity edits do not rewrite issued proposals.
+- [x] APPROVE — Issued proposal lines are snapshots. Offer/Opportunity edits do not rewrite issued proposals.
 - [ ] REJECT — Live-link proposals to current Opportunity lines.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -935,13 +955,13 @@ Same as ChatGPT. No background job in Slice B. UI may show “past valid-through
 
 ### Scott decision
 
-- [ ] APPROVE — Listed proposal states. Issued is immutable; revisions create a new version.
+- [x] APPROVE — Listed proposal states. Issued is immutable; revisions create a new version.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -967,13 +987,13 @@ Generate a professional **PDF** from CRM data, with a printable/browser-preview 
 
 ### Scott decision
 
-- [ ] APPROVE CURSOR — HTML preview + locally generated PDF. No paid doc API. No Chromium.
+- [x] APPROVE CURSOR — HTML preview + locally generated PDF. No paid doc API. No Chromium.
 - [ ] APPROVE CHATGPT AS WRITTEN — PDF required; Cursor chooses any safe stack approach including Chromium if needed.
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -997,13 +1017,13 @@ Same as ChatGPT. Download + status only. Staff email the PDF themselves.
 
 ### Scott decision
 
-- [ ] APPROVE — Generate/download + status. No in-app email send in Slice B.
+- [x] APPROVE — Generate/download + status. No in-app email send in Slice B.
 - [ ] REJECT — Include email delivery now.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -1027,13 +1047,13 @@ Same as ChatGPT. **No browser e-sign in Slice B.** Flag it as separately authori
 
 ### Scott decision
 
-- [ ] APPROVE CURSOR / CHATGPT BOUNDARY — Visual signature block; staff-recorded acceptance; optional uploaded signed copy; Won stays explicit. **No** DocuSign clone. **No** browser customer e-sign in Slice B.
+- [x] APPROVE CURSOR / CHATGPT BOUNDARY — Visual signature block; staff-recorded acceptance; optional uploaded signed copy; Won stays explicit. **No** DocuSign clone. **No** browser customer e-sign in Slice B.
 - [ ] INCLUDE BROWSER E-SIGN NOW — Accept the public-access / legal / security scope as part of Slice B.
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVED 2026-09-12 — shared ChatGPT/Cursor recommendation. Slice B may support a customer-facing signature area, staff-recorded proposal acceptance, optional uploaded signed proposal/agreement artifact, and explicit staff-controlled Opportunity Won. Do **not** implement browser customer e-signature, a DocuSign/Adobe Sign clone, a public signing portal, or a legal-evidence/audit signature system in Slice B.
 
 ---
 
@@ -1057,13 +1077,13 @@ Combination: (1) immutable snapshot rows; (2) generated PDF file on local disk u
 
 ### Scott decision
 
-- [ ] APPROVE CURSOR — Snapshot in DB + local `data/proposals/` files for generated and optional signed PDFs. No object storage.
+- [x] APPROVE CURSOR — Snapshot in DB + local `data/proposals/` files for generated and optional signed PDFs. No object storage.
 - [ ] GENERATED PDF ONLY — No signed-copy upload in Slice B.
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -1087,13 +1107,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — Accepted proposal does not auto-Won. Won stays an explicit staff action.
+- [x] APPROVE — Accepted proposal does not auto-Won. Won stays an explicit staff action.
 - [ ] REJECT — Accepting a proposal marks the Opportunity Won.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -1119,13 +1139,13 @@ Minimal commercial lifecycle: Prospect; Customer; Former Customer. Do not force 
 
 ### Scott decision
 
-- [ ] APPROVE — Prospect / Customer / Former Customer (replaces prior “inactive”).
+- [x] APPROVE — Prospect / Customer / Former Customer (replaces prior “inactive”).
 - [ ] KEEP PRIOR NOUNS — Prospect / Customer / Inactive.
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVED 2026-09-12 — Cursor terminology. Use Prospect / Customer / Former Customer. Prefer this business lifecycle over Inactive. Reconcile/migrate existing `active` semantics during the eventual authorized implementation.
 
 ---
 
@@ -1149,13 +1169,13 @@ Same as ChatGPT. Staff may still set Former Customer manually.
 
 ### Scott decision
 
-- [ ] APPROVE — Won promotes Prospect → Customer. Lost does not downgrade. Former Customer is explicit.
+- [x] APPROVE — Won promotes Prospect → Customer. Lost does not downgrade. Former Customer is explicit.
 - [ ] REJECT — Staff set Company lifecycle only; Won does not change it.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -1179,13 +1199,13 @@ Same as ChatGPT. Confirm as product law so reporting does not assume one deal pe
 
 ### Scott decision
 
-- [ ] APPROVE — Multiple Opportunities per Company over time, including after Customer.
+- [x] APPROVE — Multiple Opportunities per Company over time, including after Customer.
 - [ ] REJECT — Limit to one open Opportunity.
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -1211,13 +1231,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — Operational + commercial dashboard. Not a BI project.
+- [x] APPROVE — Operational + commercial dashboard. Not a BI project.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -1241,13 +1261,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — Listed operational metrics + drill-through to existing lists.
+- [x] APPROVE — Listed operational metrics + drill-through to existing lists.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -1271,13 +1291,13 @@ Same metrics, **period-bounded**, after Decisions 47–48. Do not present unlabe
 
 ### Scott decision
 
-- [ ] APPROVE — Listed outcome metrics with an explicit reporting period.
+- [x] APPROVE — Listed outcome metrics with an explicit reporting period.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -1301,13 +1321,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — Source and Campaign breakdowns as listed. No multi-touch modeling.
+- [x] APPROVE — Source and Campaign breakdowns as listed. No multi-touch modeling.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -1331,13 +1351,13 @@ Ship the listed presets + custom range. Metric anchors are Decision 48. Closed t
 
 ### Scott decision
 
-- [ ] APPROVE — Presets listed + custom range. Anchors decided in 47–48.
+- [x] APPROVE — Presets listed + custom range. Anchors decided in 47–48.
 - [ ] PRESETS ONLY — No custom range in Slice B.
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVED 2026-09-12 — Cursor-qualified version. Support practical presets plus custom date range. Use metric-specific date semantics (Decisions 47 and 48) rather than one generic record date for every metric.
 
 ---
 
@@ -1363,13 +1383,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — All listed capabilities stay Sales-owned. No Core promotion in Slice B.
+- [x] APPROVE — All listed capabilities stay Sales-owned. No Core promotion in Slice B.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -1393,17 +1413,17 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — Inspect MA as evidence only. No MA imports. No promotion in Slice B.
+- [x] APPROVE — Inspect MA as evidence only. No MA imports. No promotion in Slice B.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
-## Decision 42 — Public lead capture remains deferred
+## Decision 42 — Public lead capture (prior deferral overridden)
 
 ### Repository says
 
@@ -1423,13 +1443,19 @@ Same as ChatGPT.
 
 ### Scott decision
 
+- [x] MODIFY — See Scott notes. Prior deferral **overridden**.
 - [ ] APPROVE — Public lead capture stays deferred. Internal attribution model only.
 - [ ] REJECT — Include a thin public form in Slice B.
-- [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> PRIOR DEFERRAL OVERRIDDEN / MODIFIED BY OWNER 2026-09-12. Public Sales lead intake is now required in **B1**.
+
+> Intended acquisition path: Campaign + Source → Tracking Link → Public Intake Form → Lead → Conversion → Opportunity → Won/Lost.
+
+> This is a material scope change from the earlier decision to defer public capture. Do not silently preserve public lead capture in the deferred section. This does **not** automatically authorize implementation. Exact public boundary: Decisions 52+.
+
+**Owner-review Cursor update:** Original Cursor recommendation to defer public capture is **withdrawn given this owner override**. Public intake is now a B1 requirement. Martial Arts `/trial` is gym-shaped (household, programs, class slots, SMS consent). Sales must ship a **generic SI inquiry form**, not a trial-booking clone. Remaining blocking questions are Decisions 52–64.
 
 ---
 
@@ -1453,13 +1479,13 @@ Same as ChatGPT.
 
 ### Scott decision
 
-- [ ] APPROVE — Local Sales refinement only. Listed production/migration items stay out.
+- [x] APPROVE — Local Sales refinement only. Listed production/migration items stay out.
 - [ ] REJECT
 - [ ] MODIFY — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -1491,42 +1517,51 @@ Proposal generation is a second product surface (new tables, file I/O, PDF depen
 
 ### Cursor recommendation
 
-**Two implementation Work Orders after this worksheet** (still not authorized by checking boxes):
+**Two implementation Work Orders after this worksheet** (still not authorized by checking boxes).
 
-**B1 — Commercial model + attribution (must be usable without proposals)**
+**Owner-review 2026-09-12 working B1/B2 intent** (not final until Decisions 52+ are resolved):
+
+**B1 — Commercial model + acquisition foundation**
 
 - Controlled Sources
-- Bounded Campaigns (no tracking links)
-- Lead + Opportunity attribution (IDs + snapshots; no-Lead Opportunities)
-- Attribution correction via history notes
+- Bounded Campaigns (no Campaign-level Primary Source; Decision 45)
+- Campaign/Source attribution on Lead and Opportunity
+- Campaign tracking links (Decision 13)
+- Public Sales intake (Decision 42)
+- Automatic Lead creation from public intake
+- Attribution preservation / correction
 - Offers
 - Opportunity commercial lines
-- Derive one-time + MRR; migrate `amount_cents`
+- One-time + MRR valuation; migrate current `amount_cents`
 - Company lifecycle + Won promotion
 - `won_at` / `lost_at`
-- Baseline dashboard: operational metrics + current pipeline one-time/MRR + period Won/Lost + Source/Campaign baseline performance
+- Baseline operational / commercial / attribution reporting
 
-**B2 — Proposals + reporting completion**
+**B2 — Proposal system + reporting completion**
 
-- Proposal model, versions, snapshots
-- HTML preview + PDF generate/download
-- Local generated + optional signed artifacts
-- Proposal workflow (draft/issued/accepted/declined/expired/superseded)
-- Won remains explicit
-- Dashboard/reporting completion: date-range polish if any leftover, proposal issued/accepted metrics, Campaign performance rates not finished in B1
+- Proposal entity/model, versions/revisions
+- Opportunity/Offer line snapshots
+- Printable preview + PDF generation
+- Generated artifact handling + optional signed-copy handling
+- Proposal workflow
+- Remaining dashboard/reporting refinement
 
-Public capture, tracking links, C2, SI migration, email send, browser e-sign stay out of both.
+Proposal generation remains an approved Slice B requirement. Do not move it out of Slice B merely because B1/B2 are separate Work Orders.
+
+Do **not** treat this list as implementation authorization. Public-intake Decisions 52+ must be resolved first.
+
+C2, SI migration, email send, browser e-sign, billing, and customer portal stay out of both.
 
 ### Scott decision
 
-- [ ] APPROVE CURSOR RECOMMENDATION — B1 then B2 with the boundaries above. Only B1 is the next implementation WO after reconciliation.
+- [x] APPROVE CURSOR RECOMMENDATION — B1 then B2, **with the owner-review B1 expansion above**.
 - [ ] APPROVE CHATGPT INITIAL SPLIT — Same B1/B2 idea; put all reporting completion in B2 (baseline reporting waits).
 - [ ] ONE WORK ORDER — Entire approved Slice B in a single later WO (except deferred table).
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVED WITH QUALIFICATION 2026-09-12. Slice B is divided into B1 and B2. B1 is commercial model + acquisition foundation and **must include tracking links and public Sales lead intake**. B2 is the proposal system + remaining reporting depth. Proposal generation stays in Slice B. Do not finalize the B1 implementation Work Order until public-intake Decisions 52+ are resolved.
 
 ---
 
@@ -1554,13 +1589,17 @@ No Sales Campaign. ChatGPT’s Campaign model includes a **primary** Source. MA 
 
 ### Scott decision
 
+- [x] ALLOW MULTIPLE SOURCES PER CAMPAIGN
 - [ ] APPROVE CURSOR — One primary Source per Campaign.
-- [ ] ALLOW MULTIPLE SOURCES PER CAMPAIGN
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> SCOTT CHOSE THE MULTI-SOURCE MODEL 2026-09-12 (ChatGPT-implied association, not Cursor’s one-primary-Source default). A Campaign may span **multiple Sources/channels**. Campaign and Source are separate attribution dimensions.
+
+> Example: Campaign `September Managed IT` may produce Leads through Facebook, Instagram, and Google. A Lead records the actual combination (`Campaign = September Managed IT` + `Source = Facebook`). This enables overall Campaign performance **and** Source/channel performance within a Campaign. Do not force separate Campaign records merely because the same initiative appears on multiple channels.
+
+> Tracking links naturally encode a specific Campaign + Source combination. Decision 7’s Campaign-level Primary Source is **removed**.
 
 ---
 
@@ -1584,13 +1623,13 @@ Opportunities always have their own Source/Campaign fields (nullable Source only
 
 ### Scott decision
 
-- [ ] APPROVE — Direct Opportunities get the same Source/Campaign fields. Convert copies from Lead.
+- [x] APPROVE — Direct Opportunities get the same Source/Campaign fields. Convert copies from Lead.
 - [ ] REQUIRE A LEAD — Every Opportunity must come from a converted Lead.
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -1614,13 +1653,13 @@ Add `won_at` and `lost_at` (nullable). Set on Won/Lost. Clear both on Reopen. Pe
 
 ### Scott decision
 
-- [ ] APPROVE — `won_at` / `lost_at`. Reopen clears them. Period outcome metrics use these dates.
+- [x] APPROVE — `won_at` / `lost_at`. Reopen clears them. Period outcome metrics use these dates.
 - [ ] USE UPDATED AT — No new columns.
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVED 2026-09-12. Add dedicated commercial close timestamps: `won_at` and `lost_at`. Won populates `won_at`. Lost populates `lost_at`. Explicit Reopen clears the corresponding close timestamp. Do not use generic `updatedAt` as the commercial close date.
 
 ---
 
@@ -1656,13 +1695,13 @@ Do not present conversion/win rates as scientific funnels.
 
 ### Scott decision
 
-- [ ] APPROVE CURSOR TABLE — Pipeline is current-state; outcomes use closed/created dates as above.
+- [x] APPROVE CURSOR TABLE — Pipeline is current-state; outcomes use closed/created dates as above.
 - [ ] ALL METRICS USE CREATED DATE
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVED 2026-09-12 — Cursor model. Open pipeline value/MRR and Leads-by-stage are current state. Activities use current due-state semantics. New Leads / New Opportunities use creation date within the period. Won uses `won_at` within the period. Lost uses `lost_at` within the period. Win rate = Won / (Won + Lost) for the period. Lead → Opportunity conversion rate may be a simple operational metric; do not misrepresent it as sophisticated cohort/funnel analytics.
 
 ---
 
@@ -1686,13 +1725,13 @@ Monthly line MRR = `unit_price_cents × quantity`. One-time line value = `unit_p
 
 ### Scott decision
 
-- [ ] APPROVE — MRR and one-time line value = unit price × quantity. Default quantity 1. No proration.
+- [x] APPROVE — MRR and one-time line value = unit price × quantity. Default quantity 1. No proration.
 - [ ] IGNORE QUANTITY FOR MRR — Quantity applies only to one-time lines.
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> APPROVED 2026-09-12. For recurring commercial lines, MRR = quantity × monthly unit price. Example: 10 managed devices × $50/month = $500 MRR. This is commercial valuation only. It does not authorize usage billing.
 
 ---
 
@@ -1716,13 +1755,13 @@ Two tables. `sales_opportunity_lines` = working commercial truth (B1; drives pip
 
 ### Scott decision
 
-- [ ] APPROVE — Separate Opportunity lines and Proposal snapshot lines, copied at issue.
+- [x] APPROVE — Separate Opportunity lines and Proposal snapshot lines, copied at issue.
 - [ ] ONE LINE TABLE — Proposals point at live Opportunity lines (conflicts with Decision 25).
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
 
->
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
 
 ---
 
@@ -1746,7 +1785,454 @@ Gitignored local directory `sales_template/data/proposals/` + DB metadata. Snaps
 
 ### Scott decision
 
-- [ ] APPROVE — Same as Decision 30 Cursor recommendation.
+- [x] APPROVE — Same as Decision 30 Cursor recommendation.
+- [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
+
+**Scott notes:**
+
+> AUTO-APPROVED 2026-09-12. ChatGPT and Cursor materially agreed. No remaining owner business choice. Recorded in the first owner-review pass.
+
+---
+
+# Public acquisition boundary — added after Decisions 13/42 owner override
+
+These decisions were **not** in the original 44 or the first Cursor additions 45–51. They exist because Scott required tracking links **and** public Sales intake in B1.
+
+Inspected for this pass: `sales_template/` (no public routes; `createLead` requires display name plus email, phone, or reachability note; auth middleware on staff pages; Core `registerPublicPaths` unused by Sales); Martial Arts / Renzo-derived pattern (`/t/[slug]` resolves a tracking slug, stores attribution in sessionStorage, redirects to `/trial`; public POST `/api/public/trial` with IP rate limit 8/10min, idempotency replay, campaign + tracking-link IDs written onto the Lead; **no click-visit table**; gym-shaped form: household, programs, class slots, SMS consent). Sales must adapt the **pattern**, not the gym domain.
+
+This section does **not** authorize B1 implementation.
+
+## Decision 52 — Public intake fields
+
+### Repository says
+
+Sales Lead identity today: `displayName` required; at least one of email, phone, or `reachabilityNote`. Company is optional on Lead. Convert creates a Company from the display name if none is set. Martial Arts public trial requires first name, last name, **phone**, and books a class — not an SI inquiry.
+
+### ChatGPT position
+
+Scott asked Cursor to recommend the smallest useful generic/SI Sales form. Candidate fields: name; email; phone; Company/business name; message / what they need; preferred contact method; other qualification. Do not copy Martial Arts household/member fields.
+
+### Cursor assessment
+
+**AGREE** that the form must be SI/generic, not gym booking. Phone-required MA trial exists for SMS/scheduling. SI follow-up is typically email. Company cannot be required (Decision 4). A message is useful as the first history note, not as a fake reachability field.
+
+### Cursor recommendation
+
+**Required:** first name, last name (joined into Lead `displayName`), and **email**.
+
+**Optional:** phone; Company/business name (Lead `accountId` stays unset unless staff later attach; store the submitted company name on the Lead as a text field or first note — do not auto-create a Company from a public form); message / what they need (first `sales_notes` entry).
+
+**Omit from B1:** preferred contact method as a separate control (staff use email/phone that were provided); household/age/program/class slot/SMS consent; CAPTCHA fields unless Decision 58 adds one.
+
+### Scott decision
+
+- [ ] APPROVE CURSOR — Required first+last name and email. Optional phone, company name, message. No gym fields. No auto-created Company.
+- [ ] REQUIRE EMAIL OR PHONE — Either email or phone satisfies identity (closer to Slice A staff Lead rules).
+- [ ] REQUIRE PHONE — Match Martial Arts public trial.
+- [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
+
+**Scott notes:**
+
+>
+
+---
+
+## Decision 53 — Tracking-link model (Campaign + Source)
+
+### Repository says
+
+MA tracking links belong to a Campaign, have `code`, `publicSlug`, `label`, `isDefault`, UTM columns, `destinationPath` (usually `/trial`), and `active`. Source is **not** a first-class FK; UTM `utm_source` is free text. `/t/[slug]` redirects to the destination. Decision 45: a Campaign spans multiple Sources. Decision 13: a link may encode Campaign + Source.
+
+### ChatGPT position
+
+A tracking link should naturally encode a specific Campaign + Source combination. Evaluate multiple links for the same Campaign+Source, optional human-readable label, stable token/slug, active/inactive, and destination. Do not assume the MA model is automatically correct.
+
+### Cursor assessment
+
+**AGREE** that the link is the Campaign+Source join for acquisition. A Campaign-level source list table is unnecessary if every public attributed Lead comes through a link (or staff assignment). Multiple links per Campaign+Source are justified (different posts, audiences, creative). UTM free-text is weaker than a Source FK given Decision 6. Arbitrary `destinationPath` is an open-redirect risk; B1 destination should be the Sales public intake only.
+
+### Cursor recommendation
+
+`sales_tracking_links`: `campaignId` (required), `sourceId` (required), `label` (human-readable, e.g. “September IT — Instagram bio”), opaque `token` (unique, not a sequential id), `active` boolean, timestamps. Destination is always the Sales public intake (token in the path). Allow many links per Campaign+Source. Inactive links 404. Do not copy MA UTM columns, default-link, or arbitrary destination paths in B1.
+
+Public URL shape for B1: `/t/{token}` → intake form (Decision 59).
+
+### Scott decision
+
+- [ ] APPROVE CURSOR — Each tracking link is Campaign + Source + label + opaque token + active. Many links per pair. Intake-only destination.
+- [ ] ALLOW CUSTOM DESTINATIONS — Staff may point a link at an external URL (open-redirect / off-site risk).
+- [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
+
+**Scott notes:**
+
+>
+
+---
+
+## Decision 54 — Attribution written from a tracking link
+
+### Repository says
+
+MA writes `campaignId`, `campaignTrackingLinkId`, and UTM fields onto the Lead. Sales has no such columns. Decision 10 snapshots Source/Campaign onto Opportunity at convert. Decision 11 allows later staff correction with a history note.
+
+### ChatGPT position
+
+When someone submits through a tracked link, evaluate writing Source ID, Campaign ID, Tracking Link ID, source detail, and original acquisition timestamp. Determine whether Lead should retain the specific Tracking Link as durable evidence even though Source/Campaign drive most reporting.
+
+### Cursor assessment
+
+**AGREE** that the link id is audit evidence. Reporting should still group by Source and Campaign, not by every Instagram creative token, unless staff drill into a link.
+
+### Cursor recommendation
+
+On successful public submit via `/t/{token}`:
+
+- Lead `sourceId` = link.sourceId
+- Lead `campaignId` = link.campaignId
+- Lead `trackingLinkId` = link.id (durable; do not clear on later Source/Campaign correction)
+- Snapshot `sourceName` / `campaignName` / `trackingLinkLabel` at capture time
+- `createdAt` is the acquisition timestamp (no extra column unless we later need “first seen vs submitted”)
+- Optional source detail: leave empty unless the submitter typed something; do not stuff the link label into source detail
+
+Reporting uses current Source/Campaign (Decision 11). Tracking Link id remains the original capture pointer.
+
+### Scott decision
+
+- [ ] APPROVE — Write Source, Campaign, Tracking Link id + name snapshots onto the Lead. Keep trackingLinkId as original evidence after corrections.
+- [ ] SOURCE AND CAMPAIGN ONLY — Do not persist trackingLinkId on the Lead.
+- [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
+
+**Scott notes:**
+
+>
+
+---
+
+## Decision 55 — Untracked / direct public visitors
+
+### Repository says
+
+MA trial can be opened without `/t/` (plain `/trial`). Attribution then depends on query/session or is empty. Decision 6 seeds `Website / Organic`. Decision 8 allows Source without Campaign.
+
+### ChatGPT position
+
+Recommend behavior when someone reaches the public intake without a tracking link. Example: Source = Website / Organic, Campaign = null, Tracking Link = null. Do not force fake Campaign attribution.
+
+### Cursor assessment
+
+**AGREE.** Fake Campaigns poison Campaign performance. Direct URL is a real Website/Organic path.
+
+### Cursor recommendation
+
+Untracked public intake (no token, or unknown token shown as 404 rather than silently untracked — unknown tokens are Decision 58):
+
+- Source = seeded `Website / Organic`
+- Campaign = null
+- Tracking Link = null
+
+Staff may later correct (Decision 11). Also expose a stable untracked form URL (Decision 59) so the site/footer can link without minting a Campaign.
+
+### Scott decision
+
+- [ ] APPROVE — Untracked submits get Source Website/Organic, no Campaign, no tracking link. Unknown tokens 404.
+- [ ] REQUIRE A TRACKING LINK — Public form is only reachable via `/t/{token}`.
+- [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
+
+**Scott notes:**
+
+>
+
+---
+
+## Decision 56 — Attribution precedence vs staff correction
+
+### Repository says
+
+Decision 11 already approved: staff may correct attribution; write a history note; no version table; corrections allowed after convert and after Won; reporting follows the current Opportunity/Lead snapshot.
+
+### ChatGPT position
+
+If the tracking link said Facebook + Campaign A but staff later learn it was Referral, determine whether staff may correct it, whether original captured attribution remains historically visible, and what reporting uses after correction.
+
+### Cursor assessment
+
+**AGREE** this is Decision 11 applied to public capture. Do not add a second attribution engine. Original trackingLinkId (Decision 54) is enough original evidence if we also write a history note on first capture (“Submitted via {label}”).
+
+### Cursor recommendation
+
+Same as Decision 11. Public capture is the first write. Staff may correct Source/Campaign afterward. History note on capture and on each correction. Reporting uses **current** Source/Campaign. `trackingLinkId` stays as captured. Do not freeze public attribution at submit.
+
+### Scott decision
+
+- [ ] APPROVE — Public capture is the first write; staff may correct; history notes + retained trackingLinkId; reporting uses current Source/Campaign.
+- [ ] FREEZE PUBLIC ATTRIBUTION — Staff cannot change Source/Campaign that came from a tracking link.
+- [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
+
+**Scott notes:**
+
+>
+
+---
+
+## Decision 57 — Duplicate public submissions
+
+### Repository says
+
+MA public trial uses an idempotency key to replay double-clicks; it still **creates a Lead** on a new genuine submit and matches household later by phone in some paths. Sales `createLead` has no duplicate detection. Converted Leads remain as `converted` rows.
+
+### ChatGPT position
+
+Evaluate practical B1 behavior for email, phone, existing open Lead, and already converted Lead/Contact. Avoid destructive automatic merging unless clearly justified. Options: warn, link, create another Lead, suppress, or require staff resolution.
+
+### Cursor assessment
+
+**AGREE** that auto-merge is dangerous (two companies, two people sharing a phone, a returning customer with a new need). Suppressing a second inquiry hides real interest. Creating a second Lead is the honest default if we **surface a possible-duplicate warning** to staff.
+
+### Cursor recommendation
+
+- Same browser idempotency key / double-click: replay, do not create a second Lead.
+- New submit with same email or phone as an **open** (non-converted) Lead: **create another Lead** and store `possibleDuplicateLeadId` (or a history note on both) so staff can merge/ignore. Do not auto-merge. Do not auto-suppress.
+- Same email/phone as a **converted** Lead or existing Contact: still create a new Lead (new inquiry). History note: “Possible match to converted Lead / Contact {id}.”
+- No customer account and no portal (Decision 62).
+
+### Scott decision
+
+- [ ] APPROVE CURSOR — Idempotent replay for double-click; otherwise always create a Lead; staff-visible possible-duplicate note/link; no auto-merge.
+- [ ] REUSE OPEN LEAD — If an open Lead with the same email exists, update that Lead instead of creating another.
+- [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
+
+**Scott notes:**
+
+>
+
+---
+
+## Decision 58 — Public spam / abuse baseline
+
+### Repository says
+
+Sales has no public POST. Core has in-memory **login** throttle only. MA public trial uses in-memory IP rate limit (`allowPublicRequest`, 8 per 10 minutes), Zod validation, idempotency, and generic 4xx. No CAPTCHA, no honeypot in the trial form reviewed. Tracking slug GET returns 404 for unknown slugs without listing campaigns.
+
+### ChatGPT position
+
+This is now a public unauthenticated boundary. Evaluate minimum B1 controls: rate limiting, server-side validation, honeypot, CAPTCHA or equivalent, payload limits, abuse logging, CSRF relevance, token enumeration, safe error responses. Do not overbuild enterprise anti-abuse.
+
+### Cursor assessment
+
+**AGREE** a proportionate baseline is required. CAPTCHA is the only item that is a real owner/UX choice (third-party script, privacy, extra click). CSRF tokens matter less on a cookie-less public POST than origin/rate limits. Do not return whether an email already exists (enumeration). Opaque tokens + 404 prevents campaign enumeration.
+
+### Cursor recommendation
+
+B1 baseline, no extra vendor:
+
+- IP rate limit on public submit (same order of magnitude as MA: ~8 / 10 minutes)
+- Server-side Zod validation; payload size cap
+- Hidden honeypot field; drop submissions that fill it (generic success to the bot)
+- Opaque tracking tokens; unknown token → 404; do not list Campaigns publicly
+- Generic error messages; do not reveal duplicate-email existence to the visitor
+- Record throttled/rejected attempts in existing security-audit style if cheap, otherwise server logs
+- No CAPTCHA in B1 unless Scott checks it below
+- No public CSRF session; form POST is unauthenticated by design
+
+### Scott decision
+
+- [ ] APPROVE CURSOR — Rate limit + validation + honeypot + payload cap + opaque tokens + generic errors. **No CAPTCHA in B1.**
+- [ ] ADD CAPTCHA NOW — Include CAPTCHA/Turnstile in B1 (third-party script).
+- [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
+
+**Scott notes:**
+
+>
+
+---
+
+## Decision 59 — Public route architecture
+
+### Repository says
+
+`sales-crm` is one Nuxt 4 app on :5040. Core `registerPublicPaths` already supports vertical public pages/prefixes (MA uses it for `/trial`, `/t/`, `/api/public`). Sales staff pages use `middleware: 'auth'`. `default` layout is an unauthenticated canvas (no staff chrome). A second frontend would be a new deploy unit this repo does not have for Sales.
+
+### ChatGPT position
+
+Evaluate a public route within the Sales app vs another lightweight surface. Prefer the smallest architecture consistent with eventual SaaS productization. Do not introduce a separate frontend merely because Renzo has a distinct public booking page unless technically justified. (Renzo/MA public pages are **in the same Nuxt app**, different layout/auth, not a second codebase.)
+
+### Cursor assessment
+
+**AGREE.** MA’s “separate public front-end” is a page/layout split inside one app. A second Sales SPA is unjustified and would fight later CP provisioning.
+
+### Cursor recommendation
+
+Keep public intake **inside `sales_template`**:
+
+- Register public pages/prefixes via Core `registerPublicPaths`
+- `/t/{token}` — resolve link, attach attribution, show or redirect to the form
+- `/inquire` (or equivalent) — untracked form
+- `/api/public/...` — unauthenticated submit
+- Public pages use `default` layout, **no** `auth` middleware
+- Staff CRM stays on `internal` layout + auth
+
+No separate frontend service.
+
+### Scott decision
+
+- [ ] APPROVE — Public intake is routes inside the existing Sales Nuxt app. No separate frontend.
+- [ ] SEPARATE PUBLIC APP — Build a second deployable for intake.
+- [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
+
+**Scott notes:**
+
+>
+
+---
+
+## Decision 60 — SaaS / tenant compatibility (B1 vs later CP)
+
+### Repository says
+
+B1 is a single local Sales sqlite. C2 (CP Sales catalog) and D1 (account vs product instance) are **not started** and **not authorized**. Eventual SaaS: a marketing URL must land on the correct customer instance. Official public hostnames are an S8 concern; product domain is unset.
+
+### ChatGPT position
+
+Do not authorize C2 or D1. Do not invent final tenancy architecture. Do not design a tracking-link scheme that obviously cannot evolve into multi-customer SaaS. Document what B1 should do now vs later CP/Product Instance responsibility.
+
+### Cursor assessment
+
+**AGREE.** Encoding a customer slug into every B1 token would pretend D1 exists. Using only autoincrement ids in public URLs is also brittle. Opaque per-instance tokens are compatible with a later hostname-per-instance model (`{slug}.{product-domain}/t/{token}` at S8).
+
+### Cursor recommendation
+
+**B1 now:** opaque `token` unique **inside this Sales instance**. Public URL is this app’s origin + `/t/{token}` (`http://localhost:5040/t/{token}` locally). No customer id, account id, or CP id in the token.
+
+**Later (not B1):** Control Plane / product-instance hostname (or gateway) selects the instance; that instance looks up the token in **its** database. Token uniqueness is per instance, not global.
+
+Do not build a global link directory in B1.
+
+### Scott decision
+
+- [ ] APPROVE — B1 opaque per-instance tokens only. Tenancy/hostname mapping waits for later CP/S8. No D1/C2 invented here.
+- [ ] EMBED CUSTOMER SLUG IN B1 URLS
+- [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
+
+**Scott notes:**
+
+>
+
+---
+
+## Decision 61 — Public intake branding
+
+### Repository says
+
+Core `publicBrand()` already reads `NUXT_PUBLIC_BRAND_NAME`, `NUXT_PUBLIC_BRAND_LOCATION`, `NUXT_PUBLIC_APP_NAME`, `NUXT_PUBLIC_PUBLIC_TAGLINE`. MA trial uses those. Sales `.env.example` already has the same brand knobs. No white-label CMS.
+
+### ChatGPT position
+
+Determine whether B1 public intake should initially be Strategic Insights branded, generic Sales product branded, or configurable through existing brand settings. Support SI dogfooding and eventual SaaS reuse without premature white-label infrastructure.
+
+### Cursor assessment
+
+**AGREE** that hardcoding “Strategic Insights” in Vue templates would have to be ripped out for every other Sales customer. Env brand settings already exist.
+
+### Cursor recommendation
+
+Use **existing Core brand env settings** on the public page (name, location, tagline). For SI dogfood, set those values to Strategic Insights in the local `.env`. Do not add a theme/logo CMS in B1. Optional small logo file via env path is unnecessary unless Scott requires it.
+
+### Scott decision
+
+- [ ] APPROVE — Brand the public form from existing Core brand env vars. SI dogfood = env values, not hardcoded copy.
+- [ ] HARDCODE STRATEGIC INSIGHTS COPY IN B1
+- [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
+
+**Scott notes:**
+
+>
+
+---
+
+## Decision 62 — Post-submit success behavior
+
+### Repository says
+
+MA trial shows an in-page confirmation with booked class details. No customer account is created. Sales has no mailer (Decision 28). Decision 29 forbids a public customer portal.
+
+### ChatGPT position
+
+Determine thank-you state/page, confirmation text, no account creation, no customer portal, no scheduling unless separately authorized. Recommend a bounded B1 experience.
+
+### Cursor assessment
+
+**AGREE.** Scheduling is MA-specific. Email confirmation would re-open Decision 28.
+
+### Cursor recommendation
+
+In-page thank-you on the same public route. Short confirmation: we received the inquiry and will follow up. No account. No portal. No calendar/scheduling. No automated email. Do not reveal staff names or internal Lead id.
+
+### Scott decision
+
+- [ ] APPROVE — In-page thank-you only. No account, portal, scheduling, or confirmation email.
+- [ ] ADD CONFIRMATION EMAIL — Requires mailer scope (conflicts with Decision 28).
+- [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
+
+**Scott notes:**
+
+>
+
+---
+
+## Decision 63 — Tracking-link analytics level
+
+### Repository says
+
+MA tracking GET does **not** record clicks/visits; attribution is written when the **trial is submitted**. Sales Campaign performance (Decision 12) is Lead/Opportunity/Won based.
+
+### ChatGPT position
+
+Possible levels: (1) successful Lead submissions only; (2) also count link visits/clicks; (3) more detailed sessions/events. Recommend the smallest useful level. Be explicit about privacy if recommending click tracking.
+
+### Cursor assessment
+
+**AGREE** that click logs are a new personal-data surface (IP, user agent, timestamps) without helping Won/MRR reporting. Vanity click-through rates can wait. Submission counts already fall out of Leads with `trackingLinkId`.
+
+### Cursor recommendation
+
+**Level 1 for B1:** count successful Lead submissions (and downstream Opportunity/Won via existing attribution). No visit/click table. No pixel. No session replay.
+
+Link-level performance in B1 = Leads (and later Opportunities/Won) grouped by `trackingLinkId` if useful as a drill-down, not a click funnel.
+
+### Scott decision
+
+- [ ] APPROVE — B1 tracks successful Lead submissions only. No click/visit logging.
+- [ ] ALSO COUNT CLICKS — Store visit events (IP/privacy implications).
+- [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
+
+**Scott notes:**
+
+>
+
+---
+
+## Decision 64 — Staff can disable public intake
+
+### Repository says
+
+MA can unpublish `/trial` via public trial-status (`published: false` → 404). Sales has Core settings KV. A public form with no off switch is an ops risk during abuse or before SI is ready to advertise it.
+
+### ChatGPT position
+
+(Not explicit; needed because public intake is now in B1.)
+
+### Cursor assessment
+
+**AGREE.** A boolean is cheaper than taking the process down. Not a CMS.
+
+### Cursor recommendation
+
+A Sales setting or simple `public_intake_enabled` flag (default **off** until staff turn it on). When off: public form and submit API return 404. Tracking tokens still 404. Staff CRM unaffected.
+
+### Scott decision
+
+- [ ] APPROVE — Public intake is staff-toggleable and defaults off.
+- [ ] ALWAYS ON ONCE SHIPPED
 - [ ] CHOOSE DIFFERENT DIRECTION — See Scott notes.
 
 **Scott notes:**
@@ -1759,17 +2245,16 @@ Gitignored local directory `sales_template/data/proposals/` + DB metadata. Snaps
 
 None of the following is pulled into Slice B unless Scott explicitly promotes it in notes above.
 
+**Removed from deferred (owner-review 2026-09-12):** Campaign tracking links (Decision 13); public Sales lead capture (Decision 42). Those now sit in B1 **pending Decisions 52–64**.
+
 | Item | Notes |
 |---|---|
 | C2 / Control Plane Sales provisioning | C2 unchanged; not started |
 | D1 Product Instance schema | Accepted; not shipped |
 | SI migration / cutover | Local Sales only |
-| Public lead capture | Decision 42 |
-| Campaign tracking links / public tokens | Decision 13 Cursor deferral |
-| Customer self-service / public customer portal | Would be required for browser e-sign |
-| Billing / Stripe | DEF-03 |
-| Invoicing / AR | Pre-sale boundary |
-| QuickBooks / accounting | Out |
+| Customer self-service / customer accounts / public customer portal | Decision 29 / 62 |
+| Browser e-sign / public signing portal | Decision 29 |
+| Billing / Stripe / invoicing / QuickBooks / accounting | Pre-sale boundary |
 | Service delivery / project management / ticketing / CS expansion | Decision 2 |
 | Beauty | C3 |
 | S7 / VPS | Official S-track |
@@ -1778,85 +2263,102 @@ None of the following is pulled into Slice B unless Scott explicitly promotes it
 | Speculative Core promotion | Decision 40–41 observe-only |
 | MA → `apps/` move | Not C-track Slice B |
 | Multi-touch attribution | Decision 8 |
-| Ad-platform synchronization / marketing automation | Decision 7 |
+| Ad-platform API synchronization / marketing automation | Decision 7 |
 | Full contract lifecycle management | Decision 2 / 29 |
-| External e-signature integration | Decision 29 unless Scott checks browser e-sign |
+| External e-signature integration | Decision 29 |
 | In-app proposal email delivery | Decision 28 |
 | Paid document-generation SaaS | Decision 27 |
+| Click/visit analytics beyond Lead submissions | Decision 63 default |
+| CAPTCHA/Turnstile | Decision 58 unless Scott adds it |
 
-NEAR-04–10 remain open in [[SaaS-Open-Questions]] and **do not** block local Sales Slice B.
+NEAR-04–10 remain open in [[SaaS-Open-Questions]] and **do not** block local Sales Slice B planning.
 
 If Scott believes one deferred item **must** be decided now:
 
-- [ ] None — leave the table deferred
+- [x] None — leave the remaining table deferred (public intake + tracking links already promoted via 13/42)
 - [ ] Promote one item into a new decision — name it in notes
 
 **Scott notes:**
 
->
+> Public intake and tracking links were promoted by owner override of Decisions 13 and 42. Unrelated deferred items stay deferred.
 
 ---
 
 ## Scott approval summary
 
-- [ ] Decision 1 complete — Slice B objective
-- [ ] Decision 2 complete — pre-sale boundary
-- [ ] Decision 3 complete — attribution first-class
-- [ ] Decision 4 complete — reopen Campaign deferral
-- [ ] Decision 5 complete — Source vs Campaign
-- [ ] Decision 6 complete — controlled Sources (+ list)
-- [ ] Decision 7 complete — Campaign minimum model
-- [ ] Decision 8 complete — primary attribution
-- [ ] Decision 9 complete — attribution on Lead
-- [ ] Decision 10 complete — snapshot onto Opportunity
-- [ ] Decision 11 complete — attribution correction
-- [ ] Decision 12 complete — Campaign performance metrics
-- [ ] Decision 13 complete — tracking links (ChatGPT vs Cursor)
-- [ ] Decision 14 complete — Offer catalog
-- [ ] Decision 15 complete — pricing types
-- [ ] Decision 16 complete — multiple lines
-- [ ] Decision 17 complete — custom pricing
-- [ ] Decision 18 complete — discounts
-- [ ] Decision 19 complete — one-time + MRR
-- [ ] Decision 20 complete — derive from lines / migrate amountCents
-- [ ] Decision 21 complete — MRR standard
-- [ ] Decision 22 complete — proposal generation in Slice B
-- [ ] Decision 23 complete — Proposal belongs to Opportunity
-- [ ] Decision 24 complete — proposal contents
-- [ ] Decision 25 complete — proposal snapshots
-- [ ] Decision 26 complete — proposal states/versions
-- [ ] Decision 27 complete — PDF output
-- [ ] Decision 28 complete — no email send
-- [ ] Decision 29 complete — e-sign boundary
-- [ ] Decision 30 complete — signed/generated artifacts
-- [ ] Decision 31 complete — Accepted ≠ Won
-- [ ] Decision 32 complete — Company lifecycle nouns
-- [ ] Decision 33 complete — Won promotes Customer
-- [ ] Decision 34 complete — multiple Opportunities
-- [ ] Decision 35 complete — dashboard purpose
-- [ ] Decision 36 complete — operational metrics
-- [ ] Decision 37 complete — outcome metrics
-- [ ] Decision 38 complete — attribution reporting
-- [ ] Decision 39 complete — time ranges
-- [ ] Decision 40 complete — Sales-owned
-- [ ] Decision 41 complete — MA evidence only
-- [ ] Decision 42 complete — public capture deferred
-- [ ] Decision 43 complete — no production/migration
-- [ ] Decision 44 complete — B1/B2 slicing
-- [ ] Decision 45 complete — Campaign → Source cardinality
-- [ ] Decision 46 complete — no-Lead Opportunity attribution
-- [ ] Decision 47 complete — won_at / lost_at
-- [ ] Decision 48 complete — metric date anchors
-- [ ] Decision 49 complete — MRR × quantity
-- [ ] Decision 50 complete — Opportunity vs Proposal lines
-- [ ] Decision 51 complete — file storage
-- [ ] Deferred table reviewed
+- [x] Decision 1 complete — Slice B objective
+- [x] Decision 2 complete — pre-sale boundary
+- [x] Decision 3 complete — attribution first-class
+- [x] Decision 4 complete — reopen Campaign deferral
+- [x] Decision 5 complete — Source vs Campaign
+- [x] Decision 6 complete — controlled Sources (+ list)
+- [x] Decision 7 complete — Campaign minimum model
+- [x] Decision 8 complete — primary attribution
+- [x] Decision 9 complete — attribution on Lead (public-capture clause superseded by 42)
+- [x] Decision 10 complete — snapshot onto Opportunity
+- [x] Decision 11 complete — attribution correction
+- [x] Decision 12 complete — Campaign performance metrics
+- [x] Decision 13 complete — tracking links **required** (owner override)
+- [x] Decision 14 complete — Offer catalog
+- [x] Decision 15 complete — pricing types
+- [x] Decision 16 complete — multiple lines
+- [x] Decision 17 complete — custom pricing
+- [x] Decision 18 complete — discounts
+- [x] Decision 19 complete — one-time + MRR
+- [x] Decision 20 complete — derive from lines / migrate amountCents
+- [x] Decision 21 complete — MRR standard
+- [x] Decision 22 complete — proposal generation in Slice B
+- [x] Decision 23 complete — Proposal belongs to Opportunity
+- [x] Decision 24 complete — proposal contents
+- [x] Decision 25 complete — proposal snapshots
+- [x] Decision 26 complete — proposal states/versions
+- [x] Decision 27 complete — PDF output
+- [x] Decision 28 complete — no email send
+- [x] Decision 29 complete — e-sign boundary
+- [x] Decision 30 complete — signed/generated artifacts
+- [x] Decision 31 complete — Accepted ≠ Won
+- [x] Decision 32 complete — Company lifecycle nouns
+- [x] Decision 33 complete — Won promotes Customer
+- [x] Decision 34 complete — multiple Opportunities
+- [x] Decision 35 complete — dashboard purpose
+- [x] Decision 36 complete — operational metrics
+- [x] Decision 37 complete — outcome metrics
+- [x] Decision 38 complete — attribution reporting
+- [x] Decision 39 complete — time ranges
+- [x] Decision 40 complete — Sales-owned
+- [x] Decision 41 complete — MA evidence only
+- [x] Decision 42 complete — public capture **required in B1** (prior deferral overridden)
+- [x] Decision 43 complete — no production/migration
+- [x] Decision 44 complete — B1/B2 slicing (B1 expanded for acquisition)
+- [x] Decision 45 complete — Campaign may span multiple Sources
+- [x] Decision 46 complete — no-Lead Opportunity attribution
+- [x] Decision 47 complete — won_at / lost_at
+- [x] Decision 48 complete — metric date anchors
+- [x] Decision 49 complete — MRR × quantity
+- [x] Decision 50 complete — Opportunity vs Proposal lines
+- [x] Decision 51 complete — file storage
+- [ ] Decision 52 complete — public intake fields
+- [ ] Decision 53 complete — tracking-link model
+- [ ] Decision 54 complete — attribution from tracking links
+- [ ] Decision 55 complete — untracked visitors
+- [ ] Decision 56 complete — correction vs captured attribution
+- [ ] Decision 57 complete — duplicate public submissions
+- [ ] Decision 58 complete — spam/abuse baseline
+- [ ] Decision 59 complete — public route architecture
+- [ ] Decision 60 complete — SaaS/tenant compatibility
+- [ ] Decision 61 complete — public branding
+- [ ] Decision 62 complete — thank-you behavior
+- [ ] Decision 63 complete — analytics level
+- [ ] Decision 64 complete — enable/disable public intake
+- [x] Deferred table reviewed (tracking links + public intake removed from deferred)
 
 ### Planning readiness
 
-- [ ] DECISIONS COMPLETE — Ready for ChatGPT/Cursor pre-development reconciliation.
-- [ ] NOT READY — Additional owner discussion required.
+- [x] OWNER REVIEW REQUIRED — Public acquisition decisions added after Decisions 13/42 scope change.
+- [ ] DECISIONS COMPLETE — Ready for ChatGPT/Cursor pre-development reconciliation / B1 Work Order preparation.
+- [ ] NOT READY — Additional owner discussion required beyond 52–64.
 
 **Decision completion does not authorize implementation.**
 
-A separate [[Work-Order-Protocol]] work order is required before Slice B (or B1/B2) code may change. Checking boxes here does not start Campaigns, Offers, attribution fields, MRR, proposals, PDF generation, dashboard work, Company lifecycle, public capture, C2, or SI migration.
+A separate [[Work-Order-Protocol]] work order is required before B1 or B2 code may change. Checking boxes here does not start Campaigns, tracking links, public forms, Offers, MRR, proposals, PDF generation, dashboard work, Company lifecycle, C2, or SI migration.
+
