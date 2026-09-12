@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "crm_saas_vault/wip/Pre_Development_Product_Architecture_Decision_Worksheet.md",
+                "file": "crm_saas_vault/wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Pre_Development_Product_Architecture_Decision_Worksheet"
+              "title": "SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet"
             }
           }
         ]
@@ -99,7 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "crm_saas_vault/wip/Pre_Development_Product_Architecture_Decision_Worksheet.md",
+                "file": "crm_saas_vault/wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -118,7 +118,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "crm_saas_vault/wip/Pre_Development_Product_Architecture_Decision_Worksheet.md",
+                "file": "crm_saas_vault/wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
@@ -161,7 +161,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "crm_saas_vault/wip/Pre_Development_Product_Architecture_Decision_Worksheet.md",
+                "file": "crm_saas_vault/wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -190,6 +190,7 @@
   },
   "active": "0d10c21208fe0597",
   "lastOpenFiles": [
+    "crm_saas_vault/wip/Pre_Development_Product_Architecture_Decision_Worksheet.md",
     "crm_saas_vault/wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet.md",
     "crm_saas_vault/history/C2A_closeout.md",
     "crm_saas_vault/wip/WO-2026-09-11-sales-thin-slice.md",
@@ -207,7 +208,6 @@
     "sales_template/drizzle/migrations/meta",
     "sales_template/node_modules/@crm",
     "sales_template/AGENTS.md",
-    "crm_saas_vault/wip/Pre_Development_Product_Architecture_Decision_Worksheet.md",
     "crm_saas_vault/wip/WO-2026-09-11-sales-predev-audit-return.md",
     "crm_saas_vault/wip/WO-2026-09-11-sales-predev-audit.md",
     "crm_saas_vault/S6-Fleet-Runbook.md",
