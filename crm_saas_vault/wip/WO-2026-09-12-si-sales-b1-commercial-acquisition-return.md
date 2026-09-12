@@ -4,7 +4,7 @@ status: done
 id: WO-2026-09-12-si-sales-b1-commercial-acquisition
 milestone: none
 base_sha: "83506fc4f5aefc54ff65bfd3365081e16100526e"
-result_sha: pending-this-commit
+result_sha: "40851e04ac0cc64fc3315cf698991ef39c432987"
 implementation_result: shipped
 tests: "sales_template: pnpm test 6 files / 29 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass; pnpm db:migrate pass on existing sales_template/data/app.sqlite. martial_arts_template: pnpm exec vitest run tests/c1/architecture.test.ts tests/c1/registration.test.ts → 2 files / 5 tests pass."
 decisions_discovered: []
@@ -278,13 +278,15 @@ Sales-owned only. Representative set:
 
 ## Git commit table
 
-Filled after the implementation commit. See `result_sha` in the header once recorded.
+Filled after the implementation commit.
 
 | Item | SHA |
 |---|---|
 | Authorization / start | `83506fc4f5aefc54ff65bfd3365081e16100526e` |
-| Feature / closeout | pending-this-commit |
+| Feature / closeout | `40851e04ac0cc64fc3315cf698991ef39c432987` |
 | Branch | `working` |
+
+Commit: `40851e0` Implement SI Sales B1 commercial model and acquisition foundation.
 
 ---
 
