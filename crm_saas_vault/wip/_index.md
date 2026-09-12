@@ -21,7 +21,7 @@ None. `authorization.active_work_order` is null. C2B Slice A is **Successful**. 
 
 ## Current communication (not a work order)
 
-- [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] — SI Sales Slice B pre-development worksheet. **Not** a work order. Checking boxes does **not** authorize implementation.
+- [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] — SI Sales Slice B pre-development worksheet. Decisions **1–64 complete**. Ready for ChatGPT to prepare the **B1 Work Order `.md`**. Still **not** a work order and **does not** authorize implementation.
 - [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]] — SI Sales product refinement pre-development worksheet (Slice A decisions; completed). **Not** a work order.
 - [[wip/WO-2026-09-11-sales-predev-audit-return]] — Sales pre-development architecture audit return (`status: done`). Investigation evidence. **Not** the live map.
 - [[wip/WO-2026-09-11-sales-predev-audit]] — matching audit work order (`status: done`).
