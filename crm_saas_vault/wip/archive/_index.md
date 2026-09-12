@@ -2,7 +2,7 @@
 type: index
 status: current
 area: process
-updated: 2026-09-11
+updated: 2026-09-12
 tags:
   - wip
   - archive
@@ -136,7 +136,7 @@ Current orientation: [[Current-State]]. These files are evidence, not the map.
 - [[wip/archive/S6_Fleet_Reliability_Cursor_Prompt|S6 fleet reliability prompt]]
 - [[wip/archive/C1_CRM_Core_Architecture_Cursor_Prompt|C1 execution prompt]]
 - [[wip/archive/WO-2026-09-11-sales-thin-slice|C2A thin Sales consumer work order]] (Successful 2026-09-11; closeout [[history/C2A_closeout]])
-- [[wip/archive/WO-2026-09-11-si-sales-slice-a|C2B SI Sales Refinement Slice A work order]] (code-shipped 2026-09-11; return [[history/WO-2026-09-11-si-sales-slice-a-return]])
+- [[wip/archive/WO-2026-09-11-si-sales-slice-a|C2B SI Sales Refinement Slice A work order]] (Successful 2026-09-12; closeout [[history/C2B_closeout]])
 - [[wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt|Core ADR planning prompt]]
 - [[wip/archive/CRM_Core_Architecture_Planning_Return|Core architecture planning return]]
 - [[wip/archive/Milestone_Map_Conflict_Decision|Milestone map conflict briefing]]

@@ -2,7 +2,7 @@
 type: reference
 status: current
 area: process
-updated: 2026-09-11
+updated: 2026-09-12
 aliases:
   - How we work
   - Vault vs wip
@@ -125,7 +125,7 @@ Repository verification required
 
 ## Current next decision
 
-Orientation: [[Current-State]]. Official S-track: [[SaaS-Milestones]]. S0–S6 are Successful. Official **S7** is not started. CRM Core + vertical architecture is **Accepted**. D1–D4 are **accepted**. **C1 is code-shipped**. **C2A is Successful**. **C2B Slice A is code-shipped / awaiting owner acceptance**. **No active work order.** Await Scott. Do not start Slice B, C2, Core promotion, Beauty, D1 CP schema, or S7 unless Scott asks.
+Orientation: [[Current-State]]. Official S-track: [[SaaS-Milestones]]. S0–S6 are Successful. Official **S7** is not started. CRM Core + vertical architecture is **Accepted**. D1–D4 are **accepted**. **C1 is code-shipped**. **C2A is Successful**. **C2B Slice A is Successful**. **No active work order.** Await Scott. Do not start Slice B, C2, Core promotion, Beauty, D1 CP schema, or S7 unless Scott asks. Slice B is the next Sales product-refinement candidate and is **not yet authorized**.
 
 **Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 

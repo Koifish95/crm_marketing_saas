@@ -2,7 +2,7 @@
 type: decision
 status: current
 area: process
-updated: 2026-09-11
+updated: 2026-09-12
 tags:
   - adr
   - saas
@@ -25,9 +25,26 @@ Decision: what we chose
 
 ---
 
+## 2026-09-12 — Official C2B is Successful
+
+Status: accepted
+
+Context: C2B (SI Sales Refinement Slice A) was implemented on `working`, then Scott completed the browser owner-acceptance pass at http://localhost:5040 on 2026-09-12. He confirmed login, Lead without Company, New → Contacted → Qualified, explicit Convert, Company/Contact/Opportunity relationships, retained Converted Lead, Opportunity workspace, one-time amount, history notes, owner assignment, Activity queue, Proposal/Quote → Decision, Won, terminal state, Reopen, Lost, required text for `Other`, Reopen after Lost, and independent Martial Arts operation. Closeout: [[history/C2B_closeout]]. Implementation: `1ac18e4`.
+
+Decision:
+
+- Official **C2B is Successful** (2026-09-12). Slice A is closed. Path remains `sales_template/` / `sales-crm` on port 5040.
+- Sales now has Lead (`sales_leads`), explicit Convert, Opportunity Proposal/Quote → Decision → Won|Lost with structured loss reason and Reopen, operational Activities, chronological notes, owners, and Company/Opportunity workspaces.
+- Slice B remains the next Sales product-refinement **candidate** and is **not yet authorized**. Proposal generation remains an approved Slice B requirement. Offers, MRR, attribution UI, dashboard expansion, Company lifecycle, and proposal generation remain unshipped.
+- Existing **C2** is unchanged and **not started**. C2B success does **not** authorize Slice B, C2, Core promotion, D1, Control Plane Sales provisioning, Beauty, S7/VPS, DNS/TLS, billing, or SI migration.
+
+Source: Scott 2026-09-12 (owner acceptance in the current Cursor chat)
+
+---
+
 ## 2026-09-11 — C2B Slice A is code-shipped (not Successful)
 
-Status: accepted as a status record; owner QA still required
+Status: superseded by [[SaaS-Decisions#2026-09-12 — Official C2B is Successful]]
 
 Context: Scott authorized SI Sales Refinement Slice A after completing the decision worksheet. Cursor implemented C2B on `working` without redefining C2.
 

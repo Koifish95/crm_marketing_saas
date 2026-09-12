@@ -19,11 +19,23 @@ durable_docs_updated:
 
 # C2B Slice A return
 
-## Executive result
+**Not the live map.** Live map: [[Current-State]]. Successful closeout: [[history/C2B_closeout]]. C2 is **not** this slice. Slice B is **not** authorized.
+
+---
+
+## Owner acceptance (2026-09-12)
+
+Scott completed the required browser owner QA at http://localhost:5040 and explicitly granted owner acceptance. He confirmed login, Lead without Company, New → Contacted → Qualified, explicit Convert, Company/Contact/Opportunity relationships, retained Converted Lead, Opportunity workspace, one-time amount, history notes, owner assignment, Activity queue, Proposal/Quote → Decision, Won, terminal state, Reopen, Lost, required text for `Other`, Reopen after Lost, and independent Martial Arts operation.
+
+C2B is **Successful**. This file remains implementation evidence. Closing C2B does **not** authorize Slice B, proposal generation, C2, Core promotion, D1, Control Plane Sales provisioning, Beauty, S7/VPS, DNS/TLS, billing, or SI migration.
+
+---
+
+## Executive result (at code-ship)
 
 **SLICE A CODE-SHIPPED — READY FOR OWNER ACCEPTANCE**
 
-Not Successful. Scott’s browser QA at http://localhost:5040 is still required. Slice B, C2, and SI migration were not started.
+That was the result when this return was first written. Owner acceptance landed afterward; see [[history/C2B_closeout]].
 
 ## Git state
 
@@ -187,8 +199,8 @@ At http://localhost:5040 (`pnpm dev` in `sales_template/` after `pnpm db:migrate
 
 ## Handoff to ChatGPT
 
-- Slice A is **code-shipped**. Owner acceptance is **ready** and **not done**.
+- Slice A is **Successful** after owner acceptance on 2026-09-12. Closeout: [[history/C2B_closeout]].
 - No remaining owner product decisions for Slice A implementation.
 - Core-promotion evidence: workspace chrome, activity queues, chronological notes — still vertical-owned.
-- Slice B remains: offers, one-time+MRR, attribution UI, dashboard, Company lifecycle, proposal generation (Decision 18).
-- C2, SI migration, and the rest of the deferred table remain deferred.
+- Slice B remains the next Sales product-refinement candidate and is **not yet authorized**: offers, one-time+MRR, attribution UI, dashboard, Company lifecycle, proposal generation (Decision 18).
+- C2, SI migration, and the rest of the deferred table remain deferred and unauthorized.

@@ -2,7 +2,7 @@
 
 This folder is the **Sales CRM** vertical (`sales-crm`) inside `crm_marketing_saas`. It consumes `@crm/core`. It is not Martial Arts and not the Control Plane.
 
-Platform map: `crm_saas_vault/Home.md`, `crm_saas_vault/Current-State.md`. Do not implement C2 (CP catalog), D1, Beauty, S7, or Strategic Insights migration unless an active work order says so.
+Platform map: `crm_saas_vault/Home.md`, `crm_saas_vault/Current-State.md`. C2A and C2B Slice A are Successful. Do not implement Slice B, C2 (CP catalog), D1, Beauty, S7, or Strategic Insights migration unless an active work order says so.
 
 ## Commands
 

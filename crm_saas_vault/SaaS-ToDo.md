@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-11
+updated: 2026-09-12
 aliases:
   - SaaS tasks
 tags:
@@ -14,7 +14,7 @@ tags:
 
 Platform / productization tasks only. Historical Renzo gym checkboxes stay in [[Milestones]] and [[Open-Questions]] and still aggregate on [[ToDo]]. Real Renzo is not a SaaS customer.
 
-Do not treat a box here as permission to implement. Decision-first: [[Working-Agreement]]. Live map: [[Current-State]]. Sequence and **Successful** criteria: [[SaaS-Milestones]]. Map closeout: [[history/Post_S4_Foundation_Decision_Closeout]]. S5: [[history/S5_closeout]]. S6: [[history/S6_closeout]]. C1: [[history/C1_CRM_Core_Architecture_Return]]. C2A: [[history/C2A_closeout]].
+Do not treat a box here as permission to implement. Decision-first: [[Working-Agreement]]. Live map: [[Current-State]]. Sequence and **Successful** criteria: [[SaaS-Milestones]]. Map closeout: [[history/Post_S4_Foundation_Decision_Closeout]]. S5: [[history/S5_closeout]]. S6: [[history/S6_closeout]]. C1: [[history/C1_CRM_Core_Architecture_Return]]. C2A: [[history/C2A_closeout]]. C2B: [[history/C2B_closeout]].
 
 ## Sooner
 
@@ -31,12 +31,15 @@ Do not treat a box here as permission to implement. Decision-first: [[Working-Ag
 
 - [x] **S6** — Fleet Reliability / Lifecycle. **Successful** (2026-09-11). [[history/S6_closeout]]. [[S6-Fleet-Runbook]].
 
-## Architecture (C1 code-shipped; C2A Successful)
+## Architecture (C1 code-shipped; C2A Successful; C2B Successful)
 
 - [x] **D1–D4** — Account vs product instance; wait on MA leads/campaigns/public capture. [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]].
 - [x] **Vault project-state protocol** — Canonical set + [[project-state.yaml]] + [[Work-Order-Protocol]]. WIP is not the map. [[SaaS-Decisions#2026-09-11 — Vault is the sole durable project-state system]].
 - [x] **C2A** — Thin Sales consumer. **Successful** (2026-09-11). Owner browser QA at http://localhost:5040. [[history/C2A_closeout]]. Does **not** authorize C2.
+- [x] **C2B** — SI Sales Refinement Slice A. **Successful** (2026-09-12). Owner browser QA at http://localhost:5040. [[history/C2B_closeout]]. Does **not** authorize Slice B or C2.
 
 ## Later / not started
 
+- [ ] **SI Sales Slice B** — Offers, MRR, attribution UI, dashboard expansion, Company lifecycle, proposal generation. Next Sales product-refinement candidate. **Not authorized.**
+- [ ] **C2** — Sales vertical plus Control Plane product catalog. Not started. **Not authorized.**
 - [ ] **S7–S11** — Hosting/security, public exposure, dogfood, second pilot, commercial launch. Product family (Core / MA / Sales / Beauty) is intended **before** production VPS. C-track is recorded separately in [[SaaS-Milestones]]; S7 was not rewritten. Not authorized.

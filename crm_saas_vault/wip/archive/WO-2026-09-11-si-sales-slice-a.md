@@ -36,7 +36,7 @@ durable_docs:
 
 # C2B — SI Sales Refinement Slice A
 
-Implementation complete 2026-09-11. Status **done**. C2B is **code-shipped / awaiting owner acceptance**, not Successful.
+Implementation complete 2026-09-11. Status **done**. Owner-accepted 2026-09-12. C2B is **Successful**. Closeout: [[history/C2B_closeout]].
 
 Return: [[history/WO-2026-09-11-si-sales-slice-a-return]].
 

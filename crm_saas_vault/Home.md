@@ -2,7 +2,7 @@
 type: index
 status: current
 area: overview
-updated: 2026-09-11
+updated: 2026-09-12
 aliases:
   - Start
   - Index
@@ -39,7 +39,7 @@ crm_marketing_saas
         |
         +-- Generic platform
         +-- Martial Arts template
-        +-- Sales template (C2A Successful; local only)
+        +-- Sales template (C2A + C2B Slice A Successful; local only)
         +-- future industry templates (Beauty later)
         +-- Customer instances: Strategic Insights (pilot), sister's business (pilot), then others
 ```

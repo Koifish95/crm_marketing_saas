@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-11
+updated: 2026-09-12
 aliases:
   - CURRENT_STATE
   - Current state
@@ -33,11 +33,11 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | D1–D4 | **Accepted** (D1 schema **not** shipped) |
 | C1 Core extraction | **Code-shipped**. Evidence: [[history/C1_CRM_Core_Architecture_Return]] |
 | C2A Thin Sales consumer | **Successful** (2026-09-11). Owner-accepted after browser QA at http://localhost:5040. Local `sales_template/` / `sales-crm`. Not C2. Evidence: [[history/C2A_closeout]] |
-| C2B SI Sales Refinement Slice A | **Code-shipped / awaiting owner acceptance**. Feature `1ac18e4`. Not Successful. Not Slice B. Not C2. Return: [[history/WO-2026-09-11-si-sales-slice-a-return]] |
+| C2B SI Sales Refinement Slice A | **Successful** (2026-09-12). Owner-accepted after browser QA at http://localhost:5040. Feature `1ac18e4`. Not Slice B. Not C2. Evidence: [[history/C2B_closeout]] |
 | C2 / Beauty / S7–S11 | **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 
-**Authorized work:** none. C2B code-shipped does **not** authorize Slice B, C2, Core promotion, D1, Beauty, S7, or SI migration. See [[Working-Agreement]] and [[Work-Order-Protocol]].
+**Authorized work:** none. C2B Successful does **not** authorize Slice B, proposal generation, C2, Core promotion, D1, Beauty, S7, or SI migration. Slice B remains the next Sales product-refinement candidate and is **not yet authorized**. See [[Working-Agreement]] and [[Work-Order-Protocol]].
 
 Lockfile: [[project-state.yaml]].
 
@@ -101,13 +101,13 @@ Full gym CRM derived from Renzo: households as `leads` + `lead_lines`, trials, i
 
 Local: http://localhost:5030 (`pnpm dev`). Laptop Docker PRODUCTION `:5000`, STAGE `:5010`, DEV `:5020`.
 
-### Sales vertical (`sales_template/`) — C2A Successful; C2B Slice A code-shipped
+### Sales vertical (`sales_template/`) — C2A Successful; C2B Slice A Successful
 
 Second working local consumer of `@crm/core`. Package `sales-crm` (`private: true`). Extends `@crm/core`. Local only: http://localhost:5040 (`pnpm dev`). SQLite `sales_template/data/app.sqlite`. Drizzle journal `0000_wide_cyclops` + Slice A `0001_thankful_lyja`.
 
 Domain: **Lead** (`sales_leads`; Company optional) → explicit **Convert Lead** → **Company** / Sales Account (`sales_accounts`) + Contact + Opportunity. Opportunity stages `proposal_quote` → `decision` → `won` \| `lost` (terminal until Reopen; structured loss reason). Operational Activities, chronological `sales_notes`, owners on Lead/Opportunity/Activity. Company and Opportunity workspaces. Permissions `VIEW_SALES` / `MANAGE_SALES`. No Docker. No Control Plane Sales product or provisioning. Strategic Insights is the intended first real-world Sales customer/design target and has **not** been migrated or cut over.
 
-C2A owner-accepted 2026-09-11. Closeout: [[history/C2A_closeout]]. C2B Slice A return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. Work order (archived): [[wip/archive/WO-2026-09-11-si-sales-slice-a]].
+C2A owner-accepted 2026-09-11. Closeout: [[history/C2A_closeout]]. C2B owner-accepted 2026-09-12. Closeout: [[history/C2B_closeout]]. Implementation return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. Work order (archived): [[wip/archive/WO-2026-09-11-si-sales-slice-a]].
 
 ### CRM Core (`packages/crm-core`)
 
@@ -178,7 +178,7 @@ Link, do not re-litigate. Index: [[SaaS-Decisions]].
 | S6 backup/restore/upgrade | [[SaaS-Decisions#2026-09-10 — S6 backup, restore, and upgrade]] |
 | Core + vertical architecture | [[ADR-CRM-Core-Vertical-Architecture]] |
 | C2A thin Sales consumer Successful | [[SaaS-Decisions#2026-09-11 — Official C2A is Successful]] |
-| C2B Slice A code-shipped (awaiting owner QA) | [[SaaS-Decisions#2026-09-11 — C2B Slice A is code-shipped (not Successful)]] |
+| C2B Slice A Successful | [[SaaS-Decisions#2026-09-12 — Official C2B is Successful]] |
 | D1–D4 | [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]] |
 | Customer / environment unit | [[Customer-Environment]] |
 | Never `-v` / prune / Renzo volumes | [[Control-Plane]] |

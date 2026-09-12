@@ -2,7 +2,7 @@
 type: index
 status: historical
 area: process
-updated: 2026-09-11
+updated: 2026-09-12
 tags:
   - history
   - saas
@@ -28,8 +28,9 @@ Closeouts, superseded roadmaps, and dated snapshots live here so agents do not t
 - [[history/S6_Implementation_Status]]
 - [[history/C1_CRM_Core_Architecture_Return]]
 - [[history/C2A_closeout]] — 2026-09-11 C2A Successful (owner-accepted; not C2)
+- [[history/C2B_closeout]] — 2026-09-12 C2B Slice A Successful (owner-accepted; not Slice B; not C2)
 - [[history/WO-2026-09-11-sales-thin-slice-return]] — C2A implementation return (evidence, not the live map)
-- [[history/WO-2026-09-11-si-sales-slice-a-return]] — 2026-09-11 C2B Slice A code-shipped (awaiting owner acceptance; not Slice B; not C2)
+- [[history/WO-2026-09-11-si-sales-slice-a-return]] — C2B Slice A implementation return (evidence, not the live map)
 - [[wip/WO-2026-09-11-sales-predev-audit-return]] — 2026-09-11 Sales pre-development architecture audit (still in `wip/` for ChatGPT handoff; not the live map)
 - [[history/Control_Plane_Bulk_Lifecycle_Return]]
 - [[history/Post_S4_Foundation_Decision_Closeout]] — why Map B became the official S-track
