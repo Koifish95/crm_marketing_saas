@@ -6,7 +6,7 @@ updated: 2026-09-11
 repo: crm_marketing_saas
 branch: working
 remote: https://github.com/Koifish95/crm_marketing_saas.git
-head_at_write: "cc31984e31c6911274085d2be241e8926f6b034d"
+head_at_write: "1ac18e416f38cde9b187d693647832dda3db3840"
 
 canonical:
   bootstrap: Home.md
@@ -26,16 +26,16 @@ tracks:
     next: S7
     authorized: null
   c:
-    last_shipped: C2A
+    last_shipped: C2B
     last_successful: C2A
-    next: C2B
-    authorized: C2B
+    next: C2
+    authorized: null
   d:
     accepted: [D1, D2, D3, D4]
     d1_schema: not_shipped
 
 authorization:
-  active_work_order: WO-2026-09-11-si-sales-slice-a
+  active_work_order: null
   rule: "Roadmaps, ADRs, plans, ChatGPT memory, and archived prompts never authorize implementation."
 
 hard_stops:
@@ -66,3 +66,7 @@ notes:
   c2_not_authorized_by_c2a: true
   si_not_migrated: true
   si_intended_first_sales_customer: true
+  c2b: code_shipped
+  c2b_awaiting_owner_acceptance: true
+  c2b_not_slice_b: true
+  c2_not_authorized_by_c2b: true

@@ -17,7 +17,7 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-- [[wip/WO-2026-09-11-si-sales-slice-a]] — **C2B SI Sales Refinement Slice A**. Authorized. Sales-owned Lead/convert/Opportunity workflow/activities/notes/ownership/workspaces. Not Slice B. Not C2.
+None. `authorization.active_work_order` is null. C2B Slice A is **code-shipped / awaiting owner acceptance**. Do not start Slice B, C2, Core promotion, Beauty, D1, CP Sales provisioning, or S7.
 
 ## Current communication (not a work order)
 
@@ -27,6 +27,8 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 - [[wip/Pre_Development_Product_Architecture_Decision_Worksheet]] — Scott checkbox worksheet. Clerical completion boxes ticked after the audit. Checking boxes still does **not** authorize implementation.
 
 C2A work order and return were archived after owner acceptance: [[wip/archive/WO-2026-09-11-sales-thin-slice]], [[history/WO-2026-09-11-sales-thin-slice-return]], [[history/C2A_closeout]].
+
+C2B Slice A work order is archived; return is in history: [[wip/archive/WO-2026-09-11-si-sales-slice-a]], [[history/WO-2026-09-11-si-sales-slice-a-return]].
 
 ## Do not put here
 

@@ -80,13 +80,13 @@ Not S-track. Do not call C2 “S7.” Do not call historical hostname work “S5
 |---|---|---|
 | C1 | CRM Core extraction (workspace, `@crm/core`, frameworks) | **Code-shipped** (2026-09-11). Evidence: [[history/C1_CRM_Core_Architecture_Return]] |
 | C2A | Thin Sales consumer (local Core consumer; no CP catalog) | **Successful** (2026-09-11). Evidence: [[history/C2A_closeout]]. Not C2. |
-| C2B | SI Sales Refinement Slice A (Lead, convert, Opportunity workflow) | **Authorized / in progress**. Not Slice B. Not C2. Work order: [[wip/WO-2026-09-11-si-sales-slice-a]] |
+| C2B | SI Sales Refinement Slice A (Lead, convert, Opportunity workflow) | **Code-shipped / awaiting owner acceptance**. Not Slice B. Not C2. Return: [[history/WO-2026-09-11-si-sales-slice-a-return]] |
 | C2 | Sales vertical as second Core consumer + CP product catalog | Not started |
 | C3 | Beauty vertical after Sales proves Core | Not started |
 | D1 | Account vs Product Instance CP schema | **Accepted**, schema **not shipped** |
 | D2–D4 | Keep MA leads / campaigns / public capture vertical-owned | **Accepted** (wait) |
 
-C1 is not Map B Successful. C2A is **Successful** (not C2). C2B is authorized Slice A product depth only. C2 is not started and is **not** authorized by C2A or C2B. Plan narrative (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]].
+C1 is not Map B Successful. C2A is **Successful** (not C2). C2B Slice A is **code-shipped**, not Successful. C2 is not started and is **not** authorized by C2A or C2B. Plan narrative (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]].
 
 ---
 
@@ -248,9 +248,9 @@ First local Sales CRM vertical consuming `@crm/core`, with Sales-owned CRM domai
 
 ## C2B — SI Sales Refinement Slice A
 
-Status: **Authorized / in progress.** Not Successful. Not C2. Not Slice B.
+Status: **Code-shipped / awaiting owner acceptance.** Not Successful. Not C2. Not Slice B.
 
-First operational SI sales workflow backbone on the C2A Sales app: Lead, explicit Convert, Opportunity Proposal/Quote → Decision → Won|Lost, activities, notes/history, ownership, Company/Opportunity workspaces. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. Proposal generation, offers, MRR, attribution UI, dashboard expansion, and Company lifecycle wait for Slice B. Work order: [[wip/WO-2026-09-11-si-sales-slice-a]]. Decisions: [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]].
+First operational SI sales workflow backbone on the C2A Sales app: Lead, explicit Convert, Opportunity Proposal/Quote → Decision → Won|Lost, activities, notes/history, ownership, Company/Opportunity workspaces. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. Journal `0001_thankful_lyja`. Feature `1ac18e4`. Proposal generation, offers, MRR, attribution UI, dashboard expansion, and Company lifecycle wait for Slice B. Return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. Work order (archived): [[wip/archive/WO-2026-09-11-si-sales-slice-a]]. Decisions: [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]].
 
 ## C2 — Sales as second Core consumer
 

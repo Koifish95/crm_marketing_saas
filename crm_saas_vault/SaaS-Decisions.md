@@ -25,6 +25,23 @@ Decision: what we chose
 
 ---
 
+## 2026-09-11 — C2B Slice A is code-shipped (not Successful)
+
+Status: accepted as a status record; owner QA still required
+
+Context: Scott authorized SI Sales Refinement Slice A after completing the decision worksheet. Cursor implemented C2B on `working` without redefining C2.
+
+Decision:
+
+- Official **C2B is code-shipped / awaiting owner acceptance** (2026-09-11). Feature `1ac18e4`. Path remains `sales_template/` / `sales-crm` on port 5040.
+- Sales now has Lead (`sales_leads`), explicit Convert, Opportunity Proposal/Quote → Decision → Won|Lost with structured loss reason and Reopen, operational Activities, chronological notes, owners, and Company/Opportunity workspaces.
+- **C2 is unchanged and not started.** C2B does **not** authorize Slice B, C2, Core promotion, D1, CP Sales provisioning, Beauty, S7, or SI migration.
+- Proposal generation remains an approved **Slice B** product requirement (worksheet Decisions 18 and 26), not implemented.
+
+Source: WO-2026-09-11-si-sales-slice-a. Return: [[history/WO-2026-09-11-si-sales-slice-a-return]].
+
+---
+
 ## 2026-09-11 — Official C2A is Successful
 
 Status: accepted

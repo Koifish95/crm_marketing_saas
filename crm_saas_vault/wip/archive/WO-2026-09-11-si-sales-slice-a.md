@@ -1,6 +1,6 @@
 ---
 type: work-order
-status: active
+status: done
 id: WO-2026-09-11-si-sales-slice-a
 milestone: C2B
 decision_refs:
@@ -36,32 +36,13 @@ durable_docs:
 
 # C2B — SI Sales Refinement Slice A
 
+Implementation complete 2026-09-11. Status **done**. C2B is **code-shipped / awaiting owner acceptance**, not Successful.
+
+Return: [[history/WO-2026-09-11-si-sales-slice-a-return]].
+
+Original authorization text remains below for provenance.
+
 Authorized by Scott in the current Cursor chat. Authoritative decisions:
 [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]].
 
 Do not reuse or redefine C2. C2 remains Sales vertical **plus** CP product catalog and stays **not started**.
-
-## Objective
-
-Turn the C2A Sales CRM from an architectural proof into the first operational Strategic Insights sales workflow backbone:
-
-```text
-Initial interest → Lead → qualification → explicit Convert
-→ Company + Contact + Opportunity → Opportunity workflow
-→ operational follow-up → Won / Lost
-```
-
-with real Sales workspaces, ownership, and history.
-
-## Successful criteria
-
-- Code-shipped when Sales and Martial Arts `pnpm test/lint/typecheck/build` pass, migration is non-destructive, architecture tests stay green, and the owner QA checklist in the return is ready.
-- Do **not** mark C2B Successful without Scott’s browser acceptance.
-
-## Hard stops
-
-Do not touch `renzo_crm`, Koi-Pi, or `webhosting_renzo_*`. Never `docker compose down -v`. Never prune. Never start Slice B, proposal generation, C2, or SI migration.
-
-## Stop condition
-
-Write the return, update durable docs, push `working`, **STOP**.
