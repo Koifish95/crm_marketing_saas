@@ -33,10 +33,11 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | D1–D4 | **Accepted** (D1 schema **not** shipped) |
 | C1 Core extraction | **Code-shipped**. Evidence: [[history/C1_CRM_Core_Architecture_Return]] |
 | C2A Thin Sales consumer | **Successful** (2026-09-11). Owner-accepted after browser QA at http://localhost:5040. Local `sales_template/` / `sales-crm`. Not C2. Evidence: [[history/C2A_closeout]] |
+| C2B SI Sales Refinement Slice A | **Authorized / in progress**. Lead → Convert → Opportunity workflow. Not Slice B. Not C2. Work order: [[wip/WO-2026-09-11-si-sales-slice-a]] |
 | C2 / Beauty / S7–S11 | **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 
-**Authorized work:** none. C2A Successful does **not** authorize C2, SI Sales refinement, Core promotion, D1, Beauty, S7, or SI migration. See [[Working-Agreement]] and [[Work-Order-Protocol]].
+**Authorized work:** [[wip/WO-2026-09-11-si-sales-slice-a]] (C2B Slice A only). Does **not** authorize Slice B, C2, Core promotion, D1, Beauty, S7, or SI migration. See [[Working-Agreement]] and [[Work-Order-Protocol]].
 
 Lockfile: [[project-state.yaml]].
 

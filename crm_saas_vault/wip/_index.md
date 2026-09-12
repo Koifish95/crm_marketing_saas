@@ -17,7 +17,7 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-None. `authorization.active_work_order` is null. C2A is **Successful**. Do not start C2, SI Sales refinement, Core promotion, Beauty, D1, CP Sales provisioning, or S7. Closing C2A does not authorize the next Sales phase.
+- [[wip/WO-2026-09-11-si-sales-slice-a]] — **C2B SI Sales Refinement Slice A**. Authorized. Sales-owned Lead/convert/Opportunity workflow/activities/notes/ownership/workspaces. Not Slice B. Not C2.
 
 ## Current communication (not a work order)
 
