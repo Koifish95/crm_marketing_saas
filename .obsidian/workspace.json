@@ -1,0 +1,223 @@
+{
+  "main": {
+    "id": "62b46841d594cf05",
+    "type": "split",
+    "children": [
+      {
+        "id": "fee8c58ff1f7d22b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0d10c21208fe0597",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "crm_saas_vault/wip/Pre_Development_Product_Architecture_Decision_Worksheet.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Pre_Development_Product_Architecture_Decision_Worksheet"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "8d2f72fc4dc312f4",
+    "type": "split",
+    "children": [
+      {
+        "id": "f5210723bcf284cf",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "743e499d552714a9",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "c8ab9befef250c59",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "0231aa6527a5a30f",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "0b4f209e994e34f2",
+    "type": "split",
+    "children": [
+      {
+        "id": "6871dcf720e6bbad",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d22c029131194e5e",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "crm_saas_vault/wip/Pre_Development_Product_Architecture_Decision_Worksheet.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "8496e53d933b2627",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "crm_saas_vault/wip/Pre_Development_Product_Architecture_Decision_Worksheet.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "1f82506879742107",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "243eeaa86b1397c2",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "8ebd475f7eff4d47",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "crm_saas_vault/wip/Pre_Development_Product_Architecture_Decision_Worksheet.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "0d10c21208fe0597",
+  "lastOpenFiles": [
+    "crm_saas_vault/wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet.md",
+    "crm_saas_vault/history/C2A_closeout.md",
+    "crm_saas_vault/wip/WO-2026-09-11-sales-thin-slice.md",
+    "crm_saas_vault/history/WO-2026-09-11-sales-thin-slice-return.md",
+    "crm_saas_vault/wip/archive/WO-2026-09-11-sales-thin-slice.md",
+    "sales_template/data/app.sqlite-journal",
+    "crm_saas_vault/wip/WO-2026-09-11-sales-thin-slice-return.md",
+    "sales_template/login.json",
+    "sales_template/scripts/fix-api-imports.ts",
+    "sales_template/data/app.sqlite",
+    "sales_template/data",
+    "sales_template/drizzle/migrations/0000_wide_cyclops.sql",
+    "sales_template/drizzle/migrations/meta/0000_snapshot.json",
+    "sales_template/drizzle/migrations/meta/_journal.json",
+    "sales_template/drizzle/migrations/meta",
+    "sales_template/node_modules/@crm",
+    "sales_template/AGENTS.md",
+    "crm_saas_vault/wip/Pre_Development_Product_Architecture_Decision_Worksheet.md",
+    "crm_saas_vault/wip/WO-2026-09-11-sales-predev-audit-return.md",
+    "crm_saas_vault/wip/WO-2026-09-11-sales-predev-audit.md",
+    "crm_saas_vault/S6-Fleet-Runbook.md",
+    "crm_saas_vault/SaaS-Milestones.md",
+    "crm_saas_vault/SaaS-Open-Questions.md",
+    "crm_saas_vault/SaaS-ToDo.md",
+    "crm_saas_vault/ToDo.md",
+    "crm_saas_vault/S2-Hand-Boot-Checklist.md",
+    "crm_saas_vault/How-to-Run.md",
+    "crm_saas_vault/Design-System.md",
+    "crm_saas_vault/Decisions.md"
+  ]
+}
