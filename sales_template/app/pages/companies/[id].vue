@@ -13,8 +13,20 @@ type Company = {
   notes: string | null
   active: boolean
 }
+type Contact = { id: number, firstName: string, lastName: string }
+type Opportunity = { id: number, name: string, stage: string }
+type Activity = { id: number, description: string, status: string, dueAt: string | Date | null }
 
 const { data: company, error, pending, refresh } = await useFetch<Company>(() => `/api/companies/${id.value}`)
+const { data: contacts, refresh: refreshContacts } = await useFetch<Contact[]>('/api/contacts', {
+  query: computed(() => ({ accountId: String(id.value) })),
+})
+const { data: opportunities, refresh: refreshOpps } = await useFetch<Opportunity[]>('/api/opportunities', {
+  query: computed(() => ({ accountId: String(id.value) })),
+})
+const { data: activities } = await useFetch<Activity[]>('/api/activities', {
+  query: computed(() => ({ accountId: String(id.value), queue: 'open' })),
+})
 
 useHead({
   title: computed(() => company.value?.name || 'Company'),
@@ -46,6 +58,8 @@ async function save() {
       body: { name: name.value, notes: notes.value, active: active.value },
     })
     await refresh()
+    await refreshContacts()
+    await refreshOpps()
     notice.value = 'Saved.'
   } catch (caught: unknown) {
     const err = caught as { data?: { message?: string } }
@@ -94,7 +108,7 @@ async function save() {
         <textarea
           v-model="notes"
           class="control"
-          rows="4"
+          rows="3"
         />
       </AppField>
       <label class="touch-row">
@@ -111,19 +125,86 @@ async function save() {
         Save
       </AppButton>
     </form>
-    <p class="mt-6 text-sm">
-      <NuxtLink
-        :to="`/contacts?accountId=${id}`"
-        class="btn btn-subtle text-sm"
+    <template #tabs>
+      <div
+        v-if="company"
+        class="mt-8 grid gap-6 lg:grid-cols-2"
       >
-        Contacts
-      </NuxtLink>
-      <NuxtLink
-        :to="`/opportunities?accountId=${id}`"
-        class="btn btn-subtle text-sm"
-      >
-        Opportunities
-      </NuxtLink>
-    </p>
+        <AppPanel title="Contacts">
+          <ul class="space-y-2 text-sm">
+            <li
+              v-for="contact in contacts"
+              :key="contact.id"
+            >
+              <NuxtLink :to="`/contacts/${contact.id}`">
+                {{ contact.firstName }} {{ contact.lastName }}
+              </NuxtLink>
+            </li>
+          </ul>
+          <p
+            v-if="!contacts?.length"
+            class="text-sm text-muted"
+          >
+            No contacts yet.
+          </p>
+          <NuxtLink
+            :to="`/contacts?accountId=${id}`"
+            class="btn btn-subtle mt-3 text-sm"
+          >
+            Manage contacts
+          </NuxtLink>
+        </AppPanel>
+        <AppPanel title="Opportunities">
+          <ul class="space-y-2 text-sm">
+            <li
+              v-for="opportunity in opportunities"
+              :key="opportunity.id"
+            >
+              <NuxtLink :to="`/opportunities/${opportunity.id}`">
+                {{ opportunity.name }}
+              </NuxtLink>
+            </li>
+          </ul>
+          <p
+            v-if="!opportunities?.length"
+            class="text-sm text-muted"
+          >
+            No opportunities yet.
+          </p>
+          <NuxtLink
+            :to="`/opportunities?accountId=${id}`"
+            class="btn btn-subtle mt-3 text-sm"
+          >
+            Manage opportunities
+          </NuxtLink>
+        </AppPanel>
+        <AppPanel title="Open activities">
+          <ul class="space-y-2 text-sm">
+            <li
+              v-for="activity in activities"
+              :key="activity.id"
+            >
+              {{ activity.description }}
+            </li>
+          </ul>
+          <p
+            v-if="!activities?.length"
+            class="text-sm text-muted"
+          >
+            No open activities.
+          </p>
+          <NuxtLink
+            to="/activities"
+            class="btn btn-subtle mt-3 text-sm"
+          >
+            Activity queue
+          </NuxtLink>
+        </AppPanel>
+        <SalesHistory
+          record-kind="company"
+          :record-id="company.id"
+        />
+      </div>
+    </template>
   </AppRecordWorkspace>
 </template>

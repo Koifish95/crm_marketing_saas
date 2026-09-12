@@ -9,6 +9,14 @@ function salesVisible(ctx: { role?: string, accessRights?: string[] }) {
 
 registerNavItems([
   {
+    id: 'sales-leads',
+    to: '/leads',
+    label: 'Leads',
+    match: '/leads',
+    order: 15,
+    visible: salesVisible,
+  },
+  {
     id: 'sales-companies',
     to: '/companies',
     label: 'Companies',

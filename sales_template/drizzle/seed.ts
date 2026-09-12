@@ -3,7 +3,7 @@ import { seedAccessFramework } from '@crm/core/server/services/access-rights'
 import { hashStaffPassword } from '@crm/core/server/services/password'
 import { readAppEnv } from '@crm/core/shared/utils/app-env'
 import { createDb, getDatabaseUrl } from '../server/database'
-import { salesAccounts, salesActivities, salesContacts, salesOpportunities, users, userRoles, userTypes, userTypeRoles } from '../server/database/schema'
+import { salesAccounts, salesActivities, salesContacts, salesLeads, salesOpportunities, users, userRoles, userTypes, userTypeRoles } from '../server/database/schema'
 import { SEEDED_USER_ROLES, SEEDED_USER_ROLE_RIGHTS } from '../shared/utils/access-rights'
 import { loadLocalEnv } from '../server/utils/load-env'
 import { utcNowMs } from '../shared/utils/time'
@@ -98,7 +98,8 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
         updatedAt: createdAt,
       })
       const [account] = await db.select().from(salesAccounts).limit(1)
-      if (account) {
+      const [owner] = await db.select().from(users).limit(1)
+      if (account && owner) {
         await db.insert(salesContacts).values([
           {
             accountId: account.id,
@@ -127,8 +128,9 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
           primaryContactId: contact?.id ?? null,
           name: 'Advisory retainer',
           amountCents: 1200000,
-          stage: 'open',
-          notes: 'Provisional open stage. Business stage names are not final.',
+          stage: 'proposal_quote',
+          ownerUserId: owner.id,
+          notes: 'Demo one-time estimated value. MRR waits for Slice B.',
           createdAt,
           updatedAt: createdAt,
         })
@@ -137,9 +139,21 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
           accountId: account.id,
           contactId: contact?.id ?? null,
           opportunityId: opportunity?.id ?? null,
+          ownerUserId: owner.id,
+          type: 'call',
+          status: 'open',
           description: 'Schedule discovery call',
           dueAt: new Date(utcNowMs() + 86_400_000),
           completedAt: null,
+          createdAt,
+          updatedAt: createdAt,
+        })
+        await db.insert(salesLeads).values({
+          displayName: 'Casey Morgan',
+          email: 'casey@example.com',
+          phone: '555-0199',
+          stage: 'new',
+          ownerUserId: owner.id,
           createdAt,
           updatedAt: createdAt,
         })

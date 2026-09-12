@@ -17,7 +17,7 @@ pnpm dev
 
 - App: http://localhost:5040
 - Health: http://localhost:5040/api/health
-- Staff: `/login` → `/dashboard`, `/companies`, `/contacts`, `/opportunities`, `/activities`
+- Staff: `/login` → `/dashboard`, `/leads`, `/companies`, `/contacts`, `/opportunities`, `/activities`
 - ADMIN: `/users`, `/security`, `/settings`
 
 Never bind 3000, 5000, 5010, 5020, or 5030.

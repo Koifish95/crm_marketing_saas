@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { OPPORTUNITY_STAGES, opportunityStageLabel } from '#shared/utils/pipeline'
+import { opportunityStageLabel } from '#shared/utils/pipeline'
 
 definePageMeta({
   layout: 'internal',
@@ -50,7 +50,7 @@ async function create() {
         accountId: Number(accountId.value),
         name: name.value,
         amountCents: dollars ? Math.round(Number(dollars) * 100) : undefined,
-        stage: 'open',
+        stage: 'proposal_quote',
       },
     })
     name.value = ''
@@ -70,7 +70,7 @@ async function create() {
   <section class="space-y-6">
     <AppPageHeader
       title="Opportunities"
-      description="Provisional pipeline: Open → In progress → Won or Lost."
+      description="Pipeline: Proposal / Quote → Decision → Won or Lost."
     />
     <AppAlert v-if="error || errorMessage">
       {{ errorMessage || 'Could not load opportunities.' }}
@@ -162,7 +162,7 @@ async function create() {
       </li>
     </ul>
     <p class="text-xs text-muted">
-      Stages {{ OPPORTUNITY_STAGES.join(', ') }} are provisional technical codes, not Strategic Insights business names.
+      Stages are Proposal / Quote, Decision, Won, and Lost. Won/Lost are terminal until Reopen.
     </p>
   </section>
 </template>

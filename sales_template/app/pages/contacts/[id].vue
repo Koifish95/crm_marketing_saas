@@ -164,5 +164,16 @@ async function save() {
         </AppButton>
       </div>
     </form>
+    <template #tabs>
+      <div
+        v-if="contact"
+        class="mt-8"
+      >
+        <SalesHistory
+          record-kind="contact"
+          :record-id="contact.id"
+        />
+      </div>
+    </template>
   </AppRecordWorkspace>
 </template>

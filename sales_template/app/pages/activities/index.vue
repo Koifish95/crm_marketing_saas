@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ACTIVITY_TYPES } from '#shared/utils/pipeline'
+
 definePageMeta({
   layout: 'internal',
   middleware: ['auth', 'sales'],
@@ -8,24 +10,37 @@ useHead({
   title: 'Activities',
 })
 
+type Lead = { id: number, displayName: string }
 type Opportunity = { id: number, name: string }
 type Activity = {
   id: number
   description: string
+  type: string
+  status: string
   dueAt: string | Date | null
   completedAt: string | Date | null
   opportunityId: number | null
-  accountId: number | null
-  contactId: number | null
+  leadId: number | null
+  ownerUserId: number | null
 }
 
+const queue = ref<'overdue' | 'due_today' | 'upcoming' | 'open' | 'completed'>('open')
+const mine = ref(false)
 const description = ref('')
+const type = ref('call')
+const dueLocal = ref('')
 const opportunityId = ref('')
+const leadId = ref('')
 const errorMessage = ref('')
 const saving = ref(false)
 
 const { data: opportunities } = await useFetch<Opportunity[]>('/api/opportunities')
-const { data: activities, error, pending, refresh } = await useFetch<Activity[]>('/api/activities')
+const { data: leads } = await useFetch<Lead[]>('/api/leads')
+const query = computed(() => ({
+  queue: queue.value,
+  mine: mine.value ? 'true' : undefined,
+}))
+const { data: activities, error, pending, refresh } = await useFetch<Activity[]>('/api/activities', { query })
 
 function dueLabel(value: string | Date | null) {
   if (!value) {
@@ -42,10 +57,14 @@ async function create() {
       method: 'POST',
       body: {
         description: description.value,
+        type: type.value,
+        dueAt: dueLocal.value ? new Date(dueLocal.value).getTime() : undefined,
         opportunityId: opportunityId.value ? Number(opportunityId.value) : undefined,
+        leadId: leadId.value ? Number(leadId.value) : undefined,
       },
     })
     description.value = ''
+    dueLocal.value = ''
     await refresh()
   } catch (caught: unknown) {
     const err = caught as { data?: { message?: string } }
@@ -58,7 +77,7 @@ async function create() {
 async function complete(activity: Activity) {
   await $fetch(`/api/activities/${activity.id}`, {
     method: 'PATCH',
-    body: { completed: !activity.completedAt },
+    body: { completed: activity.status !== 'completed' },
   })
   await refresh()
 }
@@ -68,7 +87,7 @@ async function complete(activity: Activity) {
   <section class="space-y-6">
     <AppPageHeader
       title="Activities"
-      description="Sales follow-up. This is not Martial Arts FollowUpTask."
+      description="Sales follow-up queue. Overdue, due today, upcoming, and completed."
     />
     <AppAlert v-if="error || errorMessage">
       {{ errorMessage || 'Could not load activities.' }}
@@ -88,16 +107,51 @@ async function complete(activity: Activity) {
             required
           >
         </AppField>
-        <AppField
-          label="Opportunity"
-          hint="Optional if you later attach a company or contact"
-        >
+        <AppField label="Type">
+          <select
+            v-model="type"
+            class="control"
+          >
+            <option
+              v-for="code in ACTIVITY_TYPES"
+              :key="code"
+              :value="code"
+            >
+              {{ code }}
+            </option>
+          </select>
+        </AppField>
+        <AppField label="Due">
+          <input
+            v-model="dueLocal"
+            class="control"
+            type="datetime-local"
+          >
+        </AppField>
+        <AppField label="Lead">
+          <select
+            v-model="leadId"
+            class="control"
+          >
+            <option value="">
+              None
+            </option>
+            <option
+              v-for="lead in leads"
+              :key="lead.id"
+              :value="String(lead.id)"
+            >
+              {{ lead.displayName }}
+            </option>
+          </select>
+        </AppField>
+        <AppField label="Opportunity">
           <select
             v-model="opportunityId"
             class="control"
           >
             <option value="">
-              Select an opportunity
+              None
             </option>
             <option
               v-for="opportunity in opportunities"
@@ -118,9 +172,27 @@ async function complete(activity: Activity) {
         </div>
       </form>
     </AppPanel>
+    <div class="flex flex-wrap items-center gap-2">
+      <AppButton
+        v-for="code in (['overdue', 'due_today', 'upcoming', 'open', 'completed'] as const)"
+        :key="code"
+        type="button"
+        :variant="queue === code ? 'primary' : 'secondary'"
+        @click="queue = code"
+      >
+        {{ code.replace('_', ' ') }}
+      </AppButton>
+      <label class="touch-row ml-2">
+        <input
+          v-model="mine"
+          type="checkbox"
+        >
+        Mine
+      </label>
+    </div>
     <AppEmpty
       v-if="!pending && !activities?.length"
-      title="No activities yet"
+      title="No activities in this queue"
     />
     <ul
       v-else
@@ -133,19 +205,19 @@ async function complete(activity: Activity) {
       >
         <p
           class="record-item-title"
-          :class="{ 'line-through text-muted': activity.completedAt }"
+          :class="{ 'line-through text-muted': activity.status === 'completed' }"
         >
           {{ activity.description }}
         </p>
         <p class="record-item-meta">
-          {{ dueLabel(activity.dueAt) }}
+          {{ activity.type }} · {{ dueLabel(activity.dueAt) }}
         </p>
         <div class="record-item-actions">
           <AppButton
             variant="secondary"
             @click="complete(activity)"
           >
-            {{ activity.completedAt ? 'Reopen' : 'Complete' }}
+            {{ activity.status === 'completed' ? 'Reopen' : 'Complete' }}
           </AppButton>
         </div>
       </li>
