@@ -17,12 +17,12 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-- [[wip/WO-2026-09-11-sales-thin-slice]] — **C2A** thin Sales consumer. `authorized: yes`, `status: active`. Local Sales CRM only. Not C2 (no CP catalog). Not D1, Beauty, S7, or SI migration.
-
-When a work order exists, it is the only **authorized implementation** file that should live here besides this index (plus its return until promotion).
+None. `authorization.active_work_order` is null. Do not start C2, Core promotion, SI migration, Beauty, D1, CP Sales provisioning, or S7.
 
 ## Current communication (not a work order)
 
+- [[wip/WO-2026-09-11-sales-thin-slice-return]] — **C2A** code-shipped return. Ready for owner acceptance. **Not** the live map.
+- [[wip/WO-2026-09-11-sales-thin-slice]] — matching implementation work order (`status: done`).
 - [[wip/WO-2026-09-11-sales-predev-audit-return]] — Sales pre-development architecture audit return (`status: done`). Investigation evidence. **Not** the live map.
 - [[wip/WO-2026-09-11-sales-predev-audit]] — matching audit work order (`status: done`).
 - [[wip/Pre_Development_Product_Architecture_Decision_Worksheet]] — Scott checkbox worksheet. Clerical completion boxes ticked after the audit. Checking boxes still does **not** authorize implementation.

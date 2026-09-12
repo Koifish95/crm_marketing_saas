@@ -32,11 +32,11 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | CRM Core + vertical ADR | **Accepted** |
 | D1–D4 | **Accepted** (D1 schema **not** shipped) |
 | C1 Core extraction | **Code-shipped**. Evidence: [[history/C1_CRM_Core_Architecture_Return]] |
-| C2A Thin Sales consumer | **Authorized / in progress**. Work order: [[wip/WO-2026-09-11-sales-thin-slice]]. Not C2. |
+| C2A Thin Sales consumer | **Code-shipped** (2026-09-11). Local `sales_template/` / `sales-crm` on :5040. Not Successful. Not C2. Evidence: [[wip/WO-2026-09-11-sales-thin-slice-return]] |
 | C2 / Beauty / S7–S11 | **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 
-**Authorized work:** [[wip/WO-2026-09-11-sales-thin-slice]] (C2A thin Sales consumer). Not C2, D1, Beauty, S7, or SI migration. See [[Working-Agreement]] and [[Work-Order-Protocol]].
+**Authorized work:** none. C2A is code-shipped and waiting on Scott’s owner acceptance. Do not start C2, D1, Beauty, S7, Core promotion, or SI migration. See [[Working-Agreement]] and [[Work-Order-Protocol]].
 
 Lockfile: [[project-state.yaml]].
 
@@ -53,15 +53,16 @@ Lockfile: [[project-state.yaml]].
 
 ```text
 crm_marketing_saas/
-├── pnpm-workspace.yaml          # packages/crm-core + martial_arts_template
+├── pnpm-workspace.yaml          # packages/crm-core + martial_arts_template + sales_template
 ├── package.json                 # root workspace stub; Node 22+; pnpm 10
 ├── packages/crm-core/           # @crm/core — C1 shipped
 ├── martial_arts_template/       # first vertical; local :5030; Docker :5000/:5010/:5020
+├── sales_template/              # C2A Sales CRM (sales-crm); local :5040; no Docker / no CP
 ├── control_plane/               # NOT in the workspace; http://127.0.0.1:52100
 └── crm_saas_vault/              # this vault
 ```
 
-**Runtime:** laptop Docker only. Control plane loopback, no operator auth. Health on demand. Never `docker compose down -v`, never prune, never attach `webhosting_renzo_*` / leftover `renzo-*` volumes. Do not copy laptop sqlite onto the Pi. Do not touch `Projects/renzo_crm` or Koi-Pi PRODUCTION.
+**Runtime:** Martial Arts and Control Plane remain laptop Docker. C2A Sales is **local `pnpm dev` only** (no Sales Docker, no CP provision). Never `docker compose down -v`, never prune, never attach `webhosting_renzo_*` / leftover `renzo-*` volumes. Do not copy laptop sqlite onto the Pi. Do not touch `Projects/renzo_crm` or Koi-Pi PRODUCTION.
 
 **Image tags in use:** `martial-arts-acquisition:s2` (Acme lab) and `:s4` (provisioned). Names `crm-martial-arts` / `crm-sales` / `crm-beauty` are **target**, not current tags.
 
@@ -87,7 +88,7 @@ CRM Core is shared infrastructure. Verticals compose on Core. One-way dependency
 
 Official S-track still lists S7 (hosting/VPS) after S6. The Core ADR **changes that priority** (product family locally first). Both notes remain valid in their roles: [[SaaS-Milestones]] is the official S-track; the ADR is architecture law. Do not silently rewrite the S-track. C-track IDs are separate.
 
-**Implemented:** the control plane still has `customers` + `environments` only. Today’s customer row is the commercial account **and** the only product instance. `industry_template` is stored and always written `martial-arts`. Provision creates one PROD + one DEV under that row. Exactly one PROD per **customer row** is the implemented invariant. `@crm/core` exists. Martial Arts consumes it. Control plane provision is still Martial Arts-only.
+**Implemented:** the control plane still has `customers` + `environments` only. Today’s customer row is the commercial account **and** the only product instance. `industry_template` is stored and always written `martial-arts`. Provision creates one PROD + one DEV under that row. Exactly one PROD per **customer row** is the implemented invariant. `@crm/core` exists. Martial Arts consumes it. Sales consumes it locally (C2A). Control plane provision is still Martial Arts-only.
 
 ---
 
@@ -98,6 +99,14 @@ Official S-track still lists S7 (hosting/VPS) after S6. The Core ADR **changes t
 Full gym CRM derived from Renzo: households as `leads` + `lead_lines`, trials, intro `/trial`, follow-up, campaigns, events, marketing, settings, seed programs (`ADULT_BJJ` / `KIDS_BJJ`). Consumes `@crm/core` for brand, health, app-env, auth/users/RBAC **framework**, settings KV, shell/nav/settings/permission **registration**. Drizzle journal `0000`–`0020` remains in MA.
 
 Local: http://localhost:5030 (`pnpm dev`). Laptop Docker PRODUCTION `:5000`, STAGE `:5010`, DEV `:5020`.
+
+### Sales vertical (`sales_template/`) — C2A code-shipped
+
+Second Core consumer. Package `sales-crm` (`private: true`). Extends `@crm/core`. Local only: http://localhost:5040 (`pnpm dev`). SQLite `sales_template/data/app.sqlite`. Fresh Drizzle journal starting `0000_wide_cyclops` (did **not** copy MA `0000`–`0020`).
+
+UI noun **Company** (table `sales_accounts`) plus Contacts, Opportunities, Activities. Provisional stages: `open` → `in_progress` → `won` | `lost`. Permissions `VIEW_SALES` / `MANAGE_SALES`. No Docker. No Control Plane Sales product or provisioning. Strategic Insights is the intended first customer and has **not** been migrated.
+
+Return: [[wip/WO-2026-09-11-sales-thin-slice-return]].
 
 ### CRM Core (`packages/crm-core`)
 
@@ -137,7 +146,8 @@ Exact `docker inspect` + compose. Combined status: container running **and** `/a
 
 Do not assume any of these exist:
 
-- Sales / Software vertical (audit complete; implementation not started; recommended local shape `sales_template/` / `sales-crm` / :5040 — not created)
+- C2 Sales vertical **plus** Control Plane product catalog (C2A local Sales app exists; C2 is not that slice)
+- Control Plane Sales provisioning / Sales Docker image / Sales host ports
 - Beauty vertical (sister business is the intended second **pilot**, not a shipped product)
 - Completed generic Lead model in Core
 - Generic Campaign / Event framework

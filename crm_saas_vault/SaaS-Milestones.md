@@ -79,13 +79,13 @@ Not S-track. Do not call C2 “S7.” Do not call historical hostname work “S5
 | ID | Focus | Status |
 |---|---|---|
 | C1 | CRM Core extraction (workspace, `@crm/core`, frameworks) | **Code-shipped** (2026-09-11). Evidence: [[history/C1_CRM_Core_Architecture_Return]] |
-| C2A | Thin Sales consumer (local Core consumer; no CP catalog) | **Authorized / in progress** (WO-2026-09-11-sales-thin-slice) |
+| C2A | Thin Sales consumer (local Core consumer; no CP catalog) | **Code-shipped** (2026-09-11). Evidence: [[wip/WO-2026-09-11-sales-thin-slice-return]]. Not C2. |
 | C2 | Sales vertical as second Core consumer + CP product catalog | Not started |
 | C3 | Beauty vertical after Sales proves Core | Not started |
 | D1 | Account vs Product Instance CP schema | **Accepted**, schema **not shipped** |
 | D2–D4 | Keep MA leads / campaigns / public capture vertical-owned | **Accepted** (wait) |
 
-C1 is not Map B Successful. C2A is the authorized thin Sales slice (not C2). C2 is not authorized. Plan narrative (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]].
+C1 is not Map B Successful. C2A is **code-shipped** (not Successful; not C2). C2 is not authorized. Plan narrative (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]].
 
 ---
 
@@ -241,9 +241,9 @@ Workspace + `@crm/core` + brand/health/app-env + auth/RBAC/settings/shell framew
 
 ## C2A — Thin Sales consumer
 
-Status: **Authorized / in progress** (2026-09-11). Work order: [[wip/WO-2026-09-11-sales-thin-slice]]. Not S-track Successful. Not C2.
+Status: **Code-shipped** (2026-09-11). Not S-track Successful. Not C2. Not owner-accepted.
 
-First local Sales CRM vertical consuming `@crm/core`, with Sales-owned CRM domain and **no** Control Plane product catalog. Path `sales_template/` (package `sales-crm`), local port 5040. Do not mark Successful without Scott’s acceptance.
+First local Sales CRM vertical consuming `@crm/core`, with Sales-owned CRM domain and **no** Control Plane product catalog. Path `sales_template/` (package `sales-crm`), local http://localhost:5040. SQLite `sales_template/data/app.sqlite`. Fresh Drizzle journal `0000_wide_cyclops`. Work order: [[wip/WO-2026-09-11-sales-thin-slice]]. Return: [[wip/WO-2026-09-11-sales-thin-slice-return]]. Do not mark Successful without Scott’s acceptance.
 
 ## C2 — Sales as second Core consumer
 

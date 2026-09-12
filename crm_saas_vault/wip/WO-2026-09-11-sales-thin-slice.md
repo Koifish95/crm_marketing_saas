@@ -1,7 +1,7 @@
 ---
 
 type: work-order
-status: active
+status: done
 authorized: yes
 id: WO-2026-09-11-sales-thin-slice
 milestone: C2A
