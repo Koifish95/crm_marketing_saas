@@ -35,11 +35,11 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | C2A Thin Sales consumer | **Successful** (2026-09-11). Owner-accepted after browser QA at http://localhost:5040. Local `sales_template/` / `sales-crm`. Not C2. Evidence: [[history/C2A_closeout]] |
 | C2B SI Sales Refinement Slice A | **Successful** (2026-09-12). Owner-accepted after browser QA at http://localhost:5040. Feature `1ac18e4`. Not Slice B. Not C2. Evidence: [[history/C2B_closeout]] |
 | SI Sales B1 (commercial + acquisition) | **Successful** (2026-09-12). Owner-accepted after browser QA at http://localhost:5040. Feature `40851e0`. Not B2. Not C2. Evidence: [[history/B1_closeout]] |
-| SI Sales B2 (proposal system) | **Code-shipped** (2026-09-12). Core owner QA passed 2026-09-13; refinements `c2d611e`, awaiting regression QA at http://localhost:5040. Feature `84c0cc8`. Not Successful. Not C2. Return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]] |
+| SI Sales B2 (proposal system) | **Code-shipped** (2026-09-12). Core owner QA passed 2026-09-13; regression #6 (historical revision selection) fix shipped, awaiting final regression QA at http://localhost:5040. Feature `84c0cc8`. Not Successful. Not C2. Return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]] |
 | C2 / Beauty / S7–S11 | **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 
-**Authorized work:** none. B2 core owner QA passed; QA refinements are shipped and await Scott’s regression checklist. Do **not** mark B2 Successful until that regression QA. C2, Core promotion, D1, Beauty, S7, and SI migration remain unauthorized. See [[Working-Agreement]] and [[Work-Order-Protocol]].
+**Authorized work:** none. B2 core owner QA passed; regression items 1–5 passed; historical revision-selection fix shipped and awaits Scott’s final checklist. Do **not** mark B2 Successful until that regression QA. C2, Core promotion, D1, Beauty, S7, and SI migration remain unauthorized. See [[Working-Agreement]] and [[Work-Order-Protocol]].
 
 Lockfile: [[project-state.yaml]].
 

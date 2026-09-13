@@ -25,6 +25,20 @@ Decision: what we chose
 
 ---
 
+## 2026-09-13 — SI Sales B2 revision selection in Opportunity panel (not Successful)
+
+Status: working decision
+
+Context: Regression QA items 1–5 passed. Item 6 failed: historical revisions were not selectable in the Opportunity Proposal card while a newer Draft was current.
+
+Decision:
+
+- Staff select a revision in the Opportunity Proposal card. Controls bind to that revision. Preview stays document-only.
+- Issued revisions remain immutable. Sent remains `sent_at`. Accepted does not auto-Won. No public management route.
+- B2 remains **not Successful** until Scott’s final regression checklist.
+
+---
+
 ## 2026-09-13 — SI Sales B2 owner-QA refinements (not Successful)
 
 Status: working decision

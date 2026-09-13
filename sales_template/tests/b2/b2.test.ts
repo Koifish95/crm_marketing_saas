@@ -26,6 +26,7 @@ import {
   getProposalDocument,
   issueProposal,
   markProposalSent,
+  readSignedPdf,
   updateDraftProposal,
   uploadSignedPdf,
 } from '../../server/services/proposals'
@@ -41,7 +42,14 @@ import {
 } from '../../server/services/sales'
 import { users } from '../../server/database/schema'
 import { openTestDatabase } from '../helpers/db'
-import { PROPOSAL_LETTERHEAD_SETTING_KEY, proposalStatusDisplay } from '../../shared/utils/proposals'
+import {
+  PROPOSAL_LETTERHEAD_SETTING_KEY,
+  canCreateProposalRevision,
+  canRecordIssuedProposalActions,
+  canUploadSignedProposal,
+  proposalStatusDisplay,
+  resolveSelectedProposalRevision,
+} from '../../shared/utils/proposals'
 
 let dbHandle: Awaited<ReturnType<typeof openTestDatabase>> | undefined
 let artifactDir: string | undefined
@@ -252,6 +260,37 @@ describe('B2 proposal system', () => {
     const after = await getProposalBundle(dbHandle.db, issued.proposal.id)
     expect(after.current.signedPdfPath).toContain('signed.pdf')
     expect(after.current.generatedPdfPath).toContain('generated.pdf')
+  })
+
+  it('keeps historical signed artifacts reachable after a newer Draft becomes current', async () => {
+    dbHandle = await openTestDatabase()
+    const { actor, opportunity } = await seededOpportunity()
+    const draft = await createDraftProposal(dbHandle.db, opportunity.id, actor)
+    const issued = await issueProposal(dbHandle.db, draft.proposal.id, actor)
+    const firstId = issued.current.id
+    const signedBytes = Buffer.concat([Buffer.from('%PDF-1.4\n'), Buffer.from('historical-signed')])
+    await uploadSignedPdf(dbHandle.db, issued.proposal.id, actor, {
+      filename: 'r1-signed.pdf',
+      type: 'application/pdf',
+      data: signedBytes,
+    }, firstId)
+    await createProposalRevision(dbHandle.db, issued.proposal.id, actor)
+    const later = await getProposalBundle(dbHandle.db, issued.proposal.id)
+    expect(later.current.status).toBe('draft')
+    expect(later.current.id).not.toBe(firstId)
+    const selected = resolveSelectedProposalRevision(later.revisions, firstId, later.current)
+    expect(selected.id).toBe(firstId)
+    expect(selected.status).toBe('issued')
+    expect(canUploadSignedProposal(selected.status)).toBe(true)
+    expect(canCreateProposalRevision(later.current.status)).toBe(false)
+    expect(canRecordIssuedProposalActions(selected.status, selected.id, later.current.id)).toBe(false)
+    const historical = later.revisions.find(row => row.id === firstId)
+    expect(historical?.signedPdfPath).toContain('signed.pdf')
+    const signed = await readSignedPdf(dbHandle.db, issued.proposal.id, firstId)
+    expect(signed.bytes.includes(Buffer.from('historical-signed'))).toBe(true)
+    const generated = await getOrRegeneratePdf(dbHandle.db, issued.proposal.id, firstId)
+    expect(generated.bytes.subarray(0, 5).toString('utf8')).toBe('%PDF-')
+    expect(generated.signedPath).toContain('signed.pdf')
   })
 
   it('uses instance letterhead configuration and does not hardcode Strategic Insights', async () => {

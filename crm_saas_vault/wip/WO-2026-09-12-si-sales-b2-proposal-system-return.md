@@ -6,7 +6,7 @@ milestone: SI-Sales-B2
 base_sha: "99bb058540a706d52aca8ac30e1e1035800f00e6"
 result_sha: "84c0cc88466db931ca37b479d5edc6bc5186a0c0"
 implementation_result: shipped
-tests: "sales_template: pnpm test 7 files / 39 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass. No schema/migration change in the 2026-09-13 owner-QA refinement pass."
+tests: "sales_template: pnpm test 7 files / 40 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass. No schema/migration change in the 2026-09-13 owner-QA refinement or revision-selection passes."
 decisions_discovered: []
 durable_docs_updated:
   - Current-State.md
@@ -317,8 +317,51 @@ Do **not** mark B2 Successful until this checklist is accepted.
 
 ---
 
+## Regression finding #6 (2026-09-13)
+
+Regression items **1–5 passed**. Item **6 failed**: with multiple revisions, history rows were preview links / passive text. The Opportunity Proposal panel stayed bound to the **current** revision, so a newer Draft hid staff signed-PDF controls for r1/r2.
+
+### Fix
+
+No schema change. No Core change. Preview page stays document-only.
+
+- Opportunity Proposal card: revision list is a **selector**. Selected row is highlighted (`aria-current`).
+- Panel header, snapshot/draft form, Preview, Download PDF, and signed View/Download/Upload bind to the **selected** revision.
+- Draft selected: Save Draft, Preview, Issue (unchanged).
+- Issued/Accepted/Declined/Superseded selected: immutable snapshot copy, Preview, Download PDF, signed controls. No Edit/Reopen.
+- Mark Sent / Record Accepted / Record Declined only when the selected revision **is** the chain current **and** status is `issued` (APIs still act on current).
+- New revision still only when the chain current is not Draft.
+- Signed upload/download/view already accepted `revisionId`; UI now passes the selected id.
+
+### Tests
+
+| Command | Result |
+|---|---|
+| `sales_template` `pnpm test` | **7 files / 40 tests passed** |
+| `sales_template` `pnpm lint` | **pass** |
+| `sales_template` `pnpm typecheck` | **pass** |
+| `sales_template` `pnpm build` | **pass** (`Build complete`) |
+
+No `db:migrate`.
+
+### Result SHA
+
+`pending-revision-select-commit`
+
+### Owner checklist (this fix only)
+
+App: **http://localhost:5040**. Login `admin` / `setup`. Restart `pnpm dev` if needed.
+
+1. On an Opportunity with r1 (issued/accepted, signed PDF if possible) and a later r2/r3 Draft, click **r1** in the Proposal card. Confirm the panel switches to r1 (highlight + snapshot, not Draft fields).
+2. Confirm r1 **Preview**, **Download PDF**, and **View / Download Signed PDF** (or **Upload Signed PDF** if none). Do this without using the document preview as the staff control surface.
+3. Click the current Draft row. Confirm Draft fields, Save Draft, Preview, and Issue return. Confirm there is still no Edit/Reopen on issued rows.
+
+Do **not** mark B2 Successful until this checklist is accepted.
+
+---
+
 ## What Scott should do next
 
-1. Have ChatGPT inspect this return and Git on `working` before regression QA.
-2. Restart Sales if needed and run the six-step checklist above at http://localhost:5040.
+1. Have ChatGPT inspect this return and Git on `working` before final regression QA.
+2. Restart Sales if needed and run the three-step revision-selection checklist above at http://localhost:5040.
 3. Only after that QA: mark B2 Successful (separate closeout). Do not start C2, e-sign, email, or SI migration from this ship.

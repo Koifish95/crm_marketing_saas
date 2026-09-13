@@ -17,7 +17,7 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-None. `authorization.active_work_order` is null. C2B Slice A is **Successful**. SI Sales B1 is **Successful**. SI Sales B2 is **code-shipped** (core owner QA passed; refinements shipped; not Successful). Do not start C2, Core promotion, Beauty, D1, CP Sales provisioning, or S7. Do not mark B2 Successful without regression QA.
+None. `authorization.active_work_order` is null. C2B Slice A is **Successful**. SI Sales B1 is **Successful**. SI Sales B2 is **code-shipped** (core owner QA passed; regression #6 fix shipped; not Successful). Do not start C2, Core promotion, Beauty, D1, CP Sales provisioning, or S7. Do not mark B2 Successful without regression QA.
 
 ## Current communication (not a work order)
 

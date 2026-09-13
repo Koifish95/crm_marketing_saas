@@ -29,6 +29,26 @@ export function formatProposalLabel(proposalNumber: string, revision: number) {
   return `${proposalNumber} r${revision}`
 }
 
+export function resolveSelectedProposalRevision<T extends { id: number }>(
+  revisions: T[],
+  selectedId: number | null | undefined,
+  current: T,
+): T {
+  return revisions.find(row => row.id === selectedId) ?? current
+}
+
+export function canCreateProposalRevision(currentStatus: string) {
+  return currentStatus !== 'draft'
+}
+
+export function canUploadSignedProposal(status: string) {
+  return status !== 'draft'
+}
+
+export function canRecordIssuedProposalActions(status: string, selectedId: number, currentId: number) {
+  return selectedId === currentId && status === 'issued'
+}
+
 export function isPastValidThrough(validThrough: string | null | undefined, todayYmd: string) {
   if (!validThrough) {
     return false

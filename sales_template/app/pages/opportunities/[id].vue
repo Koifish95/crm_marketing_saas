@@ -9,7 +9,16 @@ import {
 } from '#shared/utils/pipeline'
 import { formatUsdFromCents } from '#shared/utils/money'
 import { OFFER_PRICING_TYPES, offerPricingTypeLabel } from '#shared/utils/catalog'
-import { proposalStatusDisplay } from '#shared/utils/proposals'
+import {
+  canCreateProposalRevision,
+  canRecordIssuedProposalActions,
+  canUploadSignedProposal,
+  formatProposalLabel,
+  isPastValidThrough,
+  proposalStatusDisplay,
+  resolveSelectedProposalRevision,
+} from '#shared/utils/proposals'
+import { denverYmd, utcNowMs } from '#shared/utils/time'
 
 definePageMeta({
   layout: 'internal',
@@ -125,6 +134,7 @@ const editQuantity = ref('1')
 const editPrice = ref('')
 const editType = ref('one_time')
 const signedFileInput = ref<HTMLInputElement | null>(null)
+const selectedRevisionId = ref<number | null>(null)
 const proposalTitle = ref('')
 const proposalIntro = ref('')
 const proposalTerms = ref('')
@@ -137,6 +147,25 @@ const formError = ref('')
 
 function callApi(url: string, opts: { method?: string, body?: unknown } = {}) {
   return ($fetch as (input: string, init?: { method?: string, body?: unknown }) => Promise<unknown>)(url, opts)
+}
+
+function applyRevisionToForm(revision: ProposalRevision) {
+  proposalTitle.value = revision.title
+  proposalIntro.value = revision.intro || ''
+  proposalTerms.value = revision.terms || ''
+  proposalNotes.value = revision.notes || ''
+  proposalValidThrough.value = revision.validThrough || ''
+  proposalRecipientId.value = revision.recipientContactId ? String(revision.recipientContactId) : ''
+}
+
+function selectProposalRevision(revisionId: number) {
+  const bundle = proposalBundle.value
+  if (!bundle) {
+    return
+  }
+  const selected = resolveSelectedProposalRevision(bundle.revisions, revisionId, bundle.current)
+  selectedRevisionId.value = selected.id
+  applyRevisionToForm(selected)
 }
 
 watch(opportunity, (value) => {
@@ -156,15 +185,25 @@ watch(opportunity, (value) => {
 
 watch(proposalBundle, (value) => {
   if (!value) {
+    selectedRevisionId.value = null
     return
   }
-  proposalTitle.value = value.current.title
-  proposalIntro.value = value.current.intro || ''
-  proposalTerms.value = value.current.terms || ''
-  proposalNotes.value = value.current.notes || ''
-  proposalValidThrough.value = value.current.validThrough || ''
-  proposalRecipientId.value = value.current.recipientContactId ? String(value.current.recipientContactId) : ''
+  const selected = resolveSelectedProposalRevision(value.revisions, selectedRevisionId.value, value.current)
+  selectedRevisionId.value = selected.id
+  applyRevisionToForm(selected)
 }, { immediate: true })
+
+const selectedRevision = computed(() => {
+  const bundle = proposalBundle.value
+  if (!bundle) {
+    return null
+  }
+  return resolveSelectedProposalRevision(bundle.revisions, selectedRevisionId.value, bundle.current)
+})
+
+const selectedPastValidThrough = computed(() => {
+  return isPastValidThrough(selectedRevision.value?.validThrough, denverYmd(utcNowMs()))
+})
 
 const terminal = computed(() => opportunity.value ? isTerminalOpportunityStage(opportunity.value.stage) : false)
 
@@ -354,13 +393,17 @@ async function removeLine(lineId: number) {
   await refreshProposal()
 }
 
-async function runProposal(action: () => Promise<unknown>, success: string) {
+async function runProposal(action: () => Promise<unknown>, success: string, selectCurrent = false) {
   formError.value = ''
   notice.value = ''
   saving.value = true
   try {
     await action()
     await refreshProposal()
+    if (selectCurrent && proposalBundle.value) {
+      selectedRevisionId.value = proposalBundle.value.current.id
+      applyRevisionToForm(proposalBundle.value.current)
+    }
     notice.value = success
   } catch (caught: unknown) {
     const err = caught as { data?: { message?: string } }
@@ -374,6 +417,7 @@ async function createDraftProposal() {
   await runProposal(
     () => callApi(`/api/opportunities/${id.value}/proposal`, { method: 'POST' }),
     'Draft Proposal created.',
+    true,
   )
 }
 
@@ -406,6 +450,7 @@ async function issueCurrentProposal() {
   await runProposal(
     () => callApi(`/api/proposals/${bundle.proposal.id}/issue`, { method: 'POST' }),
     'Proposal issued. Commercial terms are now a snapshot.',
+    true,
   )
 }
 
@@ -417,6 +462,7 @@ async function reviseProposal() {
   await runProposal(
     () => callApi(`/api/proposals/${bundle.proposal.id}/revise`, { method: 'POST' }),
     'New Draft revision opened. The prior revision stays until this one is issued.',
+    true,
   )
 }
 
@@ -455,15 +501,16 @@ async function declineCurrentProposal() {
 
 async function uploadSignedPdf(event: Event) {
   const bundle = proposalBundle.value
+  const selected = selectedRevision.value
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
-  if (!bundle || !file) {
+  if (!bundle || !selected || !file) {
     return
   }
   const body = new FormData()
   body.append('file', file)
   await runProposal(
-    () => callApi(`/api/proposals/${bundle.proposal.id}/revisions/${bundle.current.id}/signed`, {
+    () => callApi(`/api/proposals/${bundle.proposal.id}/revisions/${selected.id}/signed`, {
       method: 'POST',
       body,
     }),
@@ -740,19 +787,40 @@ function companyName() {
             </AppButton>
           </div>
           <div
-            v-else
+            v-else-if="selectedRevision"
             class="space-y-4"
           >
             <p class="text-sm">
-              {{ proposalBundle.label }}
-              · {{ proposalStatusDisplay(proposalBundle.current.status, proposalBundle.current.sentAt) }}
+              {{ formatProposalLabel(proposalBundle.proposal.proposalNumber, selectedRevision.revision) }}
+              · {{ proposalStatusDisplay(selectedRevision.status, selectedRevision.sentAt) }}
               <span
-                v-if="proposalBundle.pastValidThrough"
+                v-if="selectedPastValidThrough"
                 class="text-red-800"
               >· Past valid-through</span>
             </p>
+            <ul class="space-y-1">
+              <li
+                v-for="revision in proposalBundle.revisions"
+                :key="revision.id"
+              >
+                <button
+                  type="button"
+                  class="w-full rounded-md px-2.5 py-1.5 text-left text-sm"
+                  :class="selectedRevision.id === revision.id ? 'bg-brand-50 font-semibold text-navy-900' : 'text-muted hover:bg-canvas'"
+                  :aria-current="selectedRevision.id === revision.id ? 'true' : undefined"
+                  @click="selectProposalRevision(revision.id)"
+                >
+                  r{{ revision.revision }}
+                  · {{ proposalStatusDisplay(revision.status, revision.sentAt) }}
+                  <span
+                    v-if="revision.id === proposalBundle.current.id"
+                    class="text-muted"
+                  >· Current</span>
+                </button>
+              </li>
+            </ul>
             <form
-              v-if="proposalBundle.current.status === 'draft'"
+              v-if="selectedRevision.status === 'draft'"
               class="space-y-3"
               @submit.prevent="saveDraftProposal"
             >
@@ -826,32 +894,32 @@ function companyName() {
               class="text-sm text-muted"
             >
               Issued proposals are immutable. Create a new revision to make changes.
-              This snapshot: {{ formatUsdFromCents(proposalBundle.current.amountCents) }} one-time
-              · {{ formatUsdFromCents(proposalBundle.current.mrrCents) }} MRR.
+              This snapshot: {{ formatUsdFromCents(selectedRevision.amountCents) }} one-time
+              · {{ formatUsdFromCents(selectedRevision.mrrCents) }} MRR.
             </p>
             <div class="flex flex-wrap gap-2">
               <NuxtLink
                 class="btn-secondary"
-                :to="`/proposals/${proposalBundle.proposal.id}/r/${proposalBundle.current.id}`"
+                :to="`/proposals/${proposalBundle.proposal.id}/r/${selectedRevision.id}`"
               >
                 Preview
               </NuxtLink>
               <a
-                v-if="proposalBundle.current.status !== 'draft'"
+                v-if="canUploadSignedProposal(selectedRevision.status)"
                 class="btn-secondary"
-                :href="`/api/proposals/${proposalBundle.proposal.id}/revisions/${proposalBundle.current.id}/pdf`"
+                :href="`/api/proposals/${proposalBundle.proposal.id}/revisions/${selectedRevision.id}/pdf`"
               >
                 Download PDF
               </a>
               <AppButton
-                v-if="proposalBundle.current.status === 'draft'"
+                v-if="selectedRevision.status === 'draft'"
                 :loading="saving"
                 @click="issueCurrentProposal"
               >
                 Issue
               </AppButton>
               <AppButton
-                v-if="proposalBundle.current.status === 'issued'"
+                v-if="canRecordIssuedProposalActions(selectedRevision.status, selectedRevision.id, proposalBundle.current.id)"
                 variant="secondary"
                 :loading="saving"
                 @click="markProposalSent"
@@ -859,7 +927,7 @@ function companyName() {
                 Mark Sent
               </AppButton>
               <AppButton
-                v-if="proposalBundle.current.status === 'issued'"
+                v-if="canRecordIssuedProposalActions(selectedRevision.status, selectedRevision.id, proposalBundle.current.id)"
                 variant="secondary"
                 :loading="saving"
                 @click="acceptCurrentProposal"
@@ -867,7 +935,7 @@ function companyName() {
                 Record Accepted
               </AppButton>
               <AppButton
-                v-if="proposalBundle.current.status === 'issued'"
+                v-if="canRecordIssuedProposalActions(selectedRevision.status, selectedRevision.id, proposalBundle.current.id)"
                 variant="subtle"
                 :loading="saving"
                 @click="declineCurrentProposal"
@@ -875,7 +943,7 @@ function companyName() {
                 Record Declined
               </AppButton>
               <AppButton
-                v-if="proposalBundle.current.status !== 'draft'"
+                v-if="canCreateProposalRevision(proposalBundle.current.status)"
                 variant="secondary"
                 :loading="saving"
                 @click="reviseProposal"
@@ -884,7 +952,7 @@ function companyName() {
               </AppButton>
             </div>
             <div
-              v-if="proposalBundle.current.status !== 'draft'"
+              v-if="canUploadSignedProposal(selectedRevision.status)"
               class="space-y-2"
             >
               <input
@@ -902,18 +970,18 @@ function companyName() {
                 Upload Signed PDF
               </AppButton>
               <p
-                v-if="proposalBundle.current.signedPdfPath"
+                v-if="selectedRevision.signedPdfPath"
                 class="text-sm"
               >
-                Signed PDF on file{{ proposalBundle.current.signedPdfOriginalName ? `: ${proposalBundle.current.signedPdfOriginalName}` : '.' }}
+                Signed PDF on file{{ selectedRevision.signedPdfOriginalName ? `: ${selectedRevision.signedPdfOriginalName}` : '.' }}
               </p>
               <div
-                v-if="proposalBundle.current.signedPdfPath"
+                v-if="selectedRevision.signedPdfPath"
                 class="flex flex-wrap gap-2"
               >
                 <a
                   class="btn btn-secondary"
-                  :href="`/api/proposals/${proposalBundle.proposal.id}/revisions/${proposalBundle.current.id}/signed?view=1`"
+                  :href="`/api/proposals/${proposalBundle.proposal.id}/revisions/${selectedRevision.id}/signed?view=1`"
                   target="_blank"
                   rel="noopener"
                 >
@@ -921,26 +989,12 @@ function companyName() {
                 </a>
                 <a
                   class="btn btn-secondary"
-                  :href="`/api/proposals/${proposalBundle.proposal.id}/revisions/${proposalBundle.current.id}/signed`"
+                  :href="`/api/proposals/${proposalBundle.proposal.id}/revisions/${selectedRevision.id}/signed`"
                 >
                   Download Signed PDF
                 </a>
               </div>
             </div>
-            <ul
-              v-if="proposalBundle.revisions.length > 1"
-              class="space-y-1 text-sm text-muted"
-            >
-              <li
-                v-for="revision in proposalBundle.revisions"
-                :key="revision.id"
-              >
-                <NuxtLink :to="`/proposals/${proposalBundle.proposal.id}/r/${revision.id}`">
-                  r{{ revision.revision }}
-                </NuxtLink>
-                · {{ proposalStatusDisplay(revision.status, revision.sentAt) }}
-              </li>
-            </ul>
           </div>
         </AppPanel>
         <AppPanel title="Commercial lines">
