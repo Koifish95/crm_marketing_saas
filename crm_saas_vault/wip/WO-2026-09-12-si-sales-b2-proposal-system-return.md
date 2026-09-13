@@ -298,7 +298,7 @@ None vs the six requested refinements. Optional `offerId` on line PATCH is an ad
 
 ### Result SHA
 
-`pending-refinement-commit` — stamped after commit.
+`c2d611e803e18f6d91e318ea6cfc9061ae8736d8`
 
 ---
 
