@@ -1,6 +1,6 @@
 ---
 type: note
-status: draft
+status: current
 area: process
 updated: 2026-09-12
 aliases:
@@ -20,7 +20,7 @@ WIP communication. **Not** the project map. **Not** a work order. Checking boxes
 
 Cursor may change Sales (or any other product) code only after a separate active [[Work-Order-Protocol]] work order, or Scott’s explicit ask in that later chat.
 
-Do not promote answers from this file into [[SaaS-Decisions]] or ADRs until Scott has completed the checkboxes **and** a follow-up says to promote.
+B2-01 through B2-06 are owner-approved (2026-09-12). Do not promote answers from this file into [[SaaS-Decisions]] or ADRs until a follow-up says to promote. Checking boxes still does **not** authorize implementation.
 
 Prior Slice B decisions: [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] (Decisions 1–64). B1 closeout: [[history/B1_closeout]]. B1 return: [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]].
 
@@ -38,9 +38,9 @@ Prior Slice B decisions: [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Workshe
 | S-track | S0–S6 **Successful**. S7–S11 **not started** |
 | C-track | C1 **code-shipped**. C2A / C2B / B1 **Successful**. C2 / C3 **not started**. D1 schema **not shipped** |
 | Implementation authorization | **None.** `authorization.active_work_order: null`. **B2 is not authorized.** |
-| Purpose | Settle remaining SI Sales **B2** product/architecture decisions before a B2 Work Order |
-| This document | **Decision / discovery only** |
-| Owner-review state | **OWNER REVIEW REQUIRED — B2 planning decisions remain.** |
+| Purpose | Remaining SI Sales **B2** product/architecture decisions are recorded. ChatGPT/Cursor may now **prepare** a B2 Work Order. |
+| This document | **Decision record.** Still **not** a work order. Still **not** implementation authorization. |
+| Owner-review state | **DECISIONS COMPLETE — Ready for ChatGPT/Cursor B2 Work Order preparation.** |
 
 B2 is the **proposal/document portion** of already-approved Slice B. Proposal generation is **in Slice B** (Decision 22). B1/B2 split is Decision 44. This worksheet does **not** reopen whether proposals belong in Slice B.
 
@@ -116,11 +116,17 @@ Martial Arts has `data/uploads` + `assets` table (marketing files). Pattern evid
 | **43** | Local Sales refinement only. No SI migration, C2/CP, VPS, DNS/TLS, billing, self-service. | B2 is still laptop `:5040`. |
 | **44** | B2 = proposal system + remaining **proposal-related** reporting polish. Do not redesign all B1 reporting. | Dashboard may add a small proposal strip; no new BI product. |
 | **60** | Instance-local; no SI identity in infrastructure. Later hostname selects the instance. | Proposal URLs/files stay inside this Sales sqlite/disk. No tenant id in filenames required for B2. |
-| **61** (branding principle) | Do not hardcode Strategic Insights into Sales components. Use configurable settings. No form/CMS builder. | Seller letterhead must be **instance configuration**, not Vue constants. B1 brand env vars are **not enough** for a PDF (no address/phone/email/logo). That gap is Decision **B2-03**. |
+| **61** (branding principle) | Do not hardcode Strategic Insights into Sales components. Use configurable settings. No form/CMS builder. | Seller letterhead is **instance configuration** (B2-03 Option A), not Vue constants. B1 brand env vars remain insufficient alone for a PDF. |
+| **B2-01** | One Proposal record/chain per Opportunity. Revisions supersede. Concurrent alternative packages = separate Opportunities. | No second live proposal chain on the same Opportunity. |
+| **B2-02** | Issued and Sent are distinct. Issue freezes snapshot + PDF. Staff may **Mark Sent** (`sent_at` + history). No CRM email. | Status/history can show issued-but-not-sent. |
+| **B2-03** | Instance-configurable letterhead: legal name, address, phone, email, website, optional logo, optional footer/legal. Text-only valid without logo. No SI hardcoding. No theme CMS. | `app_settings` (or equivalent instance config) + optional logo file. |
+| **B2-04** | Closed slots: title, optional intro/scope, snapshot lines, derived totals, instance-default terms (overridable), optional notes, fixed signature area. No document CMS. | One layout. No repeating custom sections. |
+| **B2-05** | Optional `valid_through`. UI may show past-valid-through. Do **not** auto-mutate stored status. No expire worker. Staff may still Accept. | Display flag only. |
+| **B2-06** | One selectable recipient Contact per revision; default Opportunity primary Contact; same-Company only; snapshot name/title/email/phone at Issue. No multi-recipient. No email send. | Picker + issue-time snapshot. |
 
-### Decision 26 vs 28 (Issued/Sent)
+### Decision 26 vs 28 (Issued/Sent) — closed by B2-02
 
-Decision 26 listed **Issued/Sent** as one combined label. Decision 28 forbids CRM email send but still requires staff to record **status**. Whether “PDF finalized” and “we sent it” are one state or two is **B2-02**.
+Decision 26 listed **Issued/Sent** as one combined label. Decision 28 forbids CRM email send. **B2-02 APPROVE OPTION A:** they are distinct concepts. Issue/finalize freezes the commercial snapshot and generates the PDF. Staff may explicitly **Mark Sent** afterward. Record `sent_at` and appropriate history. No CRM email sending is implied or authorized.
 
 ### Not inherited as “ask again”
 
@@ -130,21 +136,22 @@ Decision 26 listed **Issued/Sent** as one combined label. Decision 28 forbids CR
 
 ## 5. Proposed B2 boundary
 
-Center of B2, given Decisions 22–31, 44, 50–51:
+Center of B2, given Decisions 22–31, 44, 50–51 and **B2-01 through B2-06** (all Option A):
 
 ### Proposal domain
 
-- Proposal belongs to an Opportunity.
+- One Proposal record/chain per Opportunity (B2-01). Revisions supersede; only one revision is current.
+- Genuinely different simultaneous commercial packages = **separate Opportunities**.
 - Sales-owned number + revision identity.
-- Lifecycle from Decision 26, refined by B2-02.
-- One current commercial offer unless B2-01 says otherwise.
+- Lifecycle: Draft; Issued (immutable snapshot); optional Sent (`sent_at`); Accepted; Declined; Superseded. **Expired is not a stored auto-status** (B2-05). Decision 26’s Issued/Sent mash is resolved by B2-02.
 - Per-revision immutable commercial snapshot (`sales_proposal_lines` + totals + names).
+- One selectable recipient Contact per revision (B2-06).
 
 ### Presentation
 
 - Staff HTML/printable preview from the snapshot (same layout as PDF).
 - Local PDF generation (no Chromium).
-- One branded template. One-time and MRR presented separately. No tax.
+- One branded template with instance-configurable letterhead (B2-03). Closed narrative slots (B2-04). One-time and MRR presented separately. No tax. No document CMS.
 
 ### Artifacts
 
@@ -156,15 +163,17 @@ Center of B2, given Decisions 22–31, 44, 50–51:
 ### Workflow
 
 - Draft (editable; lines may refresh from Opportunity).
-- Issue/finalize → snapshot + generate PDF; issued revision immutable.
+- Issue/finalize → freeze commercial snapshot + generate PDF; issued revision immutable (B2-02).
+- Optional staff **Mark Sent** → `sent_at` + history. **No** CRM email (B2-02, Decision 28).
 - Material change → new revision; prior becomes Superseded and remains visible.
+- Optional `valid_through`; UI may label past-valid-through; stored status does **not** auto-flip (B2-05). Staff may still Accept.
 - Staff-recorded Accepted / Declined.
 - Staff explicitly marks Opportunity Won (Decision 31).
 - Download PDF. No in-app send.
 
 ### Reporting/polish
 
-- Small Opportunity-adjacent and dashboard counts: current draft, issued/open, accepted, declined; optional aging past valid-through as a **display** flag.
+- Small Opportunity-adjacent and dashboard counts: current draft, issued, sent, accepted, declined; optional aging past valid-through as a **display** flag (B2-05).
 - Do not rebuild Source/Campaign reporting.
 
 ---
@@ -176,7 +185,8 @@ Out of B2 unless a **new** owner decision (not this worksheet’s default) says 
 - Browser customer e-sign, public signing portal, legal-evidence audit trail (29)
 - Customer accounts / portal
 - In-app email / SMTP (28)
-- Customer-facing form/document CMS or template editor (24)
+- Customer-facing form/document CMS or template editor (24, B2-03, B2-04)
+- Concurrent independent Proposal chains on one Opportunity (B2-01)
 - Tax, invoicing, Stripe, QuickBooks, billing (2, 24)
 - Discount engine (18)
 - Object storage / S3 (30, 51)
@@ -195,7 +205,7 @@ These are **not** owner questions.
 ### Schema (recommended)
 
 - `sales_proposals` — `opportunity_id`, stable `proposal_number`, pointer to current revision, timestamps.
-- `sales_proposal_revisions` — `proposal_id`, `revision` (integer, starting at 1), `status`, issued/accepted/declined timestamps, valid-through, title, intro/scope/terms/notes snapshots, seller/customer/contact name snapshots, totals caches, `generated_pdf_path`, optional `signed_pdf_path`.
+- `sales_proposal_revisions` — `proposal_id`, `revision` (integer, starting at 1), `status`, issued/`sent_at`/accepted/declined timestamps, optional `valid_through`, title, intro/scope/terms/notes snapshots, seller letterhead snapshots as needed, customer Company name, recipient Contact snapshots (B2-06), totals caches, `generated_pdf_path`, optional `signed_pdf_path`.
 - `sales_proposal_lines` — per revision: description, qty, pricing type, unit price, optional offer id/name snapshot. Derived one-time/MRR same math as B1.
 
 History notes on issue, revise, accept, decline, signed-upload. Reuse `sales_notes` (`record_kind` extended or opportunity-scoped notes). Prefer extending `record_kind` with `proposal` if cheap; otherwise note on the Opportunity. Implementation detail.
@@ -204,7 +214,7 @@ Journal **0003** after `0002_cheerful_firebrand`. `pnpm db:migrate` on existing 
 
 ### Numbering
 
-Unless B2-01 changes identity: sequential instance-local `P-{Denver year}-{NNNN}` shared across revisions; revision shown as `P-2026-0007 r2`. Not SI-specific. Unique inside this sqlite.
+Sequential instance-local `P-{Denver year}-{NNNN}` shared across revisions of the **one** proposal chain (B2-01); revision shown as `P-2026-0007 r2`. Not SI-specific. Unique inside this sqlite.
 
 ### PDF architecture
 
@@ -236,7 +246,7 @@ Keep `VIEW_SALES` / `MANAGE_SALES`. View/download with VIEW; create/issue/revise
 
 ### Settings
 
-Seller letterhead (B2-03) should use Core `app_settings` JSON (same pattern as `sales.public_intake`), not `.env` field lists, not hardcoded SI. Brand **name** can still come from `publicBrand()` so SI dogfood stays `.env` for the wordmark.
+Seller letterhead (B2-03 Option A) uses Core `app_settings` JSON (same pattern as `sales.public_intake`): legal/business name, address, phone, email, website, optional footer/legal, optional logo file. Not `.env` field lists. Not hardcoded SI. Brand **name** can still default from `publicBrand()` so SI dogfood stays instance config, not Vue. This is **not** a theme/template CMS.
 
 ### UI
 
@@ -244,7 +254,7 @@ Opportunity workspace: Proposals related list + current proposal. Compact Propos
 
 ### Tests
 
-`sales_template/tests/b2/` covering: snapshot copy at issue; Opportunity line edit does not change issued revision; new revision on commercial change; Accepted does not auto-Won; unknown file missing regenerates from snapshot; signed upload stored separately. Copy B1 test style.
+`sales_template/tests/b2/` covering: one proposal chain per Opportunity; snapshot copy at issue (lines + recipient Contact); Opportunity line edit does not change issued revision; new revision on commercial change; Mark Sent records `sent_at` without sending email; past `valid_through` does not mutate stored status; Accepted does not auto-Won; missing generated file regenerates from snapshot; signed upload stored separately. Copy B1 test style.
 
 ### SaaS compatibility
 
@@ -252,17 +262,17 @@ Opaque per-instance files and numbers. No SI string in code. Later `{slug}.{prod
 
 ---
 
-## 8–10. Numbered unresolved owner decisions
+## 8–10. Owner-approved B2 decisions (recorded 2026-09-12)
 
-Only questions that still change customer/staff/document semantics. Everything else is Section 4 or 7.
+These six questions are **closed**. Do not ask Scott again. Options below remain as the historical choice set.
 
 ---
 
 ## Decision B2-01 — One current revision chain, or concurrent independent proposals?
 
-**Why this is still open**
+**Why this was asked**
 
-Decision 23: “An Opportunity may have multiple Proposal versions/revisions, but only one should be the current/active proposal at a time.” That settles **sequential revisions**. It does not explicitly say whether SI ever needs **two live alternative quotes** on the same Opportunity (for example Managed IT vs a fixed project package) at the same time.
+Decision 23: “An Opportunity may have multiple Proposal versions/revisions, but only one should be the current/active proposal at a time.” That settled **sequential revisions**. It did not explicitly say whether SI ever needs **two live alternative quotes** on the same Opportunity (for example Managed IT vs a fixed project package) at the same time.
 
 **Existing repository evidence**
 
@@ -288,13 +298,21 @@ Not useful: Proposal hanging off Company (rejected by Decision 23).
 
 **Owner decision**
 
-`PENDING`
+**APPROVE OPTION A**
+
+One Proposal record/chain per Opportunity.
+
+Proposal revisions supersede prior revisions, and only one revision is current.
+
+Do not support multiple concurrent independent Proposal chains under one Opportunity in B2.
+
+Genuinely different simultaneous commercial packages should be represented as separate Opportunities.
 
 ---
 
 ## Decision B2-02 — Is “Issued” enough, or do we also record “Sent”?
 
-**Why this is still open**
+**Why this was asked**
 
 Decision 26 listed **Issued/Sent** as one combined state. Decision 28: no CRM email, but staff must be able to record status after they email the PDF themselves. Product meaning differs if “the PDF exists” is the same as “the customer has it.”
 
@@ -318,13 +336,20 @@ One state only: Issue means “ready and we treat it as sent.” Staff responsib
 
 **Owner decision**
 
-`PENDING`
+**APPROVE OPTION A**
+
+Issued and Sent are distinct concepts.
+
+* Issue/finalize freezes the commercial snapshot and generates the PDF.
+* Staff may explicitly **Mark Sent** afterward.
+* Record `sent_at` and appropriate history.
+* No CRM email sending is implied or authorized.
 
 ---
 
 ## Decision B2-03 — Seller letterhead: which fields, and how configured?
 
-**Why this is still open**
+**Why this was asked**
 
 Decision 24 requires SI identity/branding on the artifact. Decision 61 forbids hardcoding Strategic Insights and says brand env vars are not a CMS. B1 `publicBrand()` only has app name, brand name, location, tagline. Company records have **no** seller address. A customer-ready PDF almost certainly needs more than a name. That extra letterhead is **new B2 configuration**, not a B1 leftover.
 
@@ -353,13 +378,31 @@ Brand env vars only (name/location/tagline). Fastest. Weak as a customer PDF; li
 
 **Owner decision**
 
-`PENDING`
+**APPROVE OPTION A**
+
+Provide generic, instance-configurable proposal letterhead including:
+
+* business/legal name
+* address
+* phone
+* email
+* website
+* optional logo
+* optional footer/legal text
+
+Text-only remains valid when no logo is configured.
+
+Do not hardcode Strategic Insights.
+
+Use the existing instance-configuration architecture where appropriate.
+
+This does not authorize a general theme/template CMS.
 
 ---
 
 ## Decision B2-04 — Which narrative blocks are typed per Proposal vs instance-default?
 
-**Why this is still open**
+**Why this was asked**
 
 Decision 24 listed title, scope/summary, terms/notes, signature area. It did not say which of those staff type **every time** vs which are **instance boilerplate** (payment terms, confidentiality, “this is not an invoice”). Building all of them as a mini CMS would violate “not a template CMS.”
 
@@ -400,13 +443,25 @@ Rich template editor / repeating custom sections. Out of Decision 24. Do not pic
 
 **Owner decision**
 
-`PENDING`
+**APPROVE OPTION A**
+
+Use closed structured proposal slots:
+
+* Title — per revision; default Opportunity name
+* Intro / scope — optional per revision
+* Commercial lines — snapshot from Opportunity at Issue
+* Totals — derived one-time + MRR
+* Terms/legal text — instance default, overridable per revision
+* Notes — optional per revision
+* Signature/acceptance area — fixed template structure
+
+Do not implement arbitrary/repeating document sections or a document/template CMS.
 
 ---
 
 ## Decision B2-05 — Valid-through: required, and stored Expired vs display-only?
 
-**Why this is still open**
+**Why this was asked**
 
 Decision 24 includes expiration/valid-through on the artifact. Decision 26 includes **Expired** in the state list but Cursor said **no background job**; UI may show past valid-through without auto-status unless inexpensive. Staff workflow changes if every proposal must have a date, and if the CRM silently flips status at midnight.
 
@@ -434,15 +489,24 @@ Required date **and** stored status becomes Expired when viewed/listed after tha
 
 **Owner decision**
 
-`PENDING`
+**APPROVE OPTION A**
+
+`valid_through` is optional.
+
+When populated and the date has passed:
+
+* UI may clearly indicate that the Proposal is past its valid-through date.
+* Do not automatically mutate the stored Proposal status.
+* Do not require a background expiration worker.
+* Staff may still record acceptance if the business chooses to honor the Proposal.
 
 ---
 
 ## Decision B2-06 — Who is the proposal addressed to?
 
-**Why this is still open**
+**Why this was asked**
 
-Decision 24 includes customer Company and customer Contact. Opportunity already has optional `primaryContactId`. Company has no billing address. Whether B2 needs a **proposal-specific recipient** (or multiple recipients) is still a staff-workflow choice.
+Decision 24 includes customer Company and customer Contact. Opportunity already has optional `primaryContactId`. Company has no billing address. Whether B2 needed a **proposal-specific recipient** (or multiple recipients) was the remaining staff-workflow choice.
 
 **Existing repository evidence**
 
@@ -470,7 +534,15 @@ Multiple recipient Contacts on one proposal. Useful for CC lists; extra UI; stil
 
 **Owner decision**
 
-`PENDING`
+**APPROVE OPTION A**
+
+Each Proposal revision has one selectable recipient Contact.
+
+* Default to the Opportunity primary Contact.
+* Staff may select another Contact belonging to the same Company.
+* Snapshot recipient name, title, email, and phone when the Proposal is issued.
+* No multiple-recipient model in B2.
+* No email-send behavior is implied.
 
 ---
 
@@ -485,8 +557,9 @@ Multiple recipient Contacts on one proposal. Useful for CC lists; extra UI; stil
 | S3 / object storage | Decisions 30, 51; S7 |
 | Chromium PDF | Decision 27 |
 | C2 / D1 / SI cutover / VPS / DNS | Decisions 43, 60 |
-| Company mailing address book | Only if Scott rejects B2-06 Option A without address |
-| Concurrent option packages beyond B2-01 | If A is chosen, use another Opportunity |
+| Company mailing address book | Not required by B2-06 Option A; seller address is letterhead (B2-03), not a Company field |
+| Concurrent option packages under one Opportunity | B2-01 Option A: use another Opportunity |
+| Theme / template CMS | B2-03 / B2-04: letterhead + closed slots only |
 | Proposal-only forecasting / weighted pipeline | Decision 44: no BI project |
 | Customer self-serve download link | Portal; not authorized |
 | Core promotion of documents | Decision 40 |
@@ -495,18 +568,18 @@ Multiple recipient Contacts on one proposal. Useful for CC lists; extra UI; stil
 
 ## 12. Work Order readiness checklist
 
-A B2 Work Order may be **drafted** only after this worksheet’s six owner decisions are recorded. Checking those boxes still does **not** start code.
+A B2 Work Order may now be **drafted**. Checking these boxes still does **not** start code. Implementation waits for a separate authorized work order or Scott’s explicit ask in that later chat.
 
-Before ChatGPT prepares `WO-…-si-sales-b2-…`:
+ChatGPT/Cursor may prepare `WO-…-si-sales-b2-…`:
 
-- [ ] B2-01 recorded
-- [ ] B2-02 recorded
-- [ ] B2-03 recorded
-- [ ] B2-04 recorded
-- [ ] B2-05 recorded
-- [ ] B2-06 recorded
-- [ ] No reopen of Decisions 22–31, 50–51, 28–29, 43, 60
-- [ ] Work Order names B2 only; forbidden_scope includes e-sign, email send, C2, D1, SI cutover, billing, Chromium, S3
+- [x] B2-01 recorded — **APPROVE OPTION A** (one proposal chain per Opportunity)
+- [x] B2-02 recorded — **APPROVE OPTION A** (Issued vs Mark Sent; no CRM email)
+- [x] B2-03 recorded — **APPROVE OPTION A** (instance letterhead; optional logo; no SI hardcoding; no theme CMS)
+- [x] B2-04 recorded — **APPROVE OPTION A** (closed slots)
+- [x] B2-05 recorded — **APPROVE OPTION A** (optional valid-through; display-only; no expire worker)
+- [x] B2-06 recorded — **APPROVE OPTION A** (one selectable same-Company Contact; snapshot at Issue)
+- [x] No reopen of Decisions 22–31, 50–51, 28–29, 43, 60
+- [ ] Work Order names B2 only; forbidden_scope includes e-sign, email send, C2, D1, SI cutover, billing, Chromium, S3, document/theme CMS, concurrent proposal chains
 - [ ] Expected journal `0003`; migrate existing sqlite; tests under `tests/b2/`
 - [ ] `authorized: yes` only when Scott says so in Git or the implementing chat
 
@@ -526,24 +599,24 @@ Before ChatGPT prepares `WO-…-si-sales-b2-…`:
 | Won remains explicit | A | 31 |
 | No automated email | A | 28 |
 | Number format `P-YYYY-NNNN` + revision | B technical | §7; Decision 24 Cursor note |
-| One vs many proposal **records** | **C** | B2-01 |
-| Draft / Issued / Sent / Accepted / Declined / Expired / Superseded | A list; **C** for Issued vs Sent and Expired | 26 + B2-02 + B2-05 |
-| What snapshot copies | A | 25, 50; qty, description, type, unit, offer name, totals |
+| One vs many proposal **records** | **A** (B2-01 Option A) | one chain per Opportunity |
+| Draft / Issued / Sent / Accepted / Declined / Expired / Superseded | **A** | 26 + B2-02 Option A (Issued ≠ Sent) + B2-05 Option A (no auto-Expired) |
+| Recipient Contact | **A** (B2-06 Option A) | one selectable same-Company Contact; snapshot at Issue |
+| Seller letterhead / logo / legal | **A** (B2-03 Option A) | instance config; optional logo; no SI hardcoding; no theme CMS |
+| Narrative sections | **A** (B2-04 Option A) | closed slots |
+| Valid-through / auto-Expired | **A** (B2-05 Option A) | optional date; display-only |
+| What snapshot copies | A | 25, 50, B2-06: qty, description, type, unit, offer name, totals, recipient Contact |
 | Later Opportunity/Offer edits | A | 25, 50: do not rewrite issued |
-| Recipient Contact | **C** | B2-06 |
-| Seller letterhead / logo / legal | **C** | B2-03 (61 forbids hardcoding SI; env brand is insufficient) |
-| Narrative sections | **C** | B2-04 |
-| Valid-through / auto-Expired | **C** | B2-05 |
+| Sending | **A** | 28 + B2-02 Option A (`sent_at`; no mailer) |
 | PDF engine | B | PDFKit (or pdf-lib); no Chromium |
 | Disk vs S3 | A | 30, 51 |
 | Regeneration vs new artifact | B | §7; same revision may rebuild generated PDF |
 | Proposal Accepted vs Won | A | 31 |
-| Sending | A + **C** for Sent timestamp | 28 + B2-02 |
 | Reporting | B | small counts; no new funnel product |
 | RBAC | B | keep VIEW/MANAGE_SALES |
 
 ---
 
-**OWNER REVIEW REQUIRED — B2 planning decisions remain.**
+**DECISIONS COMPLETE — Ready for ChatGPT/Cursor B2 Work Order preparation.**
 
-Do not create the B2 Work Order until the six `PENDING` decisions are recorded. Do not implement B2 from this file.
+This file still does **not** authorize B2 implementation. ChatGPT should prepare a bounded B2 Work Order. Do not implement B2 from this file.

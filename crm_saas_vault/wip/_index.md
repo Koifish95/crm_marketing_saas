@@ -21,7 +21,7 @@ None. `authorization.active_work_order` is null. C2B Slice A is **Successful**. 
 
 ## Current communication (not a work order)
 
-- [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] — SI Sales **B2** pre-development worksheet. Owner review required. **Not** a work order. Does **not** authorize B2 implementation.
+- [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] — SI Sales **B2** pre-development worksheet. Decisions **B2-01 through B2-06 complete**. Ready for B2 Work Order **preparation**. **Not** a work order. Does **not** authorize B2 implementation.
 - [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] — SI Sales Slice B pre-development worksheet. Decisions **1–64 complete**. Used as B1 decision truth. **Not** a work order. Does **not** authorize B2.
 - [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]] — SI Sales product refinement pre-development worksheet (Slice A decisions; completed). **Not** a work order.
 - [[wip/WO-2026-09-11-sales-predev-audit-return]] — Sales pre-development architecture audit return (`status: done`). Investigation evidence. **Not** the live map.
