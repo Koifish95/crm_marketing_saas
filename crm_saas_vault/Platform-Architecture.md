@@ -60,7 +60,7 @@ Hosting Node
 CRM Core
    ↑
    ├── Martial Arts     (shipped; martial_arts_template, :5030)
-   ├── Sales / Software (C2A Successful; C2B Slice A Successful; B1 code-shipped pending acceptance; sales_template, :5040; no CP catalog)
+   ├── Sales / Software (C2A Successful; C2B Slice A Successful; B1 Successful; sales_template, :5040; no CP catalog)
    └── Beauty           (not started)
 ```
 
@@ -81,7 +81,7 @@ CRM Core
 
 **D2–D4 (accepted):** Martial Arts `leads` / `lead_lines` / trials, campaigns / acquisition events, and public capture (`/trial`, `/events/[slug]`, `/t/[slug]`) stay MA-owned until Sales provides a second implementation.
 
-C1 is **code-shipped** (`packages/crm-core`, workspace, import tests). C2A (thin local Sales consumer) is **Successful** at `sales_template/` / `sales-crm` on port 5040. C2B Slice A (Lead/convert/Opportunity workflow) is **Successful**. SI Sales B1 (commercial model + acquisition foundation) is **code-shipped** pending owner acceptance. C2 (Sales vertical **plus** CP product catalog) is **not started** and is **not** authorized by C2A, C2B, or B1. B2 (proposals/PDF/e-sign) is **not** authorized. Do not “establish Core” again.
+C1 is **code-shipped** (`packages/crm-core`, workspace, import tests). C2A (thin local Sales consumer) is **Successful** at `sales_template/` / `sales-crm` on port 5040. C2B Slice A (Lead/convert/Opportunity workflow) is **Successful**. SI Sales B1 (commercial model + acquisition foundation) is **Successful**. C2 (Sales vertical **plus** CP product catalog) is **not started** and is **not** authorized by C2A, C2B, or B1. B2 (proposals/PDF/e-sign) is the next Slice B candidate and is **not** authorized. Do not “establish Core” again.
 
 C2+ extraction narrative (not authorization): [[history/CRM_Core_Extraction_Implementation_Plan]].
 

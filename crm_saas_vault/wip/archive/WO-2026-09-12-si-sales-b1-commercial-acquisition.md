@@ -37,11 +37,17 @@ forbidden_scope: |
   promotion.
 id: WO-2026-09-12-si-sales-b1-commercial-acquisition
 milestone: none
-status: active
+status: done
 type: work-order
 ---
 
 # Work Order --- SI Sales B1: Commercial Model + Acquisition Foundation
+
+Implementation complete 2026-09-12. Status **done**. Owner-accepted 2026-09-12. B1 is **Successful**. Closeout: [[history/B1_closeout]].
+
+Return: [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]].
+
+Original authorization text remains below for provenance.
 
 ## 1. Authority and purpose
 

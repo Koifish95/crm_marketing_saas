@@ -6,7 +6,7 @@ updated: 2026-09-12
 repo: crm_marketing_saas
 branch: working
 remote: https://github.com/Koifish95/crm_marketing_saas.git
-head_at_write: "40851e04ac0cc64fc3315cf698991ef39c432987"
+head_at_write: "4ac0f305109838a92c07de07f7deec25ee81456e"
 
 canonical:
   bootstrap: Home.md
@@ -69,8 +69,9 @@ notes:
   c2b: successful
   c2b_owner_accepted: 2026-09-12
   c2b_not_slice_b: true
-  si_sales_b1: code_shipped
-  si_sales_b1_owner_accepted: false
+  si_sales_b1: successful
+  si_sales_b1_owner_accepted: 2026-09-12
   slice_b2_not_authorized: true
+  b2_is_next_slice_b_candidate: true
   c2_not_authorized_by_c2b: true
   c2_not_authorized_by_b1: true

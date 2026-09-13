@@ -29,8 +29,10 @@ Closeouts, superseded roadmaps, and dated snapshots live here so agents do not t
 - [[history/C1_CRM_Core_Architecture_Return]]
 - [[history/C2A_closeout]] — 2026-09-11 C2A Successful (owner-accepted; not C2)
 - [[history/C2B_closeout]] — 2026-09-12 C2B Slice A Successful (owner-accepted; not Slice B; not C2)
+- [[history/B1_closeout]] — 2026-09-12 SI Sales B1 Successful (owner-accepted; not B2; not C2)
 - [[history/WO-2026-09-11-sales-thin-slice-return]] — C2A implementation return (evidence, not the live map)
 - [[history/WO-2026-09-11-si-sales-slice-a-return]] — C2B Slice A implementation return (evidence, not the live map)
+- [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]] — B1 implementation return (evidence, not the live map)
 - [[wip/WO-2026-09-11-sales-predev-audit-return]] — 2026-09-11 Sales pre-development architecture audit (still in `wip/` for ChatGPT handoff; not the live map)
 - [[history/Control_Plane_Bulk_Lifecycle_Return]]
 - [[history/Post_S4_Foundation_Decision_Closeout]] — why Map B became the official S-track

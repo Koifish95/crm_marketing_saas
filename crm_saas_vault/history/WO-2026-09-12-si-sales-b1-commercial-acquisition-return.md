@@ -20,13 +20,25 @@ durable_docs_updated:
 
 # SI Sales B1 return — commercial model + acquisition foundation
 
-**Not the live map.** Live map: [[Current-State]]. Lockfile: [[project-state.yaml]].
+**Not the live map.** Live map: [[Current-State]]. Successful closeout: [[history/B1_closeout]]. B2 is **not** authorized. C2 is **not** this slice.
 
-**Owner acceptance: pending.** Do **not** mark B1, Slice B, or any milestone **Successful**. Scott must complete browser QA at http://localhost:5040.
+---
 
-**B2 was not started.** This return does **not** authorize proposals/PDF/versioning/e-sign/portal, customer form builder, C2, D1, Control Plane Sales provisioning, Beauty, S7/VPS, DNS/TLS, PostgreSQL, SI cutover, billing, or Core promotion.
+## Owner acceptance (2026-09-12)
 
-Work order: [[wip/WO-2026-09-12-si-sales-b1-commercial-acquisition]]. Decisions: [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] (1–64).
+Scott completed the full manual B1 browser QA at http://localhost:5040 from this return and explicitly granted owner acceptance. He confirmed public intake enable/disable and submit, Lead without automatic Company, replay vs genuine duplicate, Campaigns spanning Sources, multiple Tracking Links per Campaign+Source, tracked attribution, unknown-token 404, practical public-intake security, captured vs current attribution and correction history, convert preserving attribution, Offers and commercial lines, one-time totals, MRR quantity math, Offer edits not rewriting quoted lines, migrated existing amounts, Company lifecycle, Won/Lost timestamps, Reopen, dashboard/reporting, RBAC/regression, and independent Martial Arts operation.
+
+B1 is **Successful**. This file remains implementation evidence. Closing B1 does **not** authorize B2 (proposals/PDF/e-sign/portal/form builder), C2, Core promotion, D1, Control Plane Sales provisioning, Beauty, S7/VPS, DNS/TLS, billing, or SI migration.
+
+---
+
+## Executive result (at code-ship)
+
+**B1 CODE-SHIPPED — READY FOR OWNER ACCEPTANCE**
+
+That was the result when this return was first written. Owner acceptance landed afterward; see [[history/B1_closeout]].
+
+Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]]. Decisions: [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] (1–64).
 
 ---
 

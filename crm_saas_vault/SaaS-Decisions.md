@@ -25,9 +25,26 @@ Decision: what we chose
 
 ---
 
+## 2026-09-12 — Official SI Sales B1 is Successful
+
+Status: accepted
+
+Context: SI Sales B1 (commercial model + acquisition foundation) was implemented on `working` (`40851e0`), then Scott completed the full manual B1 browser owner-acceptance pass at http://localhost:5040 on 2026-09-12. Closeout: [[history/B1_closeout]]. Implementation: `40851e0`.
+
+Decision:
+
+- Official **SI Sales B1 is Successful** (2026-09-12). B1 is closed. Path remains `sales_template/` / `sales-crm` on port 5040. Journal `0002_cheerful_firebrand`.
+- Sales now has controlled Sources, Campaigns (no primary source), Campaign+Source Tracking Links, captured/current attribution, configuration-driven public intake, Offers, Opportunity commercial lines (one-time + MRR), Company lifecycle, `won_at` / `lost_at`, and baseline reporting.
+- **B2** is the next Slice B **candidate** and is **not yet authorized**. Proposal generation remains in B2.
+- Existing **C2** is unchanged and **not started**. B1 success does **not** authorize B2, C2, Core promotion, D1, Control Plane Sales provisioning, Beauty, S7/VPS, DNS/TLS, billing, or SI migration.
+
+Source: Scott 2026-09-12 (owner acceptance in the current Cursor chat)
+
+---
+
 ## 2026-09-12 — SI Sales B1 is code-shipped (not Successful)
 
-Status: working decision
+Status: superseded by [[SaaS-Decisions#2026-09-12 — Official SI Sales B1 is Successful]]
 
 Context: Scott authorized WO-2026-09-12-si-sales-b1-commercial-acquisition. Cursor implemented B1 on `working` from `83506fc`. Owner browser acceptance has not happened.
 
@@ -38,7 +55,7 @@ Decision:
 - B1 is **not Successful**. Do not mark a milestone Successful until Scott accepts.
 - **B2 is not authorized** (proposals/PDF/versioning/e-sign/portal/form builder). Existing **C2** is unchanged and **not started**. B1 does **not** authorize C2, Core promotion, D1, Control Plane Sales provisioning, Beauty, S7/VPS, DNS/TLS, billing, or SI migration.
 
-Source: Work Order [[wip/WO-2026-09-12-si-sales-b1-commercial-acquisition]] and return [[wip/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]]
+Source: Work Order [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]] and return [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]]
 
 ---
 

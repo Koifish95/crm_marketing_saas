@@ -34,11 +34,11 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | C1 Core extraction | **Code-shipped**. Evidence: [[history/C1_CRM_Core_Architecture_Return]] |
 | C2A Thin Sales consumer | **Successful** (2026-09-11). Owner-accepted after browser QA at http://localhost:5040. Local `sales_template/` / `sales-crm`. Not C2. Evidence: [[history/C2A_closeout]] |
 | C2B SI Sales Refinement Slice A | **Successful** (2026-09-12). Owner-accepted after browser QA at http://localhost:5040. Feature `1ac18e4`. Not Slice B. Not C2. Evidence: [[history/C2B_closeout]] |
-| SI Sales B1 (commercial + acquisition) | **Code-shipped** (2026-09-12). Owner acceptance **pending**. Not Successful. Not B2. Not C2. Return: [[wip/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]] |
+| SI Sales B1 (commercial + acquisition) | **Successful** (2026-09-12). Owner-accepted after browser QA at http://localhost:5040. Feature `40851e0`. Not B2. Not C2. Evidence: [[history/B1_closeout]] |
 | C2 / Beauty / S7–S11 | **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 
-**Authorized work:** none. B1 is code-shipped pending Scott’s browser acceptance. B1 does **not** authorize B2 (proposals/PDF/e-sign), C2, Core promotion, D1, Beauty, S7, or SI migration. See [[Working-Agreement]] and [[Work-Order-Protocol]].
+**Authorized work:** none. B1 is **Successful** and closed. B1 does **not** authorize B2 (proposals/PDF/e-sign), C2, Core promotion, D1, Beauty, S7, or SI migration. B2 is the next Slice B candidate and is **not yet authorized**. See [[Working-Agreement]] and [[Work-Order-Protocol]].
 
 Lockfile: [[project-state.yaml]].
 
@@ -102,7 +102,7 @@ Full gym CRM derived from Renzo: households as `leads` + `lead_lines`, trials, i
 
 Local: http://localhost:5030 (`pnpm dev`). Laptop Docker PRODUCTION `:5000`, STAGE `:5010`, DEV `:5020`.
 
-### Sales vertical (`sales_template/`) — C2A Successful; C2B Slice A Successful; B1 code-shipped
+### Sales vertical (`sales_template/`) — C2A Successful; C2B Slice A Successful; B1 Successful
 
 Second working local consumer of `@crm/core`. Package `sales-crm` (`private: true`). Extends `@crm/core`. Local only: http://localhost:5040 (`pnpm dev`). SQLite `sales_template/data/app.sqlite`. Drizzle journal `0000_wide_cyclops` + Slice A `0001_thankful_lyja` + B1 `0002_cheerful_firebrand`.
 
@@ -110,7 +110,7 @@ Domain: **Lead** (`sales_leads`; Company optional) → explicit **Convert Lead**
 
 B1 adds Sales-owned Sources, Campaigns (no primary source), Campaign+Source Tracking Links, captured/current attribution, configuration-driven public intake (`/inquire`, `/t/{token}`), Offers, Opportunity commercial lines (one-time + MRR), Company lifecycle (`prospect` / `customer` / `former_customer`), dedicated `won_at` / `lost_at`, and baseline reporting. Public intake defaults **off**. No Docker. No Control Plane Sales product or provisioning. Strategic Insights is the intended first real-world Sales customer/design target and has **not** been migrated or cut over.
 
-C2A owner-accepted 2026-09-11. Closeout: [[history/C2A_closeout]]. C2B owner-accepted 2026-09-12. Closeout: [[history/C2B_closeout]]. Slice A implementation return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. B1 implementation return: [[wip/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]] (leave in `wip/` until owner acceptance).
+C2A owner-accepted 2026-09-11. Closeout: [[history/C2A_closeout]]. C2B owner-accepted 2026-09-12. Closeout: [[history/C2B_closeout]]. Slice A implementation return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. B1 owner-accepted 2026-09-12. Closeout: [[history/B1_closeout]]. Implementation return: [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]].
 
 ### CRM Core (`packages/crm-core`)
 
@@ -150,8 +150,8 @@ Exact `docker inspect` + compose. Combined status: container running **and** `/a
 
 Do not assume any of these exist:
 
-- C2 Sales vertical **plus** Control Plane product catalog (C2A local Sales app exists; C2B Slice A exists; B1 commercial/acquisition code-shipped pending acceptance; C2 is not those slices)
-- SI Sales B2 (proposals, PDF, versioning, e-sign/portal, customer form builder) — B1 commercial/acquisition is code-shipped, not Successful
+- C2 Sales vertical **plus** Control Plane product catalog (C2A local Sales app exists; C2B Slice A exists; B1 commercial/acquisition exists; C2 is not those slices)
+- SI Sales B2 (proposals, PDF, versioning, e-sign/portal, customer form builder) — B1 is Successful; B2 is **not authorized**
 - Control Plane Sales provisioning / Sales Docker image / Sales host ports
 - Beauty vertical (sister business is the intended second **pilot**, not a shipped product)
 - Completed generic Lead model in Core
@@ -182,7 +182,7 @@ Link, do not re-litigate. Index: [[SaaS-Decisions]].
 | Core + vertical architecture | [[ADR-CRM-Core-Vertical-Architecture]] |
 | C2A thin Sales consumer Successful | [[SaaS-Decisions#2026-09-11 — Official C2A is Successful]] |
 | C2B Slice A Successful | [[SaaS-Decisions#2026-09-12 — Official C2B is Successful]] |
-| SI Sales B1 code-shipped (not Successful) | [[SaaS-Decisions#2026-09-12 — SI Sales B1 is code-shipped]] |
+| SI Sales B1 Successful | [[SaaS-Decisions#2026-09-12 — Official SI Sales B1 is Successful]] |
 | D1–D4 | [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]] |
 | Customer / environment unit | [[Customer-Environment]] |
 | Never `-v` / prune / Renzo volumes | [[Control-Plane]] |
