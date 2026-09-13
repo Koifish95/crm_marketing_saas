@@ -35,7 +35,7 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | C2A Thin Sales consumer | **Successful** (2026-09-11). Owner-accepted after browser QA at http://localhost:5040. Local `sales_template/` / `sales-crm`. Not C2. Evidence: [[history/C2A_closeout]] |
 | C2B SI Sales Refinement Slice A | **Successful** (2026-09-12). Owner-accepted after browser QA at http://localhost:5040. Feature `1ac18e4`. Not Slice B. Not C2. Evidence: [[history/C2B_closeout]] |
 | SI Sales B1 (commercial + acquisition) | **Successful** (2026-09-12). Owner-accepted after browser QA at http://localhost:5040. Feature `40851e0`. Not B2. Not C2. Evidence: [[history/B1_closeout]] |
-| SI Sales B2 (proposal system) | **Code-shipped** (2026-09-12). Awaiting owner QA at http://localhost:5040. Not Successful. Not C2. Return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]] |
+| SI Sales B2 (proposal system) | **Code-shipped** (2026-09-12). Awaiting owner QA at http://localhost:5040. Feature `84c0cc8`. Not Successful. Not C2. Return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]] |
 | C2 / Beauty / S7–S11 | **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 

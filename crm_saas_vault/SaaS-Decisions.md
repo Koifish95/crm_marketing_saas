@@ -29,7 +29,7 @@ Decision: what we chose
 
 Status: working decision
 
-Context: Authorized work order [[wip/WO-2026-09-12-si-sales-b2-proposal-system]] implemented the approved Proposal system on `working`. Owner QA has **not** run. Return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]].
+Context: Authorized work order [[wip/WO-2026-09-12-si-sales-b2-proposal-system]] implemented the approved Proposal system on `working` (feature `84c0cc8`). Owner QA has **not** run. Return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]].
 
 Decision:
 

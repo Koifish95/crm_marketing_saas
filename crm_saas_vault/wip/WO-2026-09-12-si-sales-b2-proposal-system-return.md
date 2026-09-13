@@ -4,7 +4,7 @@ status: done
 id: WO-2026-09-12-si-sales-b2-proposal-system
 milestone: SI-Sales-B2
 base_sha: "99bb058540a706d52aca8ac30e1e1035800f00e6"
-result_sha: "pending-feature-commit"
+result_sha: "84c0cc88466db931ca37b479d5edc6bc5186a0c0"
 implementation_result: shipped
 tests: "sales_template: pnpm test 7 files / 38 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass; pnpm db:migrate pass on existing sales_template/data/app.sqlite. martial_arts_template: pnpm exec vitest run tests/c1/architecture.test.ts tests/c1/registration.test.ts → 2 files / 5 tests pass."
 decisions_discovered: []
