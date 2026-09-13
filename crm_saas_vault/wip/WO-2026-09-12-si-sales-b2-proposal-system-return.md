@@ -346,7 +346,7 @@ No `db:migrate`.
 
 ### Result SHA
 
-`pending-revision-select-commit`
+`0be7e060386d243a58268a8ff12a1e9fa1431dc1`
 
 ### Owner checklist (this fix only)
 
