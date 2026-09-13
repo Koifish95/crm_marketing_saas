@@ -64,6 +64,14 @@ registerNavItems([
     order: 58,
     visible: salesVisible,
   },
+  {
+    id: 'sales-proposals',
+    to: '/proposals',
+    label: 'Proposals',
+    match: '/proposals',
+    order: 59,
+    visible: salesVisible,
+  },
 ])
 
 registerSettingsSections([
@@ -80,5 +88,12 @@ registerSettingsSections([
     title: 'Public intake',
     description: 'Enable or disable the public inquiry form and edit its configuration.',
     order: 20,
+  },
+  {
+    id: 'sales-proposals',
+    to: '/settings/proposals',
+    title: 'Proposal letterhead',
+    description: 'Instance-configurable seller identity for Proposal PDFs. Optional logo. No theme CMS.',
+    order: 30,
   },
 ])

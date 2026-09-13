@@ -241,3 +241,70 @@ export const salesNotes = sqliteTable('sales_notes', {
 }, table => [
   index('sales_notes_record_idx').on(table.recordKind, table.recordId),
 ])
+
+export const salesProposals = sqliteTable('sales_proposals', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  opportunityId: integer('opportunity_id').notNull().references(() => salesOpportunities.id),
+  proposalNumber: text('proposal_number').notNull(),
+  currentRevisionId: integer('current_revision_id'),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+}, table => [
+  uniqueIndex('sales_proposals_opportunity_id_unique').on(table.opportunityId),
+  uniqueIndex('sales_proposals_proposal_number_unique').on(table.proposalNumber),
+])
+
+export const salesProposalRevisions = sqliteTable('sales_proposal_revisions', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  proposalId: integer('proposal_id').notNull().references(() => salesProposals.id),
+  revision: integer('revision').notNull().default(1),
+  status: text('status').notNull().default('draft'),
+  title: text('title').notNull(),
+  intro: text('intro'),
+  terms: text('terms'),
+  notes: text('notes'),
+  validThrough: text('valid_through'),
+  issuedAt: integer('issued_at', { mode: 'timestamp_ms' }),
+  sentAt: integer('sent_at', { mode: 'timestamp_ms' }),
+  acceptedAt: integer('accepted_at', { mode: 'timestamp_ms' }),
+  declinedAt: integer('declined_at', { mode: 'timestamp_ms' }),
+  recipientContactId: integer('recipient_contact_id').references(() => salesContacts.id),
+  recipientFirstName: text('recipient_first_name'),
+  recipientLastName: text('recipient_last_name'),
+  recipientTitle: text('recipient_title'),
+  recipientEmail: text('recipient_email'),
+  recipientPhone: text('recipient_phone'),
+  companyName: text('company_name'),
+  letterheadName: text('letterhead_name'),
+  letterheadAddress: text('letterhead_address'),
+  letterheadPhone: text('letterhead_phone'),
+  letterheadEmail: text('letterhead_email'),
+  letterheadWebsite: text('letterhead_website'),
+  letterheadFooter: text('letterhead_footer'),
+  letterheadLogoPath: text('letterhead_logo_path'),
+  amountCents: integer('amount_cents').notNull().default(0),
+  mrrCents: integer('mrr_cents').notNull().default(0),
+  generatedPdfPath: text('generated_pdf_path'),
+  signedPdfPath: text('signed_pdf_path'),
+  signedPdfOriginalName: text('signed_pdf_original_name'),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+}, table => [
+  uniqueIndex('sales_proposal_revisions_proposal_revision_unique').on(table.proposalId, table.revision),
+  index('sales_proposal_revisions_proposal_id_idx').on(table.proposalId),
+  index('sales_proposal_revisions_status_idx').on(table.status),
+])
+
+export const salesProposalLines = sqliteTable('sales_proposal_lines', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  revisionId: integer('revision_id').notNull().references(() => salesProposalRevisions.id),
+  offerId: integer('offer_id').references(() => salesOffers.id),
+  offerName: text('offer_name'),
+  description: text('description').notNull(),
+  quantity: integer('quantity').notNull().default(1),
+  pricingType: text('pricing_type').notNull(),
+  unitPriceCents: integer('unit_price_cents').notNull().default(0),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+}, table => [
+  index('sales_proposal_lines_revision_id_idx').on(table.revisionId),
+])

@@ -25,6 +25,20 @@ Decision: what we chose
 
 ---
 
+## 2026-09-12 — SI Sales B2 is code-shipped (not Successful)
+
+Status: working decision
+
+Context: Authorized work order [[wip/WO-2026-09-12-si-sales-b2-proposal-system]] implemented the approved Proposal system on `working`. Owner QA has **not** run. Return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]].
+
+Decision:
+
+- SI Sales B2 is **code-shipped** and **not Successful** until Scott’s owner QA at http://localhost:5040.
+- Proposal generation remains Sales-owned (`sales_template/`). PDF engine is PDFKit. Artifacts are local `data/proposals/`. Sent is `sent_at`, not CRM email. Accepted does not auto-Won.
+- Existing **C2** is unchanged and **not started**. B2 code-ship does **not** authorize C2, Core promotion, D1, e-sign, email send, billing, VPS, or SI migration.
+
+---
+
 ## 2026-09-12 — Official SI Sales B1 is Successful
 
 Status: accepted

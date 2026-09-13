@@ -21,8 +21,8 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@crm/core": "workspace:*",
     "@adonisjs/hash": "^10.1.1",
+    "@crm/core": "workspace:*",
     "@libsql/client": "^0.17.4",
     "@libsql/linux-x64-gnu": "0.5.29",
     "@libsql/win32-x64-msvc": "0.5.29",
@@ -30,6 +30,7 @@
     "drizzle-orm": "^0.45.2",
     "nuxt": "^4.5.2",
     "nuxt-auth-utils": "^0.5.30",
+    "pdfkit": "^0.20.2",
     "tailwindcss": "^4.3.3",
     "vue": "^3.5.41",
     "vue-router": "^5.2.0",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.17.0",
+    "@types/pdfkit": "^0.17.6",
     "drizzle-kit": "^0.31.10",
     "eslint": "^10.9.1",
     "tsx": "^4.23.12",

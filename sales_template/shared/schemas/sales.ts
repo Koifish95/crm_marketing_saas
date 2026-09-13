@@ -250,3 +250,21 @@ export const dashboardQuerySchema = z.object({
   start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   end: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
 })
+
+export const patchProposalDraftSchema = z.object({
+  title: z.string().trim().min(1).max(200).optional(),
+  intro: z.string().max(8000).nullable().optional(),
+  terms: z.string().max(8000).nullable().optional(),
+  notes: z.string().max(8000).nullable().optional(),
+  validThrough: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  recipientContactId: z.coerce.number().int().positive().nullable().optional(),
+})
+
+export const patchProposalLetterheadSchema = z.object({
+  businessName: z.string().trim().min(1).max(200).optional(),
+  address: z.string().max(800).optional(),
+  phone: z.string().max(80).optional(),
+  email: z.string().max(200).optional(),
+  website: z.string().max(200).optional(),
+  footer: z.string().max(4000).optional(),
+})

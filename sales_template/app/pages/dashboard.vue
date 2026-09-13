@@ -33,6 +33,7 @@ type Dashboard = {
   sources: Array<{ id: number | null, name: string, leads: number, opportunities: number, wonCount: number, lostCount: number, wonOneTimeCents: number, wonMrrCents: number }>
   campaigns: Array<{ id: number, name: string, clicks: number, leads: number, clickToLead: number | null, opportunities: number, wonCount: number, wonOneTimeCents: number, wonMrrCents: number, budgetCents: number | null }>
   trackingLinks: Array<{ id: number, label: string, clicks: number, leads: number, clickToLead: number | null }>
+  proposals: { draft: number, issued: number, sent: number, accepted: number, declined: number, pastValidThrough: number }
 }
 
 const preset = ref('this_month')
@@ -190,6 +191,24 @@ const presetLabel: Record<string, string> = {
             Lead → Opportunity {{ pct(data.period.leadToOpportunity) }} (simple operational metric, not a cohort funnel)
           </p>
         </div>
+        <NuxtLink
+          to="/proposals"
+          class="panel p-4 hover:border-navy-600/30"
+        >
+          <p class="text-sm text-muted">
+            Proposals (current)
+          </p>
+          <p class="mt-1 text-sm">
+            Draft {{ data.proposals.draft }}
+            · Issued {{ data.proposals.issued }}
+            · Sent {{ data.proposals.sent }}
+          </p>
+          <p class="text-sm">
+            Accepted {{ data.proposals.accepted }}
+            · Declined {{ data.proposals.declined }}
+            · Past valid-through {{ data.proposals.pastValidThrough }}
+          </p>
+        </NuxtLink>
       </div>
       <AppPanel title="Source performance (current attribution)">
         <ul class="space-y-2 text-sm">

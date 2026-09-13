@@ -17,11 +17,13 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-None. `authorization.active_work_order` is null. C2B Slice A is **Successful**. SI Sales B1 is **Successful** and closed. Do not start B2, C2, Core promotion, Beauty, D1, CP Sales provisioning, or S7. B2 is the next Slice B candidate and is **not yet authorized**.
+None. `authorization.active_work_order` is null. C2B Slice A is **Successful**. SI Sales B1 is **Successful**. SI Sales B2 is **code-shipped** and awaits owner QA (not Successful). Do not start C2, Core promotion, Beauty, D1, CP Sales provisioning, or S7. Do not mark B2 Successful without owner QA.
 
 ## Current communication (not a work order)
 
-- [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] — SI Sales **B2** pre-development worksheet. Decisions **B2-01 through B2-06 complete**. Ready for B2 Work Order **preparation**. **Not** a work order. Does **not** authorize B2 implementation.
+- [[wip/WO-2026-09-12-si-sales-b2-proposal-system]] — SI Sales **B2** implementation work order (`authorized: yes`; implementation returned). **Not** Successful until owner QA.
+- [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]] — B2 implementation return (`status: done`). Evidence. **Not** the live map. **Not** owner acceptance.
+- [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] — SI Sales **B2** pre-development worksheet. Decisions **B2-01 through B2-06 complete**.
 - [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] — SI Sales Slice B pre-development worksheet. Decisions **1–64 complete**. Used as B1 decision truth. **Not** a work order. Does **not** authorize B2.
 - [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]] — SI Sales product refinement pre-development worksheet (Slice A decisions; completed). **Not** a work order.
 - [[wip/WO-2026-09-11-sales-predev-audit-return]] — Sales pre-development architecture audit return (`status: done`). Investigation evidence. **Not** the live map.

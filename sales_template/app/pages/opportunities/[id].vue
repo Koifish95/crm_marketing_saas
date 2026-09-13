@@ -9,6 +9,7 @@ import {
 } from '#shared/utils/pipeline'
 import { formatUsdFromCents } from '#shared/utils/money'
 import { OFFER_PRICING_TYPES, offerPricingTypeLabel } from '#shared/utils/catalog'
+import { proposalStatusLabel } from '#shared/utils/proposals'
 
 definePageMeta({
   layout: 'internal',
@@ -19,7 +20,7 @@ const route = useRoute()
 const id = computed(() => Number(route.params.id))
 
 type Company = { id: number, name: string }
-type Contact = { id: number, accountId: number, firstName: string, lastName: string }
+type Contact = { id: number, accountId: number, firstName: string, lastName: string, title: string | null, email: string | null, phone: string | null }
 type Assignee = { id: number, displayName: string }
 type Opportunity = {
   id: number
@@ -59,6 +60,28 @@ type Offer = { id: number, name: string, pricingType: string, defaultUnitPriceCe
 type Source = { id: number, name: string }
 type Campaign = { id: number, name: string }
 type Activity = { id: number, description: string, status: string }
+type ProposalRevision = {
+  id: number
+  revision: number
+  status: string
+  title: string
+  intro: string | null
+  terms: string | null
+  notes: string | null
+  validThrough: string | null
+  sentAt: string | Date | null
+  recipientContactId: number | null
+  signedPdfPath: string | null
+  amountCents: number
+  mrrCents: number
+}
+type ProposalBundle = {
+  proposal: { id: number, proposalNumber: string }
+  current: ProposalRevision
+  revisions: ProposalRevision[]
+  pastValidThrough: boolean
+  label: string
+}
 
 const { data: companies } = await useFetch<Company[]>('/api/companies')
 const { data: assignees } = await useFetch<Assignee[]>('/api/assignees')
@@ -73,6 +96,7 @@ const { data: contacts } = await useFetch<Contact[]>('/api/contacts', {
 const { data: activities, refresh: refreshActivities } = await useFetch<Activity[]>('/api/activities', {
   query: computed(() => ({ opportunityId: String(id.value) })),
 })
+const { data: proposalBundle, refresh: refreshProposal } = await useFetch<ProposalBundle | null>(() => `/api/opportunities/${id.value}/proposal`)
 
 useHead({
   title: computed(() => opportunity.value?.name || 'Opportunity'),
@@ -93,9 +117,19 @@ const lineQuantity = ref('1')
 const linePrice = ref('')
 const lineType = ref('one_time')
 const lineOfferId = ref('')
+const proposalTitle = ref('')
+const proposalIntro = ref('')
+const proposalTerms = ref('')
+const proposalNotes = ref('')
+const proposalValidThrough = ref('')
+const proposalRecipientId = ref('')
 const saving = ref(false)
 const notice = ref('')
 const formError = ref('')
+
+function callApi(url: string, opts: { method?: string, body?: unknown } = {}) {
+  return ($fetch as (input: string, init?: { method?: string, body?: unknown }) => Promise<unknown>)(url, opts)
+}
 
 watch(opportunity, (value) => {
   if (!value) {
@@ -110,6 +144,18 @@ watch(opportunity, (value) => {
   sourceDetail.value = value.sourceDetail || ''
   lossReason.value = value.lossReason || 'budget'
   lossNotes.value = value.lossNotes || ''
+}, { immediate: true })
+
+watch(proposalBundle, (value) => {
+  if (!value) {
+    return
+  }
+  proposalTitle.value = value.current.title
+  proposalIntro.value = value.current.intro || ''
+  proposalTerms.value = value.current.terms || ''
+  proposalNotes.value = value.current.notes || ''
+  proposalValidThrough.value = value.current.validThrough || ''
+  proposalRecipientId.value = value.current.recipientContactId ? String(value.current.recipientContactId) : ''
 }, { immediate: true })
 
 const terminal = computed(() => opportunity.value ? isTerminalOpportunityStage(opportunity.value.stage) : false)
@@ -233,6 +279,124 @@ async function removeLine(lineId: number) {
   await $fetch(`/api/opportunities/${id.value}/lines/${lineId}`, { method: 'DELETE' })
   await refreshLines()
   await refresh()
+}
+
+async function runProposal(action: () => Promise<unknown>, success: string) {
+  formError.value = ''
+  notice.value = ''
+  saving.value = true
+  try {
+    await action()
+    await refreshProposal()
+    notice.value = success
+  } catch (caught: unknown) {
+    const err = caught as { data?: { message?: string } }
+    formError.value = err.data?.message || 'Proposal action failed.'
+  } finally {
+    saving.value = false
+  }
+}
+
+async function createDraftProposal() {
+  await runProposal(
+    () => callApi(`/api/opportunities/${id.value}/proposal`, { method: 'POST' }),
+    'Draft Proposal created.',
+  )
+}
+
+async function saveDraftProposal() {
+  const bundle = proposalBundle.value
+  if (!bundle) {
+    return
+  }
+  await runProposal(
+    () => callApi(`/api/proposals/${bundle.proposal.id}`, {
+      method: 'PATCH',
+      body: {
+        title: proposalTitle.value,
+        intro: proposalIntro.value || null,
+        terms: proposalTerms.value || null,
+        notes: proposalNotes.value || null,
+        validThrough: proposalValidThrough.value || null,
+        recipientContactId: proposalRecipientId.value ? Number(proposalRecipientId.value) : null,
+      },
+    }),
+    'Draft saved.',
+  )
+}
+
+async function issueCurrentProposal() {
+  const bundle = proposalBundle.value
+  if (!bundle) {
+    return
+  }
+  await runProposal(
+    () => callApi(`/api/proposals/${bundle.proposal.id}/issue`, { method: 'POST' }),
+    'Proposal issued. Commercial terms are now a snapshot.',
+  )
+}
+
+async function reviseProposal() {
+  const bundle = proposalBundle.value
+  if (!bundle) {
+    return
+  }
+  await runProposal(
+    () => callApi(`/api/proposals/${bundle.proposal.id}/revise`, { method: 'POST' }),
+    'New Draft revision opened. The prior revision stays until this one is issued.',
+  )
+}
+
+async function markProposalSent() {
+  const bundle = proposalBundle.value
+  if (!bundle) {
+    return
+  }
+  await runProposal(
+    () => callApi(`/api/proposals/${bundle.proposal.id}/mark-sent`, { method: 'POST' }),
+    'Marked Sent. The CRM did not email anyone.',
+  )
+}
+
+async function acceptCurrentProposal() {
+  const bundle = proposalBundle.value
+  if (!bundle) {
+    return
+  }
+  await runProposal(
+    () => callApi(`/api/proposals/${bundle.proposal.id}/accept`, { method: 'POST' }),
+    'Proposal accepted. Opportunity Won was not changed.',
+  )
+}
+
+async function declineCurrentProposal() {
+  const bundle = proposalBundle.value
+  if (!bundle) {
+    return
+  }
+  await runProposal(
+    () => callApi(`/api/proposals/${bundle.proposal.id}/decline`, { method: 'POST' }),
+    'Proposal declined.',
+  )
+}
+
+async function uploadSignedPdf(event: Event) {
+  const bundle = proposalBundle.value
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!bundle || !file) {
+    return
+  }
+  const body = new FormData()
+  body.append('file', file)
+  await runProposal(
+    () => callApi(`/api/proposals/${bundle.proposal.id}/revisions/${bundle.current.id}/signed`, {
+      method: 'POST',
+      body,
+    }),
+    'Signed PDF stored separately from the generated file.',
+  )
+  input.value = ''
 }
 
 function companyName() {
@@ -479,6 +643,203 @@ function companyName() {
             Source Lead
           </NuxtLink>
         </p>
+        <AppPanel title="Proposal">
+          <div
+            v-if="!proposalBundle"
+            class="space-y-3"
+          >
+            <p class="text-sm text-muted">
+              One Proposal chain per Opportunity. Create a Draft, then Issue to freeze a snapshot and PDF.
+            </p>
+            <AppButton
+              :loading="saving"
+              @click="createDraftProposal"
+            >
+              Create Draft Proposal
+            </AppButton>
+          </div>
+          <div
+            v-else
+            class="space-y-4"
+          >
+            <p class="text-sm">
+              {{ proposalBundle.label }}
+              · {{ proposalStatusLabel(proposalBundle.current.status) }}
+              <span v-if="proposalBundle.current.sentAt">· Sent</span>
+              <span
+                v-if="proposalBundle.pastValidThrough"
+                class="text-red-800"
+              >· Past valid-through</span>
+            </p>
+            <form
+              v-if="proposalBundle.current.status === 'draft'"
+              class="space-y-3"
+              @submit.prevent="saveDraftProposal"
+            >
+              <AppField
+                label="Title"
+                required
+              >
+                <input
+                  v-model="proposalTitle"
+                  class="control"
+                  required
+                >
+              </AppField>
+              <AppField label="Recipient">
+                <select
+                  v-model="proposalRecipientId"
+                  class="control"
+                >
+                  <option value="">
+                    None
+                  </option>
+                  <option
+                    v-for="contact in contacts"
+                    :key="contact.id"
+                    :value="String(contact.id)"
+                  >
+                    {{ contact.firstName }} {{ contact.lastName }}
+                  </option>
+                </select>
+              </AppField>
+              <AppField label="Intro / scope">
+                <textarea
+                  v-model="proposalIntro"
+                  class="control"
+                  rows="3"
+                />
+              </AppField>
+              <AppField label="Terms / legal (override instance default)">
+                <textarea
+                  v-model="proposalTerms"
+                  class="control"
+                  rows="4"
+                />
+              </AppField>
+              <AppField label="Notes">
+                <textarea
+                  v-model="proposalNotes"
+                  class="control"
+                  rows="2"
+                />
+              </AppField>
+              <AppField
+                label="Valid through"
+                hint="Optional. Past dates are labeled only; status does not auto-change."
+              >
+                <input
+                  v-model="proposalValidThrough"
+                  class="control"
+                  type="date"
+                >
+              </AppField>
+              <AppButton
+                type="submit"
+                :loading="saving"
+              >
+                Save Draft
+              </AppButton>
+            </form>
+            <p
+              v-else
+              class="text-sm text-muted"
+            >
+              Issued snapshot: {{ formatUsdFromCents(proposalBundle.current.amountCents) }} one-time
+              · {{ formatUsdFromCents(proposalBundle.current.mrrCents) }} MRR.
+              Opportunity/Offer edits do not change this revision.
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <NuxtLink
+                class="btn-secondary"
+                :to="`/proposals/${proposalBundle.proposal.id}/r/${proposalBundle.current.id}`"
+              >
+                Preview
+              </NuxtLink>
+              <a
+                v-if="proposalBundle.current.status !== 'draft'"
+                class="btn-secondary"
+                :href="`/api/proposals/${proposalBundle.proposal.id}/revisions/${proposalBundle.current.id}/pdf`"
+              >
+                Download PDF
+              </a>
+              <AppButton
+                v-if="proposalBundle.current.status === 'draft'"
+                :loading="saving"
+                @click="issueCurrentProposal"
+              >
+                Issue
+              </AppButton>
+              <AppButton
+                v-if="proposalBundle.current.status === 'issued'"
+                variant="secondary"
+                :loading="saving"
+                @click="markProposalSent"
+              >
+                Mark Sent
+              </AppButton>
+              <AppButton
+                v-if="proposalBundle.current.status === 'issued'"
+                variant="secondary"
+                :loading="saving"
+                @click="acceptCurrentProposal"
+              >
+                Record Accepted
+              </AppButton>
+              <AppButton
+                v-if="proposalBundle.current.status === 'issued'"
+                variant="subtle"
+                :loading="saving"
+                @click="declineCurrentProposal"
+              >
+                Record Declined
+              </AppButton>
+              <AppButton
+                v-if="proposalBundle.current.status !== 'draft'"
+                variant="secondary"
+                :loading="saving"
+                @click="reviseProposal"
+              >
+                New revision
+              </AppButton>
+            </div>
+            <div
+              v-if="proposalBundle.current.status !== 'draft'"
+              class="space-y-2"
+            >
+              <p class="text-sm font-medium">
+                Optional signed PDF
+              </p>
+              <a
+                v-if="proposalBundle.current.signedPdfPath"
+                class="text-sm"
+                :href="`/api/proposals/${proposalBundle.proposal.id}/revisions/${proposalBundle.current.id}/signed`"
+              >
+                Download signed copy
+              </a>
+              <input
+                class="text-sm"
+                type="file"
+                accept="application/pdf"
+                @change="uploadSignedPdf"
+              >
+            </div>
+            <ul
+              v-if="proposalBundle.revisions.length > 1"
+              class="space-y-1 text-sm text-muted"
+            >
+              <li
+                v-for="revision in proposalBundle.revisions"
+                :key="revision.id"
+              >
+                <NuxtLink :to="`/proposals/${proposalBundle.proposal.id}/r/${revision.id}`">
+                  r{{ revision.revision }}
+                </NuxtLink>
+                · {{ proposalStatusLabel(revision.status) }}
+              </li>
+            </ul>
+          </div>
+        </AppPanel>
         <AppPanel title="Commercial lines">
           <form
             class="mb-4 grid gap-2 sm:grid-cols-2"

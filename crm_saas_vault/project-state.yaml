@@ -26,7 +26,7 @@ tracks:
     next: S7
     authorized: null
   c:
-    last_shipped: SI-Sales-B1
+    last_shipped: SI-Sales-B2
     last_successful: C2B
     next: C2
     authorized: null
@@ -71,7 +71,10 @@ notes:
   c2b_not_slice_b: true
   si_sales_b1: successful
   si_sales_b1_owner_accepted: 2026-09-12
-  slice_b2_not_authorized: true
-  b2_is_next_slice_b_candidate: true
+  si_sales_b2: code-shipped
+  slice_b2_not_authorized: false
+  b2_awaiting_owner_qa: true
+  b2_is_next_slice_b_candidate: false
   c2_not_authorized_by_c2b: true
   c2_not_authorized_by_b1: true
+  c2_not_authorized_by_b2: true

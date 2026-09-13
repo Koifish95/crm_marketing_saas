@@ -17,7 +17,7 @@ const sections = listSettingsSections()
   <section class="space-y-6">
     <AppPageHeader
       title="Settings"
-      description="Core settings registry. Sales registers Access and Public intake."
+      description="Core settings registry. Sales registers Access, Public intake, and Proposal letterhead."
     />
     <ul class="record-list">
       <li

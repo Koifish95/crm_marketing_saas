@@ -9,6 +9,7 @@ import {
 } from '../database/schema'
 import { activityQueueBucket } from '../../shared/utils/queue'
 import { inUtcRange, reportingRange, utcNowMs } from '../../shared/utils/time'
+import { listProposalSummaries, proposalDashboardCounts } from './proposals'
 
 function ms(value: Date | number | null | undefined) {
   if (value == null) {
@@ -166,6 +167,7 @@ export async function salesDashboard(db: Database, input: {
     ],
     campaigns: campaigns.map(campaign => campaignPerformance(campaign.id, campaign.name, campaign.budgetCents)),
     trackingLinks: tracking,
+    proposals: proposalDashboardCounts(await listProposalSummaries(db)),
   }
 }
 
