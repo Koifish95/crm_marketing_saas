@@ -6,7 +6,7 @@ milestone: SI-Sales-B2
 base_sha: "99bb058540a706d52aca8ac30e1e1035800f00e6"
 result_sha: "84c0cc88466db931ca37b479d5edc6bc5186a0c0"
 implementation_result: shipped
-tests: "sales_template: pnpm test 7 files / 38 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass; pnpm db:migrate pass on existing sales_template/data/app.sqlite. martial_arts_template: pnpm exec vitest run tests/c1/architecture.test.ts tests/c1/registration.test.ts → 2 files / 5 tests pass."
+tests: "sales_template: pnpm test 7 files / 39 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass. No schema/migration change in the 2026-09-13 owner-QA refinement pass."
 decisions_discovered: []
 durable_docs_updated:
   - Current-State.md
@@ -254,12 +254,71 @@ Do not treat this WIP return as the live map.
 - Compact `/proposals` index is a thin list, not a pipeline product.
 - Dashboard strip is counts only.
 - PDFKit output will not be pixel-identical to the HTML preview; slots match, typography will not.
-- B2 is **not Successful** until owner QA.
+- B2 is **not Successful** until Scott’s regression QA of the 2026-09-13 refinements.
+
+---
+
+## Owner QA (2026-09-13)
+
+Scott completed core B2 owner QA against the code-shipped implementation (`84c0cc8`). The approved Proposal workflow **passed**: letterhead, Draft, preview, live Opportunity lines on Draft, Issue PDF, issued immutability, new revisions, r1 frozen / r2 live commercial truth, r2 Issue superseding r1, Mark Sent without email, Accept without auto-Won, signed upload/download, past valid-through display, alternate same-Company recipient.
+
+Scott explicitly likes the immutable issued revision + new-revision chain. That model is preserved. **No Edit or Reopen on issued Proposals.**
+
+B2 is **still not Successful.** Six bounded refinements were required before final acceptance.
+
+---
+
+## Owner-QA refinements (2026-09-13)
+
+No schema change. No Core change. No new product slice.
+
+| # | Finding | Fix |
+|---|---|---|
+| 1 | Opportunity commercial lines had Remove only | Bounded **Edit** on existing lines (offer/custom, description, qty, pricing type, quoted unit price). `updateOpportunityLine` now accepts optional `offerId`. Recalculates B1 totals. Draft Proposals refresh from current Opportunity lines. Issued snapshots stay frozen. |
+| 2 | Header showed `Issued · Sent`; history row showed only `Issued` | `proposalStatusDisplay(status, sentAt)` — Sent appears whenever `sent_at` exists. Persisted status is unchanged. |
+| 3 | Opportunity stage not obvious in the workspace header | Badge under the name: `Open · {stage}` or `Won` / `Lost`. |
+| 4 | Browser file input did not read as an app action | **Upload Signed PDF** button; shows on-file filename after upload. |
+| 5 | Signed PDF could be downloaded but not viewed in-browser | **View Signed PDF** (`GET .../signed?view=1`, `Content-Disposition: inline`, staff auth). **Download Signed PDF** unchanged. No public route. |
+| 6 | Issued immutability was easy to miss | Copy: `Issued proposals are immutable. Create a new revision to make changes.` **New revision** remains the only post-Issue change mechanism. |
+
+### Tests (refinement pass)
+
+| Command | Result |
+|---|---|
+| `sales_template` `pnpm test` | **7 files / 39 tests passed** |
+| `sales_template` `pnpm lint` | **pass** |
+| `sales_template` `pnpm typecheck` | **pass** |
+| `sales_template` `pnpm build` | **pass** (`Build complete`) |
+
+No `db:migrate` — no journal change.
+
+### Deviations
+
+None vs the six requested refinements. Optional `offerId` on line PATCH is an additive field on the existing B1 update function, not a commercial-line redesign.
+
+### Result SHA
+
+`pending-refinement-commit` — stamped after commit.
+
+---
+
+## Regression QA checklist (Scott)
+
+App: **http://localhost:5040**. Login `admin` / `setup`. Restart `pnpm dev` if it predates this refinement.
+
+1. Open an Opportunity. Confirm the header badge shows **Open · {stage}** (or Won/Lost) without inferring from buttons.
+2. Edit an existing commercial line (qty/price/description and/or offer vs custom). Confirm Opportunity totals update.
+3. With a **Draft** Proposal, preview and confirm the edited line appears.
+4. With an **Issued** revision, confirm the snapshot did **not** change after that Opportunity line edit. Confirm the immutability copy and that there is no Edit/Reopen on the issued Proposal.
+5. Create a **New revision**, Issue it, **Mark Sent**. Confirm both the current header and the **revision-history row** show **Sent** (status remains Issued/Accepted/etc.).
+6. Upload a signed PDF via **Upload Signed PDF**. Confirm on-file state, **View Signed PDF** (browser), and **Download Signed PDF**.
+
+Do **not** mark B2 Successful until this checklist is accepted.
 
 ---
 
 ## What Scott should do next
 
-1. Have ChatGPT inspect this return and Git on `working` before owner QA.
-2. Restart Sales if needed and run the 15-step script at http://localhost:5040.
+1. Have ChatGPT inspect this return and Git on `working` before regression QA.
+2. Restart Sales if needed and run the six-step checklist above at http://localhost:5040.
 3. Only after that QA: mark B2 Successful (separate closeout). Do not start C2, e-sign, email, or SI migration from this ship.

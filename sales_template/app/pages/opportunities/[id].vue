@@ -9,7 +9,7 @@ import {
 } from '#shared/utils/pipeline'
 import { formatUsdFromCents } from '#shared/utils/money'
 import { OFFER_PRICING_TYPES, offerPricingTypeLabel } from '#shared/utils/catalog'
-import { proposalStatusLabel } from '#shared/utils/proposals'
+import { proposalStatusDisplay } from '#shared/utils/proposals'
 
 definePageMeta({
   layout: 'internal',
@@ -72,6 +72,7 @@ type ProposalRevision = {
   sentAt: string | Date | null
   recipientContactId: number | null
   signedPdfPath: string | null
+  signedPdfOriginalName: string | null
   amountCents: number
   mrrCents: number
 }
@@ -117,6 +118,13 @@ const lineQuantity = ref('1')
 const linePrice = ref('')
 const lineType = ref('one_time')
 const lineOfferId = ref('')
+const editingLineId = ref<number | null>(null)
+const editOfferId = ref('')
+const editDescription = ref('')
+const editQuantity = ref('1')
+const editPrice = ref('')
+const editType = ref('one_time')
+const signedFileInput = ref<HTMLInputElement | null>(null)
 const proposalTitle = ref('')
 const proposalIntro = ref('')
 const proposalTerms = ref('')
@@ -159,6 +167,17 @@ watch(proposalBundle, (value) => {
 }, { immediate: true })
 
 const terminal = computed(() => opportunity.value ? isTerminalOpportunityStage(opportunity.value.stage) : false)
+
+const opportunityHeaderStatus = computed(() => {
+  const stage = opportunity.value?.stage
+  if (!stage) {
+    return ''
+  }
+  if (stage === 'won' || stage === 'lost') {
+    return opportunityStageLabel(stage)
+  }
+  return `Open · ${opportunityStageLabel(stage)}`
+})
 
 async function save(nextStage?: 'proposal_quote' | 'decision') {
   formError.value = ''
@@ -269,16 +288,70 @@ async function addLine() {
     lineOfferId.value = ''
     await refreshLines()
     await refresh()
+    await refreshProposal()
   } catch (caught: unknown) {
     const err = caught as { data?: { message?: string } }
     formError.value = err.data?.message || 'Could not add line.'
   }
 }
 
+function startEditLine(line: Line) {
+  editingLineId.value = line.id
+  editOfferId.value = line.offerId ? String(line.offerId) : ''
+  editDescription.value = line.description
+  editQuantity.value = String(line.quantity)
+  editType.value = line.pricingType
+  editPrice.value = (line.unitPriceCents / 100).toFixed(2)
+}
+
+function cancelEditLine() {
+  editingLineId.value = null
+}
+
+function applyOfferToEdit() {
+  const offer = offers.value?.find(row => String(row.id) === editOfferId.value)
+  if (!offer) {
+    return
+  }
+  editDescription.value = offer.name
+  editType.value = offer.pricingType
+  editPrice.value = (offer.defaultUnitPriceCents / 100).toFixed(2)
+}
+
+async function saveEditLine() {
+  if (!editingLineId.value) {
+    return
+  }
+  formError.value = ''
+  try {
+    await $fetch(`/api/opportunities/${id.value}/lines/${editingLineId.value}`, {
+      method: 'PATCH',
+      body: {
+        offerId: editOfferId.value ? Number(editOfferId.value) : null,
+        description: editDescription.value,
+        quantity: Number(editQuantity.value || '1'),
+        pricingType: editType.value,
+        unitPriceCents: Math.round(Number(editPrice.value) * 100),
+      },
+    })
+    editingLineId.value = null
+    await refreshLines()
+    await refresh()
+    await refreshProposal()
+  } catch (caught: unknown) {
+    const err = caught as { data?: { message?: string } }
+    formError.value = err.data?.message || 'Could not save line.'
+  }
+}
+
 async function removeLine(lineId: number) {
   await $fetch(`/api/opportunities/${id.value}/lines/${lineId}`, { method: 'DELETE' })
+  if (editingLineId.value === lineId) {
+    editingLineId.value = null
+  }
   await refreshLines()
   await refresh()
+  await refreshProposal()
 }
 
 async function runProposal(action: () => Promise<unknown>, success: string) {
@@ -399,6 +472,10 @@ async function uploadSignedPdf(event: Event) {
   input.value = ''
 }
 
+function pickSignedPdf() {
+  signedFileInput.value?.click()
+}
+
 function companyName() {
   return companies.value?.find(row => row.id === opportunity.value?.accountId)?.name
 }
@@ -413,9 +490,13 @@ function companyName() {
       <h1 class="record-identity-name">
         {{ opportunity?.name || 'Opportunity' }}
       </h1>
+      <p
+        v-if="opportunityHeaderStatus"
+        class="record-status"
+      >
+        {{ opportunityHeaderStatus }}
+      </p>
       <p class="record-meta">
-        {{ opportunity ? opportunityStageLabel(opportunity.stage) : '' }}
-        ·
         <NuxtLink
           v-if="opportunity"
           :to="`/companies/${opportunity.accountId}`"
@@ -664,8 +745,7 @@ function companyName() {
           >
             <p class="text-sm">
               {{ proposalBundle.label }}
-              · {{ proposalStatusLabel(proposalBundle.current.status) }}
-              <span v-if="proposalBundle.current.sentAt">· Sent</span>
+              · {{ proposalStatusDisplay(proposalBundle.current.status, proposalBundle.current.sentAt) }}
               <span
                 v-if="proposalBundle.pastValidThrough"
                 class="text-red-800"
@@ -745,9 +825,9 @@ function companyName() {
               v-else
               class="text-sm text-muted"
             >
-              Issued snapshot: {{ formatUsdFromCents(proposalBundle.current.amountCents) }} one-time
+              Issued proposals are immutable. Create a new revision to make changes.
+              This snapshot: {{ formatUsdFromCents(proposalBundle.current.amountCents) }} one-time
               · {{ formatUsdFromCents(proposalBundle.current.mrrCents) }} MRR.
-              Opportunity/Offer edits do not change this revision.
             </p>
             <div class="flex flex-wrap gap-2">
               <NuxtLink
@@ -807,22 +887,45 @@ function companyName() {
               v-if="proposalBundle.current.status !== 'draft'"
               class="space-y-2"
             >
-              <p class="text-sm font-medium">
-                Optional signed PDF
-              </p>
-              <a
-                v-if="proposalBundle.current.signedPdfPath"
-                class="text-sm"
-                :href="`/api/proposals/${proposalBundle.proposal.id}/revisions/${proposalBundle.current.id}/signed`"
-              >
-                Download signed copy
-              </a>
               <input
-                class="text-sm"
+                ref="signedFileInput"
+                class="sr-only"
                 type="file"
                 accept="application/pdf"
                 @change="uploadSignedPdf"
               >
+              <AppButton
+                variant="secondary"
+                :loading="saving"
+                @click="pickSignedPdf"
+              >
+                Upload Signed PDF
+              </AppButton>
+              <p
+                v-if="proposalBundle.current.signedPdfPath"
+                class="text-sm"
+              >
+                Signed PDF on file{{ proposalBundle.current.signedPdfOriginalName ? `: ${proposalBundle.current.signedPdfOriginalName}` : '.' }}
+              </p>
+              <div
+                v-if="proposalBundle.current.signedPdfPath"
+                class="flex flex-wrap gap-2"
+              >
+                <a
+                  class="btn btn-secondary"
+                  :href="`/api/proposals/${proposalBundle.proposal.id}/revisions/${proposalBundle.current.id}/signed?view=1`"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  View Signed PDF
+                </a>
+                <a
+                  class="btn btn-secondary"
+                  :href="`/api/proposals/${proposalBundle.proposal.id}/revisions/${proposalBundle.current.id}/signed`"
+                >
+                  Download Signed PDF
+                </a>
+              </div>
             </div>
             <ul
               v-if="proposalBundle.revisions.length > 1"
@@ -835,7 +938,7 @@ function companyName() {
                 <NuxtLink :to="`/proposals/${proposalBundle.proposal.id}/r/${revision.id}`">
                   r{{ revision.revision }}
                 </NuxtLink>
-                · {{ proposalStatusLabel(revision.status) }}
+                · {{ proposalStatusDisplay(revision.status, revision.sentAt) }}
               </li>
             </ul>
           </div>
@@ -907,19 +1010,104 @@ function companyName() {
             <li
               v-for="line in lines"
               :key="line.id"
-              class="flex flex-wrap items-center justify-between gap-2"
+              class="space-y-2 rounded-md border border-line p-3"
             >
-              <span>
-                {{ line.quantity }} × {{ line.description }}
-                · {{ offerPricingTypeLabel(line.pricingType) }}
-                · {{ formatUsdFromCents(line.unitPriceCents) }}
-              </span>
-              <AppButton
-                variant="subtle"
-                @click="removeLine(line.id)"
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span>
+                  {{ line.quantity }} × {{ line.description }}
+                  · {{ offerPricingTypeLabel(line.pricingType) }}
+                  · {{ formatUsdFromCents(line.unitPriceCents) }}
+                </span>
+                <div class="flex flex-wrap gap-2">
+                  <AppButton
+                    v-if="editingLineId !== line.id"
+                    variant="subtle"
+                    @click="startEditLine(line)"
+                  >
+                    Edit
+                  </AppButton>
+                  <AppButton
+                    variant="subtle"
+                    @click="removeLine(line.id)"
+                  >
+                    Remove
+                  </AppButton>
+                </div>
+              </div>
+              <form
+                v-if="editingLineId === line.id"
+                class="grid gap-2 sm:grid-cols-2"
+                @submit.prevent="saveEditLine"
               >
-                Remove
-              </AppButton>
+                <AppField label="Offer">
+                  <select
+                    v-model="editOfferId"
+                    class="control"
+                    @change="applyOfferToEdit"
+                  >
+                    <option value="">
+                      Custom line
+                    </option>
+                    <option
+                      v-for="offer in offers"
+                      :key="offer.id"
+                      :value="String(offer.id)"
+                    >
+                      {{ offer.name }}
+                    </option>
+                  </select>
+                </AppField>
+                <AppField label="Description">
+                  <input
+                    v-model="editDescription"
+                    class="control"
+                    required
+                  >
+                </AppField>
+                <AppField label="Qty">
+                  <input
+                    v-model="editQuantity"
+                    class="control"
+                    type="number"
+                    min="1"
+                    required
+                  >
+                </AppField>
+                <AppField label="Type">
+                  <select
+                    v-model="editType"
+                    class="control"
+                  >
+                    <option
+                      v-for="type in OFFER_PRICING_TYPES"
+                      :key="type"
+                      :value="type"
+                    >
+                      {{ offerPricingTypeLabel(type) }}
+                    </option>
+                  </select>
+                </AppField>
+                <AppField label="Quoted unit price (USD)">
+                  <input
+                    v-model="editPrice"
+                    class="control"
+                    inputmode="decimal"
+                    required
+                  >
+                </AppField>
+                <div class="flex flex-wrap items-end gap-2">
+                  <AppButton type="submit">
+                    Save line
+                  </AppButton>
+                  <AppButton
+                    type="button"
+                    variant="secondary"
+                    @click="cancelEditLine"
+                  >
+                    Cancel
+                  </AppButton>
+                </div>
+              </form>
             </li>
           </ul>
         </AppPanel>

@@ -17,12 +17,12 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-None. `authorization.active_work_order` is null. C2B Slice A is **Successful**. SI Sales B1 is **Successful**. SI Sales B2 is **code-shipped** and awaits owner QA (not Successful). Do not start C2, Core promotion, Beauty, D1, CP Sales provisioning, or S7. Do not mark B2 Successful without owner QA.
+None. `authorization.active_work_order` is null. C2B Slice A is **Successful**. SI Sales B1 is **Successful**. SI Sales B2 is **code-shipped** (core owner QA passed; refinements shipped; not Successful). Do not start C2, Core promotion, Beauty, D1, CP Sales provisioning, or S7. Do not mark B2 Successful without regression QA.
 
 ## Current communication (not a work order)
 
-- [[wip/WO-2026-09-12-si-sales-b2-proposal-system]] — SI Sales **B2** implementation work order (`authorized: yes`; implementation returned). **Not** Successful until owner QA.
-- [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]] — B2 implementation return (`status: done`). Evidence. **Not** the live map. **Not** owner acceptance.
+- [[wip/WO-2026-09-12-si-sales-b2-proposal-system]] — SI Sales **B2** implementation work order (`authorized: yes`; implementation returned). **Not** Successful until regression QA.
+- [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]] — B2 implementation return (`status: done`) plus 2026-09-13 owner-QA refinement notes. Evidence. **Not** the live map. **Not** owner acceptance.
 - [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] — SI Sales **B2** pre-development worksheet. Decisions **B2-01 through B2-06 complete**.
 - [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] — SI Sales Slice B pre-development worksheet. Decisions **1–64 complete**. Used as B1 decision truth. **Not** a work order. Does **not** authorize B2.
 - [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]] — SI Sales product refinement pre-development worksheet (Slice A decisions; completed). **Not** a work order.

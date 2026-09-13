@@ -6,7 +6,9 @@ import { isPublicPath } from '../../server/services/authorization'
 import {
   addOpportunityLine,
   createOffer,
+  listOpportunityLines,
   updateOffer,
+  updateOpportunityLine,
 } from '../../server/services/commercial'
 import {
   defaultProposalLetterhead,
@@ -39,7 +41,7 @@ import {
 } from '../../server/services/sales'
 import { users } from '../../server/database/schema'
 import { openTestDatabase } from '../helpers/db'
-import { PROPOSAL_LETTERHEAD_SETTING_KEY } from '../../shared/utils/proposals'
+import { PROPOSAL_LETTERHEAD_SETTING_KEY, proposalStatusDisplay } from '../../shared/utils/proposals'
 
 let dbHandle: Awaited<ReturnType<typeof openTestDatabase>> | undefined
 let artifactDir: string | undefined
@@ -135,6 +137,32 @@ describe('B2 proposal system', () => {
     expect(after.current.amountCents).toBe(0)
   })
 
+  it('edits Opportunity commercial lines into current truth and draft preview without rewriting issued snapshots', async () => {
+    dbHandle = await openTestDatabase()
+    const { actor, opportunity } = await seededOpportunity()
+    const bundle = await createDraftProposal(dbHandle.db, opportunity.id, actor)
+    const issued = await issueProposal(dbHandle.db, bundle.proposal.id, actor)
+    const [line] = await listOpportunityLines(dbHandle.db, opportunity.id)
+    await updateOpportunityLine(dbHandle.db, line!.id, {
+      quantity: 3,
+      unitPriceCents: 8000,
+      description: 'Managed workstation (revised)',
+    })
+    const opportunityAfter = await getOpportunity(dbHandle.db, opportunity.id)
+    expect(opportunityAfter.mrrCents).toBe(24000)
+    const frozen = await getProposalBundle(dbHandle.db, issued.proposal.id)
+    expect(frozen.snapshotLines[0]?.quantity).toBe(10)
+    expect(frozen.snapshotLines[0]?.unitPriceCents).toBe(5000)
+    expect(frozen.current.mrrCents).toBe(50000)
+    const revised = await createProposalRevision(dbHandle.db, issued.proposal.id, actor)
+    expect(revised.liveLines[0]?.quantity).toBe(3)
+    expect(revised.liveLines[0]?.mrrCents).toBe(24000)
+    const draftDocument = await getProposalDocument(dbHandle.db, revised.proposal.id, revised.current.id)
+    expect(draftDocument.lines[0]?.quantity).toBe(3)
+    expect(draftDocument.lines[0]?.description).toBe('Managed workstation (revised)')
+    expect(draftDocument.mrrCents).toBe(24000)
+  })
+
   it('snapshots recipient Contact at Issue and rejects a different Company', async () => {
     dbHandle = await openTestDatabase()
     const { actor, company, contact, opportunity } = await seededOpportunity()
@@ -189,6 +217,8 @@ describe('B2 proposal system', () => {
     const sent = await markProposalSent(dbHandle.db, draft.proposal.id, actor)
     expect(sent.current.sentAt).toBeTruthy()
     expect(sent.current.status).toBe('issued')
+    expect(proposalStatusDisplay(sent.current.status, sent.current.sentAt)).toBe('Issued · Sent')
+    expect(proposalStatusDisplay(sent.current.status, null)).toBe('Issued')
     expect(sent.pastValidThrough).toBe(true)
     const accepted = await acceptProposal(dbHandle.db, draft.proposal.id, actor)
     expect(accepted.current.status).toBe('accepted')
@@ -246,6 +276,7 @@ describe('B2 proposal system', () => {
     const { actor, opportunity } = await seededOpportunity()
     expect(isPublicPath('/proposals')).toBe(false)
     expect(isPublicPath('/api/proposals')).toBe(false)
+    expect(isPublicPath('/api/proposals/1/revisions/1/signed')).toBe(false)
     expect(isPublicPath('/settings/proposals')).toBe(false)
     const draft = await createDraftProposal(dbHandle.db, opportunity.id, actor)
     const report = await salesDashboard(dbHandle.db, { preset: 'this_year' })

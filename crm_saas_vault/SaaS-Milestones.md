@@ -82,13 +82,13 @@ Not S-track. Do not call C2 “S7.” Do not call historical hostname work “S5
 | C2A | Thin Sales consumer (local Core consumer; no CP catalog) | **Successful** (2026-09-11). Evidence: [[history/C2A_closeout]]. Not C2. |
 | C2B | SI Sales Refinement Slice A (Lead, convert, Opportunity workflow) | **Successful** (2026-09-12). Not Slice B. Not C2. Evidence: [[history/C2B_closeout]] |
 | SI Sales B1 | Commercial model + acquisition foundation | **Successful** (2026-09-12). Not B2. Not C2. Evidence: [[history/B1_closeout]] |
-| SI Sales B2 | Proposal / document system | **Code-shipped** (2026-09-12). Awaiting owner QA. Feature `84c0cc8`. Not Successful. Not C2. Return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]] |
+| SI Sales B2 | Proposal / document system | **Code-shipped** (2026-09-12). Core owner QA passed 2026-09-13; refinements shipped, awaiting regression QA. Feature `84c0cc8`. Not Successful. Not C2. Return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]] |
 | C2 | Sales vertical as second Core consumer + CP product catalog | Not started |
 | C3 | Beauty vertical after Sales proves Core | Not started |
 | D1 | Account vs Product Instance CP schema | **Accepted**, schema **not shipped** |
 | D2–D4 | Keep MA leads / campaigns / public capture vertical-owned | **Accepted** (wait) |
 
-C1 is not Map B Successful. C2A is **Successful** (not C2). C2B Slice A is **Successful** (not Slice B, not C2). SI Sales B1 is **Successful** (not B2, not C2). SI Sales B2 is **code-shipped** and is **not Successful** until owner QA. C2 is not started and is **not** authorized by C2A, C2B, B1, or B2. Plan narrative (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]].
+C1 is not Map B Successful. C2A is **Successful** (not C2). C2B Slice A is **Successful** (not Slice B, not C2). SI Sales B1 is **Successful** (not B2, not C2). SI Sales B2 is **code-shipped** (core owner QA passed; refinements shipped; **not Successful** until regression QA). C2 is not started and is **not** authorized by C2A, C2B, B1, or B2. Plan narrative (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]].
 
 ---
 
@@ -262,7 +262,7 @@ Sales-owned Sources, Campaigns (no primary source), Campaign+Source Tracking Lin
 
 ## SI Sales B2 — Proposal system
 
-Status: **Code-shipped** (2026-09-12). Awaiting Scott’s owner QA at http://localhost:5040. **Not Successful.** Not S-track. Not C2. B2 code-ship does **not** authorize C2, Core promotion, e-sign, email send, or SI migration.
+Status: **Code-shipped** (2026-09-12). Core owner QA passed 2026-09-13. QA refinements shipped; awaiting Scott’s regression checklist at http://localhost:5040. **Not Successful.** Not S-track. Not C2. B2 does **not** authorize C2, Core promotion, e-sign, email send, or SI migration.
 
 Sales-owned Proposal chain per Opportunity, sequential immutable revisions, Issue snapshots, Mark Sent (`sent_at`, no mailer), staff-recorded Accepted/Declined (no auto-Won), optional valid-through display, instance letterhead, HTML preview, PDFKit PDFs, local `data/proposals/` artifacts, optional signed upload. Journal `0003_clammy_shocker`. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. Feature `84c0cc8`. Work order: [[wip/WO-2026-09-12-si-sales-b2-proposal-system]]. Return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]]. Decisions: [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] B2-01–B2-06 plus Slice B 22–31 / 50–51.
 

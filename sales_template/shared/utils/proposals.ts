@@ -20,6 +20,11 @@ export function proposalStatusLabel(status: string) {
   return isProposalStatus(status) ? PROPOSAL_STATUS_LABELS[status] : status
 }
 
+export function proposalStatusDisplay(status: string, sentAt: string | Date | null | undefined) {
+  const label = proposalStatusLabel(status)
+  return sentAt ? `${label} · Sent` : label
+}
+
 export function formatProposalLabel(proposalNumber: string, revision: number) {
   return `${proposalNumber} r${revision}`
 }

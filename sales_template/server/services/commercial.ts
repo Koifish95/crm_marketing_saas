@@ -206,6 +206,7 @@ export async function addOpportunityLine(db: Database, input: {
 }
 
 export async function updateOpportunityLine(db: Database, id: number, input: {
+  offerId?: number | null
   description?: string
   quantity?: number
   pricingType?: OfferPricingType
@@ -213,6 +214,14 @@ export async function updateOpportunityLine(db: Database, id: number, input: {
 }) {
   const current = await getOpportunityLine(db, id)
   const patch: Partial<typeof salesOpportunityLines.$inferInsert> = { updatedAt: now() }
+  if (input.offerId !== undefined) {
+    if (input.offerId === null) {
+      patch.offerId = null
+    } else {
+      const offer = await getOffer(db, input.offerId)
+      patch.offerId = offer.id
+    }
+  }
   if (input.description !== undefined) {
     const description = input.description.trim()
     if (!description) {

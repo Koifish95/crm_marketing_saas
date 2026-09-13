@@ -14,6 +14,7 @@ import {
   addOpportunityLine,
   createOffer,
   listOpportunityLines,
+  updateOpportunityLine,
 } from '../../server/services/commercial'
 import {
   readPublicIntakeConfig,
@@ -262,6 +263,33 @@ describe('B1 commercial model and acquisition', () => {
     expect(refreshed.mrrCents).toBe(50_000)
     expect(lineMrrCents('monthly', 10, 5000)).toBe(50_000)
     expect(refreshed.amountCents).toBe(1_200_000)
+    const managed = (await listOpportunityLines(dbHandle.db, opportunity.id)).find(row => row.offerId === offer.id)
+    expect(managed).toBeTruthy()
+    await updateOpportunityLine(dbHandle.db, managed!.id, {
+      quantity: 4,
+      unitPriceCents: 7500,
+      description: 'Managed devices (edited)',
+    })
+    const edited = await getOpportunity(dbHandle.db, opportunity.id)
+    expect(edited.mrrCents).toBe(30_000)
+    expect(edited.amountCents).toBe(1_200_000)
+    const custom = await addOpportunityLine(dbHandle.db, {
+      opportunityId: opportunity.id,
+      description: 'Custom setup',
+      pricingType: 'one_time',
+      quantity: 1,
+      unitPriceCents: 10000,
+    })
+    await updateOpportunityLine(dbHandle.db, custom.id, {
+      offerId: offer.id,
+      description: offer.name,
+      pricingType: 'monthly',
+      quantity: 2,
+      unitPriceCents: 5000,
+    })
+    const switched = await getOpportunity(dbHandle.db, opportunity.id)
+    expect(switched.mrrCents).toBe(40_000)
+    expect(switched.amountCents).toBe(1_200_000)
   })
 
   it('sets won_at / lost_at, promotes Prospect to Customer, and clears timestamps on Reopen', async () => {

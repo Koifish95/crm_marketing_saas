@@ -2,7 +2,7 @@
 type: decision
 status: current
 area: process
-updated: 2026-09-12
+updated: 2026-09-13
 tags:
   - adr
   - saas
@@ -22,6 +22,20 @@ Status: accepted | working decision | superseded
 Context: one or two sentences
 Decision: what we chose
 ```
+
+---
+
+## 2026-09-13 — SI Sales B2 owner-QA refinements (not Successful)
+
+Status: working decision
+
+Context: Scott completed core B2 owner QA against `84c0cc8`. Workflow passed. Six bounded UI/workflow refinements were requested before final acceptance. Return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]].
+
+Decision:
+
+- B2 remains **code-shipped** and **not Successful** until Scott’s regression QA of the refinements.
+- Preserve the approved immutable-revision model. No Edit/Reopen on issued Proposals. Sent remains `sent_at`. Accepted does not auto-Won.
+- Refinements are Sales UI/workflow only: Opportunity commercial-line Edit, Sent in revision history, Opportunity status visibility, signed-PDF upload/view, issued-immutability copy.
 
 ---
 

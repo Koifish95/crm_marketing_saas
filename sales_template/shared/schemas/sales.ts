@@ -210,6 +210,7 @@ export const createOpportunityLineSchema = z.object({
 })
 
 export const patchOpportunityLineSchema = z.object({
+  offerId: z.union([z.coerce.number().int().positive(), z.null()]).optional(),
   description: z.string().trim().min(1).max(200).optional(),
   quantity: z.coerce.number().int().positive().optional(),
   pricingType: offerPricingTypeSchema.optional(),
