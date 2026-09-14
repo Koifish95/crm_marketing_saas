@@ -21,15 +21,29 @@ durable_docs_updated:
 
 # SI Sales B2 return — proposal system
 
-**Not the live map.** Live map: [[Current-State]]. Work order: [[wip/WO-2026-09-12-si-sales-b2-proposal-system]]. Decisions: [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] B2-01–B2-06 plus Slice B 22–31 / 50–51.
+**Not the live map.** Live map: [[Current-State]]. Successful closeout: [[history/B2_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system]]. Decisions: [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] B2-01–B2-06 plus Slice B 22–31 / 50–51.
 
-**B2 is code-shipped and is not Successful.** Do not archive this pair until Scott’s owner QA. C2 is **not** this slice.
+**C2 is not this slice.** Closing B2 does **not** authorize C2, Core promotion, e-sign, email, or SI migration.
 
 ---
 
-## Executive result
+## Owner acceptance (2026-09-13)
+
+Scott completed core B2 owner QA, the 2026-09-13 refinement pass, and final regression QA at http://localhost:5040, then explicitly granted owner acceptance.
+
+He confirmed letterhead, Draft create/edit/preview, Draft lines refreshing from Opportunity commercial truth, Issue → immutable snapshot and generated PDF, revision chain and supersede, Mark Sent without email, Accepted without auto-Won, signed upload/view/download, past-valid-through display without status mutation, alternate same-Company recipient, Opportunity commercial-line Edit, Opportunity stage visibility, Sent in revision history, issued-immutability guidance, and historical revision selection from the Opportunity card (fix `0be7e06`).
+
+Scott approved the immutable revision model: issued Proposal is a frozen historical record; changes go through **New revision**. Do not reopen that design.
+
+B2 is **Successful**. This file remains implementation evidence.
+
+---
+
+## Executive result (at code-ship)
 
 **B2 CODE-SHIPPED — READY FOR OWNER QA**
+
+That was the result when this return was first written. Owner acceptance landed afterward; see [[history/B2_closeout]].
 
 `sales_template/` / `sales-crm` (http://localhost:5040) now has the approved Proposal system, Sales-owned, with **zero** Core package source changes and **no** Martial Arts domain imports.
 
@@ -362,6 +376,5 @@ Do **not** mark B2 Successful until this checklist is accepted.
 
 ## What Scott should do next
 
-1. Have ChatGPT inspect this return and Git on `working` before final regression QA.
-2. Restart Sales if needed and run the three-step revision-selection checklist above at http://localhost:5040.
-3. Only after that QA: mark B2 Successful (separate closeout). Do not start C2, e-sign, email, or SI migration from this ship.
+1. Have ChatGPT inspect [[history/B2_closeout]] and the canonical set before starting C2 planning.
+2. Do not start C2, e-sign, email, or SI migration from this closeout.

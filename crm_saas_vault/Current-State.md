@@ -35,11 +35,11 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | C2A Thin Sales consumer | **Successful** (2026-09-11). Owner-accepted after browser QA at http://localhost:5040. Local `sales_template/` / `sales-crm`. Not C2. Evidence: [[history/C2A_closeout]] |
 | C2B SI Sales Refinement Slice A | **Successful** (2026-09-12). Owner-accepted after browser QA at http://localhost:5040. Feature `1ac18e4`. Not Slice B. Not C2. Evidence: [[history/C2B_closeout]] |
 | SI Sales B1 (commercial + acquisition) | **Successful** (2026-09-12). Owner-accepted after browser QA at http://localhost:5040. Feature `40851e0`. Not B2. Not C2. Evidence: [[history/B1_closeout]] |
-| SI Sales B2 (proposal system) | **Code-shipped** (2026-09-12). Core owner QA passed 2026-09-13; regression #6 (historical revision selection) fix shipped, awaiting final regression QA at http://localhost:5040. Feature `84c0cc8`. Not Successful. Not C2. Return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]] |
+| SI Sales B2 (proposal system) | **Successful** (2026-09-13). Owner-accepted after core QA, refinements, and final regression QA at http://localhost:5040. Feature `84c0cc8`; refinements `c2d611e`; revision-selection `0be7e06`. Not C2. Evidence: [[history/B2_closeout]] |
 | C2 / Beauty / S7–S11 | **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 
-**Authorized work:** none. B2 core owner QA passed; regression items 1–5 passed; historical revision-selection fix shipped and awaits Scott’s final checklist. Do **not** mark B2 Successful until that regression QA. C2, Core promotion, D1, Beauty, S7, and SI migration remain unauthorized. See [[Working-Agreement]] and [[Work-Order-Protocol]].
+**Authorized work:** none. SI Sales B2 is **Successful**. C2 is next C-track work and remains unauthorized. Core promotion, D1, Beauty, S7, and SI migration remain unauthorized. See [[Working-Agreement]] and [[Work-Order-Protocol]].
 
 Lockfile: [[project-state.yaml]].
 
@@ -103,7 +103,7 @@ Full gym CRM derived from Renzo: households as `leads` + `lead_lines`, trials, i
 
 Local: http://localhost:5030 (`pnpm dev`). Laptop Docker PRODUCTION `:5000`, STAGE `:5010`, DEV `:5020`.
 
-### Sales vertical (`sales_template/`) — C2A Successful; C2B Slice A Successful; B1 Successful; B2 code-shipped
+### Sales vertical (`sales_template/`) — C2A Successful; C2B Slice A Successful; B1 Successful; B2 Successful
 
 Second working local consumer of `@crm/core`. Package `sales-crm` (`private: true`). Extends `@crm/core`. Local only: http://localhost:5040 (`pnpm dev`). SQLite `sales_template/data/app.sqlite`. Drizzle journal `0000_wide_cyclops` + Slice A `0001_thankful_lyja` + B1 `0002_cheerful_firebrand` + B2 `0003_clammy_shocker`.
 
@@ -115,7 +115,7 @@ B2 adds a Sales-owned Proposal chain on each Opportunity: draft/issue/mark-sent/
 
 No Docker. No Control Plane Sales product or provisioning. Strategic Insights is the intended first real-world Sales customer/design target and has **not** been migrated or cut over.
 
-C2A owner-accepted 2026-09-11. Closeout: [[history/C2A_closeout]]. C2B owner-accepted 2026-09-12. Closeout: [[history/C2B_closeout]]. Slice A implementation return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. B1 owner-accepted 2026-09-12. Closeout: [[history/B1_closeout]]. Implementation return: [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]]. B2 work order (active until owner QA): [[wip/WO-2026-09-12-si-sales-b2-proposal-system]]. B2 return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]].
+C2A owner-accepted 2026-09-11. Closeout: [[history/C2A_closeout]]. C2B owner-accepted 2026-09-12. Closeout: [[history/C2B_closeout]]. Slice A implementation return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. B1 owner-accepted 2026-09-12. Closeout: [[history/B1_closeout]]. Implementation return: [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]]. B2 owner-accepted 2026-09-13. Closeout: [[history/B2_closeout]]. Implementation return: [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system]].
 
 ### CRM Core (`packages/crm-core`)
 
@@ -155,7 +155,7 @@ Exact `docker inspect` + compose. Combined status: container running **and** `/a
 
 Do not assume any of these exist:
 
-- C2 Sales vertical **plus** Control Plane product catalog (C2A local Sales app exists; C2B Slice A exists; B1 commercial/acquisition exists; B2 proposal system is **code-shipped** awaiting regression QA; C2 is not those slices)
+- C2 Sales vertical **plus** Control Plane product catalog (C2A local Sales app exists; C2B Slice A exists; B1 commercial/acquisition exists; B2 proposal system exists and is **Successful**; C2 is not those slices)
 - Browser e-sign, public signing portal, customer portal, CRM email send, document/theme CMS (explicitly out of B2)
 - Control Plane Sales provisioning / Sales Docker image / Sales host ports
 - Beauty vertical (sister business is the intended second **pilot**, not a shipped product)
@@ -188,7 +188,7 @@ Link, do not re-litigate. Index: [[SaaS-Decisions]].
 | C2A thin Sales consumer Successful | [[SaaS-Decisions#2026-09-11 — Official C2A is Successful]] |
 | C2B Slice A Successful | [[SaaS-Decisions#2026-09-12 — Official C2B is Successful]] |
 | SI Sales B1 Successful | [[SaaS-Decisions#2026-09-12 — Official SI Sales B1 is Successful]] |
-| SI Sales B2 code-shipped (not Successful) | [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]] |
+| SI Sales B2 Successful | [[SaaS-Decisions#2026-09-13 — Official SI Sales B2 is Successful]] |
 | D1–D4 | [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]] |
 | Customer / environment unit | [[Customer-Environment]] |
 | Never `-v` / prune / Renzo volumes | [[Control-Plane]] |

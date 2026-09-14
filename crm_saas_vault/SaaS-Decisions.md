@@ -25,9 +25,25 @@ Decision: what we chose
 
 ---
 
+## 2026-09-13 — Official SI Sales B2 is Successful
+
+Status: accepted
+
+Context: SI Sales B2 (proposal / document system) was implemented on `working` (`84c0cc8`), then owner-QA refinements (`c2d611e`) and historical-revision selection (`0be7e06`) shipped. Scott completed core B2 owner QA, the refinement pass, and final regression QA at http://localhost:5040 on 2026-09-13. Closeout: [[history/B2_closeout]]. Implementation return: [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]].
+
+Decision:
+
+- Official **SI Sales B2 is Successful** (2026-09-13). B2 is closed. Path remains `sales_template/` / `sales-crm` on port 5040. Journal `0003_clammy_shocker`.
+- Sales now has a Sales-owned Proposal chain per Opportunity: draft/issue/mark-sent/accept/decline/supersede, immutable issued snapshots, PDFKit PDFs, letterhead, staff preview, optional signed PDF, and historical revision selection. Issued Proposal is a frozen historical record; changes go through **New revision**.
+- Existing **C2** is unchanged and **not started**. B2 success does **not** authorize C2, Core promotion, D1, Control Plane Sales provisioning, Beauty, S7/VPS, DNS/TLS, public signing, e-sign, CRM email, billing/invoicing, or SI migration.
+
+Source: Scott 2026-09-13 (owner acceptance in the current Cursor chat)
+
+---
+
 ## 2026-09-13 — SI Sales B2 revision selection in Opportunity panel (not Successful)
 
-Status: working decision
+Status: superseded by [[SaaS-Decisions#2026-09-13 — Official SI Sales B2 is Successful]]
 
 Context: Regression QA items 1–5 passed. Item 6 failed: historical revisions were not selectable in the Opportunity Proposal card while a newer Draft was current.
 
@@ -41,9 +57,9 @@ Decision:
 
 ## 2026-09-13 — SI Sales B2 owner-QA refinements (not Successful)
 
-Status: working decision
+Status: superseded by [[SaaS-Decisions#2026-09-13 — Official SI Sales B2 is Successful]]
 
-Context: Scott completed core B2 owner QA against `84c0cc8`. Workflow passed. Six bounded UI/workflow refinements were requested before final acceptance. Return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]].
+Context: Scott completed core B2 owner QA against `84c0cc8`. Workflow passed. Six bounded UI/workflow refinements were requested before final acceptance. Return: [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]].
 
 Decision:
 
@@ -55,9 +71,9 @@ Decision:
 
 ## 2026-09-12 — SI Sales B2 is code-shipped (not Successful)
 
-Status: working decision
+Status: superseded by [[SaaS-Decisions#2026-09-13 — Official SI Sales B2 is Successful]]
 
-Context: Authorized work order [[wip/WO-2026-09-12-si-sales-b2-proposal-system]] implemented the approved Proposal system on `working` (feature `84c0cc8`). Owner QA has **not** run. Return: [[wip/WO-2026-09-12-si-sales-b2-proposal-system-return]].
+Context: Authorized work order [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system]] implemented the approved Proposal system on `working` (feature `84c0cc8`). Owner QA has **not** run. Return: [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]].
 
 Decision:
 

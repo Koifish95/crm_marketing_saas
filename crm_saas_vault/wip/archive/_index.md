@@ -2,7 +2,7 @@
 type: index
 status: current
 area: process
-updated: 2026-09-12
+updated: 2026-09-13
 tags:
   - wip
   - archive
@@ -138,6 +138,7 @@ Current orientation: [[Current-State]]. These files are evidence, not the map.
 - [[wip/archive/WO-2026-09-11-sales-thin-slice|C2A thin Sales consumer work order]] (Successful 2026-09-11; closeout [[history/C2A_closeout]])
 - [[wip/archive/WO-2026-09-11-si-sales-slice-a|C2B SI Sales Refinement Slice A work order]] (Successful 2026-09-12; closeout [[history/C2B_closeout]])
 - [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition|SI Sales B1 commercial + acquisition work order]] (Successful 2026-09-12; closeout [[history/B1_closeout]])
+- [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system|SI Sales B2 proposal system work order]] (Successful 2026-09-13; closeout [[history/B2_closeout]])
 - [[wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt|Core ADR planning prompt]]
 - [[wip/archive/CRM_Core_Architecture_Planning_Return|Core architecture planning return]]
 - [[wip/archive/Milestone_Map_Conflict_Decision|Milestone map conflict briefing]]

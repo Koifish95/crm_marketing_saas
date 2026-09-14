@@ -1,7 +1,7 @@
 ---
 
 type: work-order
-status: active
+status: done
 id: WO-2026-09-12-si-sales-b2-proposal-system
 milestone: SI-Sales-B2
 decision_refs:
