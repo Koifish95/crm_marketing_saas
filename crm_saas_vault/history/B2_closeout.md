@@ -99,7 +99,7 @@ Inspected 2026-09-13 on `working`. Product code was unchanged after the historic
 | Owner-QA refinement | `c2d611e803e18f6d91e318ea6cfc9061ae8736d8` |
 | Historical-revision selection fix | `0be7e060386d243a58268a8ff12a1e9fa1431dc1` |
 | HEAD at closeout inspect | `dde75902506ec99b83f51b70c4903b69e820eabc` |
-| Closeout SHA | pending — stamp after the Successful closeout commit |
+| Closeout SHA | `dae437aaca315f976fb2dc06fe90a1530ee81376` |
 | Scope | Vault Successful record only. No Sales product code. No Core change. |
 
 No schema change in the QA refinement passes (`c2d611e`, `0be7e06`). No Core change in the QA refinement passes.
