@@ -2,7 +2,7 @@
 type: index
 status: current
 area: process
-updated: 2026-09-13
+updated: 2026-09-14
 tags:
   - wip
 ---
@@ -17,10 +17,11 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-None. `authorization.active_work_order` is null. C2B Slice A is **Successful**. SI Sales B1 is **Successful**. SI Sales B2 is **Successful**. Do not start C2, Core promotion, Beauty, D1, CP Sales provisioning, or S7. B2 closeout does **not** authorize C2.
+None. `authorization.active_work_order` is null. C2B Slice A is **Successful**. SI Sales B1 is **Successful**. SI Sales B2 is **Successful**. C2 is **not started** and **not authorized**. Do not start C2, Core promotion, Beauty, D1, CP Sales provisioning, or S7 from this planning worksheet.
 
 ## Current communication (not a work order)
 
+- [[wip/C2_Pre_Development_Audit_and_Decision_Worksheet]] — C2 pre-development audit and decision worksheet (2026-09-14). Decisions **C2-01 through C2-06 awaiting Scott**. **Not** a work order. Does **not** authorize implementation.
 - [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] — SI Sales **B2** pre-development worksheet. Decisions **B2-01 through B2-06 complete**. Evidence. **Not** a work order.
 - [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] — SI Sales Slice B pre-development worksheet. Decisions **1–64 complete**. Used as B1 decision truth. **Not** a work order.
 - [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]] — SI Sales product refinement pre-development worksheet (Slice A decisions; completed). **Not** a work order.
