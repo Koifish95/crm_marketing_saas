@@ -156,7 +156,7 @@ The recoverable Sales image build then failed for real Dockerfile/runtime reason
 
 ### Recovered proof on C2 QA Test (do not treat as Successful)
 
-Martial Arts PROD/DEV remained healthy (`martial-arts-acquisition:s4`, `:52206` / `:52207`). Sales recovered on the existing instance:
+Remediation commit: `db7af34da661ea2b0a0a7aa2c284e5fe377b9e30`. Martial Arts PROD/DEV remained healthy (`martial-arts-acquisition:s4`, `:52206` / `:52207`). Sales recovered on the existing instance:
 
 | Env | Container | Image | Port | Volumes |
 |---|---|---|---|---|
