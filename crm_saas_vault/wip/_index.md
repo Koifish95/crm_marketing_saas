@@ -21,7 +21,7 @@ None. `authorization.active_work_order` is null. C2B Slice A is **Successful**. 
 
 ## Current communication (not a work order)
 
-- [[wip/C2_Pre_Development_Audit_and_Decision_Worksheet]] — C2 pre-development audit and decision worksheet (2026-09-14). Decisions **C2-01 through C2-06 awaiting Scott**. **Not** a work order. Does **not** authorize implementation.
+- [[wip/C2_Pre_Development_Audit_and_Decision_Worksheet]] — C2 pre-development audit. Owner decisions **C2-01 B, C2-02 B, C2-03 A, C2-04 A, C2-05 A, C2-06 A** recorded 2026-09-14. **Planning-ready.** **Not** a work order. Does **not** authorize implementation.
 - [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] — SI Sales **B2** pre-development worksheet. Decisions **B2-01 through B2-06 complete**. Evidence. **Not** a work order.
 - [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] — SI Sales Slice B pre-development worksheet. Decisions **1–64 complete**. Used as B1 decision truth. **Not** a work order.
 - [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]] — SI Sales product refinement pre-development worksheet (Slice A decisions; completed). **Not** a work order.
