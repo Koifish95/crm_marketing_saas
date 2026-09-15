@@ -20,8 +20,23 @@
               "icon": "lucide-file",
               "title": "SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet"
             }
+          },
+          {
+            "id": "346216a93e522dea",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "C2_qa.md.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "C2_qa.md"
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -188,23 +203,29 @@
       "bases:Create new base": false
     }
   },
-  "active": "0d10c21208fe0597",
+  "active": "346216a93e522dea",
   "lastOpenFiles": [
+    "control_plane/tmp-inspect-c2-backups.mjs",
+    "control_plane/tests/c2/restore-copy-down.test.ts",
+    "control_plane/server/api/environments/[id]/backups.get.ts",
+    "control_plane/data/backups/c2-test/c2-test-sales-prod/c2-test_c2-test-sales-prod_2026-09-15_155406.zip",
+    "control_plane/data/backups/c2-test/c2-test-sales-prod",
+    "control_plane/data/backups/c2-test",
+    "control_plane/data/control-plane.sqlite-journal",
+    "control_plane/drizzle/migrations/0005_provision_error.sql",
+    "control_plane/tmp-inspect.mjs",
+    "control_plane/data/provisioned/73cbb789-6fd9-4da1-8101-5171027909ec.env",
+    "control_plane/data/provisioned/e22bf5c0-eecf-4cf8-84a6-ff6d67ee6556.env",
+    "crm_saas_vault/wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet.md",
+    "C2_qa.md.md",
+    "crm_saas_vault/wip/WO-2026-09-12-si-sales-b1-commercial-acquisition-return.md",
+    "crm_saas_vault/wip/WO-2026-09-12-si-sales-b1-commercial-acquisition.md",
+    "crm_saas_vault/wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet.md",
+    "crm_saas_vault/history/C2B_closeout.md",
     "crm_saas_vault/history/WO-2026-09-11-si-sales-slice-a-return.md",
     "crm_saas_vault/wip/archive/WO-2026-09-11-si-sales-slice-a.md",
-    "sales_template/app/pages/leads/[id].vue",
-    "sales_template/app/pages/leads/index.vue",
-    "sales_template/app/pages/leads",
-    "sales_template/app/components/SalesHistory.vue",
-    "sales_template/server/api/notes.post.ts",
-    "sales_template/server/api/assignees.get.ts",
-    "sales_template/server/api/notes.get.ts",
-    "sales_template/server/api/opportunities/[id]/reopen.post.ts",
-    "sales_template/server/api/opportunities/[id]/lost.post.ts",
-    "sales_template/server/api/opportunities/[id]/won.post.ts",
     "crm_saas_vault/wip/WO-2026-09-11-si-sales-slice-a.md",
     "crm_saas_vault/wip/Pre_Development_Product_Architecture_Decision_Worksheet.md",
-    "crm_saas_vault/wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet.md",
     "crm_saas_vault/history/C2A_closeout.md",
     "crm_saas_vault/wip/WO-2026-09-11-sales-thin-slice.md",
     "crm_saas_vault/history/WO-2026-09-11-sales-thin-slice-return.md",
@@ -219,8 +240,6 @@
     "crm_saas_vault/SaaS-ToDo.md",
     "crm_saas_vault/ToDo.md",
     "crm_saas_vault/S2-Hand-Boot-Checklist.md",
-    "crm_saas_vault/How-to-Run.md",
-    "crm_saas_vault/Design-System.md",
-    "crm_saas_vault/Decisions.md"
+    "crm_saas_vault/How-to-Run.md"
   ]
 }
