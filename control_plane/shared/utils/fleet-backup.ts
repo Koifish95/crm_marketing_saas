@@ -226,3 +226,90 @@ export type FleetBackupSummary = {
   offhostPath?: string | null
   offhostCopiedAt?: string | null
 }
+
+export type RestoreKind = 'rollback' | 'copy-down'
+
+export type RestoreEnvironmentRef = {
+  customerId: string
+  productInstanceId: string
+  environmentId: string
+  type: string
+}
+
+export type RestoreDecision = {
+  allowed: boolean
+  kind: RestoreKind | 'rejected'
+  reason: string
+}
+
+export type RestoreBackupSource = {
+  environmentId: string
+  displayName: string
+  type: string
+  slug: string
+  productInstanceId: string
+  productDisplayName: string
+  customerId: string
+  customerDisplayName: string
+}
+
+export type RestoreBackupCandidate = FleetBackupSummary & {
+  zipFileName: string
+  available: boolean
+  kind: RestoreKind
+  source: RestoreBackupSource
+}
+
+export function restoreBackupPolicy(
+  source: RestoreEnvironmentRef,
+  target: RestoreEnvironmentRef,
+): RestoreDecision {
+  if (source.customerId !== target.customerId) {
+    return {
+      allowed: false,
+      kind: 'rejected',
+      reason: 'Backup belongs to a different customer account.',
+    }
+  }
+  if (source.productInstanceId !== target.productInstanceId) {
+    return {
+      allowed: false,
+      kind: 'rejected',
+      reason: 'Backup belongs to a different product instance.',
+    }
+  }
+  if (source.environmentId === target.environmentId) {
+    return {
+      allowed: true,
+      kind: 'rollback',
+      reason: 'Same-environment rollback.',
+    }
+  }
+  if (source.type === 'PROD' && target.type === 'DEV') {
+    return {
+      allowed: true,
+      kind: 'copy-down',
+      reason: 'PROD → DEV copy-down.',
+    }
+  }
+  if (source.type === 'DEV' && target.type === 'PROD') {
+    return {
+      allowed: false,
+      kind: 'rejected',
+      reason: 'Copy-down is PROD → DEV only. DEV backups cannot restore into PROD.',
+    }
+  }
+  return {
+    allowed: false,
+    kind: 'rejected',
+    reason: 'This backup cannot restore into that environment.',
+  }
+}
+
+export function formatRestoreBackupOption(backup: {
+  createdAt: string
+  bytes: number
+  zipPath: string
+}, timeZone: string) {
+  return `${formatBackupCreatedAt(backup.createdAt, timeZone)} · ${formatBackupSize(backup.bytes)} · ${backupZipFileName(backup.zipPath)}`
+}

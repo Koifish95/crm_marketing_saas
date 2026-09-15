@@ -167,7 +167,7 @@ Explicit sharing between environments, if ever added, is a deliberate capability
 
 - Sibling environments cannot directly access each other’s database or assets.
 - Customers cannot directly access another customer’s persistent data.
-- **PROD → DEV** copy-down is allowed only as an explicit, operator-controlled action.
+- **PROD → DEV** copy-down is allowed only as an explicit, operator-controlled action. Control Plane restore enforces this server-side: a selected PROD backup may restore into a sibling DEV of the same Customer Account and Product Instance. Same-environment rollback is also allowed. DEV → PROD, cross-product, and cross-customer restores are refused.
 - No silent data synchronization.
 - No implicit **DEV → PROD** copy-up.
 

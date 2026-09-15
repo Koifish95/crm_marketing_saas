@@ -4,7 +4,7 @@ import { FleetBackupError, restoreRegisteredEnvironment } from '../../../service
 
 const Body = z.object({
   confirm: z.boolean(),
-  zipPath: z.string().optional(),
+  backupId: z.string(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -14,10 +14,10 @@ export default defineEventHandler(async (event) => {
   }
   const parsed = Body.safeParse(await readBody(event).catch(() => ({})))
   if (!parsed.success) {
-    throw createError({ statusCode: 400, statusMessage: 'Confirm is required to restore.' })
+    throw createError({ statusCode: 400, statusMessage: 'Confirm and backupId are required to restore.' })
   }
   try {
-    return await restoreRegisteredEnvironment(useDb(), id, parsed.data.confirm, parsed.data.zipPath)
+    return await restoreRegisteredEnvironment(useDb(), id, parsed.data.confirm, parsed.data.backupId)
   } catch (error) {
     if (error instanceof FleetBackupError) {
       throw createError({ statusCode: error.statusCode, statusMessage: error.message })

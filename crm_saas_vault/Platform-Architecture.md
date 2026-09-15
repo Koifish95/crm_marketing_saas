@@ -91,7 +91,7 @@ C2+ extraction narrative (not authorization): [[history/CRM_Core_Extraction_Impl
 
 Separate operator app: `control_plane/` at http://127.0.0.1:52100. Not another customer admin page and not the platform owner’s CRM.
 
-It lists customers/environments, observes up/down (container running **and** `/api/health`), relaunches without destroying volumes, provisions a Martial Arts PROD+DEV pair, and runs fleet lifecycle (backup, restore, off-host copy, upgrade, start/stop).
+It lists customers/environments, observes up/down (container running **and** `/api/health`), relaunches without destroying volumes, provisions a Martial Arts or Sales PROD+DEV pair, and runs fleet lifecycle (backup, selectable restore including same-product PROD→DEV copy-down, off-host copy, upgrade, start/stop).
 
 Not in the pnpm workspace. No operator login. Loopback only. Details: [[Control-Plane]].
 

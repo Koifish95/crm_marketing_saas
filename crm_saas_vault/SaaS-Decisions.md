@@ -2,7 +2,7 @@
 type: decision
 status: current
 area: process
-updated: 2026-09-14
+updated: 2026-09-15
 tags:
   - adr
   - saas
@@ -24,6 +24,22 @@ Decision: what we chose
 ```
 
 ---
+
+## 2026-09-15 — C2 selectable restore and PROD→DEV copy-down
+
+Status: working decision
+
+Context: C2 owner QA found that Lifecycle restore used only the latest zip of the same environment, and the zip manifest rejected any other environment ID. That blocked the intended PROD → DEV copy-down on disposable **C2 QA Test**. This is a bounded C2 QA remediation, not a new milestone. C2 remains **not Successful**.
+
+Decision:
+
+- Backups stay individually addressable via `environment_backups.id` plus persisted customer/environment metadata. Do not infer ownership from filenames.
+- Restore requires `{ confirm, backupId }`. Missing or invalid backups fail; the Control Plane does not silently pick another zip.
+- Allowed: same-environment rollback; same-customer / same-product **PROD → DEV** copy-down. Refused: DEV → PROD; different Product Instance; different Customer Account.
+- Copy uses the existing S6 zip (SQLite + persistent uploads, including Sales proposal PDFs). Target identity, host port, container, compose, volumes, and secrets stay target-owned.
+- Policy is enforced server-side. UI filtering is not the security boundary. No generic bidirectional cloning, scheduled backups, or off-site redesign.
+
+Source: Scott 2026-09-15 (C2 owner-QA remediation in the current Cursor chat)
 
 ## 2026-09-14 — C2 Product Instances + Sales catalog code-shipped
 

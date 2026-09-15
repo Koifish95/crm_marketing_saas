@@ -6,7 +6,7 @@ milestone: C2
 base_sha: "35c4aca8c0e02533f8e2278ade1bd6b3c513e025"
 result_sha: "43454fa08a53975fa509c1871cc53c850cc1e4ba"
 implementation_result: shipped
-tests: "QA remediation: control_plane pnpm test 19 files / 84 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass. sales_template pnpm test 8 files / 41 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass. martial_arts_template pnpm test 69 files / 331 tests pass; pnpm lint pass; pnpm typecheck pass. Original C2 ship tests were 19/81 CP."
+tests: "QA restore-selection remediation: control_plane pnpm test 20 files / 93 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass. sales_template pnpm test 8 files / 41 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass. martial_arts_template pnpm test 69 files / 331 tests pass; pnpm lint pass; pnpm typecheck pass. Previous provisioning QA remediation was 19/84 CP."
 decisions_discovered: []
 durable_docs_updated:
   - Current-State.md
@@ -164,6 +164,31 @@ Remediation commit: `db7af34da661ea2b0a0a7aa2c284e5fe377b9e30`. Martial Arts PRO
 | Sales DEV | `c2-test-sales-dev-app` | `crm-sales:c2` | 52209 | `c2-test-sales-dev-sqlite` / `-assets` |
 
 Staff login `admin` / `setup` reached must-change-password on both Sales environments. lab-acme / SI / Still Beauty / Alianna's were not mutated.
+
+## Owner QA remediation — selectable restore / PROD→DEV copy-down (2026-09-15)
+
+QA discovery: Lifecycle restore was **latest ZIP of this environment only**. `restoreRegisteredEnvironment` defaulted to that zip, and the zip `manifest.environmentId` had to equal the **target** environment. That blocked `C2 QA Test / Sales PROD backup → C2 QA Test / Sales DEV`.
+
+### Implementation
+
+- Backups remain rows in `environment_backups` (`id`, `environment_id`, `customer_id`, `created_at`, `bytes`, `zip_path`). Product Instance and PROD/DEV come from joining the registered environment. Existing zips stay usable through those rows, not filenames.
+- `GET /api/environments/:id/backups` lists restore candidates for that **target**.
+- `POST /api/environments/:id/restore` requires `{ confirm, backupId }`. No `zipPath` body. Missing/invalid backups return 404; the server does not pick another zip.
+- Server-side policy (`restoreBackupPolicy`): same customer + same Product Instance; same-env rollback; PROD→DEV copy-down; refuse DEV→PROD, cross-product, cross-customer.
+- Snapshot still uses the S6 zip (SQLite + uploads, including `uploads/proposals/.../generated.pdf`). Restore writes into the **target** container/volumes, then compose `up -d --no-deps app` without `-v`. Running targets are restarted so SQLite reloads. Target identity/port/compose/secrets stay.
+- Lifecycle UI: source environment + specific backup + visible target + destructive confirmation.
+
+### Live inspection (non-destructive)
+
+Did **not** restore into DEV. Preserved Scott’s existing Sales PROD zip:
+
+`control_plane/data/backups/c2-test/c2-test-sales-prod/c2-test_c2-test-sales-prod_2026-09-15_155406.zip`
+
+Registered backup id `5db4cda5-5eea-4178-8381-b1bbec6904c3`. Zip contents: `sqlite/crm.sqlite` and `uploads/proposals/1/1/generated.pdf`. Sales PROD `:52208` and Sales DEV `:52209` remained running `crm-sales:c2` with original identity.
+
+Live CP (`http://127.0.0.1:52100`) `GET .../backups` lists that zip as **rollback** on Sales PROD and **copy-down** on Sales DEV. Direct restore POSTs without confirm, cross-product (Sales PROD zip → Martial Arts DEV), and cross-customer were refused 400/409. No customer data was replaced.
+
+Resume owner QA at **#37** on Control Plane Lifecycle for `C2 QA Test → Sales DEV`: select the Sales PROD backup above, confirm, restore into DEV.
 
 ## Stop
 

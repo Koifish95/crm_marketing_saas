@@ -67,7 +67,7 @@ C2 code-shipped / owner QA in progress (not Successful): one account may own Mar
 - Runtime adapter: exact `docker inspect` + compose recreate (`up -d --force-recreate --no-deps app`)
 - Health GET only registered `127.0.0.1` lab URLs
 - Fleet backup zips: gitignored `control_plane/data/backups/{customerSlug}/{environmentSlug}/{customerSlug}_{environmentSlug}_{yyyy-MM-dd}_{HHmmss}.zip` (14-day retention). Older rows may still point at UUID folders. Each new zip includes `BACKUP.md`. Not `control-plane.sqlite`.
-- Environment APIs: `POST .../backup`, `.../restore`, `.../backup/copy`, `.../backup/reveal`, `.../upgrade`, `.../start`, `.../stop`, `.../bulk/start`, `.../bulk/stop`
+- Environment APIs: `POST .../backup`, `GET .../backups` (restore candidates), `POST .../restore` (`{ confirm, backupId }`), `.../backup/copy`, `.../backup/reveal`, `.../upgrade`, `.../start`, `.../stop`, `.../bulk/start`, `.../bulk/stop`. Restore is server-gated: same customer + same Product Instance; rollback or PROD→DEV copy-down only.
 - Start: eligible when not decommissioned/provisioning/failed and status `stopped`. Missing stays on Relaunch. Stop: runtime running (or healthy/unhealthy); never sets `decommissioned`. Bulk `{ scope: selected|all }`; `all` = eligible registered fleet, not the table filter. Sequential Docker; no `Promise.all`.
 - No operator login; loopback bind
 

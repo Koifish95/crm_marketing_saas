@@ -1,23 +1,29 @@
 import { randomUUID } from 'node:crypto'
-import { constants, copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { constants, copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { tmpdir } from 'node:os'
 import { and, desc, eq } from 'drizzle-orm'
 import type { Database } from '../database'
 import { environmentBackups, environments } from '../database/schema'
 import {
+  backupZipFileName,
   environmentBackupGuard,
   existingBackupFileMessage,
+  findSqliteFilename,
   fleetBackupRelativeDir,
   FLEET_BACKUP_RETENTION_DAYS,
   prodUpgradeBlocked,
   resolveFleetBackupFileName,
+  restoreBackupPolicy,
+  type RestoreBackupCandidate,
+  type RestoreKind,
 } from '../../shared/utils/fleet-backup'
 import { getRegisteredEnvironment, listRegisteredEnvironments } from './registry'
 import { restoreSnapshotToEnvironment, snapshotRegisteredEnvironment } from './fleet-backup-snapshot'
 import { extractFleetBackupZip, extractedSqliteDir, extractedUploadsDir } from './fleet-backup-extract'
 import { readFleetBackupManifest, writeFleetBackupZip } from './fleet-backup-zip'
 import { composeArgs, composeRootForEnvironment, repoRoot, resolveComposeEnvFile } from './docker-relaunch'
+import { inspectRegisteredContainer } from './docker-runtime'
 import { imageBuildArgs, waitUntilHealthy } from './provision-runtime'
 import { requireProduct } from '../products/catalog'
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
@@ -179,58 +185,229 @@ export async function copyEnvironmentBackupOffhost(
   return { ...latest, offhostPath: target, offhostCopiedAt: copiedAt }
 }
 
+export function restoreComposeArgs(input: {
+  envFile: string
+  composeFile: string
+  composeProject?: string
+}) {
+  return composeArgs({
+    envFile: input.envFile,
+    composeFile: input.composeFile,
+    composeProject: input.composeProject,
+    recreate: false,
+  })
+}
+
+function restoreRef(row: NonNullable<Awaited<ReturnType<typeof getRegisteredEnvironment>>>) {
+  return {
+    customerId: row.customer.id,
+    productInstanceId: row.productInstance.id,
+    environmentId: row.id,
+    type: row.type,
+  }
+}
+
+export function assertBackupMatchesSource(
+  manifest: { environmentId: string, customerId: string },
+  source: { id: string, customer: { id: string } },
+) {
+  if (manifest.environmentId !== source.id) {
+    throw new FleetBackupError('Backup zip does not match the selected backup.', 409)
+  }
+  if (manifest.customerId !== source.customer.id) {
+    throw new FleetBackupError('Backup zip does not match the selected customer account.', 409)
+  }
+}
+
+export function summarizeRestoreCandidate(
+  backup: {
+    id: string
+    createdAt: string
+    bytes: number
+    zipPath: string
+    offhostPath: string | null
+    offhostCopiedAt: string | null
+  },
+  source: NonNullable<Awaited<ReturnType<typeof getRegisteredEnvironment>>>,
+  kind: RestoreKind,
+  available: boolean,
+): RestoreBackupCandidate {
+  return {
+    ...summarizeBackup(backup),
+    zipFileName: backupZipFileName(backup.zipPath),
+    available,
+    kind,
+    source: {
+      environmentId: source.id,
+      displayName: source.displayName,
+      type: source.type,
+      slug: source.slug,
+      productInstanceId: source.productInstance.id,
+      productDisplayName: source.productInstance.displayName,
+      customerId: source.customer.id,
+      customerDisplayName: source.customer.displayName,
+    },
+  }
+}
+
+export async function listRestorableBackups(
+  db: Database,
+  targetId: string,
+  filesRoot = process.cwd(),
+) {
+  const target = requireEnvironment(await getRegisteredEnvironment(db, targetId))
+  const fleet = await listRegisteredEnvironments(db)
+  const envById = new Map(fleet.map(row => [row.id, row]))
+  const rows = await db.select().from(environmentBackups).orderBy(desc(environmentBackups.createdAt))
+  const backups: RestoreBackupCandidate[] = []
+  for (const row of rows) {
+    const source = envById.get(row.environmentId)
+    if (!source) {
+      continue
+    }
+    const decision = restoreBackupPolicy(restoreRef(source), restoreRef(target))
+    if (!decision.allowed || decision.kind === 'rejected') {
+      continue
+    }
+    let available = true
+    try {
+      assertRevealableZipPath(row.zipPath, filesRoot)
+    } catch {
+      available = false
+    }
+    backups.push(summarizeRestoreCandidate(row, source, decision.kind, available))
+  }
+  return {
+    target: {
+      id: target.id,
+      displayName: target.displayName,
+      type: target.type,
+      slug: target.slug,
+      containerName: target.containerName,
+      hostPort: target.hostPort,
+      composeProject: target.composeProject,
+      sqliteVolume: target.sqliteVolume,
+      assetsVolume: target.assetsVolume,
+      productInstanceId: target.productInstance.id,
+      productDisplayName: target.productInstance.displayName,
+      customerId: target.customer.id,
+      customerDisplayName: target.customer.displayName,
+    },
+    backups,
+  }
+}
+
+export async function resolveRestoreRequest(
+  db: Database,
+  targetId: string,
+  backupId: string,
+  filesRoot = process.cwd(),
+) {
+  const idValue = backupId.trim()
+  if (!idValue) {
+    throw new FleetBackupError('backupId is required.', 400)
+  }
+  const target = requireEnvironment(await getRegisteredEnvironment(db, targetId))
+  const [backup] = await db.select().from(environmentBackups)
+    .where(eq(environmentBackups.id, idValue))
+    .limit(1)
+  if (!backup) {
+    throw new FleetBackupError('Backup is not registered.', 404)
+  }
+  const source = await getRegisteredEnvironment(db, backup.environmentId)
+  if (!source) {
+    throw new FleetBackupError('Backup source environment is not registered.', 404)
+  }
+  const decision = restoreBackupPolicy(restoreRef(source), restoreRef(target))
+  if (!decision.allowed || decision.kind === 'rejected') {
+    throw new FleetBackupError(decision.reason, 409)
+  }
+  const zipPath = assertRevealableZipPath(backup.zipPath, filesRoot)
+  return {
+    target,
+    source,
+    backup,
+    zipPath,
+    kind: decision.kind,
+  }
+}
+
 export async function restoreRegisteredEnvironment(
   db: Database,
   id: string,
   confirm: boolean,
-  zipPath?: string,
+  backupId: string,
+  filesRoot = process.cwd(),
 ) {
   if (!confirm) {
     throw new FleetBackupError('Type confirm to replace this environment’s data.', 400)
   }
-  const row = requireEnvironment(await getRegisteredEnvironment(db, id))
-  const source = zipPath?.trim() || (await latestEnvironmentBackup(db, row.id))?.zipPath
-  if (!source || !existsSync(source)) {
-    throw new FleetBackupError('Backup zip is missing.', 404)
-  }
+  const resolved = await resolveRestoreRequest(db, id, backupId, filesRoot)
   const extractDir = join(tmpdir(), `fleet-restore-${randomUUID()}`)
   mkdirSync(extractDir, { recursive: true })
   const registered = (await listRegisteredEnvironments(db)).map(item => item.containerName)
   try {
-    await extractFleetBackupZip(source, extractDir)
+    await extractFleetBackupZip(resolved.zipPath, extractDir)
     const manifest = readFleetBackupManifest(extractDir)
-    if (manifest.environmentId !== row.id) {
-      throw new FleetBackupError('Backup zip belongs to a different environment.', 409)
-    }
+    assertBackupMatchesSource(manifest, resolved.source)
+    const sqliteDir = extractedSqliteDir(extractDir)
+    findSqliteFilename(readdirSync(sqliteDir))
     restoreSnapshotToEnvironment({
-      containerName: row.containerName,
-      sqliteVolume: row.sqliteVolume,
-      assetsVolume: row.assetsVolume,
-      sqliteDir: extractedSqliteDir(extractDir),
+      containerName: resolved.target.containerName,
+      sqliteVolume: resolved.target.sqliteVolume,
+      assetsVolume: resolved.target.assetsVolume,
+      sqliteDir,
       uploadsDir: extractedUploadsDir(extractDir),
       registeredNames: registered,
     })
+    if (inspectRegisteredContainer(resolved.target.containerName, registered) === 'running') {
+      const restarted = spawnSync('docker', ['restart', resolved.target.containerName], {
+        encoding: 'utf8',
+        windowsHide: true,
+      })
+      if (restarted.status !== 0) {
+        throw new FleetBackupError(
+          restarted.stderr?.trim() || restarted.stdout?.trim() || 'Restore container restart failed.',
+          500,
+        )
+      }
+    }
     const envFile = resolveComposeEnvFile({
-      envFileLocal: row.envFileLocal,
-      envFileExample: row.envFileExample,
-      root: composeRootForEnvironment(row),
+      envFileLocal: resolved.target.envFileLocal,
+      envFileExample: resolved.target.envFileExample,
+      root: composeRootForEnvironment(resolved.target),
     })
-    const up = composeArgs({
+    const up = restoreComposeArgs({
       envFile,
-      composeFile: row.composeFile,
-      composeProject: row.composeProject,
-      recreate: false,
+      composeFile: resolved.target.composeFile,
+      composeProject: resolved.target.composeProject,
     })
+    if (up.some(part => part === '-v' || part === '--volumes' || part === 'down' || part === 'prune')) {
+      throw new FleetBackupError('Refusing a forbidden Docker argument.', 500)
+    }
     const started = spawnSync('docker', up, {
-      cwd: composeRootForEnvironment(row),
+      cwd: composeRootForEnvironment(resolved.target),
       encoding: 'utf8',
       windowsHide: true,
     })
     if (started.status !== 0) {
       throw new FleetBackupError(started.stderr?.trim() || started.stdout?.trim() || 'Restore compose up failed.', 500)
     }
-    await waitUntilHealthy(row.healthUrl)
-    return { environmentId: row.id, zipPath: source }
+    await waitUntilHealthy(resolved.target.healthUrl)
+    return {
+      environmentId: resolved.target.id,
+      backupId: resolved.backup.id,
+      zipPath: resolved.zipPath,
+      kind: resolved.kind,
+      target: {
+        id: resolved.target.id,
+        containerName: resolved.target.containerName,
+        hostPort: resolved.target.hostPort,
+        composeProject: resolved.target.composeProject,
+        sqliteVolume: resolved.target.sqliteVolume,
+        assetsVolume: resolved.target.assetsVolume,
+      },
+    }
   } finally {
     rmSync(extractDir, { recursive: true, force: true })
   }

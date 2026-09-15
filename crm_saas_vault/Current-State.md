@@ -143,9 +143,9 @@ Start All / Stop All = eligible **registered fleet**, not the table filter. Elig
 
 Sales-led. `Customers → New customer` creates the **account only**. From the customer workspace Products tab, **Add product instance** and select Martial Arts or Sales. The Control Plane stores the instance immediately as **Provisioning**. Image build (`martial-arts-acquisition:s4` or `crm-sales:c2`) and compose run in the background from the product Dockerfile with **repo-root** context. Compose cwd is that product’s template directory. You can leave the page; Failed rows keep `provision_error` and Retry remounts the same volumes. Runbook: [[S4-Provision-Runbook]].
 
-### Backup / restore (official S6, Successful)
+### Backup / restore (official S6, Successful; C2 copy-down QA remediation)
 
-Lifecycle tab: same-host zip, gated restore, off-host copy to an existing folder, backup-gated local upgrade, Explorer reveal (`POST .../backup/reveal` with `{ backupId }`, path must stay under `data/backups/`). Retention 14 days. Runbook: [[S6-Fleet-Runbook]].
+Lifecycle tab: same-host zip, **selectable backup history**, gated restore, off-host copy to an existing folder, backup-gated local upgrade, Explorer reveal (`POST .../backup/reveal` with `{ backupId }`, path must stay under `data/backups/`). Restore requires `{ confirm, backupId }` — it does not silently use the latest zip. Server-side policy: same customer + same Product Instance; same-environment rollback; **PROD → DEV copy-down**; never DEV → PROD; never cross-product or cross-customer. Snapshot is SQLite + persistent uploads (including Sales proposal PDFs). Target identity/port/compose/secrets stay. Retention 14 days. Runbook: [[S6-Fleet-Runbook]].
 
 ### Docker / runtime
 
@@ -189,6 +189,7 @@ Link, do not re-litigate. Index: [[SaaS-Decisions]].
 | C2B Slice A Successful | [[SaaS-Decisions#2026-09-12 — Official C2B is Successful]] |
 | SI Sales B1 Successful | [[SaaS-Decisions#2026-09-12 — Official SI Sales B1 is Successful]] |
 | C2 code-shipped / awaiting owner QA | [[SaaS-Decisions#2026-09-14 — C2 Product Instances + Sales catalog code-shipped]] |
+| C2 restore selection / PROD→DEV copy-down | [[SaaS-Decisions#2026-09-15 — C2 selectable restore and PROD→DEV copy-down]] |
 | D1–D4 | [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]] |
 | Customer / environment unit | [[Customer-Environment]] |
 | Never `-v` / prune / Renzo volumes | [[Control-Plane]] |

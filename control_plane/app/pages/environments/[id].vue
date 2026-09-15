@@ -5,7 +5,9 @@ import {
   formatBackupCreatedNotice,
   formatBackupSize,
   formatOffhostCopyNotice,
+  formatRestoreBackupOption,
   type FleetBackupSummary,
+  type RestoreBackupCandidate,
 } from '~~/shared/utils/fleet-backup'
 import { ENVIRONMENT_TABS } from '~~/shared/utils/nav'
 import { isRetryableLifecycle } from '~~/shared/utils/provision'
@@ -29,6 +31,11 @@ const destinationDir = ref('')
 const confirmDecommission = ref(false)
 const actionError = ref('')
 const actionNotice = ref('')
+const restoreBackups = ref<RestoreBackupCandidate[]>([])
+const restoreTargetLabel = ref('')
+const sourceEnvironmentId = ref('')
+const selectedBackupId = ref('')
+const loadingBackups = ref(false)
 const environmentId = computed(() => String(route.params.id || ''))
 const env = computed(() => findById(environments.value, environmentId.value))
 const decommissioned = computed(() => env.value?.lifecycleStatus === 'decommissioned')
@@ -37,6 +44,79 @@ const provisioning = computed(() => env.value?.lifecycleStatus === 'provisioning
 const operatorStatus = computed(() => env.value ? operatorEnvironmentStatus(env.value) : 'unknown')
 const canStop = computed(() => Boolean(env.value && isStoppableEnvironment(env.value)))
 const canStart = computed(() => Boolean(env.value && isStartableEnvironment(env.value)))
+const restoreSources = computed(() => {
+  const seen = new Map<string, RestoreBackupCandidate['source']>()
+  for (const backup of restoreBackups.value) {
+    if (!seen.has(backup.source.environmentId)) {
+      seen.set(backup.source.environmentId, backup.source)
+    }
+  }
+  return [...seen.values()]
+})
+const backupsForSource = computed(() => restoreBackups.value.filter(backup => (
+  backup.source.environmentId === sourceEnvironmentId.value
+)))
+const selectedBackup = computed(() => (
+  restoreBackups.value.find(backup => backup.id === selectedBackupId.value) ?? null
+))
+const selectedSource = computed(() => (
+  restoreSources.value.find(source => source.environmentId === sourceEnvironmentId.value) ?? null
+))
+
+async function loadRestorableBackups() {
+  if (!env.value) {
+    restoreBackups.value = []
+    restoreTargetLabel.value = ''
+    return
+  }
+  loadingBackups.value = true
+  try {
+    const result = await $fetch<{
+      target: { displayName: string, type: string, productDisplayName: string, customerDisplayName: string }
+      backups: RestoreBackupCandidate[]
+    }>(`/api/environments/${env.value.id}/backups`)
+    restoreBackups.value = result.backups
+    restoreTargetLabel.value = `${result.target.customerDisplayName} · ${result.target.productDisplayName} · ${result.target.type}`
+    const previousBackup = selectedBackupId.value
+    if (previousBackup && !result.backups.some(backup => backup.id === previousBackup)) {
+      selectedBackupId.value = ''
+      confirmRestore.value = false
+      actionError.value = 'The selected backup is no longer available. Choose a backup again.'
+    }
+    if (!sourceEnvironmentId.value || !result.backups.some(backup => backup.source.environmentId === sourceEnvironmentId.value)) {
+      const prod = restoreSources.value.find(source => source.type === 'PROD')
+        || result.backups.find(backup => backup.source.type === 'PROD')?.source
+      sourceEnvironmentId.value = prod?.environmentId
+        || result.backups.find(backup => backup.source.environmentId === env.value?.id)?.source.environmentId
+        || result.backups[0]?.source.environmentId
+        || ''
+    }
+  } catch (error) {
+    restoreBackups.value = []
+    actionError.value = fetchMessage(error, 'Could not load backups.')
+  } finally {
+    loadingBackups.value = false
+  }
+}
+
+watch(environmentId, () => {
+  sourceEnvironmentId.value = ''
+  selectedBackupId.value = ''
+  confirmRestore.value = false
+})
+
+watch(() => env.value?.id, (id) => {
+  if (id) {
+    void loadRestorableBackups()
+  }
+}, { immediate: true })
+
+watch(sourceEnvironmentId, () => {
+  if (selectedBackupId.value && !backupsForSource.value.some(backup => backup.id === selectedBackupId.value)) {
+    selectedBackupId.value = ''
+    confirmRestore.value = false
+  }
+})
 
 useHead({
   title: computed(() => env.value
@@ -187,6 +267,7 @@ async function backupEnvironment() {
       method: 'POST',
     })
     await refreshStatus()
+    await loadRestorableBackups()
     const timezone = env.value.customer.timezone
     actionNotice.value = formatBackupCreatedNotice({
       zipPath: result.backup.zipPath,
@@ -243,20 +324,36 @@ async function copyOffhost() {
 }
 
 async function restoreEnvironment() {
-  if (!env.value || !confirmRestore.value) {
+  if (!env.value || !confirmRestore.value || !selectedBackupId.value) {
+    return
+  }
+  if (!selectedBackup.value?.available) {
+    actionError.value = 'The selected backup is no longer available. Choose a backup again.'
+    selectedBackupId.value = ''
+    confirmRestore.value = false
+    await loadRestorableBackups()
     return
   }
   restoring.value = true
   actionError.value = ''
   actionNotice.value = ''
   try {
-    await $fetch(`/api/environments/${env.value.id}/restore`, {
+    const result = await $fetch<{ kind: string, backupId: string }>(`/api/environments/${env.value.id}/restore`, {
       method: 'POST',
-      body: { confirm: true },
+      body: { confirm: true, backupId: selectedBackupId.value },
     })
     await refreshStatus()
+    await loadRestorableBackups()
+    confirmRestore.value = false
+    const kind = result.kind === 'copy-down' ? 'copy-down' : 'rollback'
+    actionNotice.value = `Restore finished (${kind}). This environment’s data was replaced. Identity stayed.`
   } catch (error) {
     actionError.value = fetchMessage(error, 'Restore failed.')
+    await loadRestorableBackups()
+    if (selectedBackupId.value && !restoreBackups.value.some(backup => backup.id === selectedBackupId.value)) {
+      selectedBackupId.value = ''
+      confirmRestore.value = false
+    }
   } finally {
     restoring.value = false
   }
@@ -445,7 +542,7 @@ async function decommission() {
         aria-labelledby="tab-lifecycle"
       >
         <p class="muted">
-          Backup and restore replace this environment’s data only. Siblings stay. Volumes are not deleted. Retry continues provision; upgrade is a separate gated action.
+          Backup and restore replace this environment’s data only. Choose a specific backup. Same-product PROD → DEV copy-down is allowed. DEV → PROD is not. Siblings stay. Volumes are not deleted. Retry continues provision; upgrade is a separate gated action.
         </p>
         <dl class="dl">
           <dt>Last backup</dt>
@@ -549,7 +646,60 @@ async function decommission() {
           @submit.prevent="restoreEnvironment"
         >
           <p>
-            Restore replaces this environment’s data from the latest zip. Siblings stay. It never runs compose down -v.
+            Restore replaces <strong>this</strong> environment’s data. Target identity, port, container, compose, and secrets stay. Siblings stay. It never runs compose down -v. Copy-down is PROD → DEV only, never DEV → PROD.
+          </p>
+          <dl class="dl">
+            <dt>Target</dt>
+            <dd>{{ restoreTargetLabel || (env ? `${env.customer.displayName} · ${env.productInstance?.displayName || ''} · ${env.type}` : '—') }}</dd>
+          </dl>
+          <label>
+            Source environment
+            <select
+              v-model="sourceEnvironmentId"
+              :disabled="loadingBackups || restoring || decommissioned || restoreSources.length === 0"
+            >
+              <option
+                v-if="restoreSources.length === 0"
+                value=""
+              >
+                {{ loadingBackups ? 'Loading backups…' : 'No restorable backups' }}
+              </option>
+              <option
+                v-for="source in restoreSources"
+                :key="source.environmentId"
+                :value="source.environmentId"
+              >
+                {{ source.productDisplayName }} {{ source.type }}
+              </option>
+            </select>
+          </label>
+          <label>
+            Backup
+            <select
+              v-model="selectedBackupId"
+              :disabled="loadingBackups || restoring || decommissioned || backupsForSource.length === 0"
+            >
+              <option value="">
+                {{ backupsForSource.length === 0 ? 'No backups for this source' : 'Select a backup' }}
+              </option>
+              <option
+                v-for="backup in backupsForSource"
+                :key="backup.id"
+                :value="backup.id"
+                :disabled="!backup.available"
+              >
+                {{ formatRestoreBackupOption(backup, env?.customer.timezone || 'UTC') }}{{ backup.available ? '' : ' (missing)' }}
+              </option>
+            </select>
+          </label>
+          <p
+            v-if="selectedBackup"
+            class="muted"
+          >
+            {{ selectedBackup.kind === 'copy-down' ? 'Copy-down' : 'Rollback' }} from
+            {{ selectedSource?.productDisplayName }} {{ selectedSource?.type }}
+            into {{ env?.productInstance?.displayName }} {{ env?.type }}.
+            This replaces the target environment’s SQLite and persistent uploads, including Sales proposal PDFs.
           </p>
           <label>
             <input
@@ -561,7 +711,7 @@ async function decommission() {
           <button
             type="submit"
             class="secondary"
-            :disabled="!confirmRestore || restoring || !env || decommissioned"
+            :disabled="!confirmRestore || restoring || !env || decommissioned || !selectedBackup?.available"
             :aria-busy="restoring"
           >
             {{ restoring ? 'Restoring…' : 'Restore' }}

@@ -23,6 +23,7 @@ import {
   FLEET_BACKUP_RETENTION_DAYS,
   prodUpgradeBlocked,
   resolveFleetBackupFileName,
+  restoreBackupPolicy,
 } from '../../shared/utils/fleet-backup'
 import { extractFleetBackupZip, extractedSqliteDir } from '../../server/services/fleet-backup-extract'
 import {
@@ -31,8 +32,11 @@ import {
   copyEnvironmentBackupOffhost,
   FleetBackupError,
   isPathInsideBackupRoot,
+  listRestorableBackups,
+  resolveRestoreRequest,
   revealBackupCommand,
   revealEnvironmentBackup,
+  restoreComposeArgs,
 } from '../../server/services/fleet-backup'
 import { readFleetBackupManifest, writeFleetBackupZip } from '../../server/services/fleet-backup-zip'
 
@@ -159,6 +163,37 @@ describe('S6 fleet backup contract', () => {
     } catch {
       // sqlite unlock can lag on Windows
     }
+  })
+
+  it('allows same-environment rollback and Martial Arts PROD → DEV copy-down, not DEV → PROD', () => {
+    const prod = {
+      customerId: 'lab',
+      productInstanceId: 'ma',
+      environmentId: 'prod',
+      type: 'PROD',
+    }
+    const dev = {
+      customerId: 'lab',
+      productInstanceId: 'ma',
+      environmentId: 'dev',
+      type: 'DEV',
+    }
+    expect(restoreBackupPolicy(prod, prod)).toMatchObject({ allowed: true, kind: 'rollback' })
+    expect(restoreBackupPolicy(dev, dev)).toMatchObject({ allowed: true, kind: 'rollback' })
+    expect(restoreBackupPolicy(prod, dev)).toMatchObject({ allowed: true, kind: 'copy-down' })
+    expect(restoreBackupPolicy(dev, prod)).toMatchObject({ allowed: false, kind: 'rejected' })
+    expect(restoreBackupPolicy(dev, prod).reason).toMatch(/PROD → DEV/)
+  })
+
+  it('restore compose remounts the app and never deletes volumes', () => {
+    const args = restoreComposeArgs({
+      envFile: '.env.lab-acme-dev',
+      composeFile: 'docker-compose.lab-acme-dev.yml',
+      composeProject: 'lab-acme-dev',
+    })
+    expect(args).toEqual(expect.arrayContaining(['up', '-d', '--no-deps', 'app']))
+    expect(args).not.toContain('--force-recreate')
+    expect(args.join(' ')).not.toMatch(/(^|\s)(-v|--volumes|down|prune)(\s|$)/)
   })
 
   it('refuses decommissioned environments and finds sqlite filenames', () => {
@@ -325,6 +360,54 @@ describe('S6 fleet backup contract', () => {
       )
     }
     expect(readFileSync(first.offhostPath!, 'utf8')).toBe('do-not-overwrite')
+    client.close()
+    try {
+      rmSync(root, { recursive: true, force: true })
+    } catch {
+      // sqlite unlock can lag on Windows
+    }
+  })
+
+  it('lists Martial Arts PROD backups as copy-down candidates for the sibling DEV', async () => {
+    const root = join(tmpdir(), `fleet-restore-ma-${randomUUID()}`)
+    mkdirSync(join(root, 'data', 'backups', 'lab-acme', 'lab-acme-prod'), { recursive: true })
+    const url = `file:${join(root, 'control-plane.sqlite').replaceAll('\\', '/')}`
+    await migrateDatabase(url)
+    await seedRegistry(url)
+    const { client, db } = createDb(url)
+    const rows = await listRegisteredEnvironments(db)
+    const dev = rows.find(row => row.slug === 'lab-acme-dev')
+    const prod = rows.find(row => row.slug === 'lab-acme-prod')
+    expect(dev && prod).toBeTruthy()
+    const zipPath = join(root, 'data', 'backups', 'lab-acme', 'lab-acme-prod', 'lab-acme_lab-acme-prod_2026-09-15_120000.zip')
+    writeFileSync(zipPath, 'zip')
+    const backupId = randomUUID()
+    await db.insert(environmentBackups).values({
+      id: backupId,
+      environmentId: prod!.id,
+      customerId: prod!.customer.id,
+      createdAt: '2026-09-15T18:00:00.000Z',
+      bytes: 12,
+      zipPath,
+      sqliteFilename: 'crm.sqlite',
+      offhostPath: null,
+      offhostCopiedAt: null,
+      previousExpectedImage: prod!.expectedImage,
+    })
+    const listed = await listRestorableBackups(db, dev!.id, root)
+    expect(listed.backups).toHaveLength(1)
+    expect(listed.backups[0]).toMatchObject({
+      id: backupId,
+      kind: 'copy-down',
+      source: { environmentId: prod!.id, type: 'PROD' },
+    })
+    const resolved = await resolveRestoreRequest(db, dev!.id, backupId, root)
+    expect(resolved.target.id).toBe(dev!.id)
+    expect(resolved.target.containerName).toBe(dev!.containerName)
+    await expect(resolveRestoreRequest(db, prod!.id, backupId, root)).resolves.toMatchObject({
+      kind: 'rollback',
+      target: { id: prod!.id },
+    })
     client.close()
     try {
       rmSync(root, { recursive: true, force: true })
