@@ -28,7 +28,7 @@ Implement platform work only when:
 
 If `project-state.yaml` has `authorization.active_work_order: null` and Scott did not ask in this chat: summarize understanding and **stop**.
 
-Do not start S7, C2, Core promotion, Beauty, D1 schema, VPS, or DNS/TLS because they are “next” on the roadmap. C2A/C2B Successful, B1 Successful, and B2 Successful do not authorize those.
+Do not start C3, Beauty, S7, Core promotion, VPS, or DNS/TLS because they are “next” on the roadmap. C2 Successful does not authorize those.
 
 ## Canonical set
 

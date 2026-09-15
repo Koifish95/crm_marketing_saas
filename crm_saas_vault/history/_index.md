@@ -2,7 +2,7 @@
 type: index
 status: historical
 area: process
-updated: 2026-09-13
+updated: 2026-09-15
 tags:
   - history
   - saas
@@ -31,10 +31,13 @@ Closeouts, superseded roadmaps, and dated snapshots live here so agents do not t
 - [[history/C2B_closeout]] — 2026-09-12 C2B Slice A Successful (owner-accepted; not Slice B; not C2)
 - [[history/B1_closeout]] — 2026-09-12 SI Sales B1 Successful (owner-accepted; not B2; not C2)
 - [[history/B2_closeout]] — 2026-09-13 SI Sales B2 Successful (owner-accepted; not C2)
+- [[history/C2_closeout]] — 2026-09-15 C2 Successful (owner-accepted)
+- [[history/C2_owner_qa]] — C2 owner-QA checklist (Scott’s recorded checks)
 - [[history/WO-2026-09-11-sales-thin-slice-return]] — C2A implementation return (evidence, not the live map)
 - [[history/WO-2026-09-11-si-sales-slice-a-return]] — C2B Slice A implementation return (evidence, not the live map)
 - [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]] — B1 implementation return (evidence, not the live map)
 - [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]] — B2 implementation return (evidence, not the live map)
+- [[history/WO-2026-09-14-c2-product-instance-sales-catalog-return]] — C2 implementation return (evidence, not the live map)
 - [[wip/WO-2026-09-11-sales-predev-audit-return]] — 2026-09-11 Sales pre-development architecture audit (still in `wip/` for ChatGPT handoff; not the live map)
 - [[history/Control_Plane_Bulk_Lifecycle_Return]]
 - [[history/Post_S4_Foundation_Decision_Closeout]] — why Map B became the official S-track

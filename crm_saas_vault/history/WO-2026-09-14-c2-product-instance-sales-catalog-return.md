@@ -21,15 +21,25 @@ durable_docs_updated:
 
 # C2 return — Product Instances + Sales catalog
 
-**Not the live map.** Live map: [[Current-State]]. Work order: [[wip/WO-2026-09-14-c2-product-instance-sales-catalog]]. Worksheet: [[wip/C2_Pre_Development_Audit_and_Decision_Worksheet]].
+**Not the live map.** Live map: [[Current-State]]. Successful closeout: [[history/C2_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog]]. Worksheet: [[wip/C2_Pre_Development_Audit_and_Decision_Worksheet]]. Owner QA: [[history/C2_owner_qa]].
 
-**C2 is not Successful.** This return is code-ship + automated verification. Scott must complete owner QA before C2 can be proposed as Successful.
+This file is implementation evidence. It retains the code-ship and QA-remediation narrative. C2 is **Successful** as of 2026-09-15 — see the closeout.
+
+---
+
+## Owner acceptance (2026-09-15)
+
+Scott completed owner QA on disposable **C2 QA Test** and explicitly accepted C2 as Successful on 2026-09-15. Checklist: [[history/C2_owner_qa]].
+
+Finished implementation includes the original feature commit **and** the two QA remediations (provisioning visibility / recoverable Sales; selectable restore / PROD→DEV copy-down). Do not treat `43454fa` as the entire finished C2.
+
+C2 is **Successful**. This file remains implementation evidence.
 
 ---
 
 ## Executive result
 
-**C2 CODE-SHIPPED — READY FOR OWNER QA**
+**C2 SHIPPED — OWNER-ACCEPTED 2026-09-15**
 
 Control Plane now implements minimal D1: Customer Account → Product Instance → Environments. Hybrid catalog in CP code recognizes Martial Arts and Sales. Sales is provisionable as `crm-sales:c2`. Creating an account does not choose a product.
 
@@ -134,7 +144,7 @@ CP: http://127.0.0.1:52100. Local Sales `pnpm dev` remains http://localhost:5040
 
 ## Owner QA remediation (2026-09-15)
 
-Two defects found during Scott’s owner QA on disposable account **C2 QA Test** (`c2-test`). C2 remains **not Successful**.
+Two defects found during Scott’s owner QA on disposable account **C2 QA Test** (`c2-test`). These were fixed before owner acceptance. C2 is now **Successful** (2026-09-15).
 
 ### Defect 1 — long-running provision looked dead
 
@@ -154,7 +164,7 @@ The recoverable Sales image build then failed for real Dockerfile/runtime reason
 
 **Fix:** image failures mark **only** the environments that need that image as `failed` with `provision_error`. Product Instance stays visible. Duplicate `(customer, product)` stays 409. Retry continues the same env ids/volumes (no `-v`). Sales Dockerfile: `pnpm exec esbuild`, LF entrypoint + `sed` strip CR, copy workspace `@libsql`.
 
-### Recovered proof on C2 QA Test (do not treat as Successful)
+### Recovered proof on C2 QA Test
 
 Remediation commit: `db7af34da661ea2b0a0a7aa2c284e5fe377b9e30`. Martial Arts PROD/DEV remained healthy (`martial-arts-acquisition:s4`, `:52206` / `:52207`). Sales recovered on the existing instance:
 
@@ -190,8 +200,8 @@ Live CP (`http://127.0.0.1:52100`) `GET .../backups` lists that zip as **rollbac
 
 Restore-selection remediation commit: `ded805c35a6c63f8b9648720c890f4e34f3b6efa`.
 
-Resume owner QA at **#37** on Control Plane Lifecycle for `C2 QA Test → Sales DEV`: select the Sales PROD backup above, confirm, restore into DEV.
+Scott later checked owner-QA items **#37–#39** on the disposable account. See [[history/C2_owner_qa]].
 
 ## Stop
 
-Do not start C3, Beauty, S7, S8, SI migration, or Core promotion. Leave this Work Order and return in `wip/` until Scott accepts C2.
+Work order and return are archived. Do not start C3, Beauty, S7, S8, SI migration, or Core promotion from this closeout.

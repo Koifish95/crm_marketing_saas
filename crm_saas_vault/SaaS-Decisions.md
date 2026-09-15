@@ -25,11 +25,29 @@ Decision: what we chose
 
 ---
 
+---
+
+## 2026-09-15 — Official C2 is Successful
+
+Status: accepted
+
+Context: C2 (Product Instances + Sales catalog) shipped on `working` (`43454fa`), then owner-QA remediations for provisioning visibility (`db7af34`) and selectable restore / PROD→DEV copy-down (`ded805c`). Scott completed owner QA on disposable **C2 QA Test** and explicitly accepted C2 as Successful on 2026-09-15. Closeout: [[history/C2_closeout]]. Implementation return: [[history/WO-2026-09-14-c2-product-instance-sales-catalog-return]]. Owner QA: [[history/C2_owner_qa]].
+
+Decision:
+
+- Official **C2 is Successful** (2026-09-15). C2 is closed.
+- Control Plane identity is **Customer Account → Product Instance → Environments**. One account may own Martial Arts and Sales instances, each with isolated PROD+DEV. Hybrid catalog: `martial-arts` → `martial-arts-acquisition:s4`; `sales` → `crm-sales:c2`. Beauty is not listed.
+- Add Product Instance is explicit, returns after registry insert, and provisions in the background. Failed envs keep `provision_error` and remain retryable on the same rows/volumes.
+- Restore is selectable by `backupId`. Allowed: same-environment rollback; same-customer / same-product **PROD → DEV** copy-down. Refused: DEV → PROD; cross-product; cross-customer. Copy-down is never silent.
+- C2 success does **not** authorize C3, Beauty, S7, S8, SI migration/cutover, Core promotion, Option C, billing, VPS, or DNS/TLS.
+
+Source: Scott 2026-09-15 (owner acceptance in the current Cursor chat)
+
 ## 2026-09-15 — C2 selectable restore and PROD→DEV copy-down
 
-Status: working decision
+Status: accepted (included in [[SaaS-Decisions#2026-09-15 — Official C2 is Successful]])
 
-Context: C2 owner QA found that Lifecycle restore used only the latest zip of the same environment, and the zip manifest rejected any other environment ID. That blocked the intended PROD → DEV copy-down on disposable **C2 QA Test**. This is a bounded C2 QA remediation, not a new milestone. C2 remains **not Successful**.
+Context: C2 owner QA found that Lifecycle restore used only the latest zip of the same environment, and the zip manifest rejected any other environment ID. That blocked the intended PROD → DEV copy-down on disposable **C2 QA Test**. This was a bounded C2 QA remediation, not a new milestone.
 
 Decision:
 
@@ -39,13 +57,13 @@ Decision:
 - Copy uses the existing S6 zip (SQLite + persistent uploads, including Sales proposal PDFs). Target identity, host port, container, compose, volumes, and secrets stay target-owned.
 - Policy is enforced server-side. UI filtering is not the security boundary. No generic bidirectional cloning, scheduled backups, or off-site redesign.
 
-Source: Scott 2026-09-15 (C2 owner-QA remediation in the current Cursor chat)
+Source: Scott 2026-09-15 (C2 owner-QA remediation, then included in C2 Successful)
 
 ## 2026-09-14 — C2 Product Instances + Sales catalog code-shipped
 
-Status: working decision
+Status: superseded by [[SaaS-Decisions#2026-09-15 — Official C2 is Successful]]
 
-Context: Work Order [[wip/WO-2026-09-14-c2-product-instance-sales-catalog]] authorized C2 from base `35c4aca`. Owner decisions C2-01 B through C2-06 A were already finalized. Implementation landed on `working`. C2 is **not Successful** until Scott completes owner QA.
+Context: Work Order [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog]] authorized C2 from base `35c4aca`. Owner decisions C2-01 B through C2-06 A were already finalized. Implementation landed on `working`. This entry recorded the code-ship before owner QA.
 
 Decision:
 
@@ -54,7 +72,6 @@ Decision:
 - Creating a customer does **not** choose a product. Operator flow: Create Account → Add Product Instance → Select Product. At most one instance per `(customer_id, product_id)` in C2.
 - One-PROD and upgrade “non-PROD first” are **per Product Instance**. New env names are `{customer}-{productId}-{type}`; backfilled names stay `{customer}-{type}`.
 - Sales proposal artifacts in provisioned envs live under the assets/uploads volume (`SALES_PROPOSALS_DIR=/app/data/uploads/proposals`).
-- C2 remains **awaiting owner QA**. Do not start C3, Beauty, S7, S8, SI migration, or Core promotion from this ship.
 
 Source: WO-2026-09-14-c2-product-instance-sales-catalog implementation (2026-09-14)
 

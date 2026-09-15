@@ -31,7 +31,7 @@ Long-term direction: an ultra-general marketing, lead-generation, and CRM platfo
 
 ---
 
-## Target hierarchy (accepted D1, not fully shipped)
+## Target hierarchy (accepted D1; minimal shipped in C2)
 
 ```text
 Customer Account / Organization
@@ -50,7 +50,7 @@ Hosting Node
 - PROD and DEV under one instance may **not** be different verticals.
 - Vertical switching is not a normal env config change.
 
-**Shipped today (C2 code-shipped, not Successful):** `customers` + `product_instances` + `environments`. One account may own Martial Arts and Sales instances. One PROD per **product instance**. `industry_template` is a migration leftover (`unassigned` on new accounts with no MA instance). See [[Customer-Environment]].
+**Shipped (C2 Successful, 2026-09-15):** `customers` + `product_instances` + `environments`. One account may own Martial Arts and Sales instances. One PROD per **product instance**. `industry_template` is a migration leftover (`unassigned` on new accounts with no MA instance). See [[Customer-Environment]].
 
 ---
 
@@ -60,7 +60,7 @@ Hosting Node
 CRM Core
    ↑
    ├── Martial Arts     (shipped; martial_arts_template, :5030)
-   ├── Sales / Software (C2A/C2B/B1/B2 Successful; C2 CP catalog + crm-sales:c2 code-shipped / owner QA in progress; sales_template, :5040)
+   ├── Sales / Software (C2A/C2B/B1/B2 Successful; C2 Successful — CP catalog + `crm-sales:c2`; sales_template, :5040)
    └── Beauty           (not started)
 ```
 
@@ -81,7 +81,7 @@ CRM Core
 
 **D2–D4 (accepted):** Martial Arts `leads` / `lead_lines` / trials, campaigns / acquisition events, and public capture (`/trial`, `/events/[slug]`, `/t/[slug]`) stay MA-owned until Sales provides a second implementation.
 
-C1 is **code-shipped** (`packages/crm-core`, workspace, import tests). C2A (thin local Sales consumer) is **Successful** at `sales_template/` / `sales-crm` on port 5040. C2B Slice A, SI Sales B1, and SI Sales B2 are **Successful**. C2 (minimal D1 Product Instances + hybrid CP catalog + Sales Docker `crm-sales:c2`) is **code-shipped / owner QA in progress** and is **not Successful**. Do not “establish Core” again.
+C1 is **code-shipped** (`packages/crm-core`, workspace, import tests). C2A (thin local Sales consumer) is **Successful** at `sales_template/` / `sales-crm` on port 5040. C2B Slice A, SI Sales B1, and SI Sales B2 are **Successful**. C2 (minimal D1 Product Instances + hybrid CP catalog + Sales Docker `crm-sales:c2`) is **Successful**. Do not “establish Core” again.
 
 C2+ extraction narrative (not authorization): [[history/CRM_Core_Extraction_Implementation_Plan]].
 

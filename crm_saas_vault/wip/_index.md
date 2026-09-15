@@ -2,7 +2,7 @@
 type: index
 status: current
 area: process
-updated: 2026-09-14
+updated: 2026-09-15
 tags:
   - wip
 ---
@@ -17,7 +17,7 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-None. `authorization.active_work_order` is null. C2 is **code-shipped / owner QA in progress** and is **not Successful**. Work order and return remain in `wip/` until owner acceptance: [[wip/WO-2026-09-14-c2-product-instance-sales-catalog]], [[wip/WO-2026-09-14-c2-product-instance-sales-catalog-return]]. Do not start C3, Beauty, S7, S8, SI migration, or Core promotion.
+None. `authorization.active_work_order` is null. C2 is **Successful**. Work order and return are archived: [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog]], [[history/WO-2026-09-14-c2-product-instance-sales-catalog-return]], [[history/C2_closeout]]. Do not start C3, Beauty, S7, S8, SI migration, or Core promotion.
 
 ## Current communication (not a work order)
 
@@ -36,6 +36,8 @@ C2B Slice A work order is archived after owner acceptance: [[wip/archive/WO-2026
 SI Sales B1 work order is archived after owner acceptance: [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]], [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]], [[history/B1_closeout]].
 
 SI Sales B2 work order is archived after owner acceptance: [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system]], [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]], [[history/B2_closeout]].
+
+C2 work order is archived after owner acceptance: [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog]], [[history/WO-2026-09-14-c2-product-instance-sales-catalog-return]], [[history/C2_closeout]].
 
 ## Do not put here
 

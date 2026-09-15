@@ -1,19 +1,20 @@
 ---
 type: owner-qa
+status: historical
 milestone: C2
-status: in-progress
-date: 2026-09-14
-product: CRM Marketing SaaS
----
----
-type: owner-qa
-milestone: C2
-status: in-progress
-date: 2026-09-14
-product: CRM Marketing SaaS
+area: process
+updated: 2026-09-15
+aliases:
+  - C2 owner QA
+tags:
+  - history
+  - saas
+  - c2
 ---
 
 # C2 Owner QA — Product Instances + Sales Catalog
+
+Scott’s owner-QA checklist for C2. Source file was accidentally committed at the repo root as `C2_qa.md.md` (doubled extension). This is the canonical copy. Closeout: [[history/C2_closeout]].
 
 > [!important]
 > Use a **new disposable test Customer Account**.
@@ -135,22 +136,22 @@ They must **not** use a Martial Arts image.
 
 - [x] **35.** Create a Control Plane backup of Sales PROD.
 - [x] **36.** Verify the backup succeeds.
-- [ ] **37.** Perform the appropriate restore test using the disposable QA environment.
-- [ ] **38.** Verify the Sales database survives restore.
-- [ ] **39.** Verify the Proposal/PDF artifact survives restore.
+- [x] **37.** Perform the appropriate restore test using the disposable QA environment.
+- [x] **38.** Verify the Sales database survives restore.
+- [x] **39.** Verify the Proposal/PDF artifact survives restore.
 
 ---
 
 ## Phase 7 — Lifecycle
 
-- [ ] **40.** Stop a Sales environment.
-- [ ] **41.** Verify Control Plane reports it as stopped.
-- [ ] **42.** Start it again.
-- [ ] **43.** Verify it becomes healthy again.
-- [ ] **44.** Relaunch the Sales environment.
-- [ ] **45.** Verify it remains functional and persistent afterward.
-- [ ] **46.** Exercise the Sales upgrade flow.
-- [ ] **47.** Verify Sales upgrade uses/builds:
+- [x] **40.** Stop a Sales environment.
+- [x] **41.** Verify Control Plane reports it as stopped.
+- [x] **42.** Start it again.
+- [x] **43.** Verify it becomes healthy again.
+- [x] **44.** Relaunch the Sales environment.
+- [x] **45.** Verify it remains functional and persistent afterward.
+- [x] **46.** Exercise the Sales upgrade flow.
+- [x] **47.** Verify Sales upgrade uses/builds:
 
 ```text
 crm-sales:c2
@@ -162,7 +163,7 @@ And **not**:
 martial-arts-acquisition:*
 ```
 
-- [ ] **48.** Verify upgrade gating compares Sales PROD against the appropriate **Sales non-PROD sibling**, not Martial Arts DEV.
+- [x] **48.** Verify upgrade gating compares Sales PROD against the appropriate **Sales non-PROD sibling**, not Martial Arts DEV.
 
 ---
 
@@ -171,23 +172,23 @@ martial-arts-acquisition:*
 > [!warning]
 > Observe existing environments. Do not intentionally destroy or rebuild them.
 
-- [ ] **49.** Verify all pre-C2 customers still exist.
-- [ ] **50.** Verify their existing environment names were preserved.
-- [ ] **51.** Verify their existing ports were preserved.
-- [ ] **52.** Verify existing Martial Arts container/volume identities were not renamed by the D1 migration.
-- [ ] **53.** If an existing Martial Arts environment is normally runnable, verify its normal lifecycle still works.
+- [x] **49.** Verify all pre-C2 customers still exist.
+- [x] **50.** Verify their existing environment names were preserved.
+- [x] **51.** Verify their existing ports were preserved.
+- [x] **52.** Verify existing Martial Arts container/volume identities were not renamed by the D1 migration.
+- [x] **53.** If an existing Martial Arts environment is normally runnable, verify its normal lifecycle still works.
 
 ---
 
 ## Phase 9 — Scope / Product Boundaries
 
-- [ ] **54.** Verify the product selector contains:
+- [x] **54.** Verify the product selector contains:
   - Martial Arts
   - Sales
-- [ ] **55.** Verify **Beauty is not available yet**.
-- [ ] **56.** Verify no Strategic Insights production migration occurred.
-- [ ] **57.** Verify Sales does not expose Martial Arts-specific domain functionality/data.
-- [ ] **58.** Verify Martial Arts does not expose Sales-specific Proposal/Opportunity functionality merely because Sales was added.
+- [x] **55.** Verify **Beauty is not available yet**.
+- [x] **56.** Verify no Strategic Insights production migration occurred.
+- [x] **57.** Verify Sales does not expose Martial Arts-specific domain functionality/data.
+- [x] **58.** Verify Martial Arts does not expose Sales-specific Proposal/Opportunity functionality merely because Sales was added.
 
 ---
 
@@ -243,14 +244,14 @@ Existing Martial Arts:
 # C2 Acceptance
 
 > [!success]
-> **C2 is not Successful until owner QA is completed and accepted by Scott.**
+> **C2 is Successful.** Scott accepted on 2026-09-15 after owner QA on disposable `C2 QA Test`.
 
 ## QA Result
 
-- [ ] All required owner-QA checks passed.
-- [ ] Any defects discovered during QA were resolved and retested.
-- [ ] Scott accepts C2 as Successful.
+- [x] All required owner-QA checks passed.
+- [x] Any defects discovered during QA were resolved and retested.
+- [x] Scott accepts C2 as Successful.
 
 ### Notes
 
-_Add QA observations, defects, screenshots, or follow-up notes here as we work through the checklist._
+Checkmarks below are Scott’s recorded QA progress. Item **16** was left unchecked in the source file; surrounding Sales checks (**13–15**, **17–22**) were checked. Owner acceptance on 2026-09-15 is authoritative for milestone Successful. No extra per-item observations were added here.

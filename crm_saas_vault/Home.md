@@ -2,7 +2,7 @@
 type: index
 status: current
 area: overview
-updated: 2026-09-13
+updated: 2026-09-15
 aliases:
   - Start
   - Index
@@ -39,7 +39,7 @@ crm_marketing_saas
         |
         +-- Generic platform
         +-- Martial Arts template
-        +-- Sales template (C2A + C2B Slice A + B1 + B2 Successful; local only)
+        +-- Sales template (C2A + C2B Slice A + B1 + B2 Successful; C2 Successful — CP catalog + crm-sales:c2)
         +-- future industry templates (Beauty later)
         +-- Customer instances: Strategic Insights (pilot), sister's business (pilot), then others
 ```
@@ -83,7 +83,7 @@ Renzo notes at the vault root (`Overview`, `Implementation-State`, `Milestones`,
 
 ## Where development stands
 
-Official S-track S0–S6 **Successful**. C1 **code-shipped**. C2A **Successful**. Official S7, C2, Beauty, D1 schema, DNS/TLS: **not started**. **No active work order.** Await Scott.
+Official S-track S0–S6 **Successful**. C1 **code-shipped**. C2A–B2 **Successful**. **C2 Successful** (2026-09-15). Official S7, C3, Beauty, DNS/TLS: **not started**. **No active work order.** Await Scott.
 
 Details: [[Current-State]]. Lockfile: [[project-state.yaml]].
 

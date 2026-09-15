@@ -83,12 +83,12 @@ Not S-track. Do not call C2 “S7.” Do not call historical hostname work “S5
 | C2B | SI Sales Refinement Slice A (Lead, convert, Opportunity workflow) | **Successful** (2026-09-12). Not Slice B. Not C2. Evidence: [[history/C2B_closeout]] |
 | SI Sales B1 | Commercial model + acquisition foundation | **Successful** (2026-09-12). Not B2. Not C2. Evidence: [[history/B1_closeout]] |
 | SI Sales B2 | Proposal / document system | **Successful** (2026-09-13). Feature `84c0cc8`. Not C2. Evidence: [[history/B2_closeout]] |
-| C2 | Sales vertical as second Core consumer + CP product catalog | **Code-shipped / owner QA in progress** (2026-09-14; QA remediations 2026-09-15). Not Successful. Return: [[wip/WO-2026-09-14-c2-product-instance-sales-catalog-return]]. |
+| C2 | Sales vertical as second Core consumer + CP product catalog | **Successful** (2026-09-15). Evidence: [[history/C2_closeout]]. |
 | C3 | Beauty vertical after Sales proves Core | Not started |
-| D1 | Account vs Product Instance CP schema | **Accepted**, schema **not shipped** |
+| D1 | Account vs Product Instance CP schema | **Accepted**, schema **minimal shipped** in C2 |
 | D2–D4 | Keep MA leads / campaigns / public capture vertical-owned | **Accepted** (wait) |
 
-C1 is not Map B Successful. C2A is **Successful** (not C2). C2B Slice A is **Successful** (not Slice B, not C2). SI Sales B1 is **Successful** (not B2, not C2). SI Sales B2 is **Successful** (not C2). C2 is **code-shipped / owner QA in progress** and is **not Successful**. Plan narrative (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]].
+C1 is not Map B Successful. C2A is **Successful** (not C2). C2B Slice A is **Successful** (not Slice B, not C2). SI Sales B1 is **Successful** (not B2, not C2). SI Sales B2 is **Successful** (not C2). C2 is **Successful**. Plan narrative (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]].
 
 ---
 
@@ -268,9 +268,9 @@ Sales-owned Proposal chain per Opportunity, sequential immutable revisions, Issu
 
 ## C2 — Sales as second Core consumer
 
-Status: **Code-shipped / owner QA in progress** (2026-09-14; QA remediations 2026-09-15). **Not Successful.** Owner QA must prove one disposable account owns Martial Arts and Sales, each with PROD+DEV, including selectable PROD → DEV copy-down. Do not mark Successful from this implementation pass.
+Status: **Successful** (2026-09-15). Owner-accepted after disposable **C2 QA Test** owner QA and two QA remediations (provisioning visibility; selectable restore / PROD→DEV copy-down). Not S-track. C2 success does **not** authorize C3, Beauty, S7, S8, SI migration, or Core promotion.
 
-Minimal D1 `product_instances`, hybrid CP catalog (`martial-arts`, `sales`), Sales image `crm-sales:c2`, explicit product pick after account create. Work order: [[wip/WO-2026-09-14-c2-product-instance-sales-catalog]]. Return: [[wip/WO-2026-09-14-c2-product-instance-sales-catalog-return]]. Architecture law: [[ADR-CRM-Core-Vertical-Architecture]]. C2A, C2B, B1, and B2 do not replace C2.
+Minimal D1 `product_instances`, hybrid CP catalog (`martial-arts`, `sales`), Sales image `crm-sales:c2`, explicit product pick after account create, product-scoped one-PROD and lifecycle, selectable backup restore with PROD→DEV copy-down only. Feature `43454fa`; provisioning remediation `db7af34`; restore remediation `ded805c`. Evidence: [[history/C2_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog]]. Implementation return: [[history/WO-2026-09-14-c2-product-instance-sales-catalog-return]]. Owner QA: [[history/C2_owner_qa]]. Architecture law: [[ADR-CRM-Core-Vertical-Architecture]]. C2A, C2B, B1, and B2 do not replace C2.
 
 ## C3 — Beauty vertical
 

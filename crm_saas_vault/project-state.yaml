@@ -27,8 +27,8 @@ tracks:
     authorized: null
   c:
     last_shipped: C2
-    last_successful: C2B
-    next: C2
+    last_successful: C2
+    next: C3
     authorized: null
   d:
     accepted: [D1, D2, D3, D4]
@@ -80,7 +80,8 @@ notes:
   c2_not_authorized_by_c2b: true
   c2_not_authorized_by_b1: true
   c2_not_authorized_by_b2: true
-  c2: code_shipped_awaiting_owner_qa
-  c2_successful: false
-  c2_restore_copy_down: shipped_awaiting_owner_qa
+  c2: successful
+  c2_successful: true
+  c2_owner_accepted: 2026-09-15
+  c2_restore_copy_down: successful
   d1_schema: minimal_product_instances

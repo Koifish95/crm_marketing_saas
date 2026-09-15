@@ -34,6 +34,8 @@ data/uploads/
 data/backups/
 
 # Obsidian local UI state (vault notes stay tracked)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
 crm_saas_vault/.obsidian/workspace.json
 crm_saas_vault/.obsidian/workspace-mobile.json
 crm_saas_vault/.obsidian/cache

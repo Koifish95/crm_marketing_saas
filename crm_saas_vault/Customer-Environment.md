@@ -17,7 +17,7 @@ S1 **Successful**. Conceptual unit the control plane will list, health-check, an
 
 Decisions: [[SaaS-Decisions#2026-09-08 — S1 customer environment unit]]. D1 hierarchy: [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]]. Milestones: [[SaaS-Milestones]].
 
-**Target architecture (accepted D1)** vs **current repository fact** are labeled below. Minimal D1 is **code-shipped** in C2 and is **not** Successful until owner QA.
+**Target architecture (accepted D1)** vs **current repository fact** are labeled below. Minimal D1 shipped in C2 and is **Successful** (2026-09-15).
 
 ## Target hierarchy (accepted D1)
 
@@ -47,7 +47,7 @@ A Hosting Node is **not** a child of an Environment. An Environment is **placed 
 
 ## Current repository fact
 
-C2 code-shipped (not Successful): Control Plane has `customers` + `product_instances` + `environments`. Environments keep `customer_id` and require `product_instance_id`. Existing rows backfill as one Martial Arts instance; env identities are unchanged. New accounts start with zero environments (`industry_template` = `unassigned`). Operator adds a product instance with an explicit Martial Arts or Sales pick; that creates PROD+DEV for that instance. One PROD per **instance**. At most one instance per `(customer_id, product_id)` in this slice. Beauty is not a catalog product. `industry_template` is a migration leftover, not product truth.
+C2 **Successful** (2026-09-15): Control Plane has `customers` + `product_instances` + `environments`. Environments keep `customer_id` and require `product_instance_id`. Existing rows backfill as one Martial Arts instance; env identities are unchanged. New accounts start with zero environments (`industry_template` = `unassigned`). Operator adds a product instance with an explicit Martial Arts or Sales pick; that creates PROD+DEV for that instance. One PROD per **instance**. At most one instance per `(customer_id, product_id)` in this slice. Beauty is not a catalog product. `industry_template` is a migration leftover, not product truth.
 
 New env names: `{customer}-{productId}-{type}` (and extras `{customer}-{productId}-{label}`). Backfilled names stay `{customer}-{type}` (example: `lab-acme-prod`, `strategic-insights-prod`).
 
@@ -207,6 +207,6 @@ Domains, TLS, Compose project layout, image registry, node communication mechani
 
 ## Next
 
-[[SaaS-Milestones]] **S2–S6** are Successful. Boot steps: [[S2-Hand-Boot-Checklist]]. Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]]. Lifecycle: [[S6-Fleet-Runbook]]. C1 is code-shipped. C2A is Successful. C2B Slice A is Successful. D1 account/instance split is **not** implemented. Do not start C2 or Slice B unless Scott asks.
+[[SaaS-Milestones]] **S2–S6** are Successful. Boot steps: [[S2-Hand-Boot-Checklist]]. Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]]. Lifecycle: [[S6-Fleet-Runbook]]. C1 is code-shipped. C2A–B2 and **C2** are Successful. Minimal D1 (`product_instances`) shipped in C2. Do not start C3, Beauty, S7, or SI migration unless Scott asks.
 
 Real Renzo is not a Customer in this model. Strategic Insights Consulting, LLC is laptop-provisioned (S4 proof, not a public hostname). Scott’s sister’s business is not provisioned. The S2 lab `lab-acme` is a proof environment, not a paying customer.
