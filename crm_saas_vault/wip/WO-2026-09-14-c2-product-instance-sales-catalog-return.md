@@ -188,6 +188,8 @@ Registered backup id `5db4cda5-5eea-4178-8381-b1bbec6904c3`. Zip contents: `sqli
 
 Live CP (`http://127.0.0.1:52100`) `GET .../backups` lists that zip as **rollback** on Sales PROD and **copy-down** on Sales DEV. Direct restore POSTs without confirm, cross-product (Sales PROD zip → Martial Arts DEV), and cross-customer were refused 400/409. No customer data was replaced.
 
+Restore-selection remediation commit: `ded805c35a6c63f8b9648720c890f4e34f3b6efa`.
+
 Resume owner QA at **#37** on Control Plane Lifecycle for `C2 QA Test → Sales DEV`: select the Sales PROD backup above, confirm, restore into DEV.
 
 ## Stop
