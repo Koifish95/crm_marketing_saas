@@ -69,6 +69,7 @@ Existing Martial Arts rows backfill as one Martial Arts instance **without** ren
 | `db7af34da661ea2b0a0a7aa2c284e5fe377b9e30` | QA remediation: provisioning visibility + recoverable failed Sales + Sales Docker |
 | `ded805c35a6c63f8b9648720c890f4e34f3b6efa` | QA remediation: selectable restore + PROD→DEV copy-down |
 | `6e82c15b811289a5236898e427fc8a166aa4998e` | Record restore-selection SHA |
+| `68b4199e7a17624a28f564be64d19180965c6e1f` | Successful closeout (docs/state only) |
 
 SHA-record commits `b75044e` and `fc1f556` document the feature and provisioning remediations. Do not treat `43454fa` as the entire finished C2 implementation.
 
