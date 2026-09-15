@@ -20,11 +20,35 @@ describe('S4 provisioned env and compose', () => {
     })
     expect(env).toMatch(/NUXT_AUTH_PASSWORD="setup"/)
     expect(env).toMatch(/NUXT_AUTH_MUST_CHANGE_PASSWORD="true"/)
-    expect(env).toMatch(/NUXT_PUBLIC_BRAND_NAME="Strategic Insights Consulting, LLC"/)
+    expect(env).toMatch(/NUXT_PUBLIC_APP_NAME="Strategic Insights Consulting, LLC Acquisition"/)
     expect(env).toMatch(/SQLITE_VOLUME="strategic-insights-prod-sqlite"/)
     expect(env).not.toMatch(/renzo/i)
     expect(env).not.toMatch(/webhosting/i)
     expect(env).not.toMatch(/m10a/)
+  })
+
+  it('uses a plain app name and Sales proposal dir for the Sales product', () => {
+    const env = renderProvisionedEnv({
+      composeProject: 'c2-proof-sales-prod',
+      containerName: 'c2-proof-sales-prod-app',
+      hostPort: 52220,
+      sqliteVolume: 'c2-proof-sales-prod-sqlite',
+      assetsVolume: 'c2-proof-sales-prod-assets',
+      expectedImage: 'crm-sales:c2',
+      type: 'PROD',
+      displayName: 'C2 Proof',
+      adminEmail: 'admin@c2-proof.local',
+      timezone: 'America/Denver',
+      sessionPassword: 'test-session-password-32-characters',
+      product: {
+        appNameTemplate: 'plain',
+        extraEnv: { SALES_PROPOSALS_DIR: '/app/data/uploads/proposals' },
+      },
+    })
+    expect(env).toMatch(/NUXT_PUBLIC_APP_NAME="C2 Proof"/)
+    expect(env).not.toMatch(/Acquisition/)
+    expect(env).toMatch(/SALES_PROPOSALS_DIR="\/app\/data\/uploads\/proposals"/)
+    expect(env).toMatch(/EXPECTED_IMAGE="crm-sales:c2"/)
   })
 
   it('keeps the generic compose file parameterized and free of Renzo names', () => {

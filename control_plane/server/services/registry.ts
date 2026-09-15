@@ -1,6 +1,14 @@
 import { eq } from 'drizzle-orm'
 import type { Database } from '../database'
-import { customers, environments, hostingNodes } from '../database/schema'
+import { customers, environments, hostingNodes, productInstances } from '../database/schema'
+
+export async function listCustomers(db: Database) {
+  return db.select().from(customers)
+}
+
+export async function listProductInstances(db: Database) {
+  return db.select().from(productInstances)
+}
 
 export async function getRegisteredEnvironment(db: Database, id: string) {
   const rows = await listRegisteredEnvironments(db)
@@ -12,10 +20,12 @@ export async function listRegisteredEnvironments(db: Database) {
     environment: environments,
     customer: customers,
     node: hostingNodes,
+    productInstance: productInstances,
   })
     .from(environments)
     .innerJoin(customers, eq(environments.customerId, customers.id))
     .innerJoin(hostingNodes, eq(environments.hostingNodeId, hostingNodes.id))
+    .innerJoin(productInstances, eq(environments.productInstanceId, productInstances.id))
 
   return rows.map(row => ({
     id: row.environment.id,
@@ -42,6 +52,12 @@ export async function listRegisteredEnvironments(db: Database) {
       timezone: row.customer.timezone,
       adminEmail: row.customer.adminEmail,
     },
+    productInstance: {
+      id: row.productInstance.id,
+      productId: row.productInstance.productId,
+      displayName: row.productInstance.displayName,
+      slug: row.productInstance.slug,
+    },
     node: {
       id: row.node.id,
       name: row.node.name,
@@ -55,7 +71,9 @@ export function environmentHeadline(input: {
   customerDisplayName: string
   type: string
   status?: string
+  productDisplayName?: string
 }) {
+  const product = input.productDisplayName ? ` · ${input.productDisplayName}` : ''
   const status = input.status ? ` · ${input.status}` : ''
-  return `${input.customerDisplayName} · ${input.type}${status}`
+  return `${input.customerDisplayName}${product} · ${input.type}${status}`
 }

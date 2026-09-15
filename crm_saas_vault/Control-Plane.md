@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-11
+updated: 2026-09-14
 aliases:
   - Platform control
   - Control module
@@ -13,7 +13,7 @@ tags:
 
 # Control plane
 
-S3 and S4 **Successful**. Operator app: `control_plane/` at http://127.0.0.1:52100 — multi-page shell (Dashboard, Customers, Environments, Hosting Nodes, Settings). Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]] (`Customers → New customer`). Current state: [[Current-State]]. Historical frontend status: [[wip/archive/S5_Control_Plane_Productization_Status]]. Historical audit: [[wip/archive/Control_Plane_Post_Productization_Audit]]. Handoffs: [[history/S3_closeout]], [[history/S4_closeout]].
+S3 and S4 **Successful**. Operator app: `control_plane/` at http://127.0.0.1:52100 — multi-page shell (Dashboard, Customers, Environments, Hosting Nodes, Settings). Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]] (`Customers → New customer` then **Add product instance**). Current state: [[Current-State]]. Historical frontend status: [[wip/archive/S5_Control_Plane_Productization_Status]]. Historical audit: [[wip/archive/Control_Plane_Post_Productization_Audit]]. Handoffs: [[history/S3_closeout]], [[history/S4_closeout]].
 
 It is not another customer admin page and not the platform owner's CRM.
 
@@ -43,14 +43,14 @@ which customers exist
 → which environment(s) they have
 → up / down  (container running AND /api/health)
 → relaunch without destroying data
-→ provision a Martial Arts PROD+DEV pair (S4)
+→ provision a Product Instance PROD+DEV pair (Martial Arts or Sales)
 ```
 
-Headlines still read “Acme BJJ · PROD · healthy,” not a container id. Indexes are tables. Workspaces can Refresh, Relaunch, add extra non-PROD, gated-decommission (volumes stay), and use the **Lifecycle** tab (backup, restore, off-host copy, upgrade — S6 Successful). Configuration fields stay read-only. Start / Stop / bulk start-stop are implemented on `/environments` (not Relaunch). Current state: [[Current-State]].
+Headlines still read “Acme BJJ · Martial Arts · PROD · healthy,” not a container id. Indexes are tables. Workspaces can Refresh, Retry, add a product instance, add extra non-PROD on an instance, gated-decommission (volumes stay), and use the **Lifecycle** tab (backup, restore, off-host copy, upgrade — S6 Successful). Configuration fields stay read-only. Start / Stop / bulk start-stop are implemented on `/environments` (not Relaunch). Current state: [[Current-State]].
 
-Laptop-only. Local Docker. Health on demand. Acme is seeded; new customers are provisioned. No Docker socket in CRM containers.
+Laptop-only. Local Docker. Health on demand. Acme is seeded as a Martial Arts instance; new customers are accounts until the operator adds a product. No Docker socket in CRM containers.
 
-Today’s customer row is the commercial account **and** the only product instance. Multi-instance accounts (D1: Smith Holdings → Sales instance + Beauty instance) are **accepted target architecture**, not shipped. See [[Customer-Environment]] and [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]].
+C2 code-shipped (not Successful): one account may own Martial Arts and Sales instances. One PROD per instance. Upgrade gating is instance-scoped. See [[Customer-Environment]] and [[SaaS-Decisions#2026-09-14 — C2 Product Instances + Sales catalog code-shipped]].
 
 ## What it is not
 

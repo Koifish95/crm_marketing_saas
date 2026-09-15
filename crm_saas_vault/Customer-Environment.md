@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-12
+updated: 2026-09-14
 aliases:
   - Environment unit
   - Customer Environment
@@ -17,7 +17,7 @@ S1 **Successful**. Conceptual unit the control plane will list, health-check, an
 
 Decisions: [[SaaS-Decisions#2026-09-08 — S1 customer environment unit]]. D1 hierarchy: [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]]. Milestones: [[SaaS-Milestones]].
 
-**Target architecture (accepted, not implemented)** vs **current repository fact** are labeled below. Do not treat the target hierarchy as already in `control_plane/` schema.
+**Target architecture (accepted D1)** vs **current repository fact** are labeled below. Minimal D1 is **code-shipped** in C2 and is **not** Successful until owner QA.
 
 ## Target hierarchy (accepted D1)
 
@@ -47,15 +47,9 @@ A Hosting Node is **not** a child of an Environment. An Environment is **placed 
 
 ## Current repository fact
 
-The control plane still has `customers` + `environments` only. Today’s customer row is the commercial account **and** the only product instance. `industry_template` is stored on `customers` and always written `martial-arts`. Provision creates one PROD + one DEV under that row. Exactly one PROD per customer row is the **implemented** invariant. The split above is not shipped.
+C2 code-shipped (not Successful): Control Plane has `customers` + `product_instances` + `environments`. Environments keep `customer_id` and require `product_instance_id`. Existing rows backfill as one Martial Arts instance; env identities are unchanged. New accounts start with zero environments (`industry_template` = `unassigned`). Operator adds a product instance with an explicit Martial Arts or Sales pick; that creates PROD+DEV for that instance. One PROD per **instance**. At most one instance per `(customer_id, product_id)` in this slice. Beauty is not a catalog product. `industry_template` is a migration leftover, not product truth.
 
-What will eventually need to change (documentation of future work, not a license to implement now):
-
-- Introduce a Product Instance between account and environments (or equivalent rows).
-- Move vertical / industry identity onto the instance.
-- Enforce one PROD per **instance**, not per commercial account.
-- Provision and the operator UI create an instance, then its env pair.
-- Existing rows backfill as one Martial Arts instance under each current customer.
+New env names: `{customer}-{productId}-{type}` (and extras `{customer}-{productId}-{label}`). Backfilled names stay `{customer}-{type}` (example: `lab-acme-prod`, `strategic-insights-prod`).
 
 ## Customer Account
 

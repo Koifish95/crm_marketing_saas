@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs'
 import { isAbsolute, join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { LAB_ENVIRONMENTS } from '../database/lab-seed'
+import { isProductId, requireProduct } from '../products/catalog'
 import { PROVISIONED_COMPOSE_FILE } from './provision-contract'
 
 const FORBIDDEN = ['-v', '--volumes', 'prune', 'down']
@@ -9,12 +10,41 @@ const LAB_COMPOSE = LAB_ENVIRONMENTS.map(row => row.composeFile)
 const LAB_SLUGS = LAB_ENVIRONMENTS.map(row => row.slug)
 const SAFE_NAME = /^[a-z0-9][a-z0-9-]{2,62}$/
 
-export function templateRoot() {
-  return process.env.TEMPLATE_ROOT?.trim() || join(process.cwd(), '..', 'martial_arts_template')
+export function repoRoot() {
+  const fromEnv = process.env.REPO_ROOT?.trim()
+  if (fromEnv) {
+    return fromEnv
+  }
+  const template = process.env.TEMPLATE_ROOT?.trim()
+  if (template) {
+    return join(template, '..')
+  }
+  return join(process.cwd(), '..')
 }
 
-export function repoRoot() {
-  return join(templateRoot(), '..')
+export function templateRoot() {
+  return process.env.TEMPLATE_ROOT?.trim() || join(repoRoot(), 'martial_arts_template')
+}
+
+export function productTemplateRoot(productId: string) {
+  return join(repoRoot(), requireProduct(productId).templateDir)
+}
+
+export function composeRootForEnvironment(input: {
+  composeFile: string
+  productInstance?: { productId: string }
+  root?: string
+}) {
+  if (input.root) {
+    return input.root
+  }
+  if (LAB_COMPOSE.includes(input.composeFile as typeof LAB_COMPOSE[number])) {
+    return templateRoot()
+  }
+  if (input.productInstance && isProductId(input.productInstance.productId)) {
+    return productTemplateRoot(input.productInstance.productId)
+  }
+  return templateRoot()
 }
 
 export function assertSafeRelaunch(input: {
@@ -61,6 +91,28 @@ export function resolveComposeEnvFile(input: {
   return existsSync(join(root, input.envFileExample))
     ? join(root, input.envFileExample)
     : input.envFileExample
+}
+
+type ComposeTarget = {
+  slug: string
+  composeFile: string
+  envFileLocal: string
+  envFileExample: string
+  composeProject?: string
+  root?: string
+  filesRoot?: string
+  productInstance?: { productId: string }
+}
+
+function composeCwdAndEnv(input: ComposeTarget) {
+  const root = composeRootForEnvironment(input)
+  const envFile = resolveComposeEnvFile({
+    envFileLocal: input.envFileLocal,
+    envFileExample: input.envFileExample,
+    root,
+    filesRoot: input.filesRoot,
+  })
+  return { root, envFile }
 }
 
 export function composeDecommissionArgs(input: {
@@ -132,23 +184,9 @@ export function composeArgs(input: {
   return args
 }
 
-export function relaunchCommand(input: {
-  slug: string
-  composeFile: string
-  envFileLocal: string
-  envFileExample: string
-  composeProject?: string
-  root?: string
-  filesRoot?: string
-}) {
+export function relaunchCommand(input: ComposeTarget) {
   assertSafeRelaunch(input)
-  const root = input.root ?? templateRoot()
-  const envFile = resolveComposeEnvFile({
-    envFileLocal: input.envFileLocal,
-    envFileExample: input.envFileExample,
-    root,
-    filesRoot: input.filesRoot,
-  })
+  const { root, envFile } = composeCwdAndEnv(input)
   return {
     cwd: root,
     args: composeArgs({
@@ -160,23 +198,9 @@ export function relaunchCommand(input: {
   }
 }
 
-export function stopCommand(input: {
-  slug: string
-  composeFile: string
-  envFileLocal: string
-  envFileExample: string
-  composeProject?: string
-  root?: string
-  filesRoot?: string
-}) {
+export function stopCommand(input: ComposeTarget) {
   assertSafeRelaunch(input)
-  const root = input.root ?? templateRoot()
-  const envFile = resolveComposeEnvFile({
-    envFileLocal: input.envFileLocal,
-    envFileExample: input.envFileExample,
-    root,
-    filesRoot: input.filesRoot,
-  })
+  const { root, envFile } = composeCwdAndEnv(input)
   return {
     cwd: root,
     args: composeStopArgs({
@@ -187,23 +211,9 @@ export function stopCommand(input: {
   }
 }
 
-export function startCommand(input: {
-  slug: string
-  composeFile: string
-  envFileLocal: string
-  envFileExample: string
-  composeProject?: string
-  root?: string
-  filesRoot?: string
-}) {
+export function startCommand(input: ComposeTarget) {
   assertSafeRelaunch(input)
-  const root = input.root ?? templateRoot()
-  const envFile = resolveComposeEnvFile({
-    envFileLocal: input.envFileLocal,
-    envFileExample: input.envFileExample,
-    root,
-    filesRoot: input.filesRoot,
-  })
+  const { root, envFile } = composeCwdAndEnv(input)
   return {
     cwd: root,
     args: composeStartArgs({
@@ -214,23 +224,9 @@ export function startCommand(input: {
   }
 }
 
-export function decommissionCommand(input: {
-  slug: string
-  composeFile: string
-  envFileLocal: string
-  envFileExample: string
-  composeProject?: string
-  root?: string
-  filesRoot?: string
-}) {
+export function decommissionCommand(input: ComposeTarget) {
   assertSafeRelaunch(input)
-  const root = input.root ?? templateRoot()
-  const envFile = resolveComposeEnvFile({
-    envFileLocal: input.envFileLocal,
-    envFileExample: input.envFileExample,
-    root,
-    filesRoot: input.filesRoot,
-  })
+  const { root, envFile } = composeCwdAndEnv(input)
   return {
     cwd: root,
     args: composeDecommissionArgs({
@@ -241,14 +237,7 @@ export function decommissionCommand(input: {
   }
 }
 
-export function decommissionRegisteredEnvironment(input: {
-  slug: string
-  composeFile: string
-  envFileLocal: string
-  envFileExample: string
-  composeProject?: string
-  filesRoot?: string
-}) {
+export function decommissionRegisteredEnvironment(input: ComposeTarget) {
   const command = decommissionCommand(input)
   const result = spawnSync('docker', command.args, {
     cwd: command.cwd,
@@ -268,13 +257,7 @@ export function decommissionRegisteredEnvironment(input: {
   }
 }
 
-export function stopRegisteredEnvironment(input: {
-  slug: string
-  composeFile: string
-  envFileLocal: string
-  envFileExample: string
-  composeProject?: string
-}) {
+export function stopRegisteredEnvironment(input: ComposeTarget) {
   const command = stopCommand(input)
   const result = spawnSync('docker', command.args, {
     cwd: command.cwd,
@@ -291,13 +274,7 @@ export function stopRegisteredEnvironment(input: {
   }
 }
 
-export function startRegisteredEnvironment(input: {
-  slug: string
-  composeFile: string
-  envFileLocal: string
-  envFileExample: string
-  composeProject?: string
-}) {
+export function startRegisteredEnvironment(input: ComposeTarget) {
   const command = startCommand(input)
   const result = spawnSync('docker', command.args, {
     cwd: command.cwd,
@@ -314,13 +291,7 @@ export function startRegisteredEnvironment(input: {
   }
 }
 
-export function relaunchRegisteredEnvironment(input: {
-  slug: string
-  composeFile: string
-  envFileLocal: string
-  envFileExample: string
-  composeProject?: string
-}) {
+export function relaunchRegisteredEnvironment(input: ComposeTarget) {
   const command = relaunchCommand(input)
   const result = spawnSync('docker', command.args, {
     cwd: command.cwd,

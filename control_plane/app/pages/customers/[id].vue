@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { findById } from '~~/shared/utils/fleet'
 import { CUSTOMER_TABS } from '~~/shared/utils/nav'
-import { DEFAULT_EXTRA_ENVIRONMENT_FORM, EXTRA_ENV_TYPES, customerNeedsRetry, extraEnvironmentRequestBody } from '~~/shared/utils/provision'
+import {
+  DEFAULT_EXTRA_ENVIRONMENT_FORM,
+  DEFAULT_PRODUCT_INSTANCE_FORM,
+  EXTRA_ENV_TYPES,
+  customerNeedsRetry,
+  extraEnvironmentRequestBody,
+  productInstanceRequestBody,
+} from '~~/shared/utils/provision'
 
 const route = useRoute()
 const { error, pending, refreshing, summary, checkedAt, refreshStatus } = await useFleetStatus()
@@ -9,16 +16,30 @@ const tab = ref('overview')
 const customerId = computed(() => String(route.params.id || ''))
 const customer = computed(() => findById(summary.value.customers, customerId.value))
 const adding = ref(false)
+const addingProduct = ref(false)
 const retrying = ref(false)
 const decommissioning = ref(false)
 const confirmDecommission = ref(false)
 const actionError = ref('')
 const extra = reactive({ ...DEFAULT_EXTRA_ENVIRONMENT_FORM })
+const productForm = reactive({ ...DEFAULT_PRODUCT_INSTANCE_FORM })
+const catalog = await useFetch<{ products: { id: string, displayName: string }[] }>('/api/products')
+const availableProducts = computed(() => {
+  const taken = new Set((customer.value?.instances || []).map(instance => instance.productId))
+  return (catalog.data.value?.products || []).filter(product => !taken.has(product.id))
+})
+const hasEnvironments = computed(() => Boolean(customer.value?.environments.length))
 const allDecommissioned = computed(() => (
-  !!customer.value?.environments.length
-  && customer.value.environments.every(env => env.lifecycleStatus === 'decommissioned')
+  hasEnvironments.value
+  && !!customer.value?.environments.every(env => env.lifecycleStatus === 'decommissioned')
 ))
 const canRetry = computed(() => customerNeedsRetry(customer.value?.environments ?? []))
+
+watch(() => customer.value?.instances, (instances) => {
+  if (!extra.productInstanceId && instances?.[0]) {
+    extra.productInstanceId = instances[0].id
+  }
+}, { immediate: true })
 
 async function retryProvision() {
   if (!customer.value) {
@@ -33,6 +54,26 @@ async function retryProvision() {
     actionError.value = fetchMessage(error, 'Retry failed.')
   } finally {
     retrying.value = false
+  }
+}
+
+async function addProduct() {
+  if (!customer.value) {
+    return
+  }
+  addingProduct.value = true
+  actionError.value = ''
+  try {
+    await $fetch(`/api/customers/${customer.value.id}/product-instances`, {
+      method: 'POST',
+      body: productInstanceRequestBody(productForm),
+    })
+    productForm.productId = ''
+    await refreshStatus()
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Add product failed.')
+  } finally {
+    addingProduct.value = false
   }
 }
 
@@ -122,11 +163,104 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
           <dd>{{ customer?.id }}</dd>
           <dt>Slug</dt>
           <dd>{{ customer?.slug }}</dd>
+          <dt>Products</dt>
+          <dd>{{ customer?.instanceCount || 0 }}</dd>
           <dt>Overall</dt>
           <dd><AppStatusBadge :status="customer?.overall || 'unknown'" /></dd>
           <dt>Hosting node</dt>
           <dd>{{ customer?.environments[0]?.node.name || '—' }}</dd>
         </dl>
+      </section>
+      <section
+        v-else-if="tab === 'products'"
+        id="panel-products"
+        role="tabpanel"
+        aria-labelledby="tab-products"
+      >
+        <form
+          v-if="availableProducts.length"
+          class="card"
+          @submit.prevent="addProduct"
+        >
+          <p>
+            Select a product. This creates a product instance with PROD and DEV. Creating the account did not choose a product.
+          </p>
+          <label>
+            Product
+            <select
+              v-model="productForm.productId"
+              required
+            >
+              <option
+                disabled
+                value=""
+              >
+                Select product
+              </option>
+              <option
+                v-for="product in availableProducts"
+                :key="product.id"
+                :value="product.id"
+              >
+                {{ product.displayName }}
+              </option>
+            </select>
+          </label>
+          <button
+            type="submit"
+            :disabled="addingProduct || !productForm.productId || !customer"
+            :aria-busy="addingProduct"
+          >
+            {{ addingProduct ? 'Adding…' : 'Add product instance' }}
+          </button>
+        </form>
+        <p
+          v-else
+          class="muted"
+        >
+          Martial Arts and Sales are already on this account.
+        </p>
+        <p
+          v-if="actionError && tab === 'products'"
+          class="muted"
+          role="status"
+          aria-live="polite"
+        >
+          {{ actionError }}
+        </p>
+        <AppDataTable
+          label="Product instances"
+          :columns="['Product', 'PROD', 'DEV', 'Envs', 'Overall']"
+        >
+          <tr
+            v-for="instance in customer?.instances"
+            :key="instance.id"
+          >
+            <td>{{ instance.displayName }}</td>
+            <td>
+              <AppStatusBadge
+                v-if="instance.prod"
+                :status="instance.prod.status"
+              />
+              <span
+                v-else
+                class="muted"
+              >—</span>
+            </td>
+            <td>
+              <AppStatusBadge
+                v-if="instance.dev"
+                :status="instance.dev.status"
+              />
+              <span
+                v-else
+                class="muted"
+              >—</span>
+            </td>
+            <td>{{ instance.environmentCount }}</td>
+            <td><AppStatusBadge :status="instance.overall || 'unknown'" /></td>
+          </tr>
+        </AppDataTable>
       </section>
       <section
         v-else-if="tab === 'environments'"
@@ -135,12 +269,28 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
         aria-labelledby="tab-environments"
       >
         <form
+          v-if="customer?.instances?.length"
           class="card"
           @submit.prevent="addExtra"
         >
           <p>
-            Add one extra non-PROD. Same local image, isolation, and ports as S4. A second PROD is refused.
+            Add one extra non-PROD on a product instance. A second PROD on the same instance is refused.
           </p>
+          <label>
+            Product instance
+            <select
+              v-model="extra.productInstanceId"
+              required
+            >
+              <option
+                v-for="instance in customer?.instances"
+                :key="instance.id"
+                :value="instance.id"
+              >
+                {{ instance.displayName }}
+              </option>
+            </select>
+          </label>
           <label>
             Type
             <select v-model="extra.type">
@@ -163,14 +313,20 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
           </label>
           <button
             type="submit"
-            :disabled="adding || !customer"
+            :disabled="adding || !customer || !extra.productInstanceId"
             :aria-busy="adding"
           >
             {{ adding ? 'Adding…' : 'Add environment' }}
           </button>
         </form>
         <p
-          v-if="actionError"
+          v-else
+          class="muted"
+        >
+          Add a product instance first. Extra environments attach to a product, not the account.
+        </p>
+        <p
+          v-if="actionError && tab === 'environments'"
           class="muted"
           role="status"
           aria-live="polite"
@@ -179,7 +335,7 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
         </p>
         <AppDataTable
           label="Customer environments"
-          :columns="['Environment', 'Type', 'Status', 'Runtime', 'Image', 'Access']"
+          :columns="['Environment', 'Product', 'Type', 'Status', 'Runtime', 'Image', 'Access']"
         >
           <tr
             v-for="env in customer?.environments"
@@ -190,6 +346,7 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
                 {{ env.displayName }}
               </NuxtLink>
             </td>
+            <td>{{ env.productInstance?.displayName || '—' }}</td>
             <td>{{ env.type }}</td>
             <td><AppStatusBadge :status="env.status" /></td>
             <td>{{ env.runtime }}</td>
@@ -212,11 +369,13 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
           <dd>{{ customer?.timezone }}</dd>
           <dt>Admin email</dt>
           <dd>{{ customer?.adminEmail }}</dd>
+          <dt>Products</dt>
+          <dd>{{ customer?.instanceCount || 0 }}</dd>
           <dt>Environments</dt>
           <dd>{{ customer?.environmentCount }}</dd>
         </dl>
         <form
-          v-if="!allDecommissioned"
+          v-if="hasEnvironments && !allDecommissioned"
           class="card"
           @submit.prevent="decommissionCustomer"
         >
@@ -240,10 +399,16 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
           </button>
         </form>
         <p
-          v-else
+          v-else-if="allDecommissioned"
           class="muted"
         >
           All environments for this customer are decommissioned. Volumes were left in place.
+        </p>
+        <p
+          v-else
+          class="muted"
+        >
+          This account has no environments yet.
         </p>
       </section>
     </AppAsyncPanel>

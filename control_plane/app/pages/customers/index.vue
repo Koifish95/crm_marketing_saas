@@ -39,7 +39,7 @@ const rows = computed(() => filterByQuery(
     >
       <AppDataTable
         label="Customers"
-        :columns="['Customer', 'Slug', 'Envs', 'PROD', 'DEV', 'Overall']"
+        :columns="['Customer', 'Slug', 'Products', 'Envs', 'Overall']"
       >
         <tr
           v-for="customer in rows"
@@ -51,27 +51,8 @@ const rows = computed(() => filterByQuery(
             </NuxtLink>
           </td>
           <td>{{ customer.slug }}</td>
+          <td>{{ customer.instanceCount || 0 }}</td>
           <td>{{ customer.environmentCount }}</td>
-          <td>
-            <AppStatusBadge
-              v-if="customer.prod"
-              :status="customer.prod.status"
-            />
-            <span
-              v-else
-              class="muted"
-            >—</span>
-          </td>
-          <td>
-            <AppStatusBadge
-              v-if="customer.dev"
-              :status="customer.dev.status"
-            />
-            <span
-              v-else
-              class="muted"
-            >—</span>
-          </td>
           <td><AppStatusBadge :status="customer.overall" /></td>
         </tr>
       </AppDataTable>

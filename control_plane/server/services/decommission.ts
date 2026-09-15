@@ -27,6 +27,7 @@ export async function decommissionEnvironment(db: Database, id: string, filesRoo
     envFileExample: row.envFileExample,
     composeProject: row.composeProject,
     filesRoot,
+    productInstance: row.productInstance,
   })
   await setLifecycleStatus(db, row.id, 'decommissioned')
   return {
@@ -40,7 +41,7 @@ export async function decommissionEnvironment(db: Database, id: string, filesRoo
 export async function decommissionCustomer(db: Database, customerId: string, filesRoot?: string) {
   const rows = (await listRegisteredEnvironments(db)).filter(row => row.customer.id === customerId)
   if (rows.length === 0) {
-    throw new DecommissionError('Customer has no environments.', 404)
+    return { customerId, environments: [] }
   }
   const environments = []
   for (const row of rows) {

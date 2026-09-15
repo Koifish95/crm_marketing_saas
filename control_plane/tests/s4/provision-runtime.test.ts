@@ -6,6 +6,14 @@ describe('S4 provision runtime commands', () => {
   it('builds the local s4 image and ups without -v', () => {
     expect(imageInspectArgs()).toEqual(['image', 'inspect', PROVISIONED_IMAGE])
     expect(imageBuildArgs()).toEqual(['build', '-t', PROVISIONED_IMAGE, '-f', 'martial_arts_template/Dockerfile', '.'])
+    expect(imageBuildArgs('crm-sales:c2', 'sales_template/Dockerfile')).toEqual([
+      'build',
+      '-t',
+      'crm-sales:c2',
+      '-f',
+      'sales_template/Dockerfile',
+      '.',
+    ])
     const command = provisionUpCommand({
       envFileLocal: 'C:/tmp/missing.env',
       envFileExample: 'C:/tmp/missing.env',

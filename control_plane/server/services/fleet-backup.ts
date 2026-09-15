@@ -17,8 +17,9 @@ import { getRegisteredEnvironment, listRegisteredEnvironments } from './registry
 import { restoreSnapshotToEnvironment, snapshotRegisteredEnvironment } from './fleet-backup-snapshot'
 import { extractFleetBackupZip, extractedSqliteDir, extractedUploadsDir } from './fleet-backup-extract'
 import { readFleetBackupManifest, writeFleetBackupZip } from './fleet-backup-zip'
-import { composeArgs, repoRoot, resolveComposeEnvFile, templateRoot } from './docker-relaunch'
+import { composeArgs, composeRootForEnvironment, repoRoot, resolveComposeEnvFile } from './docker-relaunch'
 import { imageBuildArgs, waitUntilHealthy } from './provision-runtime'
+import { requireProduct } from '../products/catalog'
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
 
 export class FleetBackupError extends Error {
@@ -212,6 +213,7 @@ export async function restoreRegisteredEnvironment(
     const envFile = resolveComposeEnvFile({
       envFileLocal: row.envFileLocal,
       envFileExample: row.envFileExample,
+      root: composeRootForEnvironment(row),
     })
     const up = composeArgs({
       envFile,
@@ -220,7 +222,7 @@ export async function restoreRegisteredEnvironment(
       recreate: false,
     })
     const started = spawnSync('docker', up, {
-      cwd: templateRoot(),
+      cwd: composeRootForEnvironment(row),
       encoding: 'utf8',
       windowsHide: true,
     })
@@ -264,12 +266,13 @@ export async function upgradeRegisteredEnvironment(
     throw new FleetBackupError('expectedImage is required.', 400)
   }
   const fleet = await listRegisteredEnvironments(db)
-  const siblings = fleet.filter(item => item.customer.id === row.customer.id)
+  const siblings = fleet.filter(item => item.productInstance.id === row.productInstance.id)
   if (row.type === 'PROD' && prodUpgradeBlocked(siblings, target, isAcmeLab(row.composeFile))) {
     throw new FleetBackupError('Upgrade a non-PROD environment to this image first.', 409)
   }
   const previousImage = row.expectedImage
-  const built = spawnSync('docker', imageBuildArgs(target), {
+  const product = requireProduct(row.productInstance.productId)
+  const built = spawnSync('docker', imageBuildArgs(target, product.dockerfile), {
     cwd: repoRoot(),
     encoding: 'utf8',
     windowsHide: true,
@@ -280,6 +283,7 @@ export async function upgradeRegisteredEnvironment(
   const envFile = resolveComposeEnvFile({
     envFileLocal: row.envFileLocal,
     envFileExample: row.envFileExample,
+    root: composeRootForEnvironment(row),
   })
   writeExpectedImage(isAbsolute(row.envFileLocal) ? row.envFileLocal : envFile, target)
   const up = composeArgs({
@@ -289,7 +293,7 @@ export async function upgradeRegisteredEnvironment(
     recreate: false,
   })
   const result = spawnSync('docker', up, {
-    cwd: templateRoot(),
+    cwd: composeRootForEnvironment(row),
     encoding: 'utf8',
     windowsHide: true,
   })

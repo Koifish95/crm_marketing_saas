@@ -1,3 +1,5 @@
+import { requireProduct, type ProductId } from '../products/catalog'
+
 export const PROVISIONED_IMAGE = 'martial-arts-acquisition:s4'
 export const PROVISIONED_COMPOSE_FILE = 'docker-compose.provisioned.yml'
 export const HOST_PORT_MIN = 52200
@@ -28,24 +30,32 @@ export function assertProvisionSlug(slug: string) {
   return normalized
 }
 
-export function environmentNames(customerSlug: string, type: EnvironmentType) {
-  const slug = `${assertProvisionSlug(customerSlug)}-${type.toLowerCase()}`
+function namedEnvironment(slug: string, type: EnvironmentType, displayName: string, productId: ProductId) {
+  const product = requireProduct(productId)
   return {
     type,
-    displayName: type,
+    displayName,
     slug,
     containerName: `${slug}-app`,
     composeProject: slug,
-    composeFile: PROVISIONED_COMPOSE_FILE,
+    composeFile: product.composeFile,
     sqliteVolume: `${slug}-sqlite`,
     assetsVolume: `${slug}-assets`,
     isolationMarker: `${slug}-isolation`,
-    expectedImage: PROVISIONED_IMAGE,
+    expectedImage: product.image,
   }
 }
 
-export function defaultEnvironmentPair(customerSlug: string) {
-  return [environmentNames(customerSlug, 'PROD'), environmentNames(customerSlug, 'DEV')] as const
+export function environmentNames(customerSlug: string, productId: ProductId, type: EnvironmentType) {
+  const slug = `${assertProvisionSlug(customerSlug)}-${productId}-${type.toLowerCase()}`
+  return namedEnvironment(slug, type, type, productId)
+}
+
+export function defaultEnvironmentPair(customerSlug: string, productId: ProductId) {
+  return [
+    environmentNames(customerSlug, productId, 'PROD'),
+    environmentNames(customerSlug, productId, 'DEV'),
+  ] as const
 }
 
 export function normalizeEnvironmentLabel(value: string) {
@@ -54,6 +64,7 @@ export function normalizeEnvironmentLabel(value: string) {
 
 export function extraEnvironmentNames(
   customerSlug: string,
+  productId: ProductId,
   type: NonProdEnvironmentType,
   displayName: string,
 ) {
@@ -69,22 +80,11 @@ export function extraEnvironmentNames(
   if (label === 'prod') {
     throw new Error('Extra environments must be non-PROD.')
   }
-  const slug = `${customer}-${label}`
+  const slug = `${customer}-${productId}-${label}`
   if (RESERVED.test(slug) || slug.includes('renzo') || slug.includes('webhosting')) {
     throw new Error(`Refusing reserved slug ${slug}.`)
   }
-  return {
-    type,
-    displayName: raw,
-    slug,
-    containerName: `${slug}-app`,
-    composeProject: slug,
-    composeFile: PROVISIONED_COMPOSE_FILE,
-    sqliteVolume: `${slug}-sqlite`,
-    assetsVolume: `${slug}-assets`,
-    isolationMarker: `${slug}-isolation`,
-    expectedImage: PROVISIONED_IMAGE,
-  }
+  return namedEnvironment(slug, type, raw, productId)
 }
 
 export function healthUrlForPort(port: number) {

@@ -371,6 +371,8 @@ async function decommission() {
               {{ env?.customer.displayName }}
             </NuxtLink>
           </dd>
+          <dt>Product</dt>
+          <dd>{{ env?.productInstance?.displayName || '—' }}</dd>
           <dt>Type</dt>
           <dd>{{ env?.type }}</dd>
           <dt>Hosting node</dt>

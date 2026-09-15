@@ -29,6 +29,13 @@
       "when": 1789070000000,
       "tag": "0003_fleet_backups",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1789410000000,
+      "tag": "0004_product_instances",
+      "breakpoints": true
     }
   ]
 }

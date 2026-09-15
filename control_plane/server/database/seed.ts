@@ -1,7 +1,8 @@
 import { eq } from 'drizzle-orm'
 import { createStableId } from '../../shared/utils/ids'
+import { backfillInstanceId } from '../products/catalog'
 import { createDb, getDatabaseUrl } from './index'
-import { customers, environments, hostingNodes } from './schema'
+import { customers, environments, hostingNodes, productInstances } from './schema'
 import { EXPECTED_IMAGE, LAB_CUSTOMER_SLUG, LAB_ENVIRONMENTS, LAB_NODE_NAME } from './lab-seed'
 
 export async function seedRegistry(databaseUrl = getDatabaseUrl()) {
@@ -21,6 +22,19 @@ export async function seedRegistry(databaseUrl = getDatabaseUrl()) {
         timezone: 'America/Denver',
         adminEmail: 'admin@lab-acme.local',
         createdAt: now,
+      })
+    }
+
+    const instanceId = backfillInstanceId(customerId)
+    const [existingInstance] = await db.select().from(productInstances).where(eq(productInstances.id, instanceId)).limit(1)
+    if (!existingInstance) {
+      await db.insert(productInstances).values({
+        id: instanceId,
+        customerId,
+        productId: 'martial-arts',
+        displayName: existingCustomer?.displayName ?? 'Acme BJJ',
+        slug: LAB_CUSTOMER_SLUG,
+        createdAt: existingCustomer?.createdAt ?? now,
       })
     }
 
@@ -44,6 +58,7 @@ export async function seedRegistry(databaseUrl = getDatabaseUrl()) {
       await db.insert(environments).values({
         id: createStableId(),
         customerId,
+        productInstanceId: instanceId,
         hostingNodeId: nodeId,
         type: env.type,
         displayName: env.displayName,
@@ -65,7 +80,7 @@ export async function seedRegistry(databaseUrl = getDatabaseUrl()) {
       })
     }
 
-    return { customerId, nodeId }
+    return { customerId, nodeId, productInstanceId: instanceId }
   } finally {
     client.close()
   }

@@ -207,7 +207,7 @@ async function runBulk(action: 'start' | 'stop', scope: 'selected' | 'all') {
     >
       <AppDataTable
         label="Environments"
-        :columns="['Customer', 'Environment', 'Type', 'Node', 'Runtime', 'Health', 'Image', 'Access']"
+        :columns="['Customer', 'Product', 'Environment', 'Type', 'Node', 'Runtime', 'Health', 'Image', 'Access']"
       >
         <template #leading>
           <input
@@ -235,6 +235,7 @@ async function runBulk(action: 'start' | 'stop', scope: 'selected' | 'all') {
               {{ env.customer.displayName }}
             </NuxtLink>
           </td>
+          <td>{{ env.productInstance?.displayName || '—' }}</td>
           <td>
             <NuxtLink :to="`/environments/${env.id}`">
               {{ env.displayName }}

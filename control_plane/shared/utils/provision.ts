@@ -15,19 +15,36 @@ export const DEFAULT_PROVISION_FORM: ProvisionForm = {
 export const EXTRA_ENV_TYPES = ['DEV', 'STAGE', 'UAT', 'TRAINING'] as const
 
 export type ExtraEnvironmentForm = {
+  productInstanceId: string
   type: (typeof EXTRA_ENV_TYPES)[number]
   displayName: string
 }
 
 export const DEFAULT_EXTRA_ENVIRONMENT_FORM: ExtraEnvironmentForm = {
+  productInstanceId: '',
   type: 'DEV',
   displayName: '',
 }
 
+export type ProductInstanceForm = {
+  productId: string
+}
+
+export const DEFAULT_PRODUCT_INSTANCE_FORM: ProductInstanceForm = {
+  productId: '',
+}
+
 export function extraEnvironmentRequestBody(form: ExtraEnvironmentForm): ExtraEnvironmentForm {
   return {
+    productInstanceId: form.productInstanceId,
     type: form.type,
     displayName: form.displayName,
+  }
+}
+
+export function productInstanceRequestBody(form: ProductInstanceForm): ProductInstanceForm {
+  return {
+    productId: form.productId,
   }
 }
 

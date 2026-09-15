@@ -18,6 +18,7 @@ export function navLinkActive(path: string, link: OperatorNavLink) {
 
 export const CUSTOMER_TABS = [
   { id: 'overview', label: 'Overview' },
+  { id: 'products', label: 'Products' },
   { id: 'environments', label: 'Environments' },
   { id: 'configuration', label: 'Configuration' },
 ] as const

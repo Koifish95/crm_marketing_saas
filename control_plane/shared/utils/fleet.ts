@@ -38,6 +38,12 @@ export type FleetEnvironment = {
     timezone: string
     adminEmail: string
   }
+  productInstance?: {
+    id: string
+    productId: string
+    displayName: string
+    slug: string
+  }
   node: {
     id: string
     name: string
@@ -46,9 +52,28 @@ export type FleetEnvironment = {
   }
 }
 
+export type FleetAccount = {
+  id: string
+  slug: string
+  displayName: string
+  timezone: string
+  adminEmail: string
+  industryTemplate?: string
+}
+
+export type FleetProductInstance = {
+  id: string
+  customerId: string
+  productId: string
+  displayName: string
+  slug: string
+}
+
 export type FleetStatusResponse = {
   checkedAt: string
   environments: FleetEnvironment[]
+  customers?: FleetAccount[]
+  productInstances?: FleetProductInstance[]
 }
 
 const STATUS_RANK: Record<CombinedStatus, number> = {
@@ -75,7 +100,52 @@ export function needsAttention(env: FleetEnvironment) {
   return env.status === 'unhealthy' || env.status === 'unknown' || env.status === 'missing'
 }
 
-export function groupCustomers(environments: readonly FleetEnvironment[]) {
+function defaultProductInstance(env: FleetEnvironment) {
+  return env.productInstance ?? {
+    id: `${env.customer.id}-martial-arts`,
+    productId: 'martial-arts',
+    displayName: 'Martial Arts',
+    slug: 'martial-arts',
+  }
+}
+
+export function groupProductInstances(
+  environments: readonly FleetEnvironment[],
+  instances: readonly FleetProductInstance[] = [],
+) {
+  const byId = new Map<string, FleetProductInstance & { environments: FleetEnvironment[] }>()
+  for (const instance of instances) {
+    byId.set(instance.id, { ...instance, environments: [] })
+  }
+  for (const env of environments) {
+    const productInstance = defaultProductInstance(env)
+    const existing = byId.get(productInstance.id)
+    if (existing) {
+      existing.environments.push(env)
+      continue
+    }
+    byId.set(productInstance.id, {
+      ...productInstance,
+      customerId: env.customer.id,
+      environments: [env],
+    })
+  }
+  return [...byId.values()]
+    .map(instance => ({
+      ...instance,
+      environmentCount: instance.environments.length,
+      prod: instance.environments.find(env => env.type === 'PROD') ?? null,
+      dev: instance.environments.find(env => env.type === 'DEV') ?? null,
+      overall: worstStatus(instance.environments.map(env => env.status)),
+    }))
+    .sort((left, right) => left.displayName.localeCompare(right.displayName))
+}
+
+export function groupCustomers(
+  environments: readonly FleetEnvironment[],
+  accounts: readonly FleetAccount[] = [],
+  instances: readonly FleetProductInstance[] = [],
+) {
   const byId = new Map<string, {
     id: string
     slug: string
@@ -84,6 +154,16 @@ export function groupCustomers(environments: readonly FleetEnvironment[]) {
     adminEmail: string
     environments: FleetEnvironment[]
   }>()
+  for (const account of accounts) {
+    byId.set(account.id, {
+      id: account.id,
+      slug: account.slug,
+      displayName: account.displayName,
+      timezone: account.timezone,
+      adminEmail: account.adminEmail,
+      environments: [],
+    })
+  }
   for (const env of environments) {
     const existing = byId.get(env.customer.id)
     if (existing) {
@@ -95,15 +175,23 @@ export function groupCustomers(environments: readonly FleetEnvironment[]) {
       environments: [env],
     })
   }
+  const groupedInstances = groupProductInstances(environments, instances)
   return [...byId.values()]
-    .map(customer => ({
-      ...customer,
-      environmentCount: customer.environments.length,
-      prod: customer.environments.find(env => env.type === 'PROD') ?? null,
-      dev: customer.environments.find(env => env.slug === `${customer.slug}-dev`)
-        ?? customer.environments.find(env => env.type === 'DEV') ?? null,
-      overall: worstStatus(customer.environments.map(env => env.status)),
-    }))
+    .map((customer) => {
+      const customerInstances = groupedInstances.filter(instance => instance.customerId === customer.id)
+      return {
+        ...customer,
+        instances: customerInstances,
+        instanceCount: customerInstances.length,
+        environmentCount: customer.environments.length,
+        prod: customer.environments.find(env => env.type === 'PROD') ?? null,
+        dev: customer.environments.find(env => env.slug === `${customer.slug}-dev`)
+          ?? customer.environments.find(env => env.type === 'DEV') ?? null,
+        overall: customer.environments.length === 0
+          ? 'unknown' as const
+          : worstStatus(customer.environments.map(env => env.status)),
+      }
+    })
     .sort((left, right) => left.displayName.localeCompare(right.displayName))
 }
 
@@ -135,8 +223,12 @@ export function groupNodes(environments: readonly FleetEnvironment[]) {
     .sort((left, right) => left.name.localeCompare(right.name))
 }
 
-export function summarizeFleet(environments: readonly FleetEnvironment[]) {
-  const customers = groupCustomers(environments)
+export function summarizeFleet(
+  environments: readonly FleetEnvironment[],
+  accounts: readonly FleetAccount[] = [],
+  instances: readonly FleetProductInstance[] = [],
+) {
+  const customers = groupCustomers(environments, accounts, instances)
   const nodes = groupNodes(environments)
   const byStatus = (status: CombinedStatus) => environments.filter(env => env.status === status).length
   return {
@@ -175,7 +267,7 @@ export function filterEnvironments(
   return filterByQuery(
     typed,
     query,
-    env => `${env.customer.displayName} ${env.slug} ${env.type} ${env.node.name}`,
+    env => `${env.customer.displayName} ${env.productInstance?.displayName || ''} ${env.slug} ${env.type} ${env.node.name}`,
   )
 }
 

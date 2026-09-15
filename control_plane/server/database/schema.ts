@@ -12,6 +12,19 @@ export const customers = sqliteTable('customers', {
   uniqueIndex('customers_slug_unique').on(table.slug),
 ])
 
+export const productInstances = sqliteTable('product_instances', {
+  id: text('id').primaryKey(),
+  customerId: text('customer_id').notNull().references(() => customers.id),
+  productId: text('product_id').notNull(),
+  displayName: text('display_name').notNull(),
+  slug: text('slug').notNull(),
+  createdAt: text('created_at').notNull(),
+}, table => [
+  uniqueIndex('product_instances_customer_product_unique').on(table.customerId, table.productId),
+  uniqueIndex('product_instances_customer_slug_unique').on(table.customerId, table.slug),
+  index('product_instances_customer_id_idx').on(table.customerId),
+])
+
 export const hostingNodes = sqliteTable('hosting_nodes', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
@@ -25,6 +38,7 @@ export const hostingNodes = sqliteTable('hosting_nodes', {
 export const environments = sqliteTable('environments', {
   id: text('id').primaryKey(),
   customerId: text('customer_id').notNull().references(() => customers.id),
+  productInstanceId: text('product_instance_id').notNull().references(() => productInstances.id),
   hostingNodeId: text('hosting_node_id').notNull().references(() => hostingNodes.id),
   type: text('type').notNull(),
   displayName: text('display_name').notNull(),
@@ -47,6 +61,7 @@ export const environments = sqliteTable('environments', {
   uniqueIndex('environments_slug_unique').on(table.slug),
   uniqueIndex('environments_container_unique').on(table.containerName),
   index('environments_customer_id_idx').on(table.customerId),
+  index('environments_product_instance_id_idx').on(table.productInstanceId),
 ])
 
 export const environmentBackups = sqliteTable('environment_backups', {

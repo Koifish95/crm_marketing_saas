@@ -1,7 +1,8 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import type { Database } from '../database'
-import { customers, environments, hostingNodes } from '../database/schema'
+import { customers, environments, hostingNodes, productInstances } from '../database/schema'
 import { createStableId } from '../../shared/utils/ids'
+import { backfillInstanceId, isProductId, requireProduct, UNASSIGNED_INDUSTRY, type ProductId } from '../products/catalog'
 import {
   DEFAULT_TIMEZONE,
   allocateHostPorts,
@@ -24,6 +25,18 @@ export class ProvisionError extends Error {
   }
 }
 
+export async function assertOneProdPerInstance(db: Database, productInstanceId: string, type: string) {
+  if (type !== 'PROD') {
+    return
+  }
+  const rows = await db.select({ type: environments.type }).from(environments)
+    .where(eq(environments.productInstanceId, productInstanceId))
+  if (rows.some(row => row.type === 'PROD')) {
+    throw new ProvisionError('A product instance may have only one PROD environment.')
+  }
+}
+
+/** @deprecated C2: one PROD is per product instance. Prefer assertOneProdPerInstance. */
 export async function assertOneProdPerCustomer(db: Database, customerId: string, type: string) {
   if (type !== 'PROD') {
     return
@@ -49,13 +62,15 @@ type NamedEnvironment = {
 
 export async function insertNamedEnvironment(db: Database, input: {
   customer: { id: string, displayName: string, adminEmail: string, timezone: string }
+  productInstanceId: string
+  productId: ProductId
   nodeId: string
   names: NamedEnvironment
   hostPort: number
   filesRoot?: string
   now?: string
 }) {
-  await assertOneProdPerCustomer(db, input.customer.id, input.names.type)
+  await assertOneProdPerInstance(db, input.productInstanceId, input.names.type)
   const [slugHit] = await db.select().from(environments).where(eq(environments.slug, input.names.slug)).limit(1)
   if (slugHit) {
     throw new ProvisionError(`Environment slug ${input.names.slug} is already in use.`)
@@ -63,9 +78,11 @@ export async function insertNamedEnvironment(db: Database, input: {
   const now = input.now ?? new Date().toISOString()
   const id = createStableId()
   const envFile = `data/provisioned/${id}.env`
+  const product = requireProduct(input.productId)
   await db.insert(environments).values({
     id,
     customerId: input.customer.id,
+    productInstanceId: input.productInstanceId,
     hostingNodeId: input.nodeId,
     type: input.names.type,
     displayName: input.names.displayName,
@@ -96,6 +113,7 @@ export async function insertNamedEnvironment(db: Database, input: {
     displayName: input.customer.displayName,
     adminEmail: input.customer.adminEmail,
     timezone: input.customer.timezone,
+    product,
   }), input.filesRoot)
   return { id, slug: input.names.slug, type: input.names.type, hostPort: input.hostPort, envFileLocal: envFile }
 }
@@ -118,7 +136,7 @@ function assertAdminEmail(value: string) {
   return email
 }
 
-export async function createCustomerWithDefaultEnvironments(db: Database, input: {
+export async function createCustomerAccount(db: Database, input: {
   displayName: string
   slug: string
   timezone?: string
@@ -151,33 +169,90 @@ export async function createCustomerWithDefaultEnvironments(db: Database, input:
     }
   }
 
-  const [node] = await db.select().from(hostingNodes).where(eq(hostingNodes.name, 'laptop')).limit(1)
-  if (!node) {
-    throw new ProvisionError('Laptop hosting node is not registered.', 500)
-  }
-
-  const registered = await listRegisteredEnvironments(db)
-  const ports = allocateHostPorts(usedHostPorts(registered.map(row => ({
-    hostPort: row.hostPort,
-    healthUrl: row.healthUrl,
-  }))))
-
   const now = new Date().toISOString()
   const customerId = createStableId()
   await db.insert(customers).values({
     id: customerId,
     slug,
     displayName,
-    industryTemplate: 'martial-arts',
+    industryTemplate: UNASSIGNED_INDUSTRY,
     timezone,
     adminEmail,
     createdAt: now,
   })
 
+  return { customerId, slug, displayName, resumed: false, environments: [] as const }
+}
+
+/** C2: creating a customer no longer provisions environments. */
+export const createCustomerWithDefaultEnvironments = createCustomerAccount
+
+async function requireLaptopNode(db: Database) {
+  const [node] = await db.select().from(hostingNodes).where(eq(hostingNodes.name, 'laptop')).limit(1)
+  if (!node) {
+    throw new ProvisionError('Laptop hosting node is not registered.', 500)
+  }
+  return node
+}
+
+export async function addProductInstance(db: Database, customerId: string, input: {
+  productId: string
+  displayName?: string
+  filesRoot?: string
+}) {
+  if (!isProductId(input.productId)) {
+    throw new ProvisionError('Select Martial Arts or Sales.')
+  }
+  const product = requireProduct(input.productId)
+  const [customer] = await db.select().from(customers).where(eq(customers.id, customerId)).limit(1)
+  if (!customer) {
+    throw new ProvisionError('Customer not found.', 404)
+  }
+  const [duplicate] = await db.select().from(productInstances).where(
+    and(eq(productInstances.customerId, customerId), eq(productInstances.productId, product.id)),
+  ).limit(1)
+  if (duplicate) {
+    throw new ProvisionError(`${product.displayName} is already on this account.`)
+  }
+  const [anyInstance] = await db.select().from(productInstances)
+    .where(eq(productInstances.customerId, customerId))
+    .limit(1)
+  const node = await requireLaptopNode(db)
+  const registered = await listRegisteredEnvironments(db)
+  const ports = allocateHostPorts(usedHostPorts(registered.map(row => ({
+    hostPort: row.hostPort,
+    healthUrl: row.healthUrl,
+  }))))
+  const now = new Date().toISOString()
+  const instanceId = product.id === 'martial-arts' && !anyInstance
+    ? backfillInstanceId(customerId)
+    : createStableId()
+  const displayName = input.displayName?.trim() || product.displayName
+  await db.insert(productInstances).values({
+    id: instanceId,
+    customerId,
+    productId: product.id,
+    displayName,
+    slug: product.id,
+    createdAt: now,
+  })
+  if (product.id === 'martial-arts' && customer.industryTemplate === UNASSIGNED_INDUSTRY) {
+    await db.update(customers)
+      .set({ industryTemplate: product.id })
+      .where(eq(customers.id, customerId))
+  }
+
   const created: { id: string, slug: string, type: string, hostPort: number, envFileLocal: string }[] = []
-  for (const names of defaultEnvironmentPair(slug)) {
+  for (const names of defaultEnvironmentPair(customer.slug, product.id)) {
     created.push(await insertNamedEnvironment(db, {
-      customer: { id: customerId, displayName, adminEmail, timezone },
+      customer: {
+        id: customer.id,
+        displayName: customer.displayName,
+        adminEmail: customer.adminEmail,
+        timezone: customer.timezone,
+      },
+      productInstanceId: instanceId,
+      productId: product.id,
       nodeId: node.id,
       names,
       hostPort: ports[created.length] as number,
@@ -186,10 +261,16 @@ export async function createCustomerWithDefaultEnvironments(db: Database, input:
     }))
   }
 
-  return { customerId, slug, displayName, resumed: false, environments: created }
+  return {
+    customerId,
+    productInstanceId: instanceId,
+    productId: product.id,
+    displayName,
+    environments: created,
+  }
 }
 
-export async function addExtraNonProdEnvironment(db: Database, customerId: string, input: {
+export async function addExtraNonProdEnvironment(db: Database, productInstanceId: string, input: {
   type: NonProdEnvironmentType
   displayName: string
   filesRoot?: string
@@ -197,17 +278,21 @@ export async function addExtraNonProdEnvironment(db: Database, customerId: strin
   if ((input.type as string) === 'PROD') {
     throw new ProvisionError('Extra environments must be non-PROD.')
   }
-  const [customer] = await db.select().from(customers).where(eq(customers.id, customerId)).limit(1)
+  const [instance] = await db.select().from(productInstances).where(eq(productInstances.id, productInstanceId)).limit(1)
+  if (!instance) {
+    throw new ProvisionError('Product instance not found.', 404)
+  }
+  if (!isProductId(instance.productId)) {
+    throw new ProvisionError('Product instance has an unknown product.', 500)
+  }
+  const [customer] = await db.select().from(customers).where(eq(customers.id, instance.customerId)).limit(1)
   if (!customer) {
     throw new ProvisionError('Customer not found.', 404)
   }
-  const [node] = await db.select().from(hostingNodes).where(eq(hostingNodes.name, 'laptop')).limit(1)
-  if (!node) {
-    throw new ProvisionError('Laptop hosting node is not registered.', 500)
-  }
+  const node = await requireLaptopNode(db)
   let names
   try {
-    names = extraEnvironmentNames(customer.slug, input.type, input.displayName)
+    names = extraEnvironmentNames(customer.slug, instance.productId, input.type, input.displayName)
   } catch (error) {
     throw new ProvisionError(error instanceof Error ? error.message : 'Invalid extra environment.')
   }
@@ -223,6 +308,8 @@ export async function addExtraNonProdEnvironment(db: Database, customerId: strin
       adminEmail: customer.adminEmail,
       timezone: customer.timezone,
     },
+    productInstanceId: instance.id,
+    productId: instance.productId,
     nodeId: node.id,
     names,
     hostPort: ports[0] as number,

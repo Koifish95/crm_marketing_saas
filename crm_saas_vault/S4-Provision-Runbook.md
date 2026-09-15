@@ -2,7 +2,7 @@
 type: note
 status: current
 area: saas
-updated: 2026-09-09
+updated: 2026-09-14
 aliases:
   - S4 runbook
 tags:
@@ -15,7 +15,7 @@ tags:
 Laptop-only operator procedure. Not self-serve. Not DNS/TLS.
 
 App: `control_plane/` at http://127.0.0.1:52100  
-CRM image: `martial-arts-acquisition:s4` (local Docker build)  
+CRM images: `martial-arts-acquisition:s4` (Martial Arts) and `crm-sales:c2` (Sales)  
 Handoff: [[history/S4_closeout]]
 
 ## Start
@@ -28,22 +28,22 @@ pnpm install
 pnpm dev
 ```
 
-Open http://127.0.0.1:52100 → **Customers → New customer**. Fill display name, slug, timezone, and admin email. Submit. The form calls the same two S4 POSTs, then opens the customer workspace. Wait until both environments are **healthy** (Refresh on Dashboard or the workspace).
+Open http://127.0.0.1:52100 → **Customers → New customer**. Fill display name, slug, timezone, and admin email. Submit. That creates the **account only**. Open the customer workspace → **Products** → select Martial Arts or Sales → **Add product instance**. Wait until that instance’s PROD and DEV are **healthy**. Add the other product the same way on the same account when proving C2. Do not mutate lab-acme or Strategic Insights to make a multi-product proof.
 
 ## What it creates
 
-One customer, one PROD, one DEV. Named volumes, isolated compose projects, gitignored env files under `control_plane/data/provisioned/`. Host ports from 52200–52999.
+One customer account, then (per Add product instance) one product instance with one PROD and one DEV. Named volumes, isolated compose projects, gitignored env files under `control_plane/data/provisioned/`. Host ports from 52200–52999. New names are `{customer}-{productId}-{type}`. Backfilled rows keep historical `{customer}-{type}` names.
 
 Staff unwrap login: `admin` / `setup`, then `/account/password`. Do not leave `setup` as the living password. Do not store the new password in the control plane.
 
 ## Retry
 
-The same slug does not create a second customer. **Provision** again resumes Failed/partial rows and remounts the same volumes. Never `down -v`.
+The same slug does not create a second customer. **Retry** resumes Failed/partial rows and remounts the same volumes. Never `down -v`.
 
 ## Safety
 
 - Reserved slugs: `lab-acme`, `renzo`, `martial-arts`, `webhosting*`
-- Extra non-PROD and gated decommission now exist on the customer/environment workspaces (post-S4 leftovers). This runbook is still the default-pair procedure.
+- Extra non-PROD attaches to a **product instance**. A second PROD on the same instance is refused.
 - No GHCR / Docker Hub
 - Do not attach leftover gym or Pi volumes
 

@@ -2,7 +2,7 @@
 type: decision
 status: current
 area: process
-updated: 2026-09-13
+updated: 2026-09-14
 tags:
   - adr
   - saas
@@ -24,6 +24,23 @@ Decision: what we chose
 ```
 
 ---
+
+## 2026-09-14 — C2 Product Instances + Sales catalog code-shipped
+
+Status: working decision
+
+Context: Work Order [[wip/WO-2026-09-14-c2-product-instance-sales-catalog]] authorized C2 from base `35c4aca`. Owner decisions C2-01 B through C2-06 A were already finalized. Implementation landed on `working`. C2 is **not Successful** until Scott completes owner QA.
+
+Decision:
+
+- Minimal D1 is **code-shipped**: `Customer Account → Product Instance → Environments`. Table `product_instances`. Existing CP rows backfill as one Martial Arts instance without renaming env slug / container / volume / image / host port.
+- Hybrid catalog: instance stores `product_id`; CP code owns executable definition (`martial-arts` → `martial-arts-acquisition:s4`; `sales` → `crm-sales:c2`). No Beauty. No plugin loader.
+- Creating a customer does **not** choose a product. Operator flow: Create Account → Add Product Instance → Select Product. At most one instance per `(customer_id, product_id)` in C2.
+- One-PROD and upgrade “non-PROD first” are **per Product Instance**. New env names are `{customer}-{productId}-{type}`; backfilled names stay `{customer}-{type}`.
+- Sales proposal artifacts in provisioned envs live under the assets/uploads volume (`SALES_PROPOSALS_DIR=/app/data/uploads/proposals`).
+- C2 remains **awaiting owner QA**. Do not start C3, Beauty, S7, S8, SI migration, or Core promotion from this ship.
+
+Source: WO-2026-09-14-c2-product-instance-sales-catalog implementation (2026-09-14)
 
 ## 2026-09-13 — Official SI Sales B2 is Successful
 

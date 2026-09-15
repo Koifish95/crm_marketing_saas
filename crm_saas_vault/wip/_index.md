@@ -17,7 +17,7 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-None. `authorization.active_work_order` is null. C2B Slice A is **Successful**. SI Sales B1 is **Successful**. SI Sales B2 is **Successful**. C2 is **not started** and **not authorized**. Do not start C2, Core promotion, Beauty, D1, CP Sales provisioning, or S7 from this planning worksheet.
+None. `authorization.active_work_order` is null. C2 is **code-shipped / awaiting owner QA** and is **not Successful**. Work order and return remain in `wip/` until owner acceptance: [[wip/WO-2026-09-14-c2-product-instance-sales-catalog]], [[wip/WO-2026-09-14-c2-product-instance-sales-catalog-return]]. Do not start C3, Beauty, S7, S8, SI migration, or Core promotion.
 
 ## Current communication (not a work order)
 

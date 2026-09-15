@@ -6,12 +6,18 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { createDb } from '../../server/database'
 import { migrateDatabase } from '../../server/database/migrate'
 import { seedRegistry } from '../../server/database/seed'
-import { environments, hostingNodes } from '../../server/database/schema'
+import { customers, environments, hostingNodes } from '../../server/database/schema'
 import { environmentNames } from '../../server/services/provision-contract'
-import { addExtraNonProdEnvironment, createCustomerWithDefaultEnvironments, insertNamedEnvironment } from '../../server/services/provision-registry'
+import {
+  addExtraNonProdEnvironment,
+  addProductInstance,
+  createCustomerAccount,
+  insertNamedEnvironment,
+} from '../../server/services/provision-registry'
 import { decommissionEnvironment } from '../../server/services/decommission'
 import { provisionCustomerEnvironments, setLifecycleStatus } from '../../server/services/provision-runtime'
 import { listRegisteredEnvironments } from '../../server/services/registry'
+import { UNASSIGNED_INDUSTRY } from '../../server/products/catalog'
 
 const roots: string[] = []
 
@@ -36,33 +42,25 @@ async function openRegistry() {
 }
 
 describe('S4 registry create', () => {
-  it('creates PROD and DEV rows without Docker and refuses a second slug', async () => {
+  it('creates an account with no environments and refuses a second slug', async () => {
     const { url, root } = await openRegistry()
     const { client, db } = createDb(url)
     try {
-      const created = await createCustomerWithDefaultEnvironments(db, {
+      const created = await createCustomerAccount(db, {
         displayName: 'Strategic Insights Consulting, LLC',
         slug: 'strategic-insights',
         timezone: 'America/Denver',
         adminEmail: 'admin@strategic-insights.local',
         filesRoot: root,
       })
-      expect(created.environments).toHaveLength(2)
-      expect(created.environments.map(row => row.type).sort()).toEqual(['DEV', 'PROD'])
-      expect(created.environments.every(row => row.hostPort >= 52200)).toBe(true)
+      expect(created.environments).toHaveLength(0)
+      const accounts = await db.select().from(customers)
+      const si = accounts.find(account => account.slug === 'strategic-insights')
+      expect(si?.industryTemplate).toBe(UNASSIGNED_INDUSTRY)
+      expect((await listRegisteredEnvironments(db)).filter(env => env.customer.slug === 'strategic-insights')).toHaveLength(0)
+      expect((await listRegisteredEnvironments(db)).filter(row => row.customer.slug === 'lab-acme')).toHaveLength(2)
 
-      const rows = await listRegisteredEnvironments(db)
-      const si = rows.filter(row => row.customer.slug === 'strategic-insights')
-      expect(si).toHaveLength(2)
-      expect(si.every(row => row.lifecycleStatus === 'provisioning')).toBe(true)
-      expect(si.every(row => row.expectedImage === 'martial-arts-acquisition:s4')).toBe(true)
-      expect(si.some(row => row.containerName === 'strategic-insights-prod-app')).toBe(true)
-      expect(si.every(row => row.accessUrl === `http://localhost:${row.hostPort}`)).toBe(true)
-      expect(si.every(row => !row.accessUrl.includes('/api/health'))).toBe(true)
-      expect(si.every(row => row.healthUrl.endsWith('/api/health'))).toBe(true)
-      expect(rows.filter(row => row.customer.slug === 'lab-acme')).toHaveLength(2)
-
-      const second = await createCustomerWithDefaultEnvironments(db, {
+      const second = await createCustomerAccount(db, {
         displayName: 'Strategic Insights Consulting, LLC',
         slug: 'strategic-insights',
         adminEmail: 'admin@strategic-insights.local',
@@ -72,32 +70,65 @@ describe('S4 registry create', () => {
       expect(second.resumed).toBe(true)
 
       const all = await db.select().from(environments)
-      expect(all).toHaveLength(4)
+      expect(all).toHaveLength(2)
     } finally {
       client.close()
     }
   })
 
-  it('refuses a second PROD for the same customer', async () => {
+  it('adds Martial Arts PROD and DEV only after an explicit product pick', async () => {
     const { url, root } = await openRegistry()
     const { client, db } = createDb(url)
     try {
-      const created = await createCustomerWithDefaultEnvironments(db, {
+      const created = await createCustomerAccount(db, {
         displayName: 'Nova BJJ',
         slug: 'nova-bjj',
         adminEmail: 'admin@nova.local',
         filesRoot: root,
       })
-      expect(created.environments.filter(row => row.type === 'PROD')).toHaveLength(1)
+      const instance = await addProductInstance(db, created.customerId, {
+        productId: 'martial-arts',
+        filesRoot: root,
+      })
+      expect(instance.environments).toHaveLength(2)
+      expect(instance.environments.map(row => row.type).sort()).toEqual(['DEV', 'PROD'])
+      const rows = (await listRegisteredEnvironments(db)).filter(row => row.customer.id === created.customerId)
+      expect(rows.every(row => row.expectedImage === 'martial-arts-acquisition:s4')).toBe(true)
+      expect(rows.some(row => row.containerName === 'nova-bjj-martial-arts-prod-app')).toBe(true)
+      expect(rows.every(row => row.productInstance.productId === 'martial-arts')).toBe(true)
+      await expect(addProductInstance(db, created.customerId, {
+        productId: 'martial-arts',
+        filesRoot: root,
+      })).rejects.toThrow(/already/)
+    } finally {
+      client.close()
+    }
+  })
+
+  it('refuses a second PROD for the same product instance', async () => {
+    const { url, root } = await openRegistry()
+    const { client, db } = createDb(url)
+    try {
+      const created = await createCustomerAccount(db, {
+        displayName: 'Nova BJJ',
+        slug: 'nova-bjj',
+        adminEmail: 'admin@nova.local',
+        filesRoot: root,
+      })
+      const instance = await addProductInstance(db, created.customerId, {
+        productId: 'martial-arts',
+        filesRoot: root,
+      })
+      expect(instance.environments.filter(row => row.type === 'PROD')).toHaveLength(1)
       const [node] = await db.select().from(hostingNodes)
       const names = {
-        ...environmentNames('nova-bjj', 'PROD'),
-        slug: 'nova-bjj-prod-extra',
-        containerName: 'nova-bjj-prod-extra-app',
-        composeProject: 'nova-bjj-prod-extra',
-        sqliteVolume: 'nova-bjj-prod-extra-sqlite',
-        assetsVolume: 'nova-bjj-prod-extra-assets',
-        isolationMarker: 'nova-bjj-prod-extra-isolation',
+        ...environmentNames('nova-bjj', 'martial-arts', 'PROD'),
+        slug: 'nova-bjj-martial-arts-prod-extra',
+        containerName: 'nova-bjj-martial-arts-prod-extra-app',
+        composeProject: 'nova-bjj-martial-arts-prod-extra',
+        sqliteVolume: 'nova-bjj-martial-arts-prod-extra-sqlite',
+        assetsVolume: 'nova-bjj-martial-arts-prod-extra-assets',
+        isolationMarker: 'nova-bjj-martial-arts-prod-extra-isolation',
       }
       await expect(insertNamedEnvironment(db, {
         customer: {
@@ -106,6 +137,8 @@ describe('S4 registry create', () => {
           adminEmail: 'admin@nova.local',
           timezone: 'America/Denver',
         },
+        productInstanceId: instance.productInstanceId,
+        productId: 'martial-arts',
         nodeId: node!.id,
         names,
         hostPort: 52210,
@@ -120,32 +153,36 @@ describe('S4 registry create', () => {
     const { url, root } = await openRegistry()
     const { client, db } = createDb(url)
     try {
-      const created = await createCustomerWithDefaultEnvironments(db, {
+      const created = await createCustomerAccount(db, {
         displayName: 'Nova BJJ',
         slug: 'nova-bjj',
         adminEmail: 'admin@nova.local',
         filesRoot: root,
       })
-      const extra = await addExtraNonProdEnvironment(db, created.customerId, {
+      const instance = await addProductInstance(db, created.customerId, {
+        productId: 'martial-arts',
+        filesRoot: root,
+      })
+      const extra = await addExtraNonProdEnvironment(db, instance.productInstanceId, {
         type: 'DEV',
         displayName: 'DEV-JOHN',
         filesRoot: root,
       })
       expect(extra.type).toBe('DEV')
-      expect(extra.slug).toBe('nova-bjj-dev-john')
+      expect(extra.slug).toBe('nova-bjj-martial-arts-dev-john')
       expect(extra.hostPort).toBeGreaterThanOrEqual(52200)
 
       const rows = (await listRegisteredEnvironments(db)).filter(row => row.customer.id === created.customerId)
       expect(rows).toHaveLength(3)
       expect(rows.filter(row => row.type === 'PROD')).toHaveLength(1)
 
-      await expect(addExtraNonProdEnvironment(db, created.customerId, {
+      await expect(addExtraNonProdEnvironment(db, instance.productInstanceId, {
         type: 'PROD' as 'DEV',
         displayName: 'PROD-2',
         filesRoot: root,
       })).rejects.toThrow(/non-PROD|one PROD/)
 
-      await expect(addExtraNonProdEnvironment(db, created.customerId, {
+      await expect(addExtraNonProdEnvironment(db, instance.productInstanceId, {
         type: 'DEV',
         displayName: 'DEV',
         filesRoot: root,
@@ -159,17 +196,21 @@ describe('S4 registry create', () => {
     const { url, root } = await openRegistry()
     const { client, db } = createDb(url)
     try {
-      const created = await createCustomerWithDefaultEnvironments(db, {
+      const created = await createCustomerAccount(db, {
         displayName: 'Nova BJJ',
         slug: 'nova-bjj',
         adminEmail: 'admin@nova.local',
         filesRoot: root,
       })
-      for (const row of created.environments) {
+      const instance = await addProductInstance(db, created.customerId, {
+        productId: 'martial-arts',
+        filesRoot: root,
+      })
+      for (const row of instance.environments) {
         await setLifecycleStatus(db, row.id, 'decommissioned')
       }
       await expect(provisionCustomerEnvironments(db, created.customerId, root)).rejects.toThrow(/No environments/)
-      const already = await decommissionEnvironment(db, created.environments[0]!.id)
+      const already = await decommissionEnvironment(db, instance.environments[0]!.id)
       expect(already.lifecycleStatus).toBe('decommissioned')
       expect(already.args).toEqual([])
     } finally {
@@ -181,7 +222,7 @@ describe('S4 registry create', () => {
     const { url } = await openRegistry()
     const { client, db } = createDb(url)
     try {
-      await expect(createCustomerWithDefaultEnvironments(db, {
+      await expect(createCustomerAccount(db, {
         displayName: 'Renzo',
         slug: 'renzo',
         adminEmail: 'admin@example.com',

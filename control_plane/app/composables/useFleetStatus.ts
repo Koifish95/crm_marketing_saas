@@ -23,7 +23,9 @@ export async function useFleetStatus() {
   const refreshing = ref(false)
 
   const environments = computed(() => data.value?.environments || [])
-  const summary = computed(() => summarizeFleet(environments.value))
+  const accounts = computed(() => data.value?.customers || [])
+  const instances = computed(() => data.value?.productInstances || [])
+  const summary = computed(() => summarizeFleet(environments.value, accounts.value, instances.value))
 
   async function refreshStatus() {
     refreshing.value = true

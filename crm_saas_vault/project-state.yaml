@@ -2,11 +2,11 @@
 # Human map: Current-State.md. This file is an index, not a second essay.
 # Update in the same commit as the work that changes these fields.
 schema_version: 1
-updated: 2026-09-13
+updated: 2026-09-14
 repo: crm_marketing_saas
 branch: working
 remote: https://github.com/Koifish95/crm_marketing_saas.git
-head_at_write: "dae437aaca315f976fb2dc06fe90a1530ee81376"
+head_at_write: "35c4aca8c0e02533f8e2278ade1bd6b3c513e025"
 
 canonical:
   bootstrap: Home.md
@@ -26,13 +26,13 @@ tracks:
     next: S7
     authorized: null
   c:
-    last_shipped: SI-Sales-B2
+    last_shipped: C2
     last_successful: C2B
     next: C2
     authorized: null
   d:
     accepted: [D1, D2, D3, D4]
-    d1_schema: not_shipped
+    d1_schema: minimal_shipped
 
 authorization:
   active_work_order: null
@@ -80,3 +80,6 @@ notes:
   c2_not_authorized_by_c2b: true
   c2_not_authorized_by_b1: true
   c2_not_authorized_by_b2: true
+  c2: code_shipped_awaiting_owner_qa
+  c2_successful: false
+  d1_schema: minimal_product_instances

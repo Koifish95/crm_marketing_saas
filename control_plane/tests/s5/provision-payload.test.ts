@@ -17,10 +17,12 @@ describe('S4 provision payload', () => {
 
   it('sends only non-PROD type and display name for extras', () => {
     const body = extraEnvironmentRequestBody({
+      productInstanceId: 'pi-1',
       type: 'DEV',
       displayName: 'DEV-JOHN',
     })
-    expect(Object.keys(body).sort()).toEqual(['displayName', 'type'])
+    expect(Object.keys(body).sort()).toEqual(['displayName', 'productInstanceId', 'type'])
+    expect(body.productInstanceId).toBe('pi-1')
     expect(body).not.toHaveProperty('hostname')
     expect(DEFAULT_EXTRA_ENVIRONMENT_FORM.type).toBe('DEV')
   })

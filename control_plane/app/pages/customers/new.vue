@@ -4,24 +4,23 @@ import { DEFAULT_PROVISION_FORM, provisionRequestBody } from '~~/shared/utils/pr
 useHead({ title: 'New customer' })
 
 const router = useRouter()
-const provisioning = ref(false)
+const saving = ref(false)
 const actionError = ref('')
 const form = reactive({ ...DEFAULT_PROVISION_FORM })
 
-async function provisionCustomer() {
-  provisioning.value = true
+async function createAccount() {
+  saving.value = true
   actionError.value = ''
   try {
     const created = await $fetch<{ customerId: string }>('/api/customers', {
       method: 'POST',
       body: provisionRequestBody(form),
     })
-    await $fetch(`/api/customers/${created.customerId}/provision`, { method: 'POST' })
     await router.push(`/customers/${created.customerId}`)
   } catch (error) {
-    actionError.value = fetchMessage(error, 'Provision failed.')
+    actionError.value = fetchMessage(error, 'Create customer failed.')
   } finally {
-    provisioning.value = false
+    saving.value = false
   }
 }
 </script>
@@ -32,11 +31,11 @@ async function provisionCustomer() {
       title="New customer"
       :crumbs="[{ to: '/customers', label: 'Customers' }, { label: 'New' }]"
     >
-      Creates one PROD and one DEV. Add extras from the customer workspace.
+      Creates the account only. Add a product instance from the customer workspace.
     </AppPageHeader>
     <form
       class="card"
-      @submit.prevent="provisionCustomer"
+      @submit.prevent="createAccount"
     >
       <label>
         Display name
@@ -72,10 +71,10 @@ async function provisionCustomer() {
       </label>
       <button
         type="submit"
-        :disabled="provisioning"
-        :aria-busy="provisioning"
+        :disabled="saving"
+        :aria-busy="saving"
       >
-        {{ provisioning ? 'Provisioning…' : 'Provision' }}
+        {{ saving ? 'Creating…' : 'Create account' }}
       </button>
     </form>
     <p

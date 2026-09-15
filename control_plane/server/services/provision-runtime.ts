@@ -2,19 +2,24 @@ import { spawnSync } from 'node:child_process'
 import { eq } from 'drizzle-orm'
 import type { Database } from '../database'
 import { environments } from '../database/schema'
-import { PROVISIONED_IMAGE } from './provision-contract'
-import { composeArgs, repoRoot, resolveComposeEnvFile, templateRoot } from './docker-relaunch'
+import { MARTIAL_ARTS_PRODUCT, requireProduct } from '../products/catalog'
+import { composeArgs, composeRootForEnvironment, repoRoot, resolveComposeEnvFile } from './docker-relaunch'
 import { probeRegisteredHealth } from './health'
+import { listRegisteredEnvironments } from './registry'
 
-export function imageInspectArgs(image = PROVISIONED_IMAGE) {
+export function imageInspectArgs(image = MARTIAL_ARTS_PRODUCT.image) {
   return ['image', 'inspect', image]
 }
 
-export function imageBuildArgs(image = PROVISIONED_IMAGE) {
-  return ['build', '-t', image, '-f', 'martial_arts_template/Dockerfile', '.']
+export function imageBuildArgs(image = MARTIAL_ARTS_PRODUCT.image, dockerfile = MARTIAL_ARTS_PRODUCT.dockerfile) {
+  return ['build', '-t', image, '-f', dockerfile, '.']
 }
 
-export function ensureLocalImage(root = repoRoot(), image = PROVISIONED_IMAGE) {
+export function ensureLocalImage(
+  root = repoRoot(),
+  image = MARTIAL_ARTS_PRODUCT.image,
+  dockerfile = MARTIAL_ARTS_PRODUCT.dockerfile,
+) {
   const inspect = spawnSync('docker', imageInspectArgs(image), {
     cwd: root,
     encoding: 'utf8',
@@ -23,7 +28,7 @@ export function ensureLocalImage(root = repoRoot(), image = PROVISIONED_IMAGE) {
   if (inspect.status === 0) {
     return { image, built: false }
   }
-  const build = spawnSync('docker', imageBuildArgs(image), {
+  const build = spawnSync('docker', imageBuildArgs(image, dockerfile), {
     cwd: root,
     encoding: 'utf8',
     windowsHide: true,
@@ -41,9 +46,13 @@ export function provisionUpCommand(input: {
   composeProject: string
   root?: string
   filesRoot?: string
+  productInstance?: { productId: string }
 }) {
-  const root = input.root ?? templateRoot()
-  const envFile = resolveComposeEnvFile(input)
+  const root = composeRootForEnvironment(input)
+  const envFile = resolveComposeEnvFile({
+    ...input,
+    root,
+  })
   return {
     cwd: root,
     args: composeArgs({
@@ -95,21 +104,42 @@ export function environmentProvisionGuard(row: { lifecycleStatus: string } | nul
 
 export function selectEnvironmentsToProvision<T extends {
   id: string
-  customerId: string
+  customerId?: string
+  customer?: { id: string }
+  productInstance?: { id: string }
   lifecycleStatus: string
-}>(rows: readonly T[], customerId: string, onlyIds?: readonly string[]) {
+}>(rows: readonly T[], customerId: string, onlyIds?: readonly string[], productInstanceId?: string) {
   return rows
-    .filter(row => row.customerId === customerId)
+    .filter(row => (row.customerId ?? row.customer?.id) === customerId)
     .filter(row => row.lifecycleStatus !== 'decommissioned')
     .filter(row => !onlyIds?.length || onlyIds.includes(row.id))
+    .filter(row => !productInstanceId || row.productInstance?.id === productInstanceId)
 }
 
-export async function provisionCustomerEnvironments(db: Database, customerId: string, filesRoot?: string, onlyIds?: readonly string[]) {
-  const rows = selectEnvironmentsToProvision(await db.select().from(environments), customerId, onlyIds)
+export async function provisionCustomerEnvironments(
+  db: Database,
+  customerId: string,
+  filesRoot?: string,
+  onlyIds?: readonly string[],
+  productInstanceId?: string,
+) {
+  const rows = selectEnvironmentsToProvision(
+    await listRegisteredEnvironments(db),
+    customerId,
+    onlyIds,
+    productInstanceId,
+  )
   if (rows.length === 0) {
     throw new Error('No environments to provision.')
   }
-  ensureLocalImage()
+  const images = new Map<string, { image: string, dockerfile: string }>()
+  for (const row of rows) {
+    const product = requireProduct(row.productInstance.productId)
+    images.set(product.image, { image: product.image, dockerfile: product.dockerfile })
+  }
+  for (const spec of images.values()) {
+    ensureLocalImage(repoRoot(), spec.image, spec.dockerfile)
+  }
   const results = []
   for (const row of rows) {
     await setLifecycleStatus(db, row.id, 'provisioning')
@@ -128,6 +158,7 @@ export async function provisionCustomerEnvironments(db: Database, customerId: st
         composeFile: row.composeFile,
         composeProject: row.composeProject,
         filesRoot,
+        productInstance: row.productInstance,
       })
       await waitUntilHealthy(row.healthUrl)
       await setLifecycleStatus(db, row.id, 'ready')

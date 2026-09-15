@@ -50,7 +50,7 @@ Hosting Node
 - PROD and DEV under one instance may **not** be different verticals.
 - Vertical switching is not a normal env config change.
 
-**Shipped today:** `customers` + `environments` only. The customer row is the commercial account **and** the only product instance. One PROD per customer **row**. See [[Customer-Environment]].
+**Shipped today (C2 code-shipped, not Successful):** `customers` + `product_instances` + `environments`. One account may own Martial Arts and Sales instances. One PROD per **product instance**. `industry_template` is a migration leftover (`unassigned` on new accounts with no MA instance). See [[Customer-Environment]].
 
 ---
 
@@ -60,7 +60,7 @@ Hosting Node
 CRM Core
    ↑
    ├── Martial Arts     (shipped; martial_arts_template, :5030)
-   ├── Sales / Software (C2A/C2B/B1/B2 Successful; sales_template, :5040; no CP catalog)
+   ├── Sales / Software (C2A/C2B/B1/B2 Successful; C2 CP catalog + crm-sales:c2 code-shipped / awaiting owner QA; sales_template, :5040)
    └── Beauty           (not started)
 ```
 
@@ -73,7 +73,7 @@ CRM Core
 | Settings / RBAC | Core owns frameworks + Core permissions. Verticals own vertical permissions and sections |
 | Extension | Intentional contracts only. No generic plugin framework. No file-override forks |
 | Migrations | Core owns Core migrations; verticals own theirs. MA journal `0000`–`0020` stays until a table actually moves |
-| Versioning | Independent Core vs vertical semver (target). Today’s images are still `:s2` / `:s4` |
+| Versioning | Independent Core vs vertical semver (target). Images in use: MA `:s2` / `:s4`, Sales `crm-sales:c2` |
 | Regression | A Core change is not green if a supported vertical is red |
 | Duplication | Prefer temporary vertical duplication to premature Core |
 | Promotion | Default **No until justified**. Diverge first; abstract after two real implementations |
@@ -81,7 +81,7 @@ CRM Core
 
 **D2–D4 (accepted):** Martial Arts `leads` / `lead_lines` / trials, campaigns / acquisition events, and public capture (`/trial`, `/events/[slug]`, `/t/[slug]`) stay MA-owned until Sales provides a second implementation.
 
-C1 is **code-shipped** (`packages/crm-core`, workspace, import tests). C2A (thin local Sales consumer) is **Successful** at `sales_template/` / `sales-crm` on port 5040. C2B Slice A (Lead/convert/Opportunity workflow) is **Successful**. SI Sales B1 (commercial model + acquisition foundation) is **Successful**. SI Sales B2 (proposal system) is **Successful**. C2 (Sales vertical **plus** CP product catalog) is **not started** and is **not** authorized by C2A, C2B, B1, or B2. Do not “establish Core” again.
+C1 is **code-shipped** (`packages/crm-core`, workspace, import tests). C2A (thin local Sales consumer) is **Successful** at `sales_template/` / `sales-crm` on port 5040. C2B Slice A, SI Sales B1, and SI Sales B2 are **Successful**. C2 (minimal D1 Product Instances + hybrid CP catalog + Sales Docker `crm-sales:c2`) is **code-shipped / awaiting owner QA** and is **not Successful**. Do not “establish Core” again.
 
 C2+ extraction narrative (not authorization): [[history/CRM_Core_Extraction_Implementation_Plan]].
 

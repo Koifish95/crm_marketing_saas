@@ -46,6 +46,7 @@ describe('S3 registry', () => {
       expect(rows.every(row => row.customer.displayName === 'Acme BJJ')).toBe(true)
       expect(rows.every(row => row.node.name === 'laptop')).toBe(true)
       expect(rows.every(row => row.expectedImage === 'martial-arts-acquisition:s2')).toBe(true)
+      expect(rows.every(row => row.productInstance.productId === 'martial-arts')).toBe(true)
       expect(rows.some(row => row.containerName === 'lab-acme-prod-app')).toBe(true)
       expect(rows.find(row => row.slug === 'lab-acme-prod')?.accessUrl).toBe('http://localhost:52040')
       expect(rows.find(row => row.slug === 'lab-acme-dev')?.accessUrl).toBe('http://localhost:52050')
