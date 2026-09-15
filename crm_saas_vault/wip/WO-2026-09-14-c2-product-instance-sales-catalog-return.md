@@ -4,7 +4,7 @@ status: done
 id: WO-2026-09-14-c2-product-instance-sales-catalog
 milestone: C2
 base_sha: "35c4aca8c0e02533f8e2278ade1bd6b3c513e025"
-result_sha: pending
+result_sha: "43454fa08a53975fa509c1871cc53c850cc1e4ba"
 implementation_result: shipped
 tests: "control_plane: pnpm test 19 files / 81 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass. sales_template: pnpm test 8 files / 41 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass. martial_arts_template: pnpm test 69 files / 331 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass."
 decisions_discovered: []
