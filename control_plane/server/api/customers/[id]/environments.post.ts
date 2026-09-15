@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { useDb } from '../../../database'
 import { ProvisionError, addExtraNonProdEnvironment } from '../../../services/provision-registry'
-import { provisionCustomerEnvironments } from '../../../services/provision-runtime'
+import { startBackgroundProvision } from '../../../services/provision-runtime'
 import { NON_PROD_TYPES } from '../../../services/provision-contract'
 import { productInstances } from '../../../database/schema'
 import { eq } from 'drizzle-orm'
@@ -31,8 +31,8 @@ export default defineEventHandler(async (event) => {
       type: parsed.data.type,
       displayName: parsed.data.displayName,
     })
-    const results = await provisionCustomerEnvironments(db, id, undefined, [created.id], parsed.data.productInstanceId)
-    return { customerId: id, environment: created, provision: results }
+    const provision = startBackgroundProvision(db, id, undefined, [created.id], parsed.data.productInstanceId)
+    return { customerId: id, environment: created, ...provision }
   } catch (error) {
     if (error instanceof ProvisionError) {
       throw createError({ statusCode: error.statusCode, statusMessage: error.message })

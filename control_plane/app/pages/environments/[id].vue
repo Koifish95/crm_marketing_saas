@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { findById, isStartableEnvironment, isStoppableEnvironment, pollFleetUntilHealthy, type FleetStatusResponse } from '~~/shared/utils/fleet'
+import { findById, isStartableEnvironment, isStoppableEnvironment, operatorEnvironmentStatus, pollFleetUntilHealthy, FLEET_PROVISION_POLL_ATTEMPTS, FLEET_PROVISION_POLL_MS, type FleetStatusResponse } from '~~/shared/utils/fleet'
 import {
   formatBackupCreatedAt,
   formatBackupCreatedNotice,
@@ -33,6 +33,8 @@ const environmentId = computed(() => String(route.params.id || ''))
 const env = computed(() => findById(environments.value, environmentId.value))
 const decommissioned = computed(() => env.value?.lifecycleStatus === 'decommissioned')
 const retryable = computed(() => isRetryableLifecycle(env.value?.lifecycleStatus))
+const provisioning = computed(() => env.value?.lifecycleStatus === 'provisioning')
+const operatorStatus = computed(() => env.value ? operatorEnvironmentStatus(env.value) : 'unknown')
 const canStop = computed(() => Boolean(env.value && isStoppableEnvironment(env.value)))
 const canStart = computed(() => Boolean(env.value && isStartableEnvironment(env.value)))
 
@@ -143,12 +145,31 @@ async function retryProvision() {
   }
   retrying.value = true
   actionError.value = ''
-  actionNotice.value = ''
+  actionNotice.value = 'Retry accepted. Continuing this environment. Same volumes. Image build can take several minutes.'
   try {
     await $fetch(`/api/environments/${env.value.id}/provision`, { method: 'POST' })
     await refreshStatus()
+    const outcome = await pollFleetUntilHealthy({
+      isHealthy: () => findById(environments.value, environmentId.value)?.lifecycleStatus !== 'provisioning',
+      refresh: refreshStatus,
+      attempts: FLEET_PROVISION_POLL_ATTEMPTS,
+      delayMs: FLEET_PROVISION_POLL_MS,
+    })
+    const current = findById(environments.value, environmentId.value)
+    if (outcome === 'timeout' && current?.lifecycleStatus === 'provisioning') {
+      actionNotice.value = 'Still provisioning. Refresh this page. Retry remains available if it stays Provisioning or becomes Failed.'
+      return
+    }
+    if (current?.lifecycleStatus === 'failed') {
+      actionNotice.value = ''
+      actionError.value = current.provisionError || 'Provisioning failed.'
+      return
+    }
+    actionNotice.value = `Provisioning finished. Status is ${current ? operatorEnvironmentStatus(current) : 'unknown'}.`
   } catch (error) {
+    actionNotice.value = ''
     actionError.value = fetchMessage(error, 'Retry failed.')
+    await refreshStatus()
   } finally {
     retrying.value = false
   }
@@ -327,8 +348,11 @@ async function decommission() {
         </button>
       </template>
       Last checked {{ checkedAt || '—' }}.
-      <template v-if="retryable">
-        Retry continues the existing provision. It remounts the same volumes. It does not rebuild.
+      <template v-if="provisioning">
+        Provisioning in progress. Status is stored on the server. You can leave this page.
+      </template>
+      <template v-else-if="retryable">
+        Retry continues the existing environment and remounts the same volumes. It does not delete volumes.
       </template>
     </AppPageHeader>
     <p
@@ -386,7 +410,11 @@ async function decommission() {
           <dt>Image</dt>
           <dd>{{ env?.expectedImage }}</dd>
           <dt>Status</dt>
-          <dd><AppStatusBadge :status="env?.status || 'unknown'" /></dd>
+          <dd><AppStatusBadge :status="operatorStatus" /></dd>
+          <dt>Lifecycle</dt>
+          <dd>{{ env?.lifecycleStatus || '—' }}</dd>
+          <dt>Provision error</dt>
+          <dd>{{ env?.provisionError || '—' }}</dd>
           <dt>Access URL</dt>
           <dd><AppAccessLink :href="env?.accessUrl" /></dd>
         </dl>
@@ -401,7 +429,7 @@ async function decommission() {
           <dt>Runtime</dt>
           <dd>{{ env?.runtime }}</dd>
           <dt>Combined status</dt>
-          <dd><AppStatusBadge :status="env?.status || 'unknown'" /></dd>
+          <dd><AppStatusBadge :status="operatorStatus" /></dd>
           <dt>Application health</dt>
           <dd>{{ env?.healthOk ? 'ok' : (env?.healthError || 'not ok') }}</dd>
           <dt>Last checked</dt>

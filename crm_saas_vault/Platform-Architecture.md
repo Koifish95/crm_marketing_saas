@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-13
+updated: 2026-09-15
 aliases:
   - ARCHITECTURE
   - Platform architecture
@@ -60,7 +60,7 @@ Hosting Node
 CRM Core
    ↑
    ├── Martial Arts     (shipped; martial_arts_template, :5030)
-   ├── Sales / Software (C2A/C2B/B1/B2 Successful; C2 CP catalog + crm-sales:c2 code-shipped / awaiting owner QA; sales_template, :5040)
+   ├── Sales / Software (C2A/C2B/B1/B2 Successful; C2 CP catalog + crm-sales:c2 code-shipped / owner QA in progress; sales_template, :5040)
    └── Beauty           (not started)
 ```
 
@@ -81,7 +81,7 @@ CRM Core
 
 **D2–D4 (accepted):** Martial Arts `leads` / `lead_lines` / trials, campaigns / acquisition events, and public capture (`/trial`, `/events/[slug]`, `/t/[slug]`) stay MA-owned until Sales provides a second implementation.
 
-C1 is **code-shipped** (`packages/crm-core`, workspace, import tests). C2A (thin local Sales consumer) is **Successful** at `sales_template/` / `sales-crm` on port 5040. C2B Slice A, SI Sales B1, and SI Sales B2 are **Successful**. C2 (minimal D1 Product Instances + hybrid CP catalog + Sales Docker `crm-sales:c2`) is **code-shipped / awaiting owner QA** and is **not Successful**. Do not “establish Core” again.
+C1 is **code-shipped** (`packages/crm-core`, workspace, import tests). C2A (thin local Sales consumer) is **Successful** at `sales_template/` / `sales-crm` on port 5040. C2B Slice A, SI Sales B1, and SI Sales B2 are **Successful**. C2 (minimal D1 Product Instances + hybrid CP catalog + Sales Docker `crm-sales:c2`) is **code-shipped / owner QA in progress** and is **not Successful**. Do not “establish Core” again.
 
 C2+ extraction narrative (not authorization): [[history/CRM_Core_Extraction_Implementation_Plan]].
 

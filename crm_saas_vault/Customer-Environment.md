@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-14
+updated: 2026-09-15
 aliases:
   - Environment unit
   - Customer Environment
@@ -195,7 +195,7 @@ Stop is non-destructive: process down, persistent data kept.
 
 Delete / decommission is a **separate gated** action. It is not Stop.
 
-S4 stores `lifecycleStatus` `provisioning` | `ready` | `failed` on environment rows. Gated decommission (`decommissioned`) now exists in the control plane: process removed, volumes kept. Hard delete of rows/volumes is still later.
+S4 stores `lifecycleStatus` `provisioning` | `ready` | `failed` on environment rows, plus optional `provision_error`. Adding a product instance inserts the instance and default PROD+DEV, then provisions in the background. The operator sees persisted Provisioning / Failed / Healthy; Retry continues the same rows and remounts the same volumes. Gated decommission (`decommissioned`) now exists in the control plane: process removed, volumes kept. Hard delete of rows/volumes is still later.
 
 ## Portability
 

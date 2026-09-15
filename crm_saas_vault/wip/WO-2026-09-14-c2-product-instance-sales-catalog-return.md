@@ -6,7 +6,7 @@ milestone: C2
 base_sha: "35c4aca8c0e02533f8e2278ade1bd6b3c513e025"
 result_sha: "43454fa08a53975fa509c1871cc53c850cc1e4ba"
 implementation_result: shipped
-tests: "control_plane: pnpm test 19 files / 81 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass. sales_template: pnpm test 8 files / 41 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass. martial_arts_template: pnpm test 69 files / 331 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass."
+tests: "QA remediation: control_plane pnpm test 19 files / 84 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass. sales_template pnpm test 8 files / 41 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass. martial_arts_template pnpm test 69 files / 331 tests pass; pnpm lint pass; pnpm typecheck pass. Original C2 ship tests were 19/81 CP."
 decisions_discovered: []
 durable_docs_updated:
   - Current-State.md
@@ -64,7 +64,7 @@ Customer Account
 - Schema `product_instances` + `environments.product_instance_id`. Migration `0004_product_instances`: backfill every existing customer as one Martial Arts instance; attach existing env rows; **do not rename** slug / container / compose project / volumes / image / host port.
 - Hybrid catalog `control_plane/server/products/catalog.ts`: `martial-arts` → `martial-arts-acquisition:s4` + `martial_arts_template/Dockerfile`; `sales` → `crm-sales:c2` + `sales_template/Dockerfile`. Beauty is not listed.
 - `POST /api/customers` creates an account only (`industry_template` = `unassigned`, zero environments).
-- `POST /api/customers/:id/product-instances` requires `productId`. Creates the instance and default PROD+DEV, then provisions those envs.
+- `POST /api/customers/:id/product-instances` requires `productId`. Creates the instance and default PROD+DEV immediately (`lifecycle_status` provisioning), then starts Docker provision in the background. The HTTP request does not wait for image build.
 - Extra non-PROD requires `productInstanceId`. One PROD per instance.
 - New env names `{customer}-{productId}-{type}`. Backfilled names stay `{customer}-{type}`.
 - Upgrade siblings filtered by product instance. Image build/compose cwd come from the instance product, not MA constants.
@@ -130,7 +130,40 @@ Use a **new disposable** Control Plane account. Do not mutate lab-acme or Strate
 19. No Beauty product was introduced.
 20. No Campaign/Public Capture Core promotion occurred.
 
-CP: http://127.0.0.1:52100. Local Sales `pnpm dev` remains http://localhost:5040. After CP migrate/seed, restart Control Plane so `0004_product_instances` applies to the live gitignored sqlite.
+CP: http://127.0.0.1:52100. Local Sales `pnpm dev` remains http://localhost:5040. After CP migrate/seed, restart Control Plane so `0004_product_instances` / `0005_provision_error` apply to the live gitignored sqlite.
+
+## Owner QA remediation (2026-09-15)
+
+Two defects found during Scott’s owner QA on disposable account **C2 QA Test** (`c2-test`). C2 remains **not Successful**.
+
+### Defect 1 — long-running provision looked dead
+
+`POST /api/customers/:id/product-instances` awaited `ensureLocalImage` (`spawnSync docker build`) and `waitUntilHealthy` on the HTTP request. First Sales add had no `crm-sales:c2` image, so the browser sat on **Adding…** for the full Docker/Nuxt build. Navigating away left persisted `provisioning` rows that the Products table never refreshed to show.
+
+**Fix:** registry insert returns immediately (`accepted: true`). Provision runs in-process in the background (one lock per customer, not a job queue). UI acknowledges immediately, disables duplicate submit, polls `/api/status`, and shows persisted operator status: Provisioning / Failed / Healthy. Account create stays lightweight.
+
+### Defect 2 — Sales unique-constraint orphan
+
+Sales instance `d90f4a6a-b6b7-4f31-951e-9ed36b3b9576` and PROD/DEV rows (`c2-test-sales-prod` `:52208`, `c2-test-sales-dev` `:52209`) were inserted. `ensureLocalImage` threw **before** the per-env try/catch (and/or the HTTP client aborted mid-`spawnSync`), so rows stayed `provisioning` with no error, no containers, and a second Add returned **Sales is already on this account.** Default Node `maxBuffer` (1MB) also made a large Docker build unsafe.
+
+The recoverable Sales image build then failed for real Dockerfile/runtime reasons once visibility existed:
+
+1. `node node_modules/esbuild/bin/esbuild` — pnpm hoist, esbuild not at that path.
+2. `entrypoint.sh` CRLF — tini exec `/bin/sh\r` exit 127.
+3. Runner copied stubbed `sales_template/node_modules/@libsql` (empty `databaseOpen`) instead of workspace `/src/node_modules/@libsql`.
+
+**Fix:** image failures mark **only** the environments that need that image as `failed` with `provision_error`. Product Instance stays visible. Duplicate `(customer, product)` stays 409. Retry continues the same env ids/volumes (no `-v`). Sales Dockerfile: `pnpm exec esbuild`, LF entrypoint + `sed` strip CR, copy workspace `@libsql`.
+
+### Recovered proof on C2 QA Test (do not treat as Successful)
+
+Martial Arts PROD/DEV remained healthy (`martial-arts-acquisition:s4`, `:52206` / `:52207`). Sales recovered on the existing instance:
+
+| Env | Container | Image | Port | Volumes |
+|---|---|---|---|---|
+| Sales PROD | `c2-test-sales-prod-app` | `crm-sales:c2` | 52208 | `c2-test-sales-prod-sqlite` / `-assets` |
+| Sales DEV | `c2-test-sales-dev-app` | `crm-sales:c2` | 52209 | `c2-test-sales-dev-sqlite` / `-assets` |
+
+Staff login `admin` / `setup` reached must-change-password on both Sales environments. lab-acme / SI / Still Beauty / Alianna's were not mutated.
 
 ## Stop
 

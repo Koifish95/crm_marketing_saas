@@ -20,7 +20,7 @@ import {
   createCustomerAccount,
 } from '../../server/services/provision-registry'
 import { listRegisteredEnvironments } from '../../server/services/registry'
-import { imageBuildArgs } from '../../server/services/provision-runtime'
+import { imageBuildArgs, recordProvisionFailure, setLifecycleStatus } from '../../server/services/provision-runtime'
 import { composeRootForEnvironment } from '../../server/services/docker-relaunch'
 import { prodUpgradeBlocked } from '../../shared/utils/fleet-backup'
 import { writeFleetBackupZip } from '../../server/services/fleet-backup-zip'
@@ -252,5 +252,53 @@ describe('C2 compose cwd and Sales backup path', () => {
     const extractDir = join(root, 'extract')
     await extractFleetBackupZip(zipPath, extractDir)
     expect(readFileSync(join(extractDir, 'uploads', 'proposals', '1', '1', 'generated.pdf'), 'utf8')).toBe('%PDF-1.4')
+  })
+})
+
+describe('C2 QA remediation', () => {
+  it('keeps a failed Sales instance visible and unique, and retry does not insert another pair', async () => {
+    const { url, root } = await openRegistry()
+    const { client, db } = createDb(url)
+    try {
+      const account = await createCustomerAccount(db, {
+        displayName: 'C2 QA Test',
+        slug: 'c2-qa-test',
+        adminEmail: 'admin@c2-qa.local',
+        filesRoot: root,
+      })
+      expect(account.environments).toHaveLength(0)
+      await addProductInstance(db, account.customerId, {
+        productId: 'martial-arts',
+        filesRoot: root,
+      })
+      const sales = await addProductInstance(db, account.customerId, {
+        productId: 'sales',
+        filesRoot: root,
+      })
+      for (const row of sales.environments) {
+        await recordProvisionFailure(db, row, 'Local image build failed.')
+      }
+      const rows = (await listRegisteredEnvironments(db)).filter(row => row.customer.id === account.customerId)
+      const salesRows = rows.filter(row => row.productInstance.productId === 'sales')
+      expect(salesRows).toHaveLength(2)
+      expect(salesRows.every(row => row.lifecycleStatus === 'failed')).toBe(true)
+      expect(salesRows.every(row => row.provisionError === 'Local image build failed.')).toBe(true)
+      expect(salesRows.every(row => row.expectedImage === 'crm-sales:c2')).toBe(true)
+      expect(rows.filter(row => row.type === 'PROD')).toHaveLength(2)
+      const instances = (await db.select().from(productInstances)).filter(row => row.customerId === account.customerId)
+      expect(instances.map(row => row.productId).sort()).toEqual(['martial-arts', 'sales'])
+      await expect(addProductInstance(db, account.customerId, {
+        productId: 'sales',
+        filesRoot: root,
+      })).rejects.toThrow(/already on this account/)
+      await setLifecycleStatus(db, salesRows[0]!.id, 'provisioning')
+      const retried = (await listRegisteredEnvironments(db)).filter(row => row.customer.id === account.customerId)
+      expect(retried.filter(row => row.productInstance.productId === 'sales')).toHaveLength(2)
+      expect(retried.filter(row => row.type === 'PROD')).toHaveLength(2)
+      expect(retried.find(row => row.id === salesRows[0]!.id)?.lifecycleStatus).toBe('provisioning')
+      expect(retried.find(row => row.id === salesRows[0]!.id)?.provisionError).toBeNull()
+    } finally {
+      client.close()
+    }
   })
 })

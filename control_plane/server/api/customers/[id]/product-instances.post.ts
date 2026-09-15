@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { useDb } from '../../../database'
 import { ProvisionError, addProductInstance } from '../../../services/provision-registry'
-import { provisionCustomerEnvironments } from '../../../services/provision-runtime'
+import { startBackgroundProvision } from '../../../services/provision-runtime'
 
 const Body = z.object({
   productId: z.string(),
@@ -19,14 +19,14 @@ export default defineEventHandler(async (event) => {
   }
   try {
     const created = await addProductInstance(useDb(), id, parsed.data)
-    const results = await provisionCustomerEnvironments(
+    const provision = startBackgroundProvision(
       useDb(),
       id,
       undefined,
       created.environments.map(row => row.id),
       created.productInstanceId,
     )
-    return { ...created, provision: results }
+    return { ...created, ...provision }
   } catch (error) {
     if (error instanceof ProvisionError) {
       throw createError({ statusCode: error.statusCode, statusMessage: error.message })

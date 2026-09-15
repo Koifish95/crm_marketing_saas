@@ -2,7 +2,7 @@
 type: note
 status: current
 area: saas
-updated: 2026-09-14
+updated: 2026-09-15
 aliases:
   - S4 runbook
 tags:
@@ -28,7 +28,7 @@ pnpm install
 pnpm dev
 ```
 
-Open http://127.0.0.1:52100 → **Customers → New customer**. Fill display name, slug, timezone, and admin email. Submit. That creates the **account only**. Open the customer workspace → **Products** → select Martial Arts or Sales → **Add product instance**. Wait until that instance’s PROD and DEV are **healthy**. Add the other product the same way on the same account when proving C2. Do not mutate lab-acme or Strategic Insights to make a multi-product proof.
+Open http://127.0.0.1:52100 → **Customers → New customer**. Fill display name, slug, timezone, and admin email. Submit. That creates the **account only** and is fast. Open the customer workspace → **Products** → select Martial Arts or Sales → **Add product instance**. The workspace should immediately show the instance as **provisioning**. Image build can take several minutes; you can leave the page. Wait until that instance’s PROD and DEV are **healthy**. Add the other product the same way on the same account when proving C2. Do not mutate lab-acme or Strategic Insights to make a multi-product proof.
 
 ## What it creates
 
@@ -38,7 +38,7 @@ Staff unwrap login: `admin` / `setup`, then `/account/password`. Do not leave `s
 
 ## Retry
 
-The same slug does not create a second customer. **Retry** resumes Failed/partial rows and remounts the same volumes. Never `down -v`.
+The same slug does not create a second customer. The same `(customer, product)` does not create a second product instance. **Retry** resumes Failed/Provisioning rows and remounts the same volumes. Failed rows keep `provision_error`. Never `down -v`.
 
 ## Safety
 

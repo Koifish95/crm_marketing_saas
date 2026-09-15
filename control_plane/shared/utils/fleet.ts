@@ -1,4 +1,5 @@
 export type CombinedStatus = 'healthy' | 'stopped' | 'missing' | 'unhealthy' | 'unknown'
+export type OperatorStatus = CombinedStatus | 'provisioning' | 'failed' | 'decommissioned'
 
 export type FleetEnvironment = {
   id: string
@@ -16,6 +17,7 @@ export type FleetEnvironment = {
   accessUrl: string
   hostPort?: number
   lifecycleStatus?: string
+  provisionError?: string | null
   expectedImage: string
   sqliteVolume: string
   assetsVolume: string
@@ -84,6 +86,17 @@ const STATUS_RANK: Record<CombinedStatus, number> = {
   healthy: 1,
 }
 
+const OPERATOR_RANK: Record<OperatorStatus, number> = {
+  failed: 8,
+  unhealthy: 7,
+  unknown: 6,
+  provisioning: 5,
+  missing: 4,
+  stopped: 3,
+  healthy: 2,
+  decommissioned: 1,
+}
+
 export function worstStatus(statuses: readonly CombinedStatus[]): CombinedStatus {
   if (statuses.length === 0) {
     return 'unknown'
@@ -93,9 +106,53 @@ export function worstStatus(statuses: readonly CombinedStatus[]): CombinedStatus
   ))
 }
 
-export function needsAttention(env: FleetEnvironment) {
+export function operatorEnvironmentStatus(env: {
+  status: CombinedStatus
+  lifecycleStatus?: string
+}): OperatorStatus {
   if (env.lifecycleStatus === 'decommissioned') {
+    return 'decommissioned'
+  }
+  if (env.lifecycleStatus === 'failed') {
+    return 'failed'
+  }
+  if (env.lifecycleStatus === 'provisioning') {
+    return 'provisioning'
+  }
+  return env.status
+}
+
+export function worstOperatorStatus(statuses: readonly OperatorStatus[]): OperatorStatus {
+  const live = statuses.filter(status => status !== 'decommissioned')
+  if (live.length === 0) {
+    return statuses.length === 0 ? 'unknown' : 'decommissioned'
+  }
+  return live.reduce((worst, status) => (
+    OPERATOR_RANK[status] > OPERATOR_RANK[worst] ? status : worst
+  ))
+}
+
+export function firstProvisionError(environments: readonly { provisionError?: string | null }[]) {
+  return environments.map(env => env.provisionError).find(error => Boolean(error)) || ''
+}
+
+export function shortProvisionError(error?: string | null, max = 180) {
+  if (!error) {
+    return ''
+  }
+  const text = error.replace(/\s+/g, ' ').trim()
+  if (text.length <= max) {
+    return text
+  }
+  return `…${text.slice(-max)}`
+}
+
+export function needsAttention(env: FleetEnvironment) {
+  if (env.lifecycleStatus === 'decommissioned' || env.lifecycleStatus === 'provisioning') {
     return false
+  }
+  if (env.lifecycleStatus === 'failed') {
+    return true
   }
   return env.status === 'unhealthy' || env.status === 'unknown' || env.status === 'missing'
 }
@@ -136,7 +193,8 @@ export function groupProductInstances(
       environmentCount: instance.environments.length,
       prod: instance.environments.find(env => env.type === 'PROD') ?? null,
       dev: instance.environments.find(env => env.type === 'DEV') ?? null,
-      overall: worstStatus(instance.environments.map(env => env.status)),
+      overall: worstOperatorStatus(instance.environments.map(operatorEnvironmentStatus)),
+      provisionError: firstProvisionError(instance.environments),
     }))
     .sort((left, right) => left.displayName.localeCompare(right.displayName))
 }
@@ -189,7 +247,7 @@ export function groupCustomers(
           ?? customer.environments.find(env => env.type === 'DEV') ?? null,
         overall: customer.environments.length === 0
           ? 'unknown' as const
-          : worstStatus(customer.environments.map(env => env.status)),
+          : worstOperatorStatus(customer.environments.map(operatorEnvironmentStatus)),
       }
     })
     .sort((left, right) => left.displayName.localeCompare(right.displayName))
@@ -218,7 +276,7 @@ export function groupNodes(environments: readonly FleetEnvironment[]) {
     .map(node => ({
       ...node,
       environmentCount: node.environments.length,
-      overall: worstStatus(node.environments.map(env => env.status)),
+      overall: worstOperatorStatus(node.environments.map(operatorEnvironmentStatus)),
     }))
     .sort((left, right) => left.name.localeCompare(right.name))
 }
@@ -377,6 +435,8 @@ export function formatBulkNotice(
 export const FLEET_STATUS_KEY = 'fleet-status'
 export const FLEET_HEALTH_POLL_MS = 3000
 export const FLEET_HEALTH_POLL_ATTEMPTS = 20
+export const FLEET_PROVISION_POLL_MS = 4000
+export const FLEET_PROVISION_POLL_ATTEMPTS = 180
 
 export function shouldReuseFleetStatusCache(cause?: string) {
   return cause === 'initial'

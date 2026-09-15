@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-14
+updated: 2026-09-15
 aliases:
   - CURRENT_STATE
   - Current state
@@ -36,10 +36,10 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | C2B SI Sales Refinement Slice A | **Successful** (2026-09-12). Owner-accepted after browser QA at http://localhost:5040. Feature `1ac18e4`. Not Slice B. Not C2. Evidence: [[history/C2B_closeout]] |
 | SI Sales B1 (commercial + acquisition) | **Successful** (2026-09-12). Owner-accepted after browser QA at http://localhost:5040. Feature `40851e0`. Not B2. Not C2. Evidence: [[history/B1_closeout]] |
 | SI Sales B2 (proposal system) | **Successful** (2026-09-13). Owner-accepted after core QA, refinements, and final regression QA at http://localhost:5040. Feature `84c0cc8`; refinements `c2d611e`; revision-selection `0be7e06`. Not C2. Evidence: [[history/B2_closeout]] |
-| C2 / Beauty / S7–S11 | C2 **code-shipped / awaiting owner QA** (not Successful). Beauty and S7–S11 **Not started** |
+| C2 / Beauty / S7–S11 | C2 **code-shipped / owner QA in progress** (not Successful). Beauty and S7–S11 **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 
-**Authorized work:** none. C2 is **code-shipped / awaiting owner QA** and is **not Successful**. Do not start C3, Beauty, S7, S8, SI migration, or Core promotion. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Return: [[wip/WO-2026-09-14-c2-product-instance-sales-catalog-return]].
+**Authorized work:** none. C2 is **code-shipped / owner QA in progress** and is **not Successful**. Do not start C3, Beauty, S7, S8, SI migration, or Core promotion. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Return: [[wip/WO-2026-09-14-c2-product-instance-sales-catalog-return]].
 
 Lockfile: [[project-state.yaml]].
 
@@ -91,7 +91,7 @@ CRM Core is shared infrastructure. Verticals compose on Core. One-way dependency
 
 Official S-track still lists S7 (hosting/VPS) after S6. The Core ADR **changes that priority** (product family locally first). Both notes remain valid in their roles: [[SaaS-Milestones]] is the official S-track; the ADR is architecture law. Do not silently rewrite the S-track. C-track IDs are separate.
 
-**Implemented (C2 code-shipped, not Successful):** Control Plane has `customers` + `product_instances` + `environments`. One account may own Martial Arts and Sales instances. One PROD per **product instance**. New accounts are created with zero environments (`industry_template` sentinel `unassigned`). Operator then **Add product instance** with an explicit product pick. Existing rows backfill as one Martial Arts instance; env slug / container / volume / image / port identities are unchanged. New instances use `{customer}-{productId}-{type}` names. Hybrid catalog in CP code (`martial-arts`, `sales` only). Beauty is not a catalog entry.
+**Implemented (C2 code-shipped / owner QA in progress, not Successful):** Control Plane has `customers` + `product_instances` + `environments`. One account may own Martial Arts and Sales instances. One PROD per **product instance**. New accounts are created with zero environments (`industry_template` sentinel `unassigned`). Operator then **Add product instance** with an explicit product pick. That insert returns immediately; Docker image build and compose run as server-side provisioning (`lifecycleStatus` `provisioning` → `ready` / `failed`, optional `provision_error`). Retry continues the same rows and remounts the same volumes. Existing rows backfill as one Martial Arts instance; env slug / container / volume / image / port identities are unchanged. New instances use `{customer}-{productId}-{type}` names. Hybrid catalog in CP code (`martial-arts`, `sales` only). Beauty is not a catalog entry.
 
 ---
 
@@ -103,7 +103,7 @@ Full gym CRM derived from Renzo: households as `leads` + `lead_lines`, trials, i
 
 Local: http://localhost:5030 (`pnpm dev`). Laptop Docker PRODUCTION `:5000`, STAGE `:5010`, DEV `:5020`.
 
-### Sales vertical (`sales_template/`) — C2A–B2 Successful; C2 code-shipped / awaiting owner QA
+### Sales vertical (`sales_template/`) — C2A–B2 Successful; C2 code-shipped / owner QA in progress
 
 Second working consumer of `@crm/core`. Package `sales-crm` (`private: true`). Extends `@crm/core`. Local: http://localhost:5040 (`pnpm dev`). SQLite `file:./data/app.sqlite`. Provisioned sqlite is `file:/app/data/sqlite/crm.sqlite`. Drizzle journal `0000`–`0003`. Docker image **`crm-sales:c2`**. Proposal PDFs in provisioned envs use `SALES_PROPOSALS_DIR=/app/data/uploads/proposals` on the existing assets/uploads volume (S6 zip already includes `/app/data/uploads`).
 
@@ -117,7 +117,7 @@ B2 adds a Sales-owned Proposal chain on each Opportunity: draft/issue/mark-sent/
 
 No additional Sales CRM features shipped in C2 (no e-sign, email, portal). Strategic Insights has **not** been migrated or cut over. C2 proof must use a **new disposable** Control Plane account, not lab-acme or SI mutation.
 
-C2A owner-accepted 2026-09-11. Closeout: [[history/C2A_closeout]]. C2B owner-accepted 2026-09-12. Closeout: [[history/C2B_closeout]]. Slice A implementation return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. B1 owner-accepted 2026-09-12. Closeout: [[history/B1_closeout]]. Implementation return: [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]]. B2 owner-accepted 2026-09-13. Closeout: [[history/B2_closeout]]. Implementation return: [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system]]. C2 implementation return (awaiting owner QA): [[wip/WO-2026-09-14-c2-product-instance-sales-catalog-return]].
+C2A owner-accepted 2026-09-11. Closeout: [[history/C2A_closeout]]. C2B owner-accepted 2026-09-12. Closeout: [[history/C2B_closeout]]. Slice A implementation return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. B1 owner-accepted 2026-09-12. Closeout: [[history/B1_closeout]]. Implementation return: [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]]. B2 owner-accepted 2026-09-13. Closeout: [[history/B2_closeout]]. Implementation return: [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system]]. C2 implementation return (owner QA in progress): [[wip/WO-2026-09-14-c2-product-instance-sales-catalog-return]].
 
 ### CRM Core (`packages/crm-core`)
 
@@ -125,7 +125,7 @@ C1 units 1–3: pnpm workspace, thin Nuxt layer, ESLint/architecture test (Core 
 
 ### Control Plane (`control_plane/`)
 
-http://127.0.0.1:52100. Multi-page shell: Dashboard, Customers, Environments, Hosting Nodes, Settings. Observe + provision **product instances**. New customer = account only. Add Product Instance picks Martial Arts or Sales and creates that instance’s PROD+DEV. Extra non-PROD attaches to an instance. One-PROD per instance. Upgrade “non-PROD first” is instance-scoped. Gated decommission (volumes stay). Retry = continue/resume. Localhost `accessUrl`s. No operator login. Details: [[Control-Plane]].
+http://127.0.0.1:52100. Multi-page shell: Dashboard, Customers, Environments, Hosting Nodes, Settings. Observe + provision **product instances**. New customer = account only. Add Product Instance picks Martial Arts or Sales, creates that instance’s PROD+DEV, and provisions in the background. Extra non-PROD attaches to an instance. One-PROD per instance. Upgrade “non-PROD first” is instance-scoped. Gated decommission (volumes stay). Retry = continue/resume the same environments. Localhost `accessUrl`s. No operator login. Details: [[Control-Plane]].
 
 ### Environment lifecycle
 
@@ -141,7 +141,7 @@ Start All / Stop All = eligible **registered fleet**, not the table filter. Elig
 
 ### Provisioning
 
-Sales-led. `Customers → New customer` creates the **account only**. From the customer workspace Products tab, **Add product instance** and select Martial Arts or Sales. That builds the catalog image (`martial-arts-acquisition:s4` or `crm-sales:c2`) from the product Dockerfile with **repo-root** context. Compose cwd is that product’s template directory. Runbook: [[S4-Provision-Runbook]].
+Sales-led. `Customers → New customer` creates the **account only**. From the customer workspace Products tab, **Add product instance** and select Martial Arts or Sales. The Control Plane stores the instance immediately as **Provisioning**. Image build (`martial-arts-acquisition:s4` or `crm-sales:c2`) and compose run in the background from the product Dockerfile with **repo-root** context. Compose cwd is that product’s template directory. You can leave the page; Failed rows keep `provision_error` and Retry remounts the same volumes. Runbook: [[S4-Provision-Runbook]].
 
 ### Backup / restore (official S6, Successful)
 
@@ -200,7 +200,7 @@ Link, do not re-litigate. Index: [[SaaS-Decisions]].
 
 ## Open questions
 
-IMM-01–04 and NEAR-01–03 are **resolved / working**. Do not present them as open. Remaining: [[SaaS-Open-Questions]] (NEAR-04–10, DEF-02–08). C2 is **code-shipped / awaiting owner QA**.
+IMM-01–04 and NEAR-01–03 are **resolved / working**. Do not present them as open. Remaining: [[SaaS-Open-Questions]] (NEAR-04–10, DEF-02–08). C2 is **code-shipped / owner QA in progress**.
 
 ---
 

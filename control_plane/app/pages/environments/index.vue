@@ -5,6 +5,7 @@ import {
   formatBulkNotice,
   isStartableEnvironment,
   isStoppableEnvironment,
+  operatorEnvironmentStatus,
   pollFleetUntilHealthy,
   toggleVisibleSelection,
   type FleetStatusResponse,
@@ -248,7 +249,7 @@ async function runBulk(action: 'start' | 'stop', scope: 'selected' | 'all') {
             </NuxtLink>
           </td>
           <td>{{ env.runtime }}</td>
-          <td><AppStatusBadge :status="env.status" /></td>
+          <td><AppStatusBadge :status="operatorEnvironmentStatus(env)" /></td>
           <td>{{ env.expectedImage }}</td>
           <td><AppAccessLink :href="env.accessUrl" /></td>
         </tr>

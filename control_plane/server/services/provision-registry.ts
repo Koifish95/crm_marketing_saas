@@ -212,7 +212,7 @@ export async function addProductInstance(db: Database, customerId: string, input
     and(eq(productInstances.customerId, customerId), eq(productInstances.productId, product.id)),
   ).limit(1)
   if (duplicate) {
-    throw new ProvisionError(`${product.displayName} is already on this account.`)
+    throw new ProvisionError(`${product.displayName} is already on this account.`, 409)
   }
   const [anyInstance] = await db.select().from(productInstances)
     .where(eq(productInstances.customerId, customerId))

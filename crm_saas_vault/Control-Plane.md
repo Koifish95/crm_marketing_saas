@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-14
+updated: 2026-09-15
 aliases:
   - Platform control
   - Control module
@@ -50,7 +50,7 @@ Headlines still read “Acme BJJ · Martial Arts · PROD · healthy,” not a co
 
 Laptop-only. Local Docker. Health on demand. Acme is seeded as a Martial Arts instance; new customers are accounts until the operator adds a product. No Docker socket in CRM containers.
 
-C2 code-shipped (not Successful): one account may own Martial Arts and Sales instances. One PROD per instance. Upgrade gating is instance-scoped. See [[Customer-Environment]] and [[SaaS-Decisions#2026-09-14 — C2 Product Instances + Sales catalog code-shipped]].
+C2 code-shipped / owner QA in progress (not Successful): one account may own Martial Arts and Sales instances. One PROD per instance. Add Product Instance returns after registry insert; Docker build/compose is server-side `provisioning` until `ready` or `failed` (`provision_error` retained). Retry continues the same rows. Upgrade gating is instance-scoped. See [[Customer-Environment]] and [[SaaS-Decisions#2026-09-14 — C2 Product Instances + Sales catalog code-shipped]].
 
 ## What it is not
 

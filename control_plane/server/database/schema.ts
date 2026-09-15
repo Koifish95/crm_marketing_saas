@@ -56,6 +56,7 @@ export const environments = sqliteTable('environments', {
   isolationMarker: text('isolation_marker').notNull(),
   hostPort: integer('host_port').notNull(),
   lifecycleStatus: text('lifecycle_status').notNull(),
+  provisionError: text('provision_error'),
   createdAt: text('created_at').notNull(),
 }, table => [
   uniqueIndex('environments_slug_unique').on(table.slug),

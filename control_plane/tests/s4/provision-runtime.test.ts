@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { environmentProvisionGuard, imageBuildArgs, imageInspectArgs, provisionUpCommand, selectEnvironmentsToProvision } from '../../server/services/provision-runtime'
+import { DOCKER_SPAWN_MAX_BUFFER, dockerSpawnOptions } from '../../server/services/docker-relaunch'
 import { PROVISIONED_IMAGE } from '../../server/services/provision-contract'
+import { environmentProvisionGuard, imageBuildArgs, imageInspectArgs, imageSpecsForRows, provisionUpCommand, selectEnvironmentsToProvision, startBackgroundProvision } from '../../server/services/provision-runtime'
 
 describe('S4 provision runtime commands', () => {
   it('builds the local s4 image and ups without -v', () => {
@@ -35,6 +36,12 @@ describe('S4 provision runtime commands', () => {
       'app',
     ])
     expect(command.args.join(' ')).not.toMatch(/-v|prune|down/)
+    expect(DOCKER_SPAWN_MAX_BUFFER).toBeGreaterThan(1024 * 1024)
+    expect(dockerSpawnOptions('C:/tmp').maxBuffer).toBe(DOCKER_SPAWN_MAX_BUFFER)
+    expect([...imageSpecsForRows([
+      { productInstance: { productId: 'sales' } },
+      { productInstance: { productId: 'martial-arts' } },
+    ]).keys()]).toEqual(['crm-sales:c2', 'martial-arts-acquisition:s4'])
   })
 
   it('refuses decommissioned environment retry and limits provision to onlyIds', () => {
@@ -57,5 +64,26 @@ describe('S4 provision runtime commands', () => {
     expect(selectEnvironmentsToProvision(rows, 'c1').map(row => row.id)).toEqual(['prod', 'dev'])
     expect(selectEnvironmentsToProvision(rows, 'c1', ['dev']).map(row => row.id)).toEqual(['dev'])
     expect(selectEnvironmentsToProvision(rows, 'c1', ['gone'])).toEqual([])
+  })
+
+  it('accepts one in-flight provision per customer and ignores a duplicate start', async () => {
+    let release: (() => void) | undefined
+    const gate = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    const run = async () => {
+      await gate
+      return []
+    }
+    const first = startBackgroundProvision({} as never, 'cust-lock', undefined, undefined, undefined, run)
+    const second = startBackgroundProvision({} as never, 'cust-lock', undefined, undefined, undefined, run)
+    expect(first).toEqual({ accepted: true, started: true })
+    expect(second).toEqual({ accepted: true, started: false })
+    release?.()
+    await gate
+    await new Promise(resolve => setTimeout(resolve, 20))
+    const third = startBackgroundProvision({} as never, 'cust-lock', undefined, undefined, undefined, async () => [])
+    expect(third.started).toBe(true)
+    await new Promise(resolve => setTimeout(resolve, 20))
   })
 })

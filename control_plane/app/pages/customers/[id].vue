@@ -1,10 +1,18 @@
 <script setup lang="ts">
-import { findById } from '~~/shared/utils/fleet'
+import {
+  FLEET_PROVISION_POLL_ATTEMPTS,
+  FLEET_PROVISION_POLL_MS,
+  findById,
+  operatorEnvironmentStatus,
+  pollFleetUntilHealthy,
+  shortProvisionError,
+} from '~~/shared/utils/fleet'
 import { CUSTOMER_TABS } from '~~/shared/utils/nav'
 import {
   DEFAULT_EXTRA_ENVIRONMENT_FORM,
   DEFAULT_PRODUCT_INSTANCE_FORM,
   EXTRA_ENV_TYPES,
+  customerIsProvisioning,
   customerNeedsRetry,
   extraEnvironmentRequestBody,
   productInstanceRequestBody,
@@ -21,6 +29,8 @@ const retrying = ref(false)
 const decommissioning = ref(false)
 const confirmDecommission = ref(false)
 const actionError = ref('')
+const actionNotice = ref('')
+const watchingProvision = ref(false)
 const extra = reactive({ ...DEFAULT_EXTRA_ENVIRONMENT_FORM })
 const productForm = reactive({ ...DEFAULT_PRODUCT_INSTANCE_FORM })
 const catalog = await useFetch<{ products: { id: string, displayName: string }[] }>('/api/products')
@@ -34,10 +44,47 @@ const allDecommissioned = computed(() => (
   && !!customer.value?.environments.every(env => env.lifecycleStatus === 'decommissioned')
 ))
 const canRetry = computed(() => customerNeedsRetry(customer.value?.environments ?? []))
+const provisioning = computed(() => customerIsProvisioning(customer.value?.environments ?? []))
 
 watch(() => customer.value?.instances, (instances) => {
   if (!extra.productInstanceId && instances?.[0]) {
     extra.productInstanceId = instances[0].id
+  }
+}, { immediate: true })
+
+async function watchUntilSettled() {
+  if (watchingProvision.value || !provisioning.value) {
+    return
+  }
+  watchingProvision.value = true
+  try {
+    const outcome = await pollFleetUntilHealthy({
+      isHealthy: () => !customerIsProvisioning(customer.value?.environments ?? []),
+      refresh: refreshStatus,
+      attempts: FLEET_PROVISION_POLL_ATTEMPTS,
+      delayMs: FLEET_PROVISION_POLL_MS,
+    })
+    if (outcome === 'timeout' && customerIsProvisioning(customer.value?.environments ?? [])) {
+      actionNotice.value = 'Still provisioning. Image build can take several minutes. Refresh this page; Retry remains available if it stays Provisioning or becomes Failed.'
+      return
+    }
+    const failed = customer.value?.environments.find(env => env.lifecycleStatus === 'failed')
+    if (failed) {
+      actionNotice.value = ''
+      actionError.value = failed.provisionError || 'Provisioning failed. Use Retry to continue the same environments.'
+      return
+    }
+    if (actionNotice.value.startsWith('Accepted') || actionNotice.value.startsWith('Retry accepted')) {
+      actionNotice.value = 'Provisioning finished.'
+    }
+  } finally {
+    watchingProvision.value = false
+  }
+}
+
+watch(provisioning, (active) => {
+  if (active) {
+    void watchUntilSettled()
   }
 }, { immediate: true })
 
@@ -47,10 +94,13 @@ async function retryProvision() {
   }
   retrying.value = true
   actionError.value = ''
+  actionNotice.value = 'Retry accepted. Continuing the existing environments. Same volumes. Image build can take several minutes.'
   try {
     await $fetch(`/api/customers/${customer.value.id}/provision`, { method: 'POST' })
     await refreshStatus()
+    await watchUntilSettled()
   } catch (error) {
+    actionNotice.value = ''
     actionError.value = fetchMessage(error, 'Retry failed.')
   } finally {
     retrying.value = false
@@ -63,6 +113,7 @@ async function addProduct() {
   }
   addingProduct.value = true
   actionError.value = ''
+  actionNotice.value = 'Accepted. Creating the product instance and starting provision. Image build can take several minutes. You can leave this page.'
   try {
     await $fetch(`/api/customers/${customer.value.id}/product-instances`, {
       method: 'POST',
@@ -70,8 +121,11 @@ async function addProduct() {
     })
     productForm.productId = ''
     await refreshStatus()
+    await watchUntilSettled()
   } catch (error) {
+    actionNotice.value = ''
     actionError.value = fetchMessage(error, 'Add product failed.')
+    await refreshStatus()
   } finally {
     addingProduct.value = false
   }
@@ -83,6 +137,7 @@ async function addExtra() {
   }
   adding.value = true
   actionError.value = ''
+  actionNotice.value = 'Accepted. Provisioning the extra environment.'
   try {
     await $fetch(`/api/customers/${customer.value.id}/environments`, {
       method: 'POST',
@@ -90,8 +145,11 @@ async function addExtra() {
     })
     extra.displayName = ''
     await refreshStatus()
+    await watchUntilSettled()
   } catch (error) {
+    actionNotice.value = ''
     actionError.value = fetchMessage(error, 'Add environment failed.')
+    await refreshStatus()
   } finally {
     adding.value = false
   }
@@ -103,6 +161,7 @@ async function decommissionCustomer() {
   }
   decommissioning.value = true
   actionError.value = ''
+  actionNotice.value = ''
   try {
     await $fetch(`/api/customers/${customer.value.id}/decommission`, { method: 'POST' })
     await refreshStatus()
@@ -139,10 +198,29 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
         </button>
       </template>
       Last checked {{ checkedAt || '—' }}.
-      <template v-if="canRetry">
-        Retry continues the existing provision. It remounts the same volumes. It does not rebuild.
+      <template v-if="provisioning">
+        Provisioning in progress. Status is stored on the server. You can leave this page.
+      </template>
+      <template v-else-if="canRetry">
+        Retry continues the existing environments and remounts the same volumes. It does not delete volumes.
       </template>
     </AppPageHeader>
+    <p
+      v-if="actionError"
+      class="action-error"
+      role="status"
+      aria-live="polite"
+    >
+      {{ actionError }}
+    </p>
+    <p
+      v-else-if="actionNotice"
+      class="action-status"
+      role="status"
+      aria-live="polite"
+    >
+      {{ actionNotice }}
+    </p>
     <AppAsyncPanel
       :pending="pending && !customer"
       :error="error || (!pending && !customer)"
@@ -183,7 +261,7 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
           @submit.prevent="addProduct"
         >
           <p>
-            Select a product. This creates a product instance with PROD and DEV. Creating the account did not choose a product.
+            Select a product. This creates a product instance with PROD and DEV, then provisions them in the background. Creating the account did not choose a product.
           </p>
           <label>
             Product
@@ -211,7 +289,7 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
             :disabled="addingProduct || !productForm.productId || !customer"
             :aria-busy="addingProduct"
           >
-            {{ addingProduct ? 'Adding…' : 'Add product instance' }}
+            {{ addingProduct ? 'Starting…' : 'Add product instance' }}
           </button>
         </form>
         <p
@@ -220,17 +298,9 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
         >
           Martial Arts and Sales are already on this account.
         </p>
-        <p
-          v-if="actionError && tab === 'products'"
-          class="muted"
-          role="status"
-          aria-live="polite"
-        >
-          {{ actionError }}
-        </p>
         <AppDataTable
           label="Product instances"
-          :columns="['Product', 'PROD', 'DEV', 'Envs', 'Overall']"
+          :columns="['Product', 'PROD', 'DEV', 'Envs', 'Overall', 'Detail']"
         >
           <tr
             v-for="instance in customer?.instances"
@@ -240,7 +310,7 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
             <td>
               <AppStatusBadge
                 v-if="instance.prod"
-                :status="instance.prod.status"
+                :status="operatorEnvironmentStatus(instance.prod)"
               />
               <span
                 v-else
@@ -250,7 +320,7 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
             <td>
               <AppStatusBadge
                 v-if="instance.dev"
-                :status="instance.dev.status"
+                :status="operatorEnvironmentStatus(instance.dev)"
               />
               <span
                 v-else
@@ -259,6 +329,9 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
             </td>
             <td>{{ instance.environmentCount }}</td>
             <td><AppStatusBadge :status="instance.overall || 'unknown'" /></td>
+            <td class="muted">
+              {{ shortProvisionError(instance.provisionError) || '—' }}
+            </td>
           </tr>
         </AppDataTable>
       </section>
@@ -316,7 +389,7 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
             :disabled="adding || !customer || !extra.productInstanceId"
             :aria-busy="adding"
           >
-            {{ adding ? 'Adding…' : 'Add environment' }}
+            {{ adding ? 'Starting…' : 'Add environment' }}
           </button>
         </form>
         <p
@@ -325,17 +398,9 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
         >
           Add a product instance first. Extra environments attach to a product, not the account.
         </p>
-        <p
-          v-if="actionError && tab === 'environments'"
-          class="muted"
-          role="status"
-          aria-live="polite"
-        >
-          {{ actionError }}
-        </p>
         <AppDataTable
           label="Customer environments"
-          :columns="['Environment', 'Product', 'Type', 'Status', 'Runtime', 'Image', 'Access']"
+          :columns="['Environment', 'Product', 'Type', 'Status', 'Runtime', 'Image', 'Detail', 'Access']"
         >
           <tr
             v-for="env in customer?.environments"
@@ -348,9 +413,12 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
             </td>
             <td>{{ env.productInstance?.displayName || '—' }}</td>
             <td>{{ env.type }}</td>
-            <td><AppStatusBadge :status="env.status" /></td>
+            <td><AppStatusBadge :status="operatorEnvironmentStatus(env)" /></td>
             <td>{{ env.runtime }}</td>
             <td>{{ env.expectedImage }}</td>
+            <td class="muted">
+              {{ shortProvisionError(env.provisionError) || '—' }}
+            </td>
             <td><AppAccessLink :href="env.accessUrl" /></td>
           </tr>
         </AppDataTable>

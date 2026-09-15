@@ -61,6 +61,14 @@ export function isRetryableLifecycle(lifecycleStatus?: string) {
   return lifecycleStatus === 'failed' || lifecycleStatus === 'provisioning'
 }
 
+export function isProvisioningLifecycle(lifecycleStatus?: string) {
+  return lifecycleStatus === 'provisioning'
+}
+
 export function customerNeedsRetry(environments: readonly { lifecycleStatus?: string }[]) {
   return environments.some(env => isRetryableLifecycle(env.lifecycleStatus))
+}
+
+export function customerIsProvisioning(environments: readonly { lifecycleStatus?: string }[]) {
+  return environments.some(env => isProvisioningLifecycle(env.lifecycleStatus))
 }

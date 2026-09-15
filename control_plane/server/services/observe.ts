@@ -52,6 +52,7 @@ export function toEnvironmentView(
     accessUrl: row.accessUrl,
     hostPort: row.hostPort,
     lifecycleStatus: row.lifecycleStatus,
+    provisionError: row.provisionError,
     composeProject: row.composeProject,
     expectedImage: row.expectedImage,
     sqliteVolume: row.sqliteVolume,

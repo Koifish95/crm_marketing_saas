@@ -45,6 +45,7 @@ export async function listRegisteredEnvironments(db: Database) {
     isolationMarker: row.environment.isolationMarker,
     hostPort: row.environment.hostPort,
     lifecycleStatus: row.environment.lifecycleStatus,
+    provisionError: row.environment.provisionError,
     customer: {
       id: row.customer.id,
       slug: row.customer.slug,

@@ -17,7 +17,7 @@ COPY pnpm-workspace.yaml package.json .npmrc ./
 WORKDIR /src/sales_template
 RUN node docker/stub-missing-libsql-natives.mjs
 RUN pnpm build
-RUN node node_modules/esbuild/bin/esbuild docker/runtime-init.ts \
+RUN pnpm exec esbuild docker/runtime-init.ts \
   --bundle \
   --platform=node \
   --format=cjs \
@@ -41,9 +41,10 @@ COPY --from=build /src/sales_template/.output ./.output
 COPY --from=build /src/sales_template/drizzle/migrations ./drizzle/migrations
 COPY --from=build /src/sales_template/docker/runtime-init.cjs ./docker/runtime-init.cjs
 COPY sales_template/docker/entrypoint.sh ./docker/entrypoint.sh
-COPY --from=build /src/sales_template/node_modules/@libsql ./node_modules/@libsql
+COPY --from=build /src/node_modules/@libsql ./node_modules/@libsql
 # Empty data dirs only. Never COPY a sqlite file into the image.
-RUN chmod +x docker/entrypoint.sh \
+RUN sed -i 's/\r$//' docker/entrypoint.sh \
+  && chmod +x docker/entrypoint.sh \
   && mkdir -p /app/data/sqlite /app/data/uploads /app/data/uploads/proposals \
   && chown -R node:node /app/data /app/docker
 EXPOSE 5000

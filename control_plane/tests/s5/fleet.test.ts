@@ -6,11 +6,15 @@ import {
   formatBulkNotice,
   groupCustomers,
   groupNodes,
+  groupProductInstances,
   isStartableEnvironment,
   isStoppableEnvironment,
+  operatorEnvironmentStatus,
   planBulkLifecycle,
+  shortProvisionError,
   summarizeFleet,
   toggleVisibleSelection,
+  worstOperatorStatus,
   worstStatus,
   type FleetEnvironment,
 } from '../../shared/utils/fleet'
@@ -141,6 +145,45 @@ describe('fleet grouping', () => {
     expect(filterEnvironments(rows, '', 'DEV')).toHaveLength(6)
     expect(filterEnvironments(rows, 'Shop 11', '')).toHaveLength(1)
     expect(filterEnvironments(rows, 'missing', 'PROD')).toHaveLength(0)
+  })
+
+  it('surfaces provisioning and failed product instances instead of treating them as missing', () => {
+    const salesProd = env({
+      id: 'sales-prod',
+      status: 'missing',
+      type: 'PROD',
+      lifecycleStatus: 'provisioning',
+      expectedImage: 'crm-sales:c2',
+      productInstance: { id: 'pi-sales', productId: 'sales', displayName: 'Sales', slug: 'sales' },
+    })
+    const salesDev = env({
+      id: 'sales-dev',
+      status: 'missing',
+      type: 'DEV',
+      lifecycleStatus: 'failed',
+      provisionError: 'Local image build failed.',
+      expectedImage: 'crm-sales:c2',
+      productInstance: { id: 'pi-sales', productId: 'sales', displayName: 'Sales', slug: 'sales' },
+    })
+    const martialArts = env({
+      id: 'ma-prod',
+      status: 'healthy',
+      type: 'PROD',
+      productInstance: { id: 'pi-ma', productId: 'martial-arts', displayName: 'Martial Arts', slug: 'martial-arts' },
+    })
+    expect(operatorEnvironmentStatus(salesProd)).toBe('provisioning')
+    expect(operatorEnvironmentStatus(salesDev)).toBe('failed')
+    expect(worstOperatorStatus(['healthy', 'provisioning'])).toBe('provisioning')
+    const grouped = groupProductInstances([martialArts, salesProd, salesDev], [
+      { id: 'pi-ma', customerId: 'cust-1', productId: 'martial-arts', displayName: 'Martial Arts', slug: 'martial-arts' },
+      { id: 'pi-sales', customerId: 'cust-1', productId: 'sales', displayName: 'Sales', slug: 'sales' },
+    ])
+    expect(grouped.map(row => row.productId).sort()).toEqual(['martial-arts', 'sales'])
+    const sales = grouped.find(row => row.productId === 'sales')
+    expect(sales?.overall).toBe('failed')
+    expect(sales?.provisionError).toBe('Local image build failed.')
+    expect(shortProvisionError(`${'x'.repeat(200)}ERROR: failed to build`)).toMatch(/ERROR: failed to build$/)
+    expect(summarizeFleet([martialArts, salesProd, salesDev]).needsAttention.map(row => row.id)).toEqual(['sales-dev'])
   })
 })
 
