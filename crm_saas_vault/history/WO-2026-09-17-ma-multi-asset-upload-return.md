@@ -4,7 +4,7 @@ status: done
 id: WO-2026-09-17-ma-multi-asset-upload
 milestone: none
 base_sha: "8f6b510c45d1abc0e029789ea8218f2aeb49b841"
-result_sha: pending
+result_sha: "544fc3838852993f32357c539e4c6dc603c1dbe0"
 implementation_result: shipped
 tests: "martial_arts_template pnpm test 71 files / 339 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass."
 decisions_discovered: []
