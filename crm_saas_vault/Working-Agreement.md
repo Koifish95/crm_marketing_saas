@@ -2,7 +2,7 @@
 type: reference
 status: current
 area: process
-updated: 2026-09-15
+updated: 2026-09-17
 aliases:
   - How we work
   - Vault vs wip
@@ -125,7 +125,7 @@ Repository verification required
 
 ## Current next decision
 
-Orientation: [[Current-State]]. Official S-track: [[SaaS-Milestones]]. S0–S6 are Successful. Official **S7** is not started. CRM Core + vertical architecture is **Accepted**. D1–D4 are **accepted** (minimal D1 schema shipped in C2). **C1 is code-shipped**. **C2A–B2 are Successful**. **C2 is Successful**. **No active work order.** Await Scott. Do not start C3, Beauty, Core promotion, or S7 unless Scott asks. C2 closeout does **not** authorize C3 or SI migration.
+Orientation: [[Current-State]]. Official S-track: [[SaaS-Milestones]]. S0–S6 are Successful. Official **S7** is not started. CRM Core + vertical architecture is **Accepted**. D1–D4 are **accepted** (minimal D1 schema shipped in C2). **C1 is code-shipped**. **C2A–B2 are Successful**. **C2 is Successful**. **No active work order.** Await Scott. Do not start C3, Beauty, Core promotion, or S7 unless Scott asks. C2 closeout does **not** authorize C3 or SI migration. Martial Arts sequential multi-file Asset upload is template work already shipped.
 
 **Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 

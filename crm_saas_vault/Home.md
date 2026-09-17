@@ -2,7 +2,7 @@
 type: index
 status: current
 area: overview
-updated: 2026-09-15
+updated: 2026-09-17
 aliases:
   - Start
   - Index
@@ -83,7 +83,7 @@ Renzo notes at the vault root (`Overview`, `Implementation-State`, `Milestones`,
 
 ## Where development stands
 
-Official S-track S0–S6 **Successful**. C1 **code-shipped**. C2A–B2 **Successful**. **C2 Successful** (2026-09-15). Official S7, C3, Beauty, DNS/TLS: **not started**. **No active work order.** Await Scott.
+Official S-track S0–S6 **Successful**. C1 **code-shipped**. C2A–B2 **Successful**. **C2 Successful** (2026-09-15). Martial Arts sequential multi-file Asset upload **shipped** (2026-09-17; template work, not a platform milestone). Official S7, C3, Beauty, DNS/TLS: **not started**. **No active work order.** Await Scott.
 
 Details: [[Current-State]]. Lockfile: [[project-state.yaml]].
 

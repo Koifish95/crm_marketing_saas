@@ -2,7 +2,7 @@
 type: index
 status: historical
 area: process
-updated: 2026-09-15
+updated: 2026-09-17
 tags:
   - history
   - saas
@@ -33,6 +33,7 @@ Closeouts, superseded roadmaps, and dated snapshots live here so agents do not t
 - [[history/B2_closeout]] — 2026-09-13 SI Sales B2 Successful (owner-accepted; not C2)
 - [[history/C2_closeout]] — 2026-09-15 C2 Successful (owner-accepted)
 - [[history/C2_owner_qa]] — C2 owner-QA checklist (Scott’s recorded checks)
+- [[history/WO-2026-09-17-ma-multi-asset-upload-return]] — Martial Arts sequential multi-file Asset upload return (template work; not a platform milestone)
 - [[history/WO-2026-09-11-sales-thin-slice-return]] — C2A implementation return (evidence, not the live map)
 - [[history/WO-2026-09-11-si-sales-slice-a-return]] — C2B Slice A implementation return (evidence, not the live map)
 - [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]] — B1 implementation return (evidence, not the live map)

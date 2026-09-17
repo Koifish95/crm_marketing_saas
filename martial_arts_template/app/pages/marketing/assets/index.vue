@@ -67,12 +67,21 @@ watch(
   },
 )
 
-async function onUploaded(id: number) {
-  uploadNotice.value = 'Uploaded. Set marketing-use on the asset if staff should reuse it.'
-  highlightedId.value = id
+async function onUploaded(result: { ids: number[], failedCount: number }) {
+  const created = result.ids.length
+  if (created === 1 && !result.failedCount) {
+    uploadNotice.value = 'Uploaded. Set marketing-use on the asset if staff should reuse it.'
+  } else if (!result.failedCount) {
+    uploadNotice.value = `${created} assets created. Set marketing-use on each if staff should reuse them.`
+  } else {
+    uploadNotice.value = `${created === 1 ? '1 Asset created.' : `${created} Assets created.`} ${result.failedCount === 1 ? '1 failed.' : `${result.failedCount} failed.`}`
+  }
+  highlightedId.value = result.ids[result.ids.length - 1] ?? null
   await refresh()
   await nextTick()
-  document.getElementById(`asset-card-${id}`)?.scrollIntoView({ block: 'nearest' })
+  if (highlightedId.value != null) {
+    document.getElementById(`asset-card-${highlightedId.value}`)?.scrollIntoView({ block: 'nearest' })
+  }
 }
 </script>
 

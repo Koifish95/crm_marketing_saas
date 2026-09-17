@@ -4,6 +4,15 @@ import { centsToDollarString, dollarsToCents } from '#shared/utils/money'
 import { campaignLeadsPath, campaignStaffPath, friendlyTrackingPath, trackingPath } from '#shared/utils/campaign'
 import { contentStaffPath } from '#shared/utils/content'
 import { assetStaffPath } from '#shared/utils/asset'
+import {
+  assetUploadAllSucceeded,
+  assetUploadSubmitLabel as campaignAssetSubmitText,
+  assetUploadSummaryText,
+  buildAssetUploadFormData,
+  createAssetUploadItems,
+  runAssetUploadBatch,
+  type AssetUploadItem,
+} from '#shared/utils/asset-upload'
 import { leadStaffPath } from '#shared/utils/lead'
 import { marketingTaskStaffPath } from '#shared/utils/task'
 import {
@@ -173,6 +182,15 @@ const newEventTitle = ref('')
 const attachAssetId = ref('')
 const assetFileInput = ref<HTMLInputElement | null>(null)
 const assetDisplayName = ref('')
+const assetUploadItems = ref<AssetUploadItem[]>([])
+const assetUploadPending = ref(false)
+const assetUploadStarted = ref(false)
+const assetUploadNotice = ref('')
+const campaignAssetSubmitLabel = computed(() => campaignAssetSubmitText(assetUploadItems.value, {
+  started: assetUploadStarted.value,
+  pending: assetUploadPending.value,
+  campaign: true,
+}))
 const taskForm = reactive({
   title: '',
   type: 'OTHER' as MarketingTaskType,
@@ -692,28 +710,74 @@ async function addTask() {
 }
 
 async function uploadCampaignAsset() {
-  if (!campaign.value || !canManageAssets.value) {
+  if (!campaign.value || !canManageAssets.value || assetUploadPending.value) {
     return
   }
-  const file = assetFileInput.value?.files?.[0]
-  if (!file) {
+  if (!assetUploadItems.value.length) {
     errorMessage.value = 'Choose a file.'
     return
   }
+  if (assetUploadItems.value.length === 1 && assetDisplayName.value.trim()) {
+    assetUploadItems.value[0]!.displayName = assetDisplayName.value.trim()
+  }
   errorMessage.value = ''
-  const body = new FormData()
-  body.append('file', file)
-  body.append('displayName', assetDisplayName.value || file.name)
-  body.append('campaignId', String(campaign.value.id))
+  assetUploadNotice.value = ''
+  assetUploadPending.value = true
+  assetUploadStarted.value = true
   try {
-    await $fetch('/api/marketing/assets', { method: 'POST', body })
-    assetDisplayName.value = ''
-    if (assetFileInput.value) {
-      assetFileInput.value.value = ''
-    }
+    const result = await runAssetUploadBatch({
+      items: assetUploadItems.value,
+      shared: {
+        campaignId: campaign.value.id,
+      },
+      upload: async (input) => {
+        return await $fetch<{ id: number }>('/api/marketing/assets', {
+          method: 'POST',
+          body: buildAssetUploadFormData(input),
+        })
+      },
+    })
     await refreshAssets()
-  } catch (caught) {
-    errorMessage.value = apiError(caught, 'Could not upload that asset.')
+    if (assetUploadAllSucceeded(assetUploadItems.value)) {
+      assetUploadNotice.value = result.createdIds.length === 1
+        ? 'Uploaded to this campaign.'
+        : assetUploadSummaryText(assetUploadItems.value)
+      resetCampaignAssetUpload({ keepNotice: true })
+      return
+    }
+    if (!result.createdIds.length) {
+      errorMessage.value = result.stoppedForAuth
+        ? 'Sign-in expired. Sign in again, then retry the failed files.'
+        : (assetUploadItems.value.find(item => item.errorMessage)?.errorMessage || 'Could not upload those assets.')
+    }
+  } finally {
+    assetUploadPending.value = false
+  }
+}
+
+function onCampaignAssetFilesChange() {
+  const files = [...(assetFileInput.value?.files ?? [])]
+  assetUploadItems.value = createAssetUploadItems(files)
+  assetUploadStarted.value = false
+  assetUploadNotice.value = ''
+  errorMessage.value = ''
+  if (assetUploadItems.value.length === 1) {
+    assetDisplayName.value = assetUploadItems.value[0]!.displayName
+    return
+  }
+  assetDisplayName.value = ''
+}
+
+function resetCampaignAssetUpload(options?: { keepNotice?: boolean }) {
+  assetDisplayName.value = ''
+  assetUploadItems.value = []
+  assetUploadPending.value = false
+  assetUploadStarted.value = false
+  if (!options?.keepNotice) {
+    assetUploadNotice.value = ''
+  }
+  if (assetFileInput.value) {
+    assetFileInput.value.value = ''
   }
 }
 
@@ -1572,28 +1636,47 @@ const linkableAssets = computed(() => {
             </p>
             <form
               v-if="canManageAssets"
-              class="mt-4 grid gap-2 sm:grid-cols-3"
+              class="mt-4 space-y-3"
               @submit.prevent="uploadCampaignAsset"
             >
-              <AppField label="Upload file">
+              <AppField label="Upload files">
                 <input
                   ref="assetFileInput"
                   type="file"
                   class="control"
+                  multiple
+                  :disabled="assetUploadPending"
+                  @change="onCampaignAssetFilesChange"
                 >
               </AppField>
-              <AppField label="Display name">
+              <AppAssetUploadStatus
+                :items="assetUploadItems"
+                :pending="assetUploadPending"
+                :show-summary="assetUploadStarted && !assetUploadPending"
+              />
+              <AppAlert
+                v-if="assetUploadNotice"
+                tone="success"
+              >
+                {{ assetUploadNotice }}
+              </AppAlert>
+              <AppField
+                v-if="assetUploadItems.length <= 1"
+                label="Display name"
+              >
                 <input
                   v-model="assetDisplayName"
                   class="control"
                   placeholder="Optional"
+                  :disabled="assetUploadPending"
                 >
               </AppField>
-              <div class="flex items-end">
-                <AppButton type="submit">
-                  Upload to campaign
-                </AppButton>
-              </div>
+              <AppButton
+                type="submit"
+                :loading="assetUploadPending"
+              >
+                {{ campaignAssetSubmitLabel }}
+              </AppButton>
             </form>
             <form
               v-if="canManageAssets"

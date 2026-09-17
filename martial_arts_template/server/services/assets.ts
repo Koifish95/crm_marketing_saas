@@ -75,22 +75,32 @@ export async function createAsset(
   const dir = uploadsDirectory()
   mkdirSync(dir, { recursive: true })
   const storedName = `${randomUUID()}`
-  writeFileSync(join(dir, storedName), input.bytes)
+  const storedPath = join(dir, storedName)
+  writeFileSync(storedPath, input.bytes)
   const stamp = now()
-  const [row] = await db.insert(assets).values({
-    displayName: input.displayName.trim() || input.originalFilename,
-    originalFilename: input.originalFilename,
-    mediaType: input.mediaType || 'application/octet-stream',
-    storagePath: storedName,
-    description: input.description?.trim() || null,
-    marketingUseStatus: 'UNKNOWN',
-    uploadedByUserId: actor.id,
-    campaignId: input.campaignId ?? null,
-    contentItemId: input.contentItemId ?? null,
-    createdAt: stamp,
-    updatedAt: stamp,
-  }).returning()
-  return getAsset(db, row!.id)
+  try {
+    const [row] = await db.insert(assets).values({
+      displayName: input.displayName.trim() || input.originalFilename,
+      originalFilename: input.originalFilename,
+      mediaType: input.mediaType || 'application/octet-stream',
+      storagePath: storedName,
+      description: input.description?.trim() || null,
+      marketingUseStatus: 'UNKNOWN',
+      uploadedByUserId: actor.id,
+      campaignId: input.campaignId ?? null,
+      contentItemId: input.contentItemId ?? null,
+      createdAt: stamp,
+      updatedAt: stamp,
+    }).returning()
+    return getAsset(db, row!.id)
+  } catch (error) {
+    try {
+      unlinkSync(storedPath)
+    } catch {
+      // Best-effort cleanup of a file that never received a matching row.
+    }
+    throw error
+  }
 }
 
 export async function updateAsset(

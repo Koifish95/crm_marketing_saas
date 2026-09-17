@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from 'node:fs'
+import { existsSync, mkdtempSync, readdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -142,5 +142,78 @@ describe('M9 assets', () => {
 
   it('builds a staff asset path', () => {
     expect(assetStaffPath(18)).toBe('/marketing/assets/18')
+  })
+
+  it('creates one asset row and disk file per upload, including sequential files', async () => {
+    const testDb = await openTestDatabase()
+    const dir = mkdtempSync(join(tmpdir(), 'ma-assets-'))
+    process.env.ASSET_UPLOAD_DIR = dir
+    try {
+      const [admin] = await testDb.db.select().from(users)
+      const actor = {
+        id: admin!.id,
+        email: admin!.email,
+        displayName: admin!.displayName,
+        role: 'ADMIN' as const,
+        mustChangePassword: false,
+      }
+      await expect(createAsset(testDb.db, {
+        displayName: 'Empty',
+        originalFilename: 'empty.jpg',
+        mediaType: 'image/jpeg',
+        bytes: Buffer.from(''),
+      }, actor)).rejects.toMatchObject({ message: 'Upload a file.' })
+      expect(readdirSync(dir)).toEqual([])
+
+      const first = await createAsset(testDb.db, {
+        displayName: 'Photo one',
+        originalFilename: 'photo-1.jpg',
+        mediaType: 'image/jpeg',
+        bytes: Buffer.from('photo-one'),
+      }, actor)
+      const second = await createAsset(testDb.db, {
+        displayName: 'Clip two',
+        originalFilename: 'video-1.mp4',
+        mediaType: 'video/mp4',
+        bytes: Buffer.from('video-two'),
+      }, actor)
+      expect(first.id).not.toBe(second.id)
+      expect(first.storagePath).not.toBe(second.storagePath)
+      expect(existsSync(join(dir, first.storagePath))).toBe(true)
+      expect(existsSync(join(dir, second.storagePath))).toBe(true)
+      expect(readdirSync(dir).sort()).toEqual([first.storagePath, second.storagePath].sort())
+    } finally {
+      await testDb.close()
+      rmSync(dir, { recursive: true, force: true })
+      delete process.env.ASSET_UPLOAD_DIR
+    }
+  })
+
+  it('removes the newly written file when the database insert fails', async () => {
+    const testDb = await openTestDatabase()
+    const dir = mkdtempSync(join(tmpdir(), 'ma-assets-'))
+    process.env.ASSET_UPLOAD_DIR = dir
+    try {
+      const [admin] = await testDb.db.select().from(users)
+      const actor = {
+        id: admin!.id,
+        email: admin!.email,
+        displayName: admin!.displayName,
+        role: 'ADMIN' as const,
+        mustChangePassword: false,
+      }
+      await expect(createAsset(testDb.db, {
+        displayName: 'Broken campaign',
+        originalFilename: 'broken.jpg',
+        mediaType: 'image/jpeg',
+        bytes: Buffer.from('orphan-me'),
+        campaignId: 999999,
+      }, actor)).rejects.toBeTruthy()
+      expect(readdirSync(dir)).toEqual([])
+    } finally {
+      await testDb.close()
+      rmSync(dir, { recursive: true, force: true })
+      delete process.env.ASSET_UPLOAD_DIR
+    }
   })
 })

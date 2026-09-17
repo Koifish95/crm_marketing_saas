@@ -2,7 +2,7 @@
 type: decision
 status: current
 area: process
-updated: 2026-09-15
+updated: 2026-09-17
 tags:
   - adr
   - saas
@@ -26,6 +26,23 @@ Decision: what we chose
 ---
 
 ---
+
+## 2026-09-17 — Martial Arts sequential multi-file Asset upload
+
+Status: accepted (template behavior)
+
+Context: Renzo implemented client-side sequential multi-file Asset upload. Scott authorized the same product behavior for the Martial Arts template in `crm_marketing_saas`. SaaS still used in-memory single-file `POST /api/marketing/assets`.
+
+Decision:
+
+- Staff may select multiple files in Asset Library and Campaign → Assets. Each successful file creates one independent Asset. Do not store many files on one Asset row.
+- Orchestration is client-side, sequential, concurrency 1, through the existing single-file create endpoint. No batch API.
+- Ordinary per-file failures continue the batch and keep successes. 401/403 stops remaining requests. Retry resends only failed and unattempted files.
+- Filename-derived display names remain the default. Single-file upload may still edit display name before submit. Existing MIME / marketing-use / Campaign association semantics stay.
+- If disk write succeeds and the database insert fails, remove the newly written file.
+- This is Martial Arts template work. It does not authorize Sales, Beauty, C3, S7, or Core promotion of Assets.
+
+Source: Scott 2026-09-17 (current Cursor chat work order WO-2026-09-17-ma-multi-asset-upload)
 
 ## 2026-09-15 — Official C2 is Successful
 

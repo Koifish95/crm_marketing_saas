@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-15
+updated: 2026-09-17
 aliases:
   - CURRENT_STATE
   - Current state
@@ -39,7 +39,7 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | C2 / Beauty / S7–S11 | C2 **Successful** (2026-09-15). Beauty and S7–S11 **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 
-**Authorized work:** none. C2 is **Successful** and closed. Do not start C3, Beauty, S7, S8, SI migration, or Core promotion. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Closeout: [[history/C2_closeout]].
+**Authorized work:** none. Martial Arts sequential multi-file Asset upload shipped 2026-09-17 (template work; not a platform milestone). C2 remains **Successful**. Do not start C3, Beauty, S7, S8, SI migration, or Core promotion. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Closeout: [[history/C2_closeout]]. Asset upload return: [[history/WO-2026-09-17-ma-multi-asset-upload-return]].
 
 Lockfile: [[project-state.yaml]].
 
@@ -100,6 +100,8 @@ Official S-track still lists S7 (hosting/VPS) after S6. The Core ADR **changes t
 ### Martial Arts vertical (`martial_arts_template/`)
 
 Full gym CRM derived from Renzo: households as `leads` + `lead_lines`, trials, intro `/trial`, follow-up, campaigns, events, marketing, settings, seed programs (`ADULT_BJJ` / `KIDS_BJJ`). Consumes `@crm/core` for brand, health, app-env, auth/users/RBAC **framework**, settings KV, shell/nav/settings/permission **registration**. Drizzle journal `0000`–`0020` remains in MA.
+
+Staff with `MANAGE_ASSETS` can select one or many files in Asset Library and on Campaign → Assets. Each successful file creates one independent Asset through sequential `POST /api/marketing/assets` (concurrency 1). Partial failures keep successes; retry sends only failed/unattempted files; 401/403 stops the remaining batch. The existing Asset picker still only attaches already-created Assets.
 
 Local: http://localhost:5030 (`pnpm dev`). Laptop Docker PRODUCTION `:5000`, STAGE `:5010`, DEV `:5020`.
 

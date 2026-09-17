@@ -2,7 +2,7 @@
 type: index
 status: current
 area: process
-updated: 2026-09-15
+updated: 2026-09-17
 tags:
   - wip
 ---
@@ -17,7 +17,7 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-None. `authorization.active_work_order` is null. C2 is **Successful**. Work order and return are archived: [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog]], [[history/WO-2026-09-14-c2-product-instance-sales-catalog-return]], [[history/C2_closeout]]. Do not start C3, Beauty, S7, S8, SI migration, or Core promotion.
+None. `authorization.active_work_order` is null. Martial Arts sequential multi-file Asset upload shipped 2026-09-17: [[wip/archive/WO-2026-09-17-ma-multi-asset-upload]], [[history/WO-2026-09-17-ma-multi-asset-upload-return]]. C2 remains **Successful**. Do not start C3, Beauty, S7, S8, SI migration, or Core promotion.
 
 ## Current communication (not a work order)
 
@@ -38,6 +38,8 @@ SI Sales B1 work order is archived after owner acceptance: [[wip/archive/WO-2026
 SI Sales B2 work order is archived after owner acceptance: [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system]], [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]], [[history/B2_closeout]].
 
 C2 work order is archived after owner acceptance: [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog]], [[history/WO-2026-09-14-c2-product-instance-sales-catalog-return]], [[history/C2_closeout]].
+
+Martial Arts multi-file Asset upload work order is archived after code-ship: [[wip/archive/WO-2026-09-17-ma-multi-asset-upload]], [[history/WO-2026-09-17-ma-multi-asset-upload-return]].
 
 ## Do not put here
 
