@@ -12,7 +12,7 @@ tags:
 
 # C1 CRM Core architecture — return
 
-**Historical evidence.** Live map: [[Current-State]]. S-track S0–S6 are Successful; this return predates official S6 Successful and must not be read as current status.
+**Historical evidence.** Live architecture law: [[ADR-Product-Owned-Domains-Shared-Foundation]] (2026-09-17). C1 units 1–3 shipped a useful shared **application foundation**; the remaining Core-domain / Core-migrator finish line in the original plan is **superseded**. Do not treat this return as current milestone status (it predates official S6 Successful, C2, and the 2026-09-17 pivot). Live map: [[Current-State]].
 
 C1 units 1–3 are **code-shipped** on `working`. Sales is **not** started. D1 Control Plane schema is **unchanged**. C2 is **not** started.
 

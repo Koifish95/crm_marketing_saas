@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-15
+updated: 2026-09-17
 aliases:
   - Platform control
   - Control module
@@ -50,7 +50,7 @@ Headlines still read “Acme BJJ · Martial Arts · PROD · healthy,” not a co
 
 Laptop-only. Local Docker. Health on demand. Acme is seeded as a Martial Arts instance; new customers are accounts until the operator adds a product. No Docker socket in CRM containers.
 
-C2 **Successful** (2026-09-15): one account may own Martial Arts and Sales instances. One PROD per instance. Add Product Instance returns after registry insert; Docker build/compose is server-side `provisioning` until `ready` or `failed` (`provision_error` retained). Retry continues the same rows. Upgrade gating is instance-scoped. Restore is selectable with PROD→DEV copy-down. See [[Customer-Environment]] and [[SaaS-Decisions#2026-09-15 — Official C2 is Successful]].
+C2 **Successful** (2026-09-15): one account may own Martial Arts and Sales instances. One PROD per instance. Add Product Instance returns after registry insert; Docker build/compose is server-side `provisioning` until `ready` or `failed` (`provision_error` retained). Retry continues the same rows. Upgrade gating is instance-scoped. Restore is selectable with PROD→DEV copy-down. The Control Plane does **not** track a CRM Core / foundation package version and does **not** inspect a product’s domain model. See [[Customer-Environment]] and [[SaaS-Decisions#2026-09-15 — Official C2 is Successful]].
 
 ## What it is not
 
@@ -77,4 +77,4 @@ Relaunch means: recreate the process, remount the same durable data. Never `dock
 
 ## Next
 
-Official S5 and S6 are **Successful**. C2 is **Successful**. Public hostname work is official S8. Do not start S7, C3, or DNS/TLS unless an active work order says so. Do not duplicate `lab-acme` or `strategic-insights` blindly. Runbook: [[S6-Fleet-Runbook]]. Closeout: [[history/S6_closeout]]. Live map: [[Current-State]].
+Official S5 and S6 are **Successful**. C2 is **Successful**. Public hostname work is official S8. Do not start S7, C3, or DNS/TLS unless an active work order says so. Architecture: [[ADR-Product-Owned-Domains-Shared-Foundation]]. Do not duplicate `lab-acme` or `strategic-insights` blindly. Runbook: [[S6-Fleet-Runbook]]. Closeout: [[history/S6_closeout]]. Live map: [[Current-State]].

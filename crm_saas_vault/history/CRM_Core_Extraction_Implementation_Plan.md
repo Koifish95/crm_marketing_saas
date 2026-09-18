@@ -1,9 +1,9 @@
 ---
 type: note
-# Historical C2+ narrative. Not authorization. Live architecture: Platform-Architecture.md / ADR-CRM-Core-Vertical-Architecture.md.
-status: current
+# Historical C2+ narrative. NOT architecture law. Remaining Core-domain / Core-migrator units are superseded 2026-09-17.
+status: superseded
 area: architecture
-updated: 2026-09-11
+updated: 2026-09-17
 tags:
   - wip
   - saas
@@ -12,9 +12,11 @@ tags:
 
 # CRM Core extraction — implementation plan
 
-C1 units 1–3 are **code-shipped**. Sales is not started. D1 CP schema is unchanged. ADR: [[ADR-CRM-Core-Vertical-Architecture]]. Prompt: [[wip/archive/C1_CRM_Core_Architecture_Cursor_Prompt]]. C1 return: [[history/C1_CRM_Core_Architecture_Return]]. Planning return: [[wip/archive/CRM_Core_Architecture_Planning_Return]].
+**Superseded as remaining-work law (2026-09-17).** Live architecture: [[ADR-Product-Owned-Domains-Shared-Foundation]] and [[Platform-Architecture]]. C1 units 1–3 in this plan **did ship** and remain the shared foundation. Units that required Core-owned migrations, generic Leads/Campaigns/Follow-ups, Core semver on the Control Plane, or Beauty as Core-proof are **not** to be implemented from this document.
 
-Distinguish **repository fact** from **recommendation** throughout.
+C1 units 1–3 are **code-shipped**. Sales later shipped as a real second product (C2A–B2) and became Control Plane–provisionable (C2). ADR: [[ADR-CRM-Core-Vertical-Architecture]] (historical). Current law: [[ADR-Product-Owned-Domains-Shared-Foundation]]. C1 return: [[history/C1_CRM_Core_Architecture_Return]]. Planning return: [[wip/archive/CRM_Core_Architecture_Planning_Return]].
+
+Distinguish **repository fact** from **recommendation** throughout. Recommendations below that contradict the 2026-09-17 ADR are historical only.
 
 ---
 

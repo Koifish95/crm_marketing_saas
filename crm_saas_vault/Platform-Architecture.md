@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-15
+updated: 2026-09-17
 aliases:
   - ARCHITECTURE
   - Platform architecture
@@ -15,7 +15,7 @@ tags:
 
 Live **platform** architecture for `crm_marketing_saas`. This is not the Renzo gym stack; that evidence stays in [[Architecture]].
 
-Law: [[ADR-CRM-Core-Vertical-Architecture]]. Index: [[SaaS-Decisions]]. Domain unit: [[Customer-Environment]]. Operator app: [[Control-Plane]]. What exists now: [[Current-State]].
+Law: [[ADR-Product-Owned-Domains-Shared-Foundation]]. Historical Core+vertical ADR (partially superseded): [[ADR-CRM-Core-Vertical-Architecture]]. Index: [[SaaS-Decisions]]. Domain unit: [[Customer-Environment]]. Operator app: [[Control-Plane]]. What exists now: [[Current-State]].
 
 Do not treat this note as a work order. Implementation requires [[Work-Order-Protocol]].
 
@@ -35,7 +35,7 @@ Long-term direction: an ultra-general marketing, lead-generation, and CRM platfo
 
 ```text
 Customer Account / Organization
-    └── Business / Product Instance   (exactly one vertical)
+    └── Business / Product Instance   (exactly one product)
             └── Environments
                     ├── exactly one Type = PROD
                     ├── default one DEV
@@ -45,45 +45,53 @@ Hosting Node
 └── zero or more Environments         (placement, not ownership)
 ```
 
-- One account may own multiple product instances; instances may use different verticals.
-- Each instance has exactly one vertical. All of its environments share that vertical.
-- PROD and DEV under one instance may **not** be different verticals.
-- Vertical switching is not a normal env config change.
+- One account may own multiple product instances; instances may use different products.
+- Each instance has exactly one product. All of its environments share that product.
+- PROD and DEV under one instance may **not** be different products.
+- Switching products is not a normal env config change.
 
 **Shipped (C2 Successful, 2026-09-15):** `customers` + `product_instances` + `environments`. One account may own Martial Arts and Sales instances. One PROD per **product instance**. `industry_template` is a migration leftover (`unassigned` on new accounts with no MA instance). See [[Customer-Environment]].
 
+Older notes may say “vertical” for the same idea (product identity on the instance). That does **not** mean “CRM Core vertical composition.”
+
 ---
 
-## Core + verticals
+## Products + shared foundation
 
 ```text
-CRM Core
-   ↑
-   ├── Martial Arts     (shipped; martial_arts_template, :5030)
-   ├── Sales / Software (C2A/C2B/B1/B2 Successful; C2 Successful — CP catalog + `crm-sales:c2`; sales_template, :5040)
-   └── Beauty           (not started)
+                       Control Plane
+                            |
+              +-------------+-------------+
+              |             |             |
+              v             v             v
+        Martial Arts       Sales        Beauty
+         Product App    Product App    Product App
+              \             |             /
+                    Shared Foundation
+                    (today: @crm/core)
 ```
 
 | Topic | Rule |
 |---|---|
-| Core purpose | Shared infrastructure, not a sellable Generic CRM |
-| Composition | Not class inheritance, not forked apps, not one universal image |
-| Dependency | Vertical → Core. Core ↛ vertical. Vertical A ↛ Vertical B. Mechanically enforced |
-| Core UI | Core owns Core-capability UI, shell, nav **framework**. Verticals register entries |
-| Settings / RBAC | Core owns frameworks + Core permissions. Verticals own vertical permissions and sections |
-| Extension | Intentional contracts only. No generic plugin framework. No file-override forks |
-| Migrations | Core owns Core migrations; verticals own theirs. MA journal `0000`–`0020` stays until a table actually moves |
-| Versioning | Independent Core vs vertical semver (target). Images in use: MA `:s2` / `:s4`, Sales `crm-sales:c2` |
-| Regression | A Core change is not green if a supported vertical is red |
-| Duplication | Prefer temporary vertical duplication to premature Core |
-| Promotion | Default **No until justified**. Diverge first; abstract after two real implementations |
-| Sequence | Martial Arts → Sales → Beauty. Do not build Beauty to “get the architecture” |
+| Foundation purpose | Shared **application** infrastructure, not a sellable Generic CRM and not a shared CRM domain model |
+| Products | Independently owned apps: domain, schema, **complete migration journal**, pages, workflows, image, release |
+| Composition | Products may `extends` `@crm/core` for shell/auth/users. Not class inheritance, not file-override forks, not one universal image |
+| Dependency | Product → Foundation. Foundation ↛ product. Product A ↛ Product B. Mechanically enforced |
+| Foundation UI | Shell, nav **framework**, primitives. Products own pages (login/users copies today are acceptable) |
+| Settings / RBAC | Foundation owns frameworks + staff-user tables. Products own permission catalogs and settings sections |
+| Extension | Intentional registration contracts only. No generic plugin framework |
+| Migrations | **Each product owns the full journal.** Foundation may export table definitions; it does not run `migrateCore()` first |
+| Versioning | Product / image identity is what the Control Plane records. Foundation package version is not a CP deployment axis |
+| Regression | A foundation-package change runs the suites of products that depend on it |
+| Duplication | Prefer product-owned duplication to speculative shared domain |
+| Promotion | Default **No**. Extract only when multiple real products need substantially the same behavior and the contract is clean. Similar names are not enough |
+| Sequence | Martial Arts and Sales already exist. Beauty, when authorized, is another independent product — not a Core-proof exercise |
 
-**D2–D4 (accepted):** Martial Arts `leads` / `lead_lines` / trials, campaigns / acquisition events, and public capture (`/trial`, `/events/[slug]`, `/t/[slug]`) stay MA-owned until Sales provides a second implementation.
+**D2–D4 (modified 2026-09-17):** Martial Arts `leads` / trials, campaigns / events, and public capture stay **product-owned**. Sales shipped different Lead, Campaign, activity, and intake models. Do not promote those into the foundation.
 
-C1 is **code-shipped** (`packages/crm-core`, workspace, import tests). C2A (thin local Sales consumer) is **Successful** at `sales_template/` / `sales-crm` on port 5040. C2B Slice A, SI Sales B1, and SI Sales B2 are **Successful**. C2 (minimal D1 Product Instances + hybrid CP catalog + Sales Docker `crm-sales:c2`) is **Successful**. Do not “establish Core” again.
+C1 is **code-shipped** (`packages/crm-core` as the foundation package). C2A–B2 and C2 are **Successful**. Do not “establish Core” again. Do not grow `@crm/core` into generic Leads/Campaigns. Package rename is not authorized.
 
-C2+ extraction narrative (not authorization): [[history/CRM_Core_Extraction_Implementation_Plan]].
+The original Core+vertical extraction narrative is historical and not a license: [[history/CRM_Core_Extraction_Implementation_Plan]].
 
 ---
 
@@ -93,12 +101,14 @@ Separate operator app: `control_plane/` at http://127.0.0.1:52100. Not another c
 
 It lists customers/environments, observes up/down (container running **and** `/api/health`), relaunches without destroying volumes, provisions a Martial Arts or Sales PROD+DEV pair, and runs fleet lifecycle (backup, selectable restore including same-product PROD→DEV copy-down, off-host copy, upgrade, start/stop).
 
+Operational chain: Customer → Product Instance → Product/Build → Docker image → Environment → Hosting Node → Port (DNS/TLS later). The Control Plane does **not** need to know a product’s internal domain, how much source products share, or a foundation package version.
+
 Not in the pnpm workspace. No operator login. Loopback only. Details: [[Control-Plane]].
 
 ---
 
 ## Hosting contract (current)
 
-Laptop Docker is the only runtime. Production VPS, image registry, operator auth, DNS/TLS, and remote nodes are **not** implemented. Official S-track still names those S7/S8; the ADR says product family locally first. State both. Do not rewrite S0–S6.
+Laptop Docker is the only runtime. Production VPS, image registry, operator auth, DNS/TLS, and remote nodes are **not** implemented. Official S-track still names those S7/S8; product family locally first remains C-track *priority*, not a rewrite of S7. State both.
 
 Safety: never `docker compose down -v`, never prune, never attach `webhosting_renzo_*` / leftover `renzo-*` volumes.

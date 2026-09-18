@@ -1,8 +1,8 @@
 ---
 type: decision
-status: current
+status: superseded
 area: architecture
-updated: 2026-09-12
+updated: 2026-09-17
 aliases:
   - CRM Core ADR
   - Core plus vertical
@@ -14,7 +14,11 @@ tags:
 
 # ADR — CRM Core + Vertical Product Architecture
 
-**Current implementation (2026-09-12):** C1 is **code-shipped** — `pnpm-workspace.yaml`, `packages/crm-core` (`@crm/core`), Martial Arts consumes Core, architecture import tests exist. C2A is **Successful** — `sales_template/` / `sales-crm` is the second local Core consumer. C2B Slice A is **Successful** — Lead, convert, Opportunity workflow. See [[history/C1_CRM_Core_Architecture_Return]], [[history/C2A_closeout]], [[history/C2B_closeout]], and [[Current-State]]. Sections 2 and 4 below still describe the **pre-C1** repository (no workspace, no Core). That is historical context for the decision, not current repo fact. Do not “establish Core” again. C2 (CP catalog) / D1 schema / Slice B are **not** started. C2A or C2B success does not authorize C2 or Slice B.
+**Status: superseded in part (2026-09-17).** Current architecture law is [[ADR-Product-Owned-Domains-Shared-Foundation]]. Keep this note for history and for rules that ADR still lists as **RETAINED**.
+
+Do **not** read this file as an obligation to build a broad shared CRM domain, a Core migrator, Core semver on the Control Plane, generic Leads/Campaigns/Follow-ups, or Beauty as a Core-proof exercise. C1’s shipped foundation (`@crm/core`) remains; the remaining Core-domain finish line does not.
+
+C2 is **Successful** (2026-09-15). Sections 2 and 4 below still describe the **pre-C1** repository (no workspace, no Core). That is historical context, not current repo fact. Implementation snapshot as of this file’s original write: [[history/C1_CRM_Core_Architecture_Return]], [[Current-State]].
 
 ## 1. Title
 
@@ -22,7 +26,9 @@ CRM Core is shared infrastructure consumed by independently built vertical produ
 
 ## 2. Status
 
-**Accepted** (2026-09-11). Owner-approved in the architectural discussion recorded by [wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]. D1–D4 resolved the same day: [SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]. **C1 is code-shipped.** **C2A is Successful.** **C2B Slice A is Successful.** C2 / D1 schema / Slice B are not started. Extraction plan (not a license): [history/CRM_Core_Extraction_Implementation_Plan]. Pointer: [SaaS-Decisions#2026-09-11 — CRM Core + vertical architecture]. Live map: [Current-State].
+**Accepted** (2026-09-11). **Partially superseded** (2026-09-17) by [[ADR-Product-Owned-Domains-Shared-Foundation]] and [[SaaS-Decisions#2026-09-17 — Product-owned domains and shared foundation]].
+
+Original owner approval: [wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]. D1 remains in force. D2–D4 wait-then-promote is modified: those domains stay product-owned; Sales already supplied the second implementation. C1 foundation work remains. Extraction plan remaining Core-domain units are not law: [history/CRM_Core_Extraction_Implementation_Plan]. Live map: [Current-State].
 
 ## 3. Date
 
@@ -269,6 +275,8 @@ Deferred to [history/CRM_Core_Extraction_Implementation_Plan] and later owner au
 - Whether campaigns, events, or public capture later pass the promotion checklist (D3–D4: wait).
 
 ## 23. Supersedes / conflicts-with
+
+**2026-09-17:** Remaining Core-domain, Core-migration, Core-version, and Beauty-as-Core-proof trajectory is superseded by [[ADR-Product-Owned-Domains-Shared-Foundation]]. Retained vs superseded rules are tabulated there. Do not treat ADR-27 remaining items as current work.
 
 Does **not** supersede S0–S5 Successful closeouts, IMM-01–04, S4 provision decisions, or S6 NEAR-01–03.
 

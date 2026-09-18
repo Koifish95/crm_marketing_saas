@@ -29,8 +29,8 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 |---|---|
 | Official S-track S0–S6 | **Successful** |
 | Official S6 (fleet backup / restore / upgrade + start/stop) | **Successful** (2026-09-11). Evidence: [[history/S6_closeout]] |
-| CRM Core + vertical ADR | **Accepted** |
-| D1–D4 | **Accepted**. D1 schema **minimal shipped** in C2 (**Successful** 2026-09-15) |
+| CRM Core + vertical ADR | **Partially superseded** (2026-09-17) by product-owned domains + shared foundation |
+| D1–D4 | **Accepted**. D1 **retained**. D2–D4 **modified** 2026-09-17 (stay product-owned; Sales does not justify promotion). D1 schema **minimal shipped** in C2 (**Successful** 2026-09-15) |
 | C1 Core extraction | **Code-shipped**. Evidence: [[history/C1_CRM_Core_Architecture_Return]] |
 | C2A Thin Sales consumer | **Successful** (2026-09-11). Owner-accepted after browser QA at http://localhost:5040. Local `sales_template/` / `sales-crm`. Not C2. Evidence: [[history/C2A_closeout]] |
 | C2B SI Sales Refinement Slice A | **Successful** (2026-09-12). Owner-accepted after browser QA at http://localhost:5040. Feature `1ac18e4`. Not Slice B. Not C2. Evidence: [[history/C2B_closeout]] |
@@ -39,7 +39,7 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | C2 / Beauty / S7–S11 | C2 **Successful** (2026-09-15). Beauty and S7–S11 **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 
-**Authorized work:** none. Martial Arts sequential multi-file Asset upload shipped 2026-09-17 (template work; not a platform milestone). C2 remains **Successful**. Do not start C3, Beauty, S7, S8, SI migration, or Core promotion. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Closeout: [[history/C2_closeout]]. Asset upload return: [[history/WO-2026-09-17-ma-multi-asset-upload-return]].
+**Authorized work:** none. Architecture law is [[ADR-Product-Owned-Domains-Shared-Foundation]] (2026-09-17). Martial Arts sequential multi-file Asset upload shipped 2026-09-17 (template work; not a platform milestone). C2 remains **Successful**. Do not start C3, Beauty, S7, S8, SI migration, Core-domain promotion, package rename, or `apps/` moves. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Closeout: [[history/C2_closeout]]. Asset upload return: [[history/WO-2026-09-17-ma-multi-asset-upload-return]]. Architecture return: [[history/WO-2026-09-17-product-owned-domains-shared-foundation-return]].
 
 Lockfile: [[project-state.yaml]].
 
@@ -58,9 +58,9 @@ Lockfile: [[project-state.yaml]].
 crm_marketing_saas/
 ├── pnpm-workspace.yaml          # packages/crm-core + martial_arts_template + sales_template
 ├── package.json                 # root workspace stub; Node 22+; pnpm 10
-├── packages/crm-core/           # @crm/core — C1 shipped
-├── martial_arts_template/       # first vertical; local :5030; Docker :5000/:5010/:5020
-├── sales_template/              # Sales CRM (sales-crm); local :5040; Docker image crm-sales:c2
+├── packages/crm-core/           # @crm/core — shared application foundation (C1 shipped; name historical)
+├── martial_arts_template/       # Martial Arts product; local :5030; Docker :5000/:5010/:5020
+├── sales_template/              # Sales product (sales-crm); local :5040; Docker image crm-sales:c2
 ├── control_plane/               # NOT in the workspace; http://127.0.0.1:52100
 └── crm_saas_vault/              # this vault
 ```
@@ -75,21 +75,21 @@ crm_marketing_saas/
 
 ## Target vs implemented
 
-**Target** (accepted, not fully implemented) — [[Platform-Architecture]], [[ADR-CRM-Core-Vertical-Architecture]], [[Customer-Environment]]:
+**Target** (accepted D1 + 2026-09-17 foundation ADR) — [[Platform-Architecture]], [[ADR-Product-Owned-Domains-Shared-Foundation]], [[Customer-Environment]]:
 
 ```text
 Customer Account / Organization
     ↓
-Business / Product Instance     (exactly one vertical)
+Business / Product Instance     (exactly one product)
     ↓
-Vertical Product                (Martial Arts | Sales | Beauty)
+Product                         (Martial Arts | Sales | Beauty)
     ↓
-Environments                    (exactly one PROD, default DEV, optional extras — same vertical)
+Environments                    (exactly one PROD, default DEV, optional extras — same product)
 ```
 
-CRM Core is shared infrastructure. Verticals compose on Core. One-way dependency: Vertical → Core only. Sequence: Core → Martial Arts → Sales as second consumer → prove shared abstractions → Beauty → then production VPS.
+Products own their domains, schemas, and complete migration journals. `@crm/core` is the shared **application foundation** (name is historical), not a shared CRM domain. One-way dependency: Product → Foundation only. Beauty, when authorized, is another independent product — not a Core-proof exercise.
 
-Official S-track still lists S7 (hosting/VPS) after S6. The Core ADR **changes that priority** (product family locally first). Both notes remain valid in their roles: [[SaaS-Milestones]] is the official S-track; the ADR is architecture law. Do not silently rewrite the S-track. C-track IDs are separate.
+Official S-track still lists S7 (hosting/VPS) after S6. Product family locally first remains C-track *priority*, not a silent rewrite of S7. Both notes remain valid in their roles: [[SaaS-Milestones]] is the official S-track; [[ADR-Product-Owned-Domains-Shared-Foundation]] is architecture law. C-track IDs are separate.
 
 **Implemented (C2 Successful, 2026-09-15):** Control Plane has `customers` + `product_instances` + `environments`. One account may own Martial Arts and Sales instances. One PROD per **product instance**. New accounts are created with zero environments (`industry_template` sentinel `unassigned`). Operator then **Add product instance** with an explicit product pick. That insert returns immediately; Docker image build and compose run as server-side provisioning (`lifecycleStatus` `provisioning` → `ready` / `failed`, optional `provision_error`). Retry continues the same rows and remounts the same volumes. Existing rows backfill as one Martial Arts instance; env slug / container / volume / image / port identities are unchanged. New instances use `{customer}-{productId}-{type}` names. Hybrid catalog in CP code (`martial-arts`, `sales` only). Beauty is not a catalog entry. Restore is selectable (`backupId`) with server-side same-customer/same-product rollback and PROD→DEV copy-down.
 
@@ -97,7 +97,7 @@ Official S-track still lists S7 (hosting/VPS) after S6. The Core ADR **changes t
 
 ## What is implemented
 
-### Martial Arts vertical (`martial_arts_template/`)
+### Martial Arts product (`martial_arts_template/`)
 
 Full gym CRM derived from Renzo: households as `leads` + `lead_lines`, trials, intro `/trial`, follow-up, campaigns, events, marketing, settings, seed programs (`ADULT_BJJ` / `KIDS_BJJ`). Consumes `@crm/core` for brand, health, app-env, auth/users/RBAC **framework**, settings KV, shell/nav/settings/permission **registration**. Drizzle journal `0000`–`0020` remains in MA.
 
@@ -105,11 +105,11 @@ Staff with `MANAGE_ASSETS` can select one or many files in Asset Library and on 
 
 Local: http://localhost:5030 (`pnpm dev`). Laptop Docker PRODUCTION `:5000`, STAGE `:5010`, DEV `:5020`.
 
-### Sales vertical (`sales_template/`) — C2A–B2 Successful; C2 Successful
+### Sales product (`sales_template/`) — C2A–B2 Successful; C2 Successful
 
-Second working consumer of `@crm/core`. Package `sales-crm` (`private: true`). Extends `@crm/core`. Local: http://localhost:5040 (`pnpm dev`). SQLite `file:./data/app.sqlite`. Provisioned sqlite is `file:/app/data/sqlite/crm.sqlite`. Drizzle journal `0000`–`0003`. Docker image **`crm-sales:c2`**. Proposal PDFs in provisioned envs use `SALES_PROPOSALS_DIR=/app/data/uploads/proposals` on the existing assets/uploads volume (S6 zip already includes `/app/data/uploads`).
+Second working product consuming the shared foundation `@crm/core` (Nuxt `extends`). Package `sales-crm` (`private: true`). Local: http://localhost:5040 (`pnpm dev`). SQLite `file:./data/app.sqlite`. Provisioned sqlite is `file:/app/data/sqlite/crm.sqlite`. Drizzle journal `0000`–`0003` is **Sales-owned** (including `users` / RBAC / `app_settings` created in `0000_wide_cyclops`). Docker image **`crm-sales:c2`**. Proposal PDFs in provisioned envs use `SALES_PROPOSALS_DIR=/app/data/uploads/proposals` on the existing assets/uploads volume (S6 zip already includes `/app/data/uploads`).
 
-Second working local consumer of `@crm/core`. Package `sales-crm` (`private: true`). Extends `@crm/core`. Local only: http://localhost:5040 (`pnpm dev`). SQLite `sales_template/data/app.sqlite`. Drizzle journal `0000_wide_cyclops` + Slice A `0001_thankful_lyja` + B1 `0002_cheerful_firebrand` + B2 `0003_clammy_shocker`.
+Sales already performed the architectural role of the second consumer: it shares foundation infrastructure and owns a **divergent** domain (not a Core Lead/Campaign). Do not describe Sales as still needing to be built to challenge Core.
 
 Domain: **Lead** (`sales_leads`; Company optional) → explicit **Convert Lead** → **Company** / Sales Account (`sales_accounts`) + Contact + Opportunity. Opportunity stages `proposal_quote` → `decision` → `won` \| `lost` (terminal until Reopen; structured loss reason). Operational Activities, chronological `sales_notes`, owners on Lead/Opportunity/Activity. Company and Opportunity workspaces. Permissions `VIEW_SALES` / `MANAGE_SALES`.
 
@@ -121,9 +121,9 @@ No additional Sales CRM features shipped in C2 (no e-sign, email, portal). Strat
 
 C2A owner-accepted 2026-09-11. Closeout: [[history/C2A_closeout]]. C2B owner-accepted 2026-09-12. Closeout: [[history/C2B_closeout]]. Slice A implementation return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. B1 owner-accepted 2026-09-12. Closeout: [[history/B1_closeout]]. Implementation return: [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]]. B2 owner-accepted 2026-09-13. Closeout: [[history/B2_closeout]]. Implementation return: [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system]]. C2 owner-accepted 2026-09-15. Closeout: [[history/C2_closeout]]. Implementation return: [[history/WO-2026-09-14-c2-product-instance-sales-catalog-return]]. Work order (archived): [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog]].
 
-### CRM Core (`packages/crm-core`)
+### Shared foundation (`packages/crm-core`, package name `@crm/core`)
 
-C1 units 1–3: pnpm workspace, thin Nuxt layer, ESLint/architecture test (Core must not import MA / sales / beauty), brand/health/app-env, auth/users/RBAC framework, settings KV, shell + registration. `control_plane` is **out** of the workspace. `martial_arts_template/` was **not** moved to `apps/`.
+C1 units 1–3 **code-shipped** and **still in force**: pnpm workspace, thin Nuxt layer, ESLint/architecture test (foundation must not import MA / sales / beauty), brand/health/app-env, auth/users/RBAC framework, settings KV, shell + registration. The package name is historical; it is the shared **application foundation**, not a CRM domain. No Core migrator. No Core pages. Version `0.0.0` / `workspace:*`. `control_plane` is **out** of the workspace. `martial_arts_template/` was **not** moved to `apps/`. Do not split the package or rename it without a new work order.
 
 ### Control Plane (`control_plane/`)
 
@@ -159,12 +159,10 @@ Exact `docker inspect` + compose. Combined status: container running **and** `/a
 
 Do not assume any of these exist:
 
-- C3 Beauty, S7–S11, VPS / DNS / TLS
+- C3 Beauty as an independently owned product; S7–S11; VPS / DNS / TLS
 - Browser e-sign, public signing portal, customer portal, CRM email send, document/theme CMS
-- Beauty vertical (sister business is the intended second **pilot**, not a shipped product)
-- Completed generic Lead model in Core
-- Generic Campaign / Event framework
-- Generic public-capture framework
+- Beauty product (sister business is the intended second **pilot**, not a shipped product)
+- Generic Lead / Campaign / Event / public-capture model in the foundation (not planned)
 - Option C account-management redesign (multiple instances of the same product, SI cutover)
 - VPS / remote nodes / image registry
 - DNS / TLS / public hostnames / production edge
@@ -172,7 +170,10 @@ Do not assume any of these exist:
 - Remote Control Plane auth (or any CP login)
 - S-track rewritten around Core
 - `martial_arts_template` moved to `apps/`
+- `@crm/core` rename or split into `ui` / `auth` / `rbac` / `runtime`
 - Plugin framework, `tenant_id`, Beauty images
+- Core-owned migration journal / `migrateCore()` then product
+- Control Plane tracking of a foundation/Core package version
 
 ---
 
@@ -186,13 +187,14 @@ Link, do not re-litigate. Index: [[SaaS-Decisions]].
 | Vault is the durable record; wip is not | [[Working-Agreement]], [[Conventions]] |
 | Official S-track; S0–S6 Successful | [[SaaS-Milestones]], [[SaaS-Decisions#2026-09-10 — Map B is the official post-S4 roadmap]] |
 | S6 backup/restore/upgrade | [[SaaS-Decisions#2026-09-10 — S6 backup, restore, and upgrade]] |
-| Core + vertical architecture | [[ADR-CRM-Core-Vertical-Architecture]] |
+| Core + vertical architecture | Historical; **partially superseded** by [[ADR-Product-Owned-Domains-Shared-Foundation]] |
+| Product-owned domains + shared foundation | [[SaaS-Decisions#2026-09-17 — Product-owned domains and shared foundation]] |
 | C2A thin Sales consumer Successful | [[SaaS-Decisions#2026-09-11 — Official C2A is Successful]] |
 | C2B Slice A Successful | [[SaaS-Decisions#2026-09-12 — Official C2B is Successful]] |
 | SI Sales B1 Successful | [[SaaS-Decisions#2026-09-12 — Official SI Sales B1 is Successful]] |
 | C2 Successful | [[SaaS-Decisions#2026-09-15 — Official C2 is Successful]] |
 | C2 restore selection / PROD→DEV copy-down | [[SaaS-Decisions#2026-09-15 — C2 selectable restore and PROD→DEV copy-down]] |
-| D1–D4 | [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]] |
+| D1–D4 | [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]] (D2–D4 modified 2026-09-17) |
 | Customer / environment unit | [[Customer-Environment]] |
 | Never `-v` / prune / Renzo volumes | [[Control-Plane]] |
 | Retry = continue/resume | IMM-02 in [[SaaS-Open-Questions]] |
@@ -213,10 +215,11 @@ IMM-01–04 and NEAR-01–03 are **resolved / working**. Do not present them as 
 - This SaaS repo is not a license to manage Renzo.
 - No VPS / DNS / TLS / public hostnames unless an active work order says so (official S8 / S7).
 - No Sales or Beauty unless an active work order authorizes that sprint.
-- No premature Core promotion (D2–D4 wait).
+- No premature foundation-domain promotion. D2–D4 stay product-owned.
 - No D1 schema rewrite unless authorized. Minimal D1 (`product_instances`) shipped in C2; do not expand to Option C unless a new work order says so.
 - No destructive Docker: never `down -v`, never prune, never attach Renzo volumes.
-- No architecture that contradicts [[ADR-CRM-Core-Vertical-Architecture]].
+- No architecture that contradicts [[ADR-Product-Owned-Domains-Shared-Foundation]].
+- Do not implement a Core migrator, `@crm/core` rename/split, or `apps/` move unless a work order says so.
 - Do not `git push --force` to `main` / `master`. Commit one repo at a time, only when asked.
 - Do not treat live laptop sqlite extras as official pilots.
 - Do not infer permission from [[SaaS-Milestones]], an ADR, a plan, ChatGPT memory, or an archived prompt.
@@ -233,7 +236,8 @@ IMM-01–04 and NEAR-01–03 are **resolved / working**. Do not present them as 
 | Roadmap (S-track and C-track) | [[SaaS-Milestones]] |
 | Decisions index | [[SaaS-Decisions]] |
 | Platform architecture | [[Platform-Architecture]] |
-| Core / vertical ADR | [[ADR-CRM-Core-Vertical-Architecture]] |
+| Core / vertical ADR (historical) | [[ADR-CRM-Core-Vertical-Architecture]] |
+| Product-owned domains + foundation ADR | [[ADR-Product-Owned-Domains-Shared-Foundation]] |
 | State lockfile | [[project-state.yaml]] |
 | Work authorization | [[Work-Order-Protocol]], [[wip/_index]] |
 | Customer / environment | [[Customer-Environment]] |

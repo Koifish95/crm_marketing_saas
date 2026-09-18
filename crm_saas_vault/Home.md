@@ -37,10 +37,10 @@ External renzo_crm (separate repo, host, deploy)
         v
 crm_marketing_saas
         |
-        +-- Generic platform
-        +-- Martial Arts template
-        +-- Sales template (C2A + C2B Slice A + B1 + B2 Successful; C2 Successful — CP catalog + crm-sales:c2)
-        +-- future industry templates (Beauty later)
+        +-- Shared foundation (`@crm/core`) + Control Plane
+        +-- Martial Arts product
+        +-- Sales product (C2A + C2B Slice A + B1 + B2 Successful; C2 Successful — CP catalog + crm-sales:c2)
+        +-- future products (Beauty later, independently owned)
         +-- Customer instances: Strategic Insights (pilot), sister's business (pilot), then others
 ```
 
@@ -59,7 +59,8 @@ Git: this folder is its own repo; `origin` is https://github.com/Koifish95/crm_m
 | [[Current-State]] | What exists now. In-place. Not dated snapshots. |
 | [[SaaS-Milestones]] | Live S-track and C-track. Not permission to implement. |
 | [[SaaS-Decisions]] | Platform ADR index (newest first) |
-| [[ADR-CRM-Core-Vertical-Architecture]] | Core + vertical architecture law |
+| [[ADR-Product-Owned-Domains-Shared-Foundation]] | Current architecture law (products + shared foundation) |
+| [[ADR-CRM-Core-Vertical-Architecture]] | Historical Core + vertical ADR (partially superseded) |
 | [[Platform-Architecture]] | Platform composition (not Renzo [[Architecture]]) |
 | [[project-state.yaml]] | Machine-readable lockfile; update in the same commit as the work |
 | [[Work-Order-Protocol]] | Only thing that authorizes Cursor implementation |
@@ -83,7 +84,7 @@ Renzo notes at the vault root (`Overview`, `Implementation-State`, `Milestones`,
 
 ## Where development stands
 
-Official S-track S0–S6 **Successful**. C1 **code-shipped**. C2A–B2 **Successful**. **C2 Successful** (2026-09-15). Martial Arts sequential multi-file Asset upload **shipped** (2026-09-17; template work, not a platform milestone). Official S7, C3, Beauty, DNS/TLS: **not started**. **No active work order.** Await Scott.
+Official S-track S0–S6 **Successful**. C1 **code-shipped** (shared foundation). C2A–B2 **Successful**. **C2 Successful** (2026-09-15). Architecture: product-owned domains + shared foundation (**accepted** 2026-09-17). Martial Arts sequential multi-file Asset upload **shipped** (2026-09-17; template work, not a platform milestone). Official S7, C3, Beauty, DNS/TLS: **not started**. **No active work order.** Await Scott.
 
 Details: [[Current-State]]. Lockfile: [[project-state.yaml]].
 

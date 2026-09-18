@@ -12,6 +12,7 @@ Durable project knowledge lives in `crm_saas_vault/`. **The git vault is the onl
 4. `crm_saas_vault/project-state.yaml`
 5. `crm_saas_vault/SaaS-Milestones.md` — status tables only, then the ID you were authorized for
 6. `crm_saas_vault/SaaS-Decisions.md` (newest first) and `crm_saas_vault/Platform-Architecture.md`
+7. Architecture law: `crm_saas_vault/ADR-Product-Owned-Domains-Shared-Foundation.md`
 
 Then inspect **only** the code that matters. Code is implementation truth; durable vault notes are documented rules. If they conflict, investigate, then fix the map.
 
@@ -28,7 +29,7 @@ Implement platform work only when:
 
 If `project-state.yaml` has `authorization.active_work_order: null` and Scott did not ask in this chat: summarize understanding and **stop**.
 
-Do not start C3, Beauty, S7, Core promotion, VPS, or DNS/TLS because they are “next” on the roadmap. C2 Successful does not authorize those.
+Do not start C3, Beauty, S7, VPS, or DNS/TLS because they are “next” on the roadmap. Do not promote CRM domain into `@crm/core`, implement a Core migrator, or rename/split that package without a work order. C2 Successful does not authorize those.
 
 ## Canonical set
 
@@ -40,7 +41,8 @@ Do not start C3, Beauty, S7, Core promotion, VPS, or DNS/TLS because they are �
 | Roadmap (S-track and C-track) | `crm_saas_vault/SaaS-Milestones.md` |
 | Decisions | `crm_saas_vault/SaaS-Decisions.md` |
 | Platform architecture | `crm_saas_vault/Platform-Architecture.md` |
-| Core ADR | `crm_saas_vault/ADR-CRM-Core-Vertical-Architecture.md` |
+| Architecture ADR | `crm_saas_vault/ADR-Product-Owned-Domains-Shared-Foundation.md` |
+| Historical Core ADR | `crm_saas_vault/ADR-CRM-Core-Vertical-Architecture.md` |
 | Lockfile | `crm_saas_vault/project-state.yaml` |
 | Work orders | `crm_saas_vault/Work-Order-Protocol.md` |
 | Open NEAR/DEF | `crm_saas_vault/SaaS-Open-Questions.md` |

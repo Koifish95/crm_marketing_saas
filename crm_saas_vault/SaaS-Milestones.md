@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-15
+updated: 2026-09-17
 aliases:
   - Platform milestones
   - Successful
@@ -70,7 +70,7 @@ S0 Workspace split
 
 S0–S6 are Successful. Official S7 is not started. Evidence: [[history/S5_closeout]], [[history/S6_closeout]].
 
-The Core ADR says product family locally **before** production VPS. That is C-track priority, not a silent rewrite of S7. State both.
+The 2026-09-11 Core ADR placed product family locally **before** production VPS. That C-track *priority* remains. Architecture law is now [[ADR-Product-Owned-Domains-Shared-Foundation]] (not a silent rewrite of S7). State both.
 
 ## Status (C-track — architecture; separate IDs)
 
@@ -78,17 +78,17 @@ Not S-track. Do not call C2 “S7.” Do not call historical hostname work “S5
 
 | ID | Focus | Status |
 |---|---|---|
-| C1 | CRM Core extraction (workspace, `@crm/core`, frameworks) | **Code-shipped** (2026-09-11). Evidence: [[history/C1_CRM_Core_Architecture_Return]] |
-| C2A | Thin Sales consumer (local Core consumer; no CP catalog) | **Successful** (2026-09-11). Evidence: [[history/C2A_closeout]]. Not C2. |
+| C1 | Shared application foundation (`@crm/core` workspace/layer/frameworks) | **Code-shipped** (2026-09-11). Evidence: [[history/C1_CRM_Core_Architecture_Return]]. Remaining Core-domain finish line **superseded** 2026-09-17. |
+| C2A | Thin Sales product (local foundation consumer; no CP catalog) | **Successful** (2026-09-11). Evidence: [[history/C2A_closeout]]. Not C2. |
 | C2B | SI Sales Refinement Slice A (Lead, convert, Opportunity workflow) | **Successful** (2026-09-12). Not Slice B. Not C2. Evidence: [[history/C2B_closeout]] |
 | SI Sales B1 | Commercial model + acquisition foundation | **Successful** (2026-09-12). Not B2. Not C2. Evidence: [[history/B1_closeout]] |
 | SI Sales B2 | Proposal / document system | **Successful** (2026-09-13). Feature `84c0cc8`. Not C2. Evidence: [[history/B2_closeout]] |
-| C2 | Sales vertical as second Core consumer + CP product catalog | **Successful** (2026-09-15). Evidence: [[history/C2_closeout]]. |
-| C3 | Beauty vertical after Sales proves Core | Not started |
+| C2 | Sales as second product + CP product catalog | **Successful** (2026-09-15). Evidence: [[history/C2_closeout]]. |
+| C3 | Beauty as an independently owned product | Not started. Not a Core-proof exercise. |
 | D1 | Account vs Product Instance CP schema | **Accepted**, schema **minimal shipped** in C2 |
-| D2–D4 | Keep MA leads / campaigns / public capture vertical-owned | **Accepted** (wait) |
+| D2–D4 | MA leads / campaigns / public capture stay product-owned | **Accepted**; **modified** 2026-09-17 (Sales does not justify promotion) |
 
-C1 is not Map B Successful. C2A is **Successful** (not C2). C2B Slice A is **Successful** (not Slice B, not C2). SI Sales B1 is **Successful** (not B2, not C2). SI Sales B2 is **Successful** (not C2). C2 is **Successful**. Plan narrative (not a license): [[history/CRM_Core_Extraction_Implementation_Plan]].
+C1 is not Map B Successful. C1 shipped a useful shared **application foundation**; it did not establish a shared CRM domain, and that remaining trajectory is superseded ([[ADR-Product-Owned-Domains-Shared-Foundation]]). C2A is **Successful** (not C2). C2B Slice A is **Successful** (not Slice B, not C2). SI Sales B1 is **Successful** (not B2, not C2). SI Sales B2 is **Successful** (not C2). C2 is **Successful**. Historical extraction narrative (not law): [[history/CRM_Core_Extraction_Implementation_Plan]].
 
 ---
 
@@ -244,37 +244,37 @@ Workspace + `@crm/core` + brand/health/app-env + auth/RBAC/settings/shell framew
 
 ## C2A — Thin Sales consumer
 
-Status: **Successful** (2026-09-11). Owner-accepted after Scott’s browser QA at http://localhost:5040. Not S-track. Not C2. C2A success does **not** authorize C2, SI Sales refinement, or Core promotion.
+Status: **Successful** (2026-09-11). Owner-accepted after Scott’s browser QA at http://localhost:5040. Not S-track. Not C2. C2A success does **not** authorize C2, SI Sales refinement, or foundation-domain promotion.
 
 First local Sales CRM vertical consuming `@crm/core`, with Sales-owned CRM domain and **no** Control Plane product catalog. Path `sales_template/` (package `sales-crm`), local http://localhost:5040. SQLite `sales_template/data/app.sqlite`. Fresh Drizzle journal `0000_wide_cyclops`. Thin domain: Company / Sales Account, Contacts, Opportunities, provisional stages (`open` → `in_progress` → `won` | `lost`), Activities / Tasks, Won / Lost. Strategic Insights is the intended first real-world Sales customer and has **not** been migrated. Evidence: [[history/C2A_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-11-sales-thin-slice]]. Implementation return: [[history/WO-2026-09-11-sales-thin-slice-return]].
 
 ## C2B — SI Sales Refinement Slice A
 
-Status: **Successful** (2026-09-12). Owner-accepted after Scott’s browser QA at http://localhost:5040. Not S-track. Not C2. Not Slice B. C2B success does **not** authorize Slice B, C2, Core promotion, or SI migration.
+Status: **Successful** (2026-09-12). Owner-accepted after Scott’s browser QA at http://localhost:5040. Not S-track. Not C2. Not Slice B. C2B success does **not** authorize Slice B, C2, foundation-domain promotion, or SI migration.
 
 First operational SI sales workflow backbone on the C2A Sales app: Lead, explicit Convert, Opportunity Proposal/Quote → Decision → Won|Lost, activities, notes/history, ownership, Company/Opportunity workspaces. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. Journal `0001_thankful_lyja`. Feature `1ac18e4`. Evidence: [[history/C2B_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-11-si-sales-slice-a]]. Implementation return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. Decisions: [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]].
 
 ## SI Sales B1 — Commercial model + acquisition foundation
 
-Status: **Successful** (2026-09-12). Owner-accepted after Scott’s browser QA at http://localhost:5040. Not S-track. Not C2. Not B2. B1 success does **not** authorize B2, C2, Core promotion, or SI migration.
+Status: **Successful** (2026-09-12). Owner-accepted after Scott’s browser QA at http://localhost:5040. Not S-track. Not C2. Not B2. B1 success does **not** authorize B2, C2, foundation-domain promotion, or SI migration.
 
 Sales-owned Sources, Campaigns (no primary source), Campaign+Source Tracking Links, captured/current attribution, configuration-driven public intake (`/inquire`, `/t/{token}`), Offers, Opportunity commercial lines (one-time + MRR), Company lifecycle, `won_at` / `lost_at`, baseline reporting. Journal `0002_cheerful_firebrand`. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. Feature `40851e0`. Evidence: [[history/B1_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]]. Implementation return: [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]]. Decisions: [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]].
 
 ## SI Sales B2 — Proposal system
 
-Status: **Successful** (2026-09-13). Owner-accepted after Scott’s core B2 owner QA, 2026-09-13 refinements, and final regression QA at http://localhost:5040. Not S-track. Not C2. B2 success does **not** authorize C2, Core promotion, e-sign, email send, or SI migration.
+Status: **Successful** (2026-09-13). Owner-accepted after Scott’s core B2 owner QA, 2026-09-13 refinements, and final regression QA at http://localhost:5040. Not S-track. Not C2. B2 success does **not** authorize C2, foundation-domain promotion, e-sign, email send, or SI migration.
 
 Sales-owned Proposal chain per Opportunity, sequential immutable revisions, Issue snapshots, Mark Sent (`sent_at`, no mailer), staff-recorded Accepted/Declined (no auto-Won), optional valid-through display, instance letterhead, HTML preview, PDFKit PDFs, local `data/proposals/` artifacts, optional signed upload, historical revision selection from the Opportunity card. Journal `0003_clammy_shocker`. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. Feature `84c0cc8`; refinements `c2d611e`; revision-selection `0be7e06`. Evidence: [[history/B2_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system]]. Implementation return: [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]]. Decisions: [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] B2-01–B2-06 plus Slice B 22–31 / 50–51.
 
-## C2 — Sales as second Core consumer
+## C2 — Sales as second product + CP catalog
 
-Status: **Successful** (2026-09-15). Owner-accepted after disposable **C2 QA Test** owner QA and two QA remediations (provisioning visibility; selectable restore / PROD→DEV copy-down). Not S-track. C2 success does **not** authorize C3, Beauty, S7, S8, SI migration, or Core promotion.
+Status: **Successful** (2026-09-15). Owner-accepted after disposable **C2 QA Test** owner QA and two QA remediations (provisioning visibility; selectable restore / PROD→DEV copy-down). Not S-track. C2 success does **not** authorize C3, Beauty, S7, S8, SI migration, or foundation-domain promotion.
 
-Minimal D1 `product_instances`, hybrid CP catalog (`martial-arts`, `sales`), Sales image `crm-sales:c2`, explicit product pick after account create, product-scoped one-PROD and lifecycle, selectable backup restore with PROD→DEV copy-down only. Feature `43454fa`; provisioning remediation `db7af34`; restore remediation `ded805c`. Evidence: [[history/C2_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog]]. Implementation return: [[history/WO-2026-09-14-c2-product-instance-sales-catalog-return]]. Owner QA: [[history/C2_owner_qa]]. Architecture law: [[ADR-CRM-Core-Vertical-Architecture]]. C2A, C2B, B1, and B2 do not replace C2.
+Minimal D1 `product_instances`, hybrid CP catalog (`martial-arts`, `sales`), Sales image `crm-sales:c2`, explicit product pick after account create, product-scoped one-PROD and lifecycle, selectable backup restore with PROD→DEV copy-down only. Feature `43454fa`; provisioning remediation `db7af34`; restore remediation `ded805c`. Evidence: [[history/C2_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog]]. Implementation return: [[history/WO-2026-09-14-c2-product-instance-sales-catalog-return]]. Owner QA: [[history/C2_owner_qa]]. Architecture law: [[ADR-Product-Owned-Domains-Shared-Foundation]]. C2A, C2B, B1, and B2 do not replace C2.
 
-## C3 — Beauty vertical
+## C3 — Beauty product
 
-Status: **Not started.** After Sales proves Core. Sister-as-Beauty is a later business milestone (S10), not an architecture shortcut.
+Status: **Not started.** Independently owned product application when authorized. May consume `@crm/core` as shared foundation. Domain follows Beauty’s actual requirements. **Not** an exercise to prove CRM Core. Sister-as-Beauty remains a later business milestone (S10), not an architecture shortcut.
 
 ## After commercial launch (not required for Successful S11)
 

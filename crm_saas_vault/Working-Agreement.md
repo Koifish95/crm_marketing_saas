@@ -26,18 +26,18 @@ The **git vault is the only durable project-state system.** ChatGPT Project sour
 | Track | What it is | How we work |
 |---|---|---|
 | **Martial Arts template** | Improve `martial_arts_template` as the generic industry product | Evidence-driven. Default: template change. |
-| **Platform expansion** | Control plane, customer environments, provisioning, Core/verticals | Decision-first. No implementation until a [[Work-Order-Protocol\|work order]] (or Scott’s explicit ask in the current chat). |
+| **Platform expansion** | Control plane, customer environments, provisioning, product catalog | Decision-first. No implementation until a [[Work-Order-Protocol\|work order]] (or Scott’s explicit ask in the current chat). |
 
 Do not refactor the CRM into multi-tenant SaaS in order to “get ready.” Do not treat a CRM UX fix as a platform architecture change.
 
 When a CRM change appears, classify it:
 
 ```text
-template-only (this Martial Arts product)
-→ platform-generic?
+product-only (this Martial Arts or Sales product)
+→ shared foundation?
 ```
 
-Promotion to platform-generic is an explicit decision, recorded in [[SaaS-Decisions]].
+Promotion into `@crm/core` is an explicit decision, recorded in [[SaaS-Decisions]], and must meet [[ADR-Product-Owned-Domains-Shared-Foundation]] (substantially the same behavior, not similar names).
 
 “Protect Renzo” means: do not touch the external `renzo_crm` project, Koi-Pi, or `webhosting_renzo_*`. Copied Renzo-derived artifacts **inside this repository** may be generalized.
 
@@ -54,7 +54,7 @@ Promotion to platform-generic is an explicit decision, recorded in [[SaaS-Decisi
 | What Cursor may implement **now** | An active work order, or Scott’s explicit ask in this chat |
 | Historical proof (SHAs, closeouts) | Git + [[history/_index\|history/]] |
 
-Conflict rule: if two durable notes disagree, [[Current-State]] and [[project-state.yaml]] win for *status*; the ADR wins for *architecture law*; Git wins for *whether code exists*. Then update the loser. Do not invent a third document.
+Conflict rule: if two durable notes disagree, [[Current-State]] and [[project-state.yaml]] win for *status*; [[ADR-Product-Owned-Domains-Shared-Foundation]] wins for *architecture law*; Git wins for *whether code exists*. Then update the loser. Do not invent a third document.
 
 Renzo notes (`Domain-Model`, [[Architecture]], [[Implementation-State]], [[Decisions]], [[Milestones]]) stay **historical evidence**. Do not rewrite them into SaaS docs. “Accepted for Renzo” is not “accepted for the platform.”
 
@@ -125,7 +125,7 @@ Repository verification required
 
 ## Current next decision
 
-Orientation: [[Current-State]]. Official S-track: [[SaaS-Milestones]]. S0–S6 are Successful. Official **S7** is not started. CRM Core + vertical architecture is **Accepted**. D1–D4 are **accepted** (minimal D1 schema shipped in C2). **C1 is code-shipped**. **C2A–B2 are Successful**. **C2 is Successful**. **No active work order.** Await Scott. Do not start C3, Beauty, Core promotion, or S7 unless Scott asks. C2 closeout does **not** authorize C3 or SI migration. Martial Arts sequential multi-file Asset upload is template work already shipped.
+Orientation: [[Current-State]]. Official S-track: [[SaaS-Milestones]]. S0–S6 are Successful. Official **S7** is not started. Architecture law: [[ADR-Product-Owned-Domains-Shared-Foundation]] (**accepted** 2026-09-17). D1 is **retained**. D2–D4 are **modified** (product-owned; Sales does not justify promotion). **C1 is code-shipped** (foundation). **C2A–B2 are Successful**. **C2 is Successful**. **No active work order.** Await Scott. Do not start C3, Beauty, Core-domain promotion, package rename, or S7 unless Scott asks. C2 closeout does **not** authorize C3 or SI migration. Martial Arts sequential multi-file Asset upload is template work already shipped.
 
 **Git:** this workspace is its own repo at `C:\Users\Scoy9\Projects\crm_marketing_saas`. `origin` is https://github.com/Koifish95/crm_marketing_saas.git (not `renzo-crm`).
 
@@ -133,13 +133,13 @@ Orientation: [[Current-State]]. Official S-track: [[SaaS-Milestones]]. S0–S6 a
 
 ## What we do not do next
 
-- Start C3, Core promotion, Beauty, Option C, or VPS/S7
+- Start C3, Beauty, Option C, or VPS/S7
 - Treat C2 closeout as authorization for Beauty, e-sign, CRM email, or SI migration
+- Promote Leads/Campaigns/Follow-ups into `@crm/core`, implement a Core migrator, rename/split `@crm/core`, or move products into `apps/`
 - Add browser e-sign, CRM email send, or a customer portal
-- Move `martial_arts_template` to `apps/` in C1 (C1 already shipped without that move)
 - Start DNS / TLS / public hostnames (official S8)
-- Start VPS cutover, operator auth, or an image registry (official S7) — product family locally first
-- Add `tenant_id` to the CRM
+- Start VPS cutover, operator auth, or an image registry (official S7)
+- Add `tenant_id` to a product CRM
 - Start Stripe, self-service signup, or a beauty-variant design
 - Touch Koi-Pi PRODUCTION SQLite or `Projects/renzo_crm`
 - Start unstarted Renzo gym milestones unless Scott asks

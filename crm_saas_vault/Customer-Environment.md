@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-15
+updated: 2026-09-17
 aliases:
   - Environment unit
   - Customer Environment
@@ -15,7 +15,7 @@ tags:
 
 S1 **Successful**. Conceptual unit the control plane will list, health-check, and relaunch. Not an implementation spec. Domains, TLS, Compose, provisioning scripts, and billing enforcement are out of this note. Live map: [[Current-State]]. Platform architecture: [[Platform-Architecture]].
 
-Decisions: [[SaaS-Decisions#2026-09-08 — S1 customer environment unit]]. D1 hierarchy: [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]]. Milestones: [[SaaS-Milestones]].
+Decisions: [[SaaS-Decisions#2026-09-08 — S1 customer environment unit]]. D1 hierarchy: [[SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain]] (D1 retained; D2–D4 modified 2026-09-17). Architecture: [[ADR-Product-Owned-Domains-Shared-Foundation]]. Milestones: [[SaaS-Milestones]].
 
 **Target architecture (accepted D1)** vs **current repository fact** are labeled below. Minimal D1 shipped in C2 and is **Successful** (2026-09-15).
 
@@ -23,7 +23,7 @@ Decisions: [[SaaS-Decisions#2026-09-08 — S1 customer environment unit]]. D1 hi
 
 ```text
 Customer Account / Organization     (commercial relationship)
-    └── Business / Product Instance (exactly one vertical)
+    └── Business / Product Instance (exactly one product)
             └── Environments
                     ├── exactly one Type = PROD
                     ├── default one DEV
@@ -37,11 +37,13 @@ Example: Smith Holdings → Smith Software (Sales: PROD+DEV) and Smith Aesthetic
 
 Rules:
 
-- One account may own multiple product instances; those instances may use different verticals.
-- Each instance belongs to exactly one vertical. All of its environments use that vertical.
-- PROD and DEV under one instance may **not** be different verticals.
-- Vertical switching is not a normal environment configuration change. Cross-product conversion is a future explicit migration.
+- One account may own multiple product instances; those instances may use different products.
+- Each instance belongs to exactly one product. All of its environments use that product.
+- PROD and DEV under one instance may **not** be different products.
+- Switching products is not a normal environment configuration change. Cross-product conversion is a future explicit migration.
 - Do not add billing or account-management product features merely because the account level exists.
+
+Older notes may say “vertical” here. That means **product identity**, not CRM Core composition.
 
 A Hosting Node is **not** a child of an Environment. An Environment is **placed on** a node. Many environments may share a node, including environments from different accounts.
 
@@ -67,7 +69,7 @@ New env names: `{customer}-{productId}-{type}` (and extras `{customer}-{productI
 | Instance ID | Permanent. |
 | Account ID | Parent commercial account. |
 | Display name | e.g. Smith Software, Smith Aesthetics. |
-| Vertical / product | Exactly one. Martial Arts, Sales, or Beauty. |
+| Product | Exactly one. Martial Arts, Sales, or Beauty. |
 | Business / branding configuration | Instance-owned defaults for that deployment. |
 
 The platform owner’s own business is a normal account (plus separate control-plane privileges) and may later have more than one instance. See [[Control-Plane]].

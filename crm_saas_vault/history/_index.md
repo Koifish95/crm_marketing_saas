@@ -27,6 +27,7 @@ Closeouts, superseded roadmaps, and dated snapshots live here so agents do not t
 - [[history/S6_closeout]]
 - [[history/S6_Implementation_Status]]
 - [[history/C1_CRM_Core_Architecture_Return]]
+- [[history/WO-2026-09-17-product-owned-domains-shared-foundation-return]] — architecture-law reconciliation (docs only)
 - [[history/C2A_closeout]] — 2026-09-11 C2A Successful (owner-accepted; not C2)
 - [[history/C2B_closeout]] — 2026-09-12 C2B Slice A Successful (owner-accepted; not Slice B; not C2)
 - [[history/B1_closeout]] — 2026-09-12 SI Sales B1 Successful (owner-accepted; not B2; not C2)
@@ -47,6 +48,6 @@ Closeouts, superseded roadmaps, and dated snapshots live here so agents do not t
 
 - [[history/Current_State_and_Fresh_Agent_Handoff_2026-09-11]] — superseded by [[Current-State]]
 - [[history/Clean_Starting_Point_Decision_Backlog]] — superseded by [[SaaS-Open-Questions]]
-- [[history/CRM_Core_Extraction_Implementation_Plan]] — C2+ narrative; not a license to start
+- [[history/CRM_Core_Extraction_Implementation_Plan]] — C2+ narrative; remaining Core-domain units superseded 2026-09-17; not a license to start
 
 Renzo gym sequence and implementation narrative remain at the vault root as labeled evidence: [[Milestones]], [[Implementation-State]], [[Architecture]], [[Decisions]].

@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-12
+updated: 2026-09-17
 aliases:
   - Platform open questions
 tags:
@@ -29,7 +29,7 @@ Do not treat a row here as permission to implement. [[Working-Agreement]]. Histo
 | NEAR-01 | Per-env CRM sqlite + uploads. Same-host gitignored zip. Off-host = copy to an existing folder. Retention 14 days. Restore gated, one env, never `-v`. |
 | NEAR-02 | No image registry in S6. Registry remains official S7. |
 | NEAR-03 | Per-environment upgrade. Non-PROD before PROD when the customer has one (Acme `:s2` lab may be exempt). Refuse upgrade without an S6 backup of that env. |
-| DEF-01 (Core timing) | Core ADR accepted. **C1 code-shipped.** **C2A Successful.** **C2B Successful.** Do not establish Core again. Beauty waits; C2 (CP catalog) when authorized. C2A or C2B success does not authorize C2 or Slice B. |
+| DEF-01 (Core timing) | C1 foundation **code-shipped**. Remaining Core-domain trajectory **superseded** 2026-09-17 ([[ADR-Product-Owned-Domains-Shared-Foundation]]). Do not establish a shared CRM domain. Beauty is an independent product when authorized, not a Core-proof exercise. |
 
 ---
 
@@ -95,4 +95,4 @@ Safe to leave until after a map rewrite or after the first VPS customer.
 | DEF-07 | Self-service signup? Explicitly not required for launch. Do not design it. |
 | DEF-08 | Control-plane roles beyond a single Platform Administrator? |
 
-C2 start is **not** listed here. It is authorization, not an open question.
+C2 is **Successful**. Remaining C-track work (C3 Beauty as an independent product) is authorization, not an open question.

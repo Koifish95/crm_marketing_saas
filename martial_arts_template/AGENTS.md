@@ -2,7 +2,7 @@
 
 This folder is the **Martial Arts template** inside `crm_marketing_saas`. It was derived from the external Renzo CRM implementation. It is not Renzo’s live app.
 
-SaaS / platform work starts at `crm_saas_vault/Home.md` and `crm_saas_vault/Current-State.md`. How we work: `crm_saas_vault/Working-Agreement.md`. Repo-root `AGENTS.md` is the platform brief. Do not implement the control plane, C2, Sales, Beauty, or S7 unless an active work order (or Scott in the current chat) authorizes it.
+SaaS / platform work starts at `crm_saas_vault/Home.md` and `crm_saas_vault/Current-State.md`. How we work: `crm_saas_vault/Working-Agreement.md`. Repo-root `AGENTS.md` is the platform brief. Do not implement the control plane, Beauty, or S7 unless an active work order (or Scott in the current chat) authorizes it. Do not promote Martial Arts domain into `@crm/core`.
 
 This is a generic martial-arts customer-acquisition CRM. It captures leads, stores intro (Trial) history, supports staff follow-up, and runs marketing operations that **feed** acquisition. It is not a gym-management product, not a social-media manager, and not multi-tenant SaaS.
 
@@ -21,6 +21,7 @@ Project knowledge lives in `crm_saas_vault/`. Code is authoritative for implemen
 | What is next (not permission) | `crm_saas_vault/SaaS-Milestones.md` |
 | How we work / authorization | `crm_saas_vault/Working-Agreement.md`, `crm_saas_vault/Work-Order-Protocol.md` |
 | Platform architecture | `crm_saas_vault/Platform-Architecture.md` |
+| Architecture ADR | `crm_saas_vault/ADR-Product-Owned-Domains-Shared-Foundation.md` |
 | SaaS decisions | `crm_saas_vault/SaaS-Decisions.md` |
 | Lockfile | `crm_saas_vault/project-state.yaml` |
 

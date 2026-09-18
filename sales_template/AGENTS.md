@@ -1,6 +1,6 @@
 # Agent instructions
 
-This folder is the **Sales CRM** vertical (`sales-crm`) inside `crm_marketing_saas`. It consumes `@crm/core`. It is not Martial Arts and not the Control Plane.
+This folder is the **Sales CRM** product (`sales-crm`) inside `crm_marketing_saas`. It consumes `@crm/core` as shared application foundation. It is not Martial Arts and not the Control Plane.
 
 Platform map: `crm_saas_vault/Home.md`, `crm_saas_vault/Current-State.md`. C2A, C2B Slice A, SI Sales B1, SI Sales B2, and **C2** are Successful. C2 shipped Control Plane Product Instances plus Sales Docker `crm-sales:c2`. Local `pnpm dev` remains http://localhost:5040. Do not implement Beauty, S7, Strategic Insights migration, browser e-sign, or CRM email unless an active work order says so.
 

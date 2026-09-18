@@ -14,11 +14,11 @@ tags:
 
 # C2 closeout
 
-Definitive record of Milestone **C2 — Sales as second Core consumer + Control Plane product catalog**. Written 2026-09-15 after Scott’s owner acceptance.
+Definitive record of Milestone **C2 — Sales as second Core consumer + Control Plane product catalog**. Written 2026-09-15 after Scott’s owner acceptance. The 2026-09-17 architecture pivot did **not** reopen C2; current law is [[ADR-Product-Owned-Domains-Shared-Foundation]].
 
 **Not the live map.** Live map: [[Current-State]]. Decisions: [[SaaS-Decisions#2026-09-15 — Official C2 is Successful]]. Work order (archived): [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog]]. Implementation return: [[history/WO-2026-09-14-c2-product-instance-sales-catalog-return]]. Owner QA checklist: [[history/C2_owner_qa]].
 
-This closeout does **not** authorize C3, Beauty, S7, S8, SI migration/cutover, Core promotion, Option C, billing, VPS, or DNS/TLS.
+This closeout does **not** authorize C3, Beauty, S7, S8, SI migration/cutover, foundation-domain promotion, Option C, billing, VPS, or DNS/TLS.
 
 ---
 

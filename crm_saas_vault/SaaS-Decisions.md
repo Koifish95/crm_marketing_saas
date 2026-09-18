@@ -27,6 +27,23 @@ Decision: what we chose
 
 ---
 
+## 2026-09-17 — Product-owned domains and shared foundation
+
+Status: accepted
+
+Context: C1 extracted `@crm/core` as a Nuxt layer plus services. Sales then shipped as a real second product (C2A–B2) and became Control Plane–provisionable (C2). Martial Arts and Sales share application infrastructure but not CRM domain models. Continuing toward Core-owned migrations, generic Leads/Campaigns, Core semver on the Control Plane, or Beauty-as-Core-proof would over-constrain independent products. Scott authorized a documentation-only reconciliation.
+
+Decision:
+
+- Architecture law: [[ADR-Product-Owned-Domains-Shared-Foundation]]. Products own domains, schemas, complete migration journals, pages, workflows, images, and releases. `@crm/core` remains the shared **application foundation** (name is historical; no rename in this work).
+- Promotion into shared code requires substantially the same behavior, compatible semantics, a stable contract, and understood migration/release coupling. Similar names are not enough. Deliberate duplication is acceptable meanwhile.
+- **Supersede** Core-owned migrations / `migrateCore()`-then-product; generic Core Leads, Campaigns, Follow-Ups, public-capture, Core-owned CRM-domain UI; Core version as a Control Plane deployment axis; C3 Beauty as a Core-proof exercise; ADR-27 remaining finish-line items.
+- **Retain** D1 (account vs product instance); one-way Product → Foundation dependency; independent images; no universal CRM image; no `tenant_id`; no file-override forks; shell/RBAC/settings **frameworks**; conservative membership for what is already in `@crm/core`.
+- **Modify** D2–D4: those domains stay product-owned. Sales already supplied the second implementation and does **not** justify promoting them.
+- No application, schema, package, Docker, or Control Plane code change. No `apps/` move. No package split.
+
+Source: Scott 2026-09-17 (current Cursor chat work order WO-2026-09-17-product-owned-domains-shared-foundation)
+
 ## 2026-09-17 — Martial Arts sequential multi-file Asset upload
 
 Status: accepted (template behavior)
@@ -270,18 +287,18 @@ Source: Scott 2026-09-11
 
 ## 2026-09-11 — D1–D4: account vs product instance; wait on Core domain
 
-Status: accepted
+Status: accepted (D1 **retained**; D2–D4 **modified** 2026-09-17 — [[SaaS-Decisions#2026-09-17 — Product-owned domains and shared foundation]])
 
 Context: Planning listed D1–D4 as unresolved. Scott decided. This does **not** implement Control Plane schema, extract Core, or start C1. Full Core ADR: [[ADR-CRM-Core-Vertical-Architecture]]. Domain: [[Customer-Environment]].
 
 Decision:
 
 - **D1:** Reject “one Customer = one product family.” Target hierarchy is Customer Account / Organization → Business / Product Instance → Vertical → Environments. One account may own multiple instances; each instance has exactly one vertical; all of that instance’s environments share that vertical; PROD and DEV under one instance may not be different verticals. Switching verticals is not a normal env config change. Cross-product conversion is a future explicit migration. Do not add billing/account-management features merely because the account level exists. **Not implemented** — today’s `customers` row is still the account and the only product instance.
-- **D2:** Wait. Keep Martial Arts `leads` / `lead_lines` / trials MA-owned. Do not promote them into Core. Sales builds its own contact/opportunity model. Compare after two implementations. The eventual Core name need not be `Lead`.
-- **D3:** Wait. Keep campaigns and acquisition events MA-owned (`/trial` destinations, household-creating event process). Sales states its own requirements first.
-- **D4:** Wait. Keep `/trial`, `/events/[slug]`, `/t/[slug]` vertical-owned. No generic Core public-capture framework yet.
+- **D2:** Keep Martial Arts `leads` / `lead_lines` / trials **product-owned**. Do not promote them into the shared foundation. Sales built its own contact/opportunity model. After two implementations (2026-09-17), they are **not** the same aggregate. The eventual shared name need not be `Lead`, and sharing is not expected.
+- **D3:** Keep campaigns and acquisition events Martial Arts–owned (`/trial` destinations, household-creating event process). Sales stated and shipped its own campaign/intake model. Do not promote.
+- **D4:** Keep `/trial`, `/events/[slug]`, `/t/[slug]` product-owned. No generic foundation public-capture framework.
 
-Rule: diverge first; abstract after demonstrated commonality and the Core-promotion checklist. Sequence: Core → Martial Arts → Sales as second consumer → prove shared abstractions → Beauty → then production VPS.
+Original 2026-09-11 rule (“diverge first; abstract after demonstrated commonality and the Core-promotion checklist. Sequence: Core → Martial Arts → Sales as second consumer → prove shared abstractions → Beauty → then production VPS”) is **modified**: Sales already existed as the second product; domain promotion is not the next step. Current promotion rule: [[ADR-Product-Owned-Domains-Shared-Foundation]].
 
 Source: Scott 2026-09-11
 
@@ -289,7 +306,7 @@ Source: Scott 2026-09-11
 
 ## 2026-09-11 — CRM Core + vertical architecture
 
-Status: accepted
+Status: superseded in part by [[SaaS-Decisions#2026-09-17 — Product-owned domains and shared foundation]] / [[ADR-Product-Owned-Domains-Shared-Foundation]]
 
 Context: Scott approved CRM Core as shared infrastructure consumed by Martial Arts, Sales / Software, then Beauty. The repository is still a Martial Arts monolith plus a Martial Arts-only control plane. Prompt: [[wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt]]. This does **not** authorize extraction, Sales, Beauty, or VPS work.
 
@@ -299,6 +316,8 @@ Decision:
 - Core is not a sellable Generic CRM. Composition, not inheritance or forks. Separate product images. One-way dependency: Vertical → Core only.
 - Conservative Core membership and a promotion gate. Incremental Martial Arts extraction. Sales before Beauty, early enough to challenge Core.
 - Product family locally before production VPS. Do not start S7 on this ADR. Do not mark S6 Successful.
+
+**Later (2026-09-17):** C1 foundation work stands. Remaining Core-domain / Core-migration / Beauty-as-proof trajectory is superseded. Current law: [[ADR-Product-Owned-Domains-Shared-Foundation]].
 
 Source: Scott 2026-09-11 (architecture discussion + planning prompt)
 
