@@ -40,5 +40,5 @@ Authorized by Scott’s current chat: follow [[wip/CRM_SaaS_Pre_VPS_Product_Qual
 ## Phase log
 
 - **Phase 1 SUCCESS** (2026-09-19) — investigation only. Durable audit: [[Product-Workflow-UX-Audit]]. No product implementation in Phase 1.
-- **Phase 2** — not started. UI/UX overhaul using the audit as evidence.
-- **Phase 3** — not started.
+- **Phase 2 code-shipped** (2026-09-19) — staff shell, MA convert/follow-up, Sales nav/workspaces. Return: [[Product-UX-Overhaul-Return]]. Deferred polish listed there.
+- **Phase 3** — in progress. Release/update lifecycle.

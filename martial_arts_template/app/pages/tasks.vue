@@ -179,7 +179,7 @@ function confirmCancel() {
     <AppEmpty
       v-else-if="!error && !tasks?.length"
       title="No follow-up in this view"
-      description="Try another filter, or schedule an intro to create the first confirmation call."
+      description="Try another filter. Confirmation calls appear when an intro is scheduled; conversion calls appear after attendance or a no-show."
     />
 
     <ul

@@ -349,11 +349,18 @@ function startLineAction(lineId: number, action: 'convert' | 'lost' | 'schedule'
 const lineMoreId = ref<number | null>(null)
 
 function linePrimaryKind(line: NonNullable<LeadRecord['lines']>[number]) {
+  if (isLineTerminal(line)) {
+    return 'details' as const
+  }
   const trial = nextTrialForLine(line)
   if (canWrite.value && trial?.canRecordTrialOutcome) {
     return 'attended' as const
   }
-  if (canWrite.value && !isLineTerminal(line) && !trial) {
+  const latest = lineSummaries.value[line.id]?.latestTrial
+  if (canWrite.value && !trial && (line.status === 'TRIAL_ATTENDED' || latest?.status === 'ATTENDED')) {
+    return 'convert' as const
+  }
+  if (canWrite.value && !trial) {
     return 'schedule' as const
   }
   return 'details' as const
@@ -1252,6 +1259,12 @@ function closeTaskConfirm(open: boolean) {
                     Intro is scheduled.
                   </p>
                   <p
+                    v-else-if="linePrimaryKind(line) === 'convert'"
+                    class="mt-1 text-sm text-navy-800"
+                  >
+                    Decide: convert or mark lost.
+                  </p>
+                  <p
                     v-else
                     class="mt-1 text-sm text-navy-800"
                   >
@@ -1279,13 +1292,26 @@ function closeTaskConfirm(open: boolean) {
                   Mark attended
                 </AppButton>
                 <AppButton
+                  v-else-if="linePrimaryKind(line) === 'convert'"
+                  @click="startLineAction(line.id, 'convert')"
+                >
+                  Convert
+                </AppButton>
+                <AppButton
+                  v-if="linePrimaryKind(line) === 'convert'"
+                  variant="secondary"
+                  @click="startLineAction(line.id, 'lost')"
+                >
+                  Mark lost
+                </AppButton>
+                <AppButton
                   v-else-if="linePrimaryKind(line) === 'schedule'"
                   @click="startLineAction(line.id, 'schedule')"
                 >
                   Schedule trial
                 </AppButton>
                 <AppButton
-                  v-else
+                  v-else-if="linePrimaryKind(line) !== 'attended' && linePrimaryKind(line) !== 'convert'"
                   variant="secondary"
                   @click="toggleLine(line.id)"
                 >
@@ -1353,7 +1379,7 @@ function closeTaskConfirm(open: boolean) {
                   Schedule trial
                 </button>
                 <button
-                  v-if="canWrite && line.status !== 'JOINED' && line.status !== 'LOST'"
+                  v-if="canWrite && line.status !== 'JOINED' && line.status !== 'LOST' && linePrimaryKind(line) !== 'convert'"
                   type="button"
                   class="btn btn-subtle min-h-11 w-full justify-start"
                   @click="startLineAction(line.id, 'convert')"
@@ -1361,7 +1387,7 @@ function closeTaskConfirm(open: boolean) {
                   Convert
                 </button>
                 <button
-                  v-if="canWrite && line.status !== 'JOINED' && line.status !== 'LOST'"
+                  v-if="canWrite && line.status !== 'JOINED' && line.status !== 'LOST' && linePrimaryKind(line) !== 'convert'"
                   type="button"
                   class="btn btn-danger min-h-11 w-full justify-start"
                   @click="startLineAction(line.id, 'lost')"
@@ -1808,7 +1834,11 @@ function closeTaskConfirm(open: boolean) {
                   <AppAlert v-if="errorMessage">
                     {{ errorMessage }}
                   </AppAlert>
+                  <AppAlert v-if="!offeringsForLine(line.programId, line.membershipOfferingId).length">
+                    No membership offerings exist for this program. Add one in Settings → Catalog, then convert.
+                  </AppAlert>
                   <AppField
+                    v-else
                     label="Offering"
                     required
                   >
@@ -1829,6 +1859,13 @@ function closeTaskConfirm(open: boolean) {
                       </option>
                     </select>
                   </AppField>
+                  <NuxtLink
+                    v-if="!offeringsForLine(line.programId, line.membershipOfferingId).length"
+                    class="text-sm font-medium text-brand-700"
+                    to="/settings/catalog"
+                  >
+                    Open catalog
+                  </NuxtLink>
                   <AppField label="Conversion note">
                     <input
                       v-model="convertNote[line.id]"

@@ -32,6 +32,7 @@ const state = ref('')
 const notes = ref('')
 const errorMessage = ref('')
 const saving = ref(false)
+const creating = ref(false)
 
 const query = computed(() => ({
   search: search.value || undefined,
@@ -76,11 +77,24 @@ async function create() {
     <AppPageHeader
       title="Companies"
       description="Start outbound academies here: Company → Contacts → Opportunity. This is not a Control Plane customer. Leads are for inbound interest."
-    />
+    >
+      <template #actions>
+        <AppButton
+          type="button"
+          variant="secondary"
+          @click="creating = !creating"
+        >
+          {{ creating ? 'Cancel' : 'New company' }}
+        </AppButton>
+      </template>
+    </AppPageHeader>
     <AppAlert v-if="error || errorMessage">
       {{ errorMessage || 'Could not load companies.' }}
     </AppAlert>
-    <AppPanel title="New company">
+    <AppPanel
+      v-if="creating"
+      title="New company"
+    >
       <form
         class="grid gap-3 sm:grid-cols-2"
         @submit.prevent="create"

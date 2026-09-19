@@ -15,7 +15,7 @@ import {
 import { createLead, createTrial, rescheduleTrial, setTrialOutcome } from '../../server/services/leads'
 import { bookPublicTrial } from '../../server/services/public-trial'
 import type { SessionUser } from '../../server/services/authorization'
-import { followUpDueAt, followUpDueState } from '../../shared/utils/follow-up'
+import { followUpDueAt, followUpDueState, introConfirmationDueAt } from '../../shared/utils/follow-up'
 import { denverYmd, denverWallToUtc } from '../../shared/utils/time'
 import { openTestDatabase } from '../helpers/db'
 
@@ -197,7 +197,9 @@ describe('M5 follow-up workflow', () => {
       expect(task.purpose).toBe('INITIAL_SCHEDULE')
       expect(task.assignedUser).toBeNull()
       expect(task.trialId).toBe(scheduledTrial(booked.lead).id)
-      expect(new Date(task.dueAt).getTime()).toBe(followUpDueAt(new Date(task.createdAt!).getTime()).getTime())
+      expect(new Date(task.dueAt).getTime()).toBe(
+        introConfirmationDueAt(new Date(scheduledTrial(booked.lead).scheduledAt).getTime(), MONDAY).getTime(),
+      )
     } finally {
       await testDb.close()
     }
@@ -220,7 +222,9 @@ describe('M5 follow-up workflow', () => {
       expect(tasks).toHaveLength(1)
       expect(tasks[0]!.type).toBe('PHONE_CALL')
       expect(tasks[0]!.status).toBe('PENDING')
-      expect(new Date(tasks[0]!.dueAt).getTime()).toBe(followUpDueAt(MONDAY).getTime())
+      expect(new Date(tasks[0]!.dueAt).getTime()).toBe(
+        introConfirmationDueAt(MONDAY + 86_400_000, MONDAY).getTime(),
+      )
     } finally {
       await testDb.close()
     }
@@ -281,7 +285,9 @@ describe('M5 follow-up workflow', () => {
       const kept = moved.followUpTasks?.find(task => task.id === originalTask.id)
       expect(kept?.status).toBe('PENDING')
       expect(kept?.trialId).toBe(next.id)
-      expect(new Date(kept!.dueAt).getTime()).toBe(followUpDueAt(MONDAY).getTime())
+      expect(new Date(kept!.dueAt).getTime()).toBe(
+        introConfirmationDueAt(new Date(next.scheduledAt).getTime(), TUESDAY_MORNING).getTime(),
+      )
       expect(moved.followUpTasks?.filter(task => task.purpose === 'INITIAL_SCHEDULE' && task.status === 'PENDING')).toHaveLength(1)
     } finally {
       await testDb.close()
@@ -354,11 +360,15 @@ describe('M5 follow-up workflow', () => {
       const afterNoShow = await setTrialOutcome(testDb.db, scheduledTrial(noShow).id, { status: 'NO_SHOW' })
 
       expect(afterCancel.followUpTasks?.[0]?.status).toBe('CANCELLED')
-      expect(afterAttend.followUpTasks?.[0]?.status).toBe('CANCELLED')
-      expect(afterNoShow.followUpTasks?.[0]?.status).toBe('CANCELLED')
+      const attendedTasks = afterAttend.followUpTasks ?? []
+      expect(attendedTasks.some(task => task.purpose === 'INITIAL_SCHEDULE' && task.status === 'CANCELLED')).toBe(true)
+      expect(attendedTasks.some(task => task.purpose === 'MANUAL' && task.status === 'PENDING')).toBe(true)
+      const noShowTasks = afterNoShow.followUpTasks ?? []
+      expect(noShowTasks.some(task => task.purpose === 'INITIAL_SCHEDULE' && task.status === 'CANCELLED')).toBe(true)
+      expect(noShowTasks.some(task => task.purpose === 'MANUAL' && task.status === 'PENDING')).toBe(true)
       expect(afterNoShow.status).toBe('NO_SHOW')
       const extra = await testDb.db.select().from(followUpTasks).where(eq(followUpTasks.leadId, noShowLead.id))
-      expect(extra).toHaveLength(1)
+      expect(extra).toHaveLength(2)
     } finally {
       await testDb.close()
     }

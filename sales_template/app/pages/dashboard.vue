@@ -304,7 +304,7 @@ const presetLabel: Record<string, string> = {
       <AppPanel title="Source performance (current attribution)">
         <ul class="space-y-2 text-sm">
           <li
-            v-for="source in data.sources"
+            v-for="source in data.sources.filter(row => row.leads || row.opportunities || row.wonCount || row.name === 'Unattributed')"
             :key="String(source.id)"
           >
             {{ source.name }}

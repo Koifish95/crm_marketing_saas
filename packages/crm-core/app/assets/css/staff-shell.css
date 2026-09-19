@@ -1,0 +1,77 @@
+/* Staff chrome. Keep unlayered so it wins over incomplete Tailwind
+   utility generation in product CSS bundles (UX-SHARED-001). */
+
+.staff-shell {
+  min-height: 100vh;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+.staff-shell-body {
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+}
+
+.staff-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--color-navy-950) 50%, transparent);
+}
+
+.staff-nav {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 50;
+  display: flex;
+  width: 16rem;
+  flex-shrink: 0;
+  flex-direction: column;
+  overflow-y: auto;
+  background: var(--color-navy-900);
+  color: #fff;
+  transform: translateX(-100%);
+  transition: transform 150ms ease;
+}
+
+.staff-nav.is-open {
+  transform: translateX(0);
+}
+
+.staff-main-column {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.staff-mobile-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: block;
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-paper);
+  padding: 0.75rem 1rem;
+}
+
+@media (min-width: 1024px) {
+  .staff-shell-body {
+    display: flex;
+  }
+
+  .staff-nav {
+    position: static;
+    transform: none;
+  }
+
+  .staff-nav-backdrop {
+    display: none;
+  }
+
+  .staff-mobile-header {
+    display: none;
+  }
+}

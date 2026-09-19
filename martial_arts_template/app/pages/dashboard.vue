@@ -113,7 +113,7 @@ const followUpCounts = computed(() => [
           class="mt-4"
           bare
           title="No open follow-up calls"
-          description="New confirmation calls appear here when an intro is scheduled."
+          description="Confirmation calls appear when an intro is scheduled. After attendance, a conversion call is created so someone can join or close."
         />
         <ul
           v-else

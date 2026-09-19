@@ -105,5 +105,6 @@ notes:
   sales_minimum_v1: code_shipped
   sales_minimum_v1_date: 2026-09-19
   sales_minimum_v1_work_order: WO-2026-09-19-sales-minimum-v1
-  pre_vps_product_quality_phase: 1_audit_complete
+  pre_vps_product_quality_phase: 2_overhaul_code_shipped
   pre_vps_product_quality_audit: Product-Workflow-UX-Audit.md
+  pre_vps_product_quality_overhaul: Product-UX-Overhaul-Return.md

@@ -17,7 +17,7 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-[[wip/WO-2026-09-19-pre-vps-product-quality]] — Pre-VPS product quality & release readiness program. Phase 1 audit **complete** ([[Product-Workflow-UX-Audit]]). Phase 2 UI/UX overhaul is next. Program: [[wip/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program]].
+[[wip/WO-2026-09-19-pre-vps-product-quality]] — Pre-VPS product quality & release readiness. Phase 1 **complete**. Phase 2 **code-shipped**. Phase 3 next. Program: [[wip/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program]].
 
 ## Current communication (not a work order)
 

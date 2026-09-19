@@ -4,7 +4,9 @@ import { roleLabel } from '../../lib/role-label'
 
 const { user, clear } = useUserSession()
 const route = useRoute()
+const config = useRuntimeConfig()
 const navOpen = ref(false)
+const staffSubtitle = computed(() => String(config.public.staffSubtitle || '').trim())
 
 const { data: me, error: sessionError } = await useFetch<{
   user?: { id: number, displayName: string, role: string }
@@ -55,9 +57,9 @@ async function logout() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-canvas text-ink lg:flex lg:flex-col">
+  <div class="staff-shell">
     <AppEnvBanner />
-    <div class="flex min-h-0 min-w-0 flex-1 lg:flex">
+    <div class="staff-shell-body">
       <a
         href="#main"
         class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-paper focus:px-3 focus:py-2"
@@ -67,14 +69,14 @@ async function logout() {
 
       <div
         v-if="navOpen"
-        class="fixed inset-0 z-40 bg-navy-950/50 lg:hidden"
+        class="staff-nav-backdrop"
         @click="navOpen = false"
       />
 
       <aside
         id="staff-nav"
-        class="fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 flex-col overflow-y-auto bg-navy-900 text-white transition-transform lg:static lg:translate-x-0"
-        :class="navOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+        class="staff-nav"
+        :class="{ 'is-open': navOpen }"
       >
         <div class="border-b border-white/10 px-5 py-5">
           <AppBrandMark
@@ -82,8 +84,11 @@ async function logout() {
             compact
             to="/dashboard"
           />
-          <p class="mt-2 text-xs text-white/55">
-            Acquisition
+          <p
+            v-if="staffSubtitle"
+            class="mt-2 text-xs text-white/55"
+          >
+            {{ staffSubtitle }}
           </p>
           <AppEnvSwitcher
             class="mt-3"
@@ -136,8 +141,8 @@ async function logout() {
         </div>
       </aside>
 
-      <div class="flex min-w-0 flex-1 flex-col">
-        <header class="sticky top-0 z-30 border-b border-line bg-paper px-4 py-3 lg:hidden">
+      <div class="staff-main-column">
+        <header class="staff-mobile-header">
           <div class="flex items-center justify-between gap-3">
             <AppBrandMark
               compact

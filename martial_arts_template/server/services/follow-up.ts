@@ -3,7 +3,7 @@ import type { Database } from '../database'
 import { followUpTasks, followUpTaskLines, leadLines, leads, trials, users } from '../database/schema'
 import type { FollowUpCallOutcome, FollowUpTaskStatus } from '../../shared/schemas/enums'
 import type { FollowUpTaskView } from '../../shared/schemas/follow-up-task'
-import { dueStateRank, followUpDueAt, followUpDueState, matchesFollowUpTimeView } from '../../shared/utils/follow-up'
+import { dueStateRank, followUpDueAt, followUpDueState, introConfirmationDueAt, matchesFollowUpTimeView } from '../../shared/utils/follow-up'
 import { utcNowMs } from '../../shared/utils/time'
 import type { SessionUser } from './authorization'
 import { DomainError } from './errors'
@@ -299,6 +299,12 @@ async function retargetKeepToIntro(
   } else {
     patch.trialId = input.trialId
   }
+  if (patch.trialId && patch.trialId !== keep.trialId) {
+    const [targetTrial] = await db.select().from(trials).where(eq(trials.id, patch.trialId)).limit(1)
+    if (targetTrial?.scheduledAt) {
+      patch.dueAt = introConfirmationDueAt(new Date(targetTrial.scheduledAt).getTime(), now.getTime())
+    }
+  }
   await db.update(followUpTasks).set(patch).where(eq(followUpTasks.id, keep.id))
   if (input.leadLineId) {
     await linkFollowUpLine(db, keep.id, input.leadLineId, now)
@@ -342,6 +348,11 @@ export async function ensureInitialFollowUpTask(
   nowMs = utcNowMs(),
 ) {
   const now = new Date(nowMs)
+  const [trial] = await db.select().from(trials).where(eq(trials.id, input.trialId)).limit(1)
+  const confirmationDue = introConfirmationDueAt(
+    trial?.scheduledAt ? new Date(trial.scheduledAt).getTime() : nowMs,
+    nowMs,
+  )
   const pending = await pendingAcquisitionCallTasks(db, input.leadId)
   const keep = pending.find(task => task.purpose === 'INITIAL_SCHEDULE') ?? pending[0]
   if (keep) {
@@ -355,7 +366,7 @@ export async function ensureInitialFollowUpTask(
       trialId: input.trialId,
       type: 'PHONE_CALL',
       purpose: 'INITIAL_SCHEDULE',
-      dueAt: followUpDueAt(nowMs),
+      dueAt: confirmationDue,
       status: 'PENDING',
       assignedUserId: null,
       createdAt: now,
@@ -590,6 +601,35 @@ export async function createManualFollowUpTask(
   }
 
   return loadTask(db, row!.id)
+}
+
+export async function ensurePostOutcomeFollowUp(
+  db: Database,
+  input: { leadId: number, trialId: number, leadLineId?: number | null, kind: 'ATTENDED' | 'NO_SHOW' },
+  nowMs = utcNowMs(),
+) {
+  const pending = await pendingAcquisitionCallTasks(db, input.leadId)
+  if (pending.length) {
+    return pending[0]
+  }
+  const pendingManual = await db.select().from(followUpTasks).where(and(
+    eq(followUpTasks.leadId, input.leadId),
+    eq(followUpTasks.status, 'PENDING'),
+    eq(followUpTasks.purpose, 'MANUAL'),
+  ))
+  if (pendingManual.length) {
+    return pendingManual[0]
+  }
+  const note = input.kind === 'ATTENDED'
+    ? 'Call to convert or close after the intro.'
+    : 'Call after a no-show.'
+  return createManualFollowUpTask(db, {
+    leadId: input.leadId,
+    trialId: input.trialId,
+    dueAt: followUpDueAt(nowMs),
+    notes: note,
+    leadLineIds: input.leadLineId ? [input.leadLineId] : [],
+  })
 }
 
 export async function completeFollowUpTask(

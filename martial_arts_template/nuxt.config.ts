@@ -39,6 +39,7 @@ export default defineNuxtConfig({
       brandName: brand.brandName,
       brandLocation: brand.brandLocation,
       publicTagline: brand.publicTagline,
+      staffSubtitle: process.env.NUXT_PUBLIC_STAFF_SUBTITLE?.trim() || 'Acquisition',
       timezone: process.env.NUXT_PUBLIC_TIMEZONE || 'America/Denver',
       appEnv: process.env.NUXT_PUBLIC_APP_ENV || process.env.APP_ENV || 'dev',
     },

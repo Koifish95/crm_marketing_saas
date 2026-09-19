@@ -50,6 +50,7 @@ const lifecycle = ref('prospect')
 const saving = ref(false)
 const notice = ref('')
 const formError = ref('')
+const editingDetails = ref(false)
 
 watch(company, (value) => {
   if (!value) {
@@ -107,6 +108,12 @@ async function save() {
       </h1>
       <p class="record-meta">
         {{ company ? companyLifecycleLabel(company.lifecycle) : '' }}
+        <span v-if="company?.city || company?.state">
+          · {{ [company.city, company.state].filter(Boolean).join(', ') }}
+        </span>
+        <span v-if="company?.phone">
+          · {{ company.phone }}
+        </span>
       </p>
     </template>
     <AppAlert v-if="error || formError">
@@ -118,8 +125,17 @@ async function save() {
     >
       {{ notice }}
     </AppAlert>
-    <form
+    <AppButton
       v-if="company"
+      class="mb-4"
+      type="button"
+      variant="secondary"
+      @click="editingDetails = !editingDetails"
+    >
+      {{ editingDetails ? 'Hide details' : 'Edit details' }}
+    </AppButton>
+    <form
+      v-if="company && editingDetails"
       class="form-measure space-y-4"
       @submit.prevent="save"
     >

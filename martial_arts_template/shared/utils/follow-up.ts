@@ -70,8 +70,10 @@ const WEEKEND = new Set([0, 6])
 export function addBusinessDays(ymd: string, days: number): string {
   let remaining = days
   let current = ymd
+  const step = days < 0 ? -1 : 1
+  remaining = Math.abs(days)
   while (remaining > 0) {
-    current = addCalendarDays(current, 1)
+    current = addCalendarDays(current, step)
     if (!WEEKEND.has(weekdayFromYmd(current))) {
       remaining -= 1
     }
@@ -84,4 +86,20 @@ export function followUpDueAt(scheduledAtMs: number): Date {
   const startYmd = denverYmd(scheduledAtMs)
   const dueYmd = addBusinessDays(startYmd, FOLLOW_UP_BUSINESS_DAY_DELAY)
   return denverWallToUtc(dueYmd, FOLLOW_UP_DUE_MINUTE)
+}
+
+/** Confirmation call: last business day before the intro, at 5:00 PM Denver. */
+export function introConfirmationDueAt(trialScheduledAtMs: number, nowMs: number): Date {
+  const trialYmd = denverYmd(trialScheduledAtMs)
+  let dueYmd = addBusinessDays(trialYmd, -1)
+  let due = denverWallToUtc(dueYmd, FOLLOW_UP_DUE_MINUTE)
+  if (due.getTime() >= nowMs && due.getTime() < trialScheduledAtMs) {
+    return due
+  }
+  const todayYmd = denverYmd(nowMs)
+  const todayDue = denverWallToUtc(todayYmd, FOLLOW_UP_DUE_MINUTE)
+  if (todayDue.getTime() >= nowMs && todayDue.getTime() < trialScheduledAtMs) {
+    return todayDue
+  }
+  return new Date(Math.min(nowMs + 2 * 60 * 60 * 1000, trialScheduledAtMs - 30 * 60 * 1000))
 }

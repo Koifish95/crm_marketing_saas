@@ -170,6 +170,7 @@ const proposalValidThrough = ref('')
 const proposalRecipientId = ref('')
 const saving = ref(false)
 const notice = ref('')
+const editingDetails = ref(false)
 const formError = ref('')
 
 function callApi(url: string, opts: { method?: string, body?: unknown } = {}) {
@@ -640,6 +641,18 @@ function companyName() {
         · {{ formatUsdFromCents(opportunity?.amountCents ?? 0) }} one-time
         · {{ formatUsdFromCents(opportunity?.mrrCents ?? 0) }} MRR
       </p>
+      <p
+        v-if="openActivities[0]"
+        class="record-meta"
+      >
+        Next: {{ openActivities[0].description }}
+      </p>
+      <p
+        v-else-if="opportunity && !terminal"
+        class="record-meta"
+      >
+        No next action
+      </p>
     </template>
     <AppAlert v-if="error || formError">
       {{ formError || 'Could not load this opportunity.' }}
@@ -650,8 +663,30 @@ function companyName() {
     >
       {{ notice }}
     </AppAlert>
-    <form
+    <div
       v-if="opportunity"
+      class="mb-4 flex flex-wrap gap-2"
+    >
+      <AppButton
+        type="button"
+        variant="secondary"
+        @click="editingDetails = !editingDetails"
+      >
+        {{ editingDetails ? 'Hide details' : 'Edit details' }}
+      </AppButton>
+      <AppButton
+        v-for="code in ACTIVE_OPPORTUNITY_STAGES"
+        :key="code"
+        type="button"
+        variant="secondary"
+        :disabled="terminal || opportunity.stage === code || saving"
+        @click="save(code)"
+      >
+        {{ opportunityStageLabel(code) }}
+      </AppButton>
+    </div>
+    <form
+      v-if="opportunity && editingDetails"
       class="form-measure space-y-4"
       @submit.prevent="save()"
     >
@@ -770,16 +805,6 @@ function companyName() {
           :loading="saving"
         >
           Save
-        </AppButton>
-        <AppButton
-          v-for="code in ACTIVE_OPPORTUNITY_STAGES"
-          :key="code"
-          type="button"
-          variant="secondary"
-          :disabled="terminal || opportunity.stage === code || saving"
-          @click="save(code)"
-        >
-          {{ opportunityStageLabel(code) }}
         </AppButton>
       </div>
     </form>

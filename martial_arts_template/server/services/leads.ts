@@ -839,6 +839,12 @@ export async function setTrialOutcome(
         toStatus: lineStatus,
         note: input.notes || (input.status === 'ATTENDED' ? 'Trial attended.' : 'Trial no-show.'),
       }, actor)
+      await followUp.ensurePostOutcomeFollowUp(tx, {
+        leadId: trial.leadId,
+        trialId,
+        leadLineId: line.id,
+        kind: input.status,
+      }, nowMs)
     }
 
     return getLead(tx, trial.leadId, { nowMs })

@@ -67,7 +67,7 @@ Git: this folder is its own repo; `origin` is https://github.com/Koifish95/crm_m
 | [[SaaS-Open-Questions]] | Unresolved NEAR/DEF |
 | [[Conventions]] | How notes are written and promoted |
 
-Supporting live notes (not a second current-state): [[Customer-Environment]], [[Control-Plane]], [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]], [[S2-Hand-Boot-Checklist]], [[S3-Control-Plane-Runbook]], [[S4-Provision-Runbook]], [[S6-Fleet-Runbook]], [[SaaS-ToDo]], [[Martial-Arts-Customer-1-Sell-Readiness]], [[Customer-1-Production-Deploy-Runbook]], [[Martial-Arts-Product-Boundary]], [[Sales-SIC-Dogfooding-Readiness-Assessment]], [[Product-Workflow-UX-Audit]].
+Supporting live notes (not a second current-state): [[Customer-Environment]], [[Control-Plane]], [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]], [[S2-Hand-Boot-Checklist]], [[S3-Control-Plane-Runbook]], [[S4-Provision-Runbook]], [[S6-Fleet-Runbook]], [[SaaS-ToDo]], [[Martial-Arts-Customer-1-Sell-Readiness]], [[Customer-1-Production-Deploy-Runbook]], [[Martial-Arts-Product-Boundary]], [[Sales-SIC-Dogfooding-Readiness-Assessment]], [[Product-Workflow-UX-Audit]], [[Product-UX-Overhaul-Return]].
 
 ---
 
@@ -84,7 +84,7 @@ Renzo notes at the vault root (`Overview`, `Implementation-State`, `Milestones`,
 
 ## Where development stands
 
-Official S-track S0–S6 **Successful**. C1 **code-shipped** (shared foundation). C2A–B2 **Successful**. **C2 Successful** (2026-09-15). Architecture: product-owned domains + shared foundation (**accepted** 2026-09-17). Martial Arts sequential multi-file Asset upload **shipped** (2026-09-17; template work, not a platform milestone). Martial Arts Customer #1 sell-readiness **repository-complete** 2026-09-19, awaiting external blockers ([[Martial-Arts-Customer-1-Sell-Readiness]]). Hosting-node repository path **shipped** 2026-09-19 ([[Hosting-Node-Architecture]]); live VPS/DNS/TLS remain external. Official S7/S8 remain **not Successful**. C3, Beauty: **not started**. Active work order: [[wip/WO-2026-09-19-pre-vps-product-quality]]. Phase 1 UX audit complete: [[Product-Workflow-UX-Audit]]. Phase 2 is next.
+Official S-track S0–S6 **Successful**. C1 **code-shipped** (shared foundation). C2A–B2 **Successful**. **C2 Successful** (2026-09-15). Architecture: product-owned domains + shared foundation (**accepted** 2026-09-17). Martial Arts sequential multi-file Asset upload **shipped** (2026-09-17; template work, not a platform milestone). Martial Arts Customer #1 sell-readiness **repository-complete** 2026-09-19, awaiting external blockers ([[Martial-Arts-Customer-1-Sell-Readiness]]). Hosting-node repository path **shipped** 2026-09-19 ([[Hosting-Node-Architecture]]); live VPS/DNS/TLS remain external. Official S7/S8 remain **not Successful**. C3, Beauty: **not started**. Active work order: [[wip/WO-2026-09-19-pre-vps-product-quality]]. Phase 1 UX audit complete: [[Product-Workflow-UX-Audit]]. Phase 2 overhaul code-shipped: [[Product-UX-Overhaul-Return]]. Phase 3 is next.
 
 Details: [[Current-State]]. Lockfile: [[project-state.yaml]].
 
