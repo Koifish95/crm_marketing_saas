@@ -67,7 +67,7 @@ Git: this folder is its own repo; `origin` is https://github.com/Koifish95/crm_m
 | [[SaaS-Open-Questions]] | Unresolved NEAR/DEF |
 | [[Conventions]] | How notes are written and promoted |
 
-Supporting live notes (not a second current-state): [[Customer-Environment]], [[Control-Plane]], [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]], [[S2-Hand-Boot-Checklist]], [[S3-Control-Plane-Runbook]], [[S4-Provision-Runbook]], [[S6-Fleet-Runbook]], [[SaaS-ToDo]], [[Martial-Arts-Customer-1-Sell-Readiness]], [[Customer-1-Production-Deploy-Runbook]], [[Martial-Arts-Product-Boundary]].
+Supporting live notes (not a second current-state): [[Customer-Environment]], [[Control-Plane]], [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]], [[S2-Hand-Boot-Checklist]], [[S3-Control-Plane-Runbook]], [[S4-Provision-Runbook]], [[S6-Fleet-Runbook]], [[SaaS-ToDo]], [[Martial-Arts-Customer-1-Sell-Readiness]], [[Customer-1-Production-Deploy-Runbook]], [[Martial-Arts-Product-Boundary]], [[Sales-SIC-Dogfooding-Readiness-Assessment]].
 
 ---
 
