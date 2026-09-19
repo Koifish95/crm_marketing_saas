@@ -34,7 +34,7 @@ Open http://127.0.0.1:52100 → **Customers → New customer**. Fill display nam
 
 One customer account, then (per Add product instance) one product instance with one PROD and one DEV. Named volumes, isolated compose projects, gitignored env files under `control_plane/data/provisioned/`. Host ports from 52200–52999. New names are `{customer}-{productId}-{type}`. Backfilled rows keep historical `{customer}-{type}` names.
 
-Staff unwrap login: `admin` / `setup`, then `/account/password`. Do not leave `setup` as the living password. Do not store the new password in the control plane.
+Staff unwrap login: unique initial password written to the gitignored env file and `*.initial-access.txt` (0600 where the OS allows). First login still forces `/account/password`. The API returns `initialUsername` / `initialPassword` once at provision. **Never `setup`.** Do not store the living password in Control Plane sqlite.
 
 ## Retry
 

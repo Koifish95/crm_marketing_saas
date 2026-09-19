@@ -2,7 +2,7 @@
 type: index
 status: current
 area: process
-updated: 2026-09-17
+updated: 2026-09-19
 tags:
   - wip
   - archive
@@ -140,6 +140,8 @@ Current orientation: [[Current-State]]. These files are evidence, not the map.
 - [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition|SI Sales B1 commercial + acquisition work order]] (Successful 2026-09-12; closeout [[history/B1_closeout]])
 - [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system|SI Sales B2 proposal system work order]] (Successful 2026-09-13; closeout [[history/B2_closeout]])
 - [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog|C2 Product Instances + Sales catalog work order]] (Successful 2026-09-15; closeout [[history/C2_closeout]])
+- [[wip/archive/WO-2026-09-18-ma-customer-1-sell-readiness|Martial Arts Customer #1 sell-readiness work order]] (repository-complete 2026-09-19; return [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]]; tracker [[Martial-Arts-Customer-1-Sell-Readiness]])
+- [[wip/archive/Cursor_Martial_Arts_CRM_Customer_1_Sell_Readiness_Execution_Prompt|Customer #1 sell-readiness execution prompt]]
 - [[wip/archive/WO-2026-09-17-ma-multi-asset-upload|Martial Arts sequential multi-file Asset upload work order]] (code-shipped 2026-09-17; return [[history/WO-2026-09-17-ma-multi-asset-upload-return]])
 - [[wip/archive/WO-2026-09-17-product-owned-domains-shared-foundation|Product-owned domains + shared foundation work order]] (docs only, 2026-09-17; return [[history/WO-2026-09-17-product-owned-domains-shared-foundation-return]])
 - [[wip/archive/Create_CRM_Core_Vertical_Architecture_ADR_and_Planning_Prompt|Core ADR planning prompt]]

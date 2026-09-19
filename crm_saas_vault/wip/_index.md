@@ -2,7 +2,7 @@
 type: index
 status: current
 area: process
-updated: 2026-09-17
+updated: 2026-09-19
 tags:
   - wip
 ---
@@ -17,7 +17,7 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-None. `authorization.active_work_order` is null. Architecture law: [[ADR-Product-Owned-Domains-Shared-Foundation]] (2026-09-17). Martial Arts sequential multi-file Asset upload shipped 2026-09-17: [[wip/archive/WO-2026-09-17-ma-multi-asset-upload]], [[history/WO-2026-09-17-ma-multi-asset-upload-return]]. Architecture pivot (docs only): [[wip/archive/WO-2026-09-17-product-owned-domains-shared-foundation]], [[history/WO-2026-09-17-product-owned-domains-shared-foundation-return]]. C2 remains **Successful**. Do not start C3, Beauty, S7, S8, SI migration, Core-domain promotion, or `@crm/core` rename.
+None. `authorization.active_work_order` is null. Architecture law: [[ADR-Product-Owned-Domains-Shared-Foundation]] (2026-09-17). Martial Arts sequential multi-file Asset upload shipped 2026-09-17: [[wip/archive/WO-2026-09-17-ma-multi-asset-upload]], [[history/WO-2026-09-17-ma-multi-asset-upload-return]]. Architecture pivot (docs only): [[wip/archive/WO-2026-09-17-product-owned-domains-shared-foundation]], [[history/WO-2026-09-17-product-owned-domains-shared-foundation-return]]. Customer #1 sell-readiness repository-complete 2026-09-19: [[wip/archive/WO-2026-09-18-ma-customer-1-sell-readiness]], [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]], [[Martial-Arts-Customer-1-Sell-Readiness]]. C2 remains **Successful**. Do not start C3, Beauty, S7, S8, SI migration, Core-domain promotion, or `@crm/core` rename.
 
 ## Current communication (not a work order)
 

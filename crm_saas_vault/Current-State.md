@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-17
+updated: 2026-09-19
 aliases:
   - CURRENT_STATE
   - Current state
@@ -39,7 +39,7 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | C2 / Beauty / S7–S11 | C2 **Successful** (2026-09-15). Beauty and S7–S11 **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 
-**Authorized work:** none. Architecture law is [[ADR-Product-Owned-Domains-Shared-Foundation]] (2026-09-17). Martial Arts sequential multi-file Asset upload shipped 2026-09-17 (template work; not a platform milestone). C2 remains **Successful**. Do not start C3, Beauty, S7, S8, SI migration, Core-domain promotion, package rename, or `apps/` moves. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Closeout: [[history/C2_closeout]]. Asset upload return: [[history/WO-2026-09-17-ma-multi-asset-upload-return]]. Architecture return: [[history/WO-2026-09-17-product-owned-domains-shared-foundation-return]].
+**Authorized work:** none (Customer #1 sell-readiness repository work shipped 2026-09-19; not a platform milestone). Architecture law is [[ADR-Product-Owned-Domains-Shared-Foundation]] (2026-09-17). Martial Arts sequential multi-file Asset upload shipped 2026-09-17 (template work; not a platform milestone). C2 remains **Successful**. Do not start C3, Beauty, S7, S8, SI migration, Core-domain promotion, package rename, or `apps/` moves. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Closeout: [[history/C2_closeout]]. Asset upload return: [[history/WO-2026-09-17-ma-multi-asset-upload-return]]. Architecture return: [[history/WO-2026-09-17-product-owned-domains-shared-foundation-return]]. Customer #1 sell-readiness: [[Martial-Arts-Customer-1-Sell-Readiness]], [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]].
 
 Lockfile: [[project-state.yaml]].
 
@@ -103,6 +103,8 @@ Full gym CRM derived from Renzo: households as `leads` + `lead_lines`, trials, i
 
 Staff with `MANAGE_ASSETS` can select one or many files in Asset Library and on Campaign → Assets. Each successful file creates one independent Asset through sequential `POST /api/marketing/assets` (concurrency 1). Partial failures keep successes; retry sends only failed/unattempted files; 401/403 stops the remaining batch. The existing Asset picker still only attaches already-created Assets.
 
+Customer #1 sell-readiness (repository-complete 2026-09-19): unique initial-access passwords, CSRF/trusted-proxy/security headers, VACUUM INTO backups, health `releaseId`/`schemaVersion`, lead CSV import/export, and `deploy/customer-1/` nginx TLS edge templates. Tracker: [[Martial-Arts-Customer-1-Sell-Readiness]]. Live VPS/DNS/TLS remain official S7/S8.
+
 Local: http://localhost:5030 (`pnpm dev`). Laptop Docker PRODUCTION `:5000`, STAGE `:5010`, DEV `:5020`.
 
 ### Sales product (`sales_template/`) — C2A–B2 Successful; C2 Successful
@@ -127,7 +129,7 @@ C1 units 1–3 **code-shipped** and **still in force**: pnpm workspace, thin Nux
 
 ### Control Plane (`control_plane/`)
 
-http://127.0.0.1:52100. Multi-page shell: Dashboard, Customers, Environments, Hosting Nodes, Settings. Observe + provision **product instances**. New customer = account only. Add Product Instance picks Martial Arts or Sales, creates that instance’s PROD+DEV, and provisions in the background. Extra non-PROD attaches to an instance. One-PROD per instance. Upgrade “non-PROD first” is instance-scoped. Gated decommission (volumes stay). Retry = continue/resume the same environments. Localhost `accessUrl`s. No operator login. Details: [[Control-Plane]].
+http://127.0.0.1:52100. Multi-page shell: Dashboard, Customers, Environments, Hosting Nodes, Settings. Observe + provision **product instances**. New customer = account only. Add Product Instance picks Martial Arts or Sales, creates that instance’s PROD+DEV, and provisions in the background. Extra non-PROD attaches to an instance. One-PROD per instance. Upgrade “non-PROD first” is instance-scoped. Gated decommission (volumes stay). Retry = continue/resume the same environments. Localhost `accessUrl`s. No operator login; non-loopback is 403 unless `CONTROL_PLANE_ALLOW_REMOTE` + token. Unique initial-access passwords (never `setup`). Details: [[Control-Plane]].
 
 ### Environment lifecycle
 
@@ -143,11 +145,11 @@ Start All / Stop All = eligible **registered fleet**, not the table filter. Elig
 
 ### Provisioning
 
-Sales-led. `Customers → New customer` creates the **account only**. From the customer workspace Products tab, **Add product instance** and select Martial Arts or Sales. The Control Plane stores the instance immediately as **Provisioning**. Image build (`martial-arts-acquisition:s4` or `crm-sales:c2`) and compose run in the background from the product Dockerfile with **repo-root** context. Compose cwd is that product’s template directory. You can leave the page; Failed rows keep `provision_error` and Retry remounts the same volumes. Runbook: [[S4-Provision-Runbook]].
+Sales-led. `Customers → New customer` creates the **account only**. From the customer workspace Products tab, **Add product instance** and select Martial Arts or Sales. The Control Plane stores the instance immediately as **Provisioning**. Image build (`martial-arts-acquisition:s4` or `crm-sales:c2`) and compose run in the background from the product Dockerfile with **repo-root** context. Compose cwd is that product’s template directory. You can leave the page; Failed rows keep `provision_error` and Retry remounts the same volumes. Initial access is a unique password written to the env file (chmod 0600) plus a sidecar file — never `setup`. Runbook: [[S4-Provision-Runbook]].
 
 ### Backup / restore (official S6 Successful; C2 copy-down included)
 
-Lifecycle tab: same-host zip, **selectable backup history**, gated restore, off-host copy to an existing folder, backup-gated local upgrade, Explorer reveal (`POST .../backup/reveal` with `{ backupId }`, path must stay under `data/backups/`). Restore requires `{ confirm, backupId }` — it does not silently use the latest zip. Server-side policy: same customer + same Product Instance; same-environment rollback; **PROD → DEV copy-down**; never DEV → PROD; never cross-product or cross-customer. Snapshot is SQLite + persistent uploads (including Sales proposal PDFs). Target identity/port/compose/secrets stay. Retention 14 days. Runbook: [[S6-Fleet-Runbook]].
+Lifecycle tab: same-host zip, **selectable backup history**, gated restore, off-host copy to an existing folder, backup-gated local upgrade, Explorer reveal (`POST .../backup/reveal` with `{ backupId }`, path must stay under `data/backups/`). Restore requires `{ confirm, backupId }` — it does not silently use the latest zip. Server-side policy: same customer + same Product Instance; same-environment rollback; **PROD → DEV copy-down**; never DEV → PROD; never cross-product or cross-customer. Snapshot is SQLite via **VACUUM INTO** + persistent uploads (including Sales proposal PDFs). Target identity/port/compose/secrets stay. Retention 14 days. Runbooks: [[S6-Fleet-Runbook]], [[Customer-1-Backup-Restore-Runbook]].
 
 ### Docker / runtime
 
@@ -159,13 +161,13 @@ Exact `docker inspect` + compose. Combined status: container running **and** `/a
 
 Do not assume any of these exist:
 
-- C3 Beauty as an independently owned product; S7–S11; VPS / DNS / TLS
+- C3 Beauty as an independently owned product; S7–S11; **live** VPS / DNS / TLS
 - Browser e-sign, public signing portal, customer portal, CRM email send, document/theme CMS
 - Beauty product (sister business is the intended second **pilot**, not a shipped product)
 - Generic Lead / Campaign / Event / public-capture model in the foundation (not planned)
 - Option C account-management redesign (multiple instances of the same product, SI cutover)
 - VPS / remote nodes / image registry
-- DNS / TLS / public hostnames / production edge
+- Live DNS / TLS certificates / public hostnames (repo-side nginx edge templates exist under `deploy/customer-1/`)
 - Billing, Stripe, self-service signup
 - Remote Control Plane auth (or any CP login)
 - S-track rewritten around Core
@@ -244,6 +246,10 @@ IMM-01–04 and NEAR-01–03 are **resolved / working**. Do not present them as 
 | Control Plane | [[Control-Plane]] |
 | Open NEAR/DEF | [[SaaS-Open-Questions]] |
 | Historical evidence | [[history/_index]] |
+| Customer #1 sell-readiness | [[Martial-Arts-Customer-1-Sell-Readiness]] |
+| Customer #1 production deploy | [[Customer-1-Production-Deploy-Runbook]] |
+| Customer #1 backup/restore | [[Customer-1-Backup-Restore-Runbook]] |
+| Martial Arts product boundary | [[Martial-Arts-Product-Boundary]] |
 | Renzo gym evidence | [[Implementation-State]], [[Milestones]], [[Architecture]], [[Decisions]] |
 
 Renzo gym notes at the vault root are **historical evidence of the source implementation**, not SaaS law. [[Architecture]] is the Renzo/source stack. Platform architecture is [[Platform-Architecture]].

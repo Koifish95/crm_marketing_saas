@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-17
+updated: 2026-09-18
 aliases:
   - Platform control
   - Control module
@@ -70,6 +70,10 @@ C2 **Successful** (2026-09-15): one account may own Martial Arts and Sales insta
 - Environment APIs: `POST .../backup`, `GET .../backups` (restore candidates), `POST .../restore` (`{ confirm, backupId }`), `.../backup/copy`, `.../backup/reveal`, `.../upgrade`, `.../start`, `.../stop`, `.../bulk/start`, `.../bulk/stop`. Restore is server-gated: same customer + same Product Instance; rollback or PROD→DEV copy-down only.
 - Start: eligible when not decommissioned/provisioning/failed and status `stopped`. Missing stays on Relaunch. Stop: runtime running (or healthy/unhealthy); never sets `decommissioned`. Bulk `{ scope: selected|all }`; `all` = eligible registered fleet, not the table filter. Sequential Docker; no `Promise.all`.
 - No operator login; loopback bind
+- Non-loopback requests are refused unless `CONTROL_PLANE_ALLOW_REMOTE=true` **and** `x-control-plane-token` matches `CONTROL_PLANE_TOKEN`
+- New Martial Arts/Sales envs get a unique initial-access password (never provisioned `setup`); env files and sidecar password files are `0600` where the OS allows
+- Fleet SQLite snapshot uses in-container `VACUUM INTO` + integrity_check, not a live `docker cp` of the database file
+- Customer #1 operator procedures: [[Customer-1-Production-Deploy-Runbook]], [[Customer-1-Backup-Restore-Runbook]], [[Martial-Arts-Customer-1-Sell-Readiness]]
 
 ## Safety rule
 

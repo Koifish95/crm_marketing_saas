@@ -2,11 +2,11 @@
 # Human map: Current-State.md. This file is an index, not a second essay.
 # Update in the same commit as the work that changes these fields.
 schema_version: 1
-updated: 2026-09-17
+updated: 2026-09-19
 repo: crm_marketing_saas
 branch: working
 remote: https://github.com/Koifish95/crm_marketing_saas.git
-head_at_write: "8c117d4d5d486fca91e014a571a25da53e83b21a"
+head_at_write: "a7348b0c4f4d3a0d279934037aadc7a2b4d3d27a"
 
 canonical:
   bootstrap: Home.md
@@ -97,3 +97,5 @@ notes:
   crm_core_package_name: historical_shared_foundation
   core_domain_promotion: not_planned
   core_migrator: not_planned
+  ma_customer1_sell_readiness: repository_complete_awaiting_external
+  ma_customer1_sell_readiness_date: 2026-09-19
