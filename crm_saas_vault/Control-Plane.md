@@ -46,7 +46,7 @@ which customers exist
 → provision a Product Instance PROD+DEV pair (Martial Arts or Sales)
 ```
 
-Headlines still read “Acme BJJ · Martial Arts · PROD · healthy,” not a container id. Indexes are tables. Workspaces can Refresh, Retry, add a product instance, add extra non-PROD on an instance, gated-decommission (volumes stay), assign a PROD public hostname, and use the **Lifecycle** tab (backup, restore, off-host copy, upgrade — S6 Successful). Start / Stop / bulk start-stop are implemented on `/environments` (not Relaunch). Current state: [[Current-State]].
+Headlines still read “Acme BJJ · Martial Arts · PROD · healthy,” not a container id. Indexes are tables. Workspaces show `releaseId` and `schemaVersion` from `/api/health`. Operators can Refresh, Retry, add a product instance, add extra non-PROD on an instance, gated-decommission (volumes stay), assign a PROD public hostname, and use the **Lifecycle** tab (backup, restore, off-host copy, target-image upgrade — S6 Successful; recreate without `-v`). Start / Stop / bulk start-stop are implemented on `/environments` (not Relaunch). Map: [[Product-Release-Update-Lifecycle]]. Current state: [[Current-State]].
 
 Laptop **or** Linux hosting node (`kind=laptop|vps`, `driver=local-docker`). Health on demand. Acme is seeded as a Martial Arts instance on laptop; VPS bootstrap sets `SKIP_LAB_SEED=true`. New customers are accounts until the operator adds a product. No Docker socket in CRM containers.
 

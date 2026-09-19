@@ -208,7 +208,7 @@ async function runBulk(action: 'start' | 'stop', scope: 'selected' | 'all') {
     >
       <AppDataTable
         label="Environments"
-        :columns="['Customer', 'Product', 'Environment', 'Type', 'Node', 'Runtime', 'Health', 'Image', 'Access']"
+        :columns="['Customer', 'Product', 'Environment', 'Type', 'Node', 'Runtime', 'Health', 'Image', 'Release', 'Access']"
       >
         <template #leading>
           <input
@@ -251,6 +251,7 @@ async function runBulk(action: 'start' | 'stop', scope: 'selected' | 'all') {
           <td>{{ env.runtime }}</td>
           <td><AppStatusBadge :status="operatorEnvironmentStatus(env)" /></td>
           <td>{{ env.expectedImage }}</td>
+          <td>{{ env.releaseId || '—' }}</td>
           <td><AppAccessLink :href="env.accessUrl" /></td>
         </tr>
       </AppDataTable>

@@ -182,11 +182,9 @@ Current `/api/health` is minimal and operational:
 - application readiness
 - database reachability / health
 
-It is **not** required to expose Customer ID, Environment ID, Type, Hosting Node, version, or build metadata for S1.
+It is **not** required to expose Customer ID, Environment ID, Type, or Hosting Node on the public health route.
 
-The control plane is the authority for identity, placement, and deployed version.
-
-Richer diagnostics (ids, type, version, commit, uptime, dependency status, liveness vs readiness, deploy info) may be added in later milestones, especially S3 and S6. This is not a permanent restriction.
+`/api/health` now also reports `releaseId` and, per product, `schemaVersion`. The control plane remains the authority for customer identity and placement; it displays those health fields so the operator can answer what release an environment is running. See [[Product-Release-Update-Lifecycle]].
 
 Healthy (for the future control plane) still means: process running **and** `/api/health` reports app + database reachable. See [[Control-Plane]].
 

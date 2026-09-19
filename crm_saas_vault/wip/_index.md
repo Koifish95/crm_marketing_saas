@@ -17,9 +17,11 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-[[wip/WO-2026-09-19-pre-vps-product-quality]] — Pre-VPS product quality & release readiness. Phase 1 **complete**. Phase 2 **code-shipped**. Phase 3 next. Program: [[wip/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program]].
+None.
 
 ## Current communication (not a work order)
+
+- [[wip/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program]] — executed 2026-09-19. Return: [[history/WO-2026-09-19-pre-vps-product-quality-return]]. **Not** a work order.
 
 - [[wip/C2_Pre_Development_Audit_and_Decision_Worksheet]] — C2 pre-development audit. Owner decisions **C2-01 B, C2-02 B, C2-03 A, C2-04 A, C2-05 A, C2-06 A** recorded 2026-09-14. **Planning-ready.** **Not** a work order. Does **not** authorize implementation.
 - [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] — SI Sales **B2** pre-development worksheet. Decisions **B2-01 through B2-06 complete**. Evidence. **Not** a work order.

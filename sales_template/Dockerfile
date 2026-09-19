@@ -29,6 +29,7 @@ RUN pnpm exec esbuild docker/runtime-init.ts \
   --external:@libsql/darwin-arm64
 
 FROM node:22-bookworm-slim AS runner
+ARG RELEASE_ID=dev
 RUN apt-get update \
   && apt-get install -y --no-install-recommends gosu \
   && rm -rf /var/lib/apt/lists/*
@@ -36,6 +37,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=5000
+ENV RELEASE_ID=${RELEASE_ID}
 ENV DRIZZLE_MIGRATIONS_DIR=/app/drizzle/migrations
 COPY --from=build /src/sales_template/.output ./.output
 COPY --from=build /src/sales_template/drizzle/migrations ./drizzle/migrations

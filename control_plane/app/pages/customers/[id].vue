@@ -400,7 +400,7 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
         </p>
         <AppDataTable
           label="Customer environments"
-          :columns="['Environment', 'Product', 'Type', 'Status', 'Runtime', 'Image', 'Detail', 'Access']"
+          :columns="['Environment', 'Product', 'Type', 'Status', 'Runtime', 'Image', 'Release', 'Detail', 'Access']"
         >
           <tr
             v-for="env in customer?.environments"
@@ -416,6 +416,7 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
             <td><AppStatusBadge :status="operatorEnvironmentStatus(env)" /></td>
             <td>{{ env.runtime }}</td>
             <td>{{ env.expectedImage }}</td>
+            <td>{{ env.releaseId || '—' }}</td>
             <td class="muted">
               {{ shortProvisionError(env.provisionError) || '—' }}
             </td>

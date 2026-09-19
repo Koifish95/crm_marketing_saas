@@ -27,6 +27,22 @@ Decision: what we chose
 
 ---
 
+## 2026-09-19 — Pre-VPS release identity, migrations, and upgrade recreate
+
+Status: accepted
+
+Context: Phase 3 of the pre-VPS program. S6 already backed up, restored, and upgraded environments. Upgrade did not recreate a rebuilt mutable tag, Sales health omitted schema version, and the Control Plane did not show `releaseId`.
+
+Decision:
+
+- Keep S6 backup-gated upgrade. Recreate the app container with `--force-recreate` and never `-v`.
+- Stamp `RELEASE_ID` into the environment env file at upgrade so compose does not pin `dev`.
+- Identify a running release by expected image + running image + health `releaseId` + `schemaVersion`.
+- Additive Drizzle migrations run at container start. Destructive schema change requires restore of the pre-update backup plus the previous image. Do not downgrade SQLite in place.
+- Control Plane shows release identity and accepts a target image. Rollback remains Restore + previous image, not an automatic health-fail revert of a running new container.
+
+---
+
 ## 2026-09-19 — Sales Minimum V1 locked decisions for SIC dogfooding
 
 Status: accepted

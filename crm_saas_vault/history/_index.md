@@ -34,6 +34,7 @@ Closeouts, superseded roadmaps, and dated snapshots live here so agents do not t
 - [[history/B2_closeout]] — 2026-09-13 SI Sales B2 Successful (owner-accepted; not C2)
 - [[history/C2_closeout]] — 2026-09-15 C2 Successful (owner-accepted)
 - [[history/C2_owner_qa]] — C2 owner-QA checklist (Scott’s recorded checks)
+- [[history/WO-2026-09-19-pre-vps-product-quality-return]] — Pre-VPS product quality program return (Phases 1–3 SUCCESS; not an official milestone)
 - [[history/WO-2026-09-19-sales-minimum-v1-return]] — Sales Minimum V1 SIC dogfooding return (code-shipped; not a platform milestone; not owner-accepted Successful)
 - [[history/WO-2026-09-19-production-hosting-node-return]] — hosting-node / private Control Plane return (repository-complete; live VPS/DNS/TLS external; not official S7/S8)
 - [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]] — Martial Arts Customer #1 sell-readiness return (repository-complete; not a platform milestone)

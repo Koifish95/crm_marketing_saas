@@ -37,6 +37,8 @@ import {
   revealBackupCommand,
   revealEnvironmentBackup,
   restoreComposeArgs,
+  upgradeComposeArgs,
+  writeUpgradeEnv,
 } from '../../server/services/fleet-backup'
 import { readFleetBackupManifest, writeFleetBackupZip } from '../../server/services/fleet-backup-zip'
 
@@ -194,6 +196,28 @@ describe('S6 fleet backup contract', () => {
     expect(args).toEqual(expect.arrayContaining(['up', '-d', '--no-deps', 'app']))
     expect(args).not.toContain('--force-recreate')
     expect(args.join(' ')).not.toMatch(/(^|\s)(-v|--volumes|down|prune)(\s|$)/)
+  })
+
+  it('upgrade compose recreates the app container without deleting volumes', () => {
+    const args = upgradeComposeArgs({
+      envFile: '.env.lab-acme-dev',
+      composeFile: 'docker-compose.lab-acme-dev.yml',
+      composeProject: 'lab-acme-dev',
+    })
+    expect(args).toEqual(expect.arrayContaining(['up', '-d', '--force-recreate', '--no-deps', 'app']))
+    expect(args.join(' ')).not.toMatch(/(^|\s)(-v|--volumes|down|prune)(\s|$)/)
+  })
+
+  it('stamps expected image and release id into the compose env file', () => {
+    const root = join(tmpdir(), `upgrade-env-${randomUUID()}`)
+    mkdirSync(root, { recursive: true })
+    const envFile = join(root, '.env')
+    writeFileSync(envFile, 'EXPECTED_IMAGE="crm-sales:c2"\nRELEASE_ID="old"\n')
+    writeUpgradeEnv(envFile, 'crm-sales:phase3', 'abc123')
+    const contents = readFileSync(envFile, 'utf8')
+    expect(contents).toMatch(/EXPECTED_IMAGE="crm-sales:phase3"/)
+    expect(contents).toMatch(/RELEASE_ID="abc123"/)
+    rmSync(root, { recursive: true, force: true })
   })
 
   it('refuses decommissioned environments and finds sqlite filenames', () => {

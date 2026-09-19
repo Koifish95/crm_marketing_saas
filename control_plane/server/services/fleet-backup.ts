@@ -24,7 +24,8 @@ import { extractFleetBackupZip, extractedSqliteDir, extractedUploadsDir } from '
 import { readFleetBackupManifest, writeFleetBackupZip } from './fleet-backup-zip'
 import { composeArgs, composeRootForEnvironment, repoRoot, resolveComposeEnvFile } from './docker-relaunch'
 import { inspectRegisteredContainer } from './docker-runtime'
-import { imageBuildArgs, waitUntilHealthy } from './provision-runtime'
+import { currentReleaseId, imageBuildArgs, waitUntilHealthy } from './provision-runtime'
+import { patchEnvFileContents } from './provision-env'
 import { requireProduct } from '../products/catalog'
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
 
@@ -417,14 +418,31 @@ function isAcmeLab(composeFile: string) {
   return composeFile.startsWith('docker-compose.lab-acme')
 }
 
-function writeExpectedImage(envFile: string, expectedImage: string) {
+export function upgradeComposeArgs(input: {
+  envFile: string
+  composeFile: string
+  composeProject?: string
+}) {
+  return composeArgs({
+    envFile: input.envFile,
+    composeFile: input.composeFile,
+    composeProject: input.composeProject,
+    recreate: true,
+  })
+}
+
+export function writeUpgradeEnv(
+  envFile: string,
+  expectedImage: string,
+  releaseId = currentReleaseId(),
+) {
   if (!existsSync(envFile)) {
     throw new FleetBackupError(`Env file missing: ${envFile}`, 500)
   }
-  const next = readFileSync(envFile, 'utf8').replace(
-    /^EXPECTED_IMAGE=.*$/m,
-    `EXPECTED_IMAGE="${expectedImage.replaceAll('"', '\\"')}"`,
-  )
+  const next = patchEnvFileContents(readFileSync(envFile, 'utf8'), {
+    EXPECTED_IMAGE: expectedImage,
+    RELEASE_ID: releaseId,
+  })
   writeFileSync(envFile, next)
 }
 
@@ -449,6 +467,7 @@ export async function upgradeRegisteredEnvironment(
   }
   const previousImage = row.expectedImage
   const product = requireProduct(row.productInstance.productId)
+  const releaseId = currentReleaseId()
   const built = spawnSync('docker', imageBuildArgs(target, product.dockerfile), {
     cwd: repoRoot(),
     encoding: 'utf8',
@@ -462,12 +481,13 @@ export async function upgradeRegisteredEnvironment(
     envFileExample: row.envFileExample,
     root: composeRootForEnvironment(row),
   })
-  writeExpectedImage(isAbsolute(row.envFileLocal) ? row.envFileLocal : envFile, target)
-  const up = composeArgs({
+  const absoluteEnvFile = isAbsolute(row.envFileLocal) ? row.envFileLocal : envFile
+  const previousEnv = existsSync(absoluteEnvFile) ? readFileSync(absoluteEnvFile, 'utf8') : ''
+  writeUpgradeEnv(absoluteEnvFile, target, releaseId)
+  const up = upgradeComposeArgs({
     envFile,
     composeFile: row.composeFile,
     composeProject: row.composeProject,
-    recreate: false,
   })
   const result = spawnSync('docker', up, {
     cwd: composeRootForEnvironment(row),
@@ -475,15 +495,20 @@ export async function upgradeRegisteredEnvironment(
     windowsHide: true,
   })
   if (result.status !== 0) {
+    if (previousEnv) {
+      writeFileSync(absoluteEnvFile, previousEnv)
+    }
     throw new FleetBackupError(result.stderr?.trim() || result.stdout?.trim() || 'Upgrade compose up failed.', 500)
   }
   await db.update(environments).set({ expectedImage: target }).where(eq(environments.id, row.id))
-  await waitUntilHealthy(row.healthUrl)
+  const health = await waitUntilHealthy(row.healthUrl)
   return {
     environmentId: row.id,
     previousImage,
     expectedImage: target,
     backupId: latest.id,
+    releaseId: health.releaseId || releaseId,
+    schemaVersion: health.schemaVersion || null,
   }
 }
 

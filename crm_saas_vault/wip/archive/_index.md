@@ -140,6 +140,7 @@ Current orientation: [[Current-State]]. These files are evidence, not the map.
 - [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition|SI Sales B1 commercial + acquisition work order]] (Successful 2026-09-12; closeout [[history/B1_closeout]])
 - [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system|SI Sales B2 proposal system work order]] (Successful 2026-09-13; closeout [[history/B2_closeout]])
 - [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog|C2 Product Instances + Sales catalog work order]] (Successful 2026-09-15; closeout [[history/C2_closeout]])
+- [[wip/archive/WO-2026-09-19-pre-vps-product-quality|Pre-VPS product quality & release readiness work order]] (complete 2026-09-19; return [[history/WO-2026-09-19-pre-vps-product-quality-return]])
 - [[wip/archive/WO-2026-09-19-sales-minimum-v1|Sales Minimum V1 SIC dogfooding work order]] (code-shipped 2026-09-19; return [[history/WO-2026-09-19-sales-minimum-v1-return]])
 - [[wip/archive/WO-2026-09-19-production-hosting-node|Production Control Plane + VPS hosting node work order]] (repository-complete 2026-09-19; return [[history/WO-2026-09-19-production-hosting-node-return]]; map [[Hosting-Node-Architecture]])
 - [[wip/archive/WO-2026-09-18-ma-customer-1-sell-readiness|Martial Arts Customer #1 sell-readiness work order]] (repository-complete 2026-09-19; return [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]]; tracker [[Martial-Arts-Customer-1-Sell-Readiness]])

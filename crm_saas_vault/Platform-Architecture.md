@@ -101,7 +101,7 @@ The original Core+vertical extraction narrative is historical and not a license:
 
 Separate operator app: `control_plane/` at http://127.0.0.1:52100. Not another customer admin page and not the platform owner’s CRM.
 
-It lists customers/environments, observes up/down (container running **and** `/api/health`), relaunches without destroying volumes, provisions a Martial Arts or Sales PROD+DEV pair, and runs fleet lifecycle (backup, selectable restore including same-product PROD→DEV copy-down, off-host copy, upgrade, start/stop).
+It lists customers/environments, observes up/down (container running **and** `/api/health` including `releaseId` / `schemaVersion`), relaunches without destroying volumes, provisions a Martial Arts or Sales PROD+DEV pair, and runs fleet lifecycle (backup, selectable restore including same-product PROD→DEV copy-down, off-host copy, target-image upgrade with `--force-recreate` and no `-v`, start/stop). Map: [[Product-Release-Update-Lifecycle]].
 
 Operational chain: Customer → Product Instance → Product/Build → Docker image → Environment → Hosting Node → Port (DNS/TLS later). The Control Plane does **not** need to know a product’s internal domain, how much source products share, or a foundation package version.
 

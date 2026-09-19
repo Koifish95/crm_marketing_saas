@@ -23,6 +23,7 @@ const restoring = ref(false)
 const copying = ref(false)
 const revealing = ref(false)
 const upgrading = ref(false)
+const targetImage = ref('')
 const stopping = ref(false)
 const starting = ref(false)
 const assigningHostname = ref(false)
@@ -64,6 +65,12 @@ const selectedBackup = computed(() => (
 const selectedSource = computed(() => (
   restoreSources.value.find(source => source.environmentId === sourceEnvironmentId.value) ?? null
 ))
+
+watch(() => env.value?.expectedImage, (value) => {
+  if (value && !upgrading.value) {
+    targetImage.value = value
+  }
+}, { immediate: true })
 
 async function loadRestorableBackups() {
   if (!env.value) {
@@ -403,10 +410,27 @@ async function upgradeEnvironment() {
   actionError.value = ''
   actionNotice.value = ''
   try {
-    await $fetch(`/api/environments/${env.value.id}/upgrade`, { method: 'POST' })
+    const result = await $fetch<{
+      previousImage: string
+      expectedImage: string
+      backupId: string
+      releaseId?: string | null
+      schemaVersion?: string | null
+    }>(`/api/environments/${env.value.id}/upgrade`, {
+      method: 'POST',
+      body: { expectedImage: targetImage.value.trim() || undefined },
+    })
     await refreshStatus()
+    actionNotice.value = [
+      `Upgrade finished.`,
+      `${result.previousImage} → ${result.expectedImage}.`,
+      `Backup ${result.backupId}.`,
+      `Release ${result.releaseId || '—'}.`,
+      `Schema ${result.schemaVersion || '—'}.`,
+    ].join(' ')
   } catch (error) {
     actionError.value = fetchMessage(error, 'Upgrade failed.')
+    await refreshStatus()
   } finally {
     upgrading.value = false
   }
@@ -542,6 +566,12 @@ async function decommission() {
           <dd>{{ env?.containerName }}</dd>
           <dt>Image</dt>
           <dd>{{ env?.expectedImage }}</dd>
+          <dt>Running image</dt>
+          <dd>{{ env?.runningImage?.imageName || '—' }}</dd>
+          <dt>Release ID</dt>
+          <dd>{{ env?.releaseId || '—' }}</dd>
+          <dt>Schema version</dt>
+          <dd>{{ env?.schemaVersion || '—' }}</dd>
           <dt>Status</dt>
           <dd><AppStatusBadge :status="operatorStatus" /></dd>
           <dt>Lifecycle</dt>
@@ -788,19 +818,31 @@ async function decommission() {
             {{ restoring ? 'Restoring…' : 'Restore' }}
           </button>
         </form>
-        <div class="card">
+        <form
+          class="card"
+          @submit.prevent="upgradeEnvironment"
+        >
           <p class="muted">
-            Upgrade rebuilds the local image and remounts the same volumes. Requires an S6 backup of this environment. Non-PROD first when the customer has one.
+            Upgrade rebuilds the local image, recreates the app container, and remounts the same volumes. Requires an S6 backup of this environment. Non-PROD first when the customer has one. Rollback is Restore plus the previous image — do not downgrade SQLite.
           </p>
+          <label>
+            Target image
+            <input
+              v-model="targetImage"
+              type="text"
+              name="expectedImage"
+              autocomplete="off"
+              :disabled="upgrading || decommissioned"
+            >
+          </label>
           <button
-            type="button"
-            :disabled="upgrading || !env || decommissioned"
+            type="submit"
+            :disabled="upgrading || !env || decommissioned || !targetImage.trim()"
             :aria-busy="upgrading"
-            @click="upgradeEnvironment"
           >
             {{ upgrading ? 'Upgrading…' : 'Upgrade' }}
           </button>
-        </div>
+        </form>
       </section>
       <section
         v-else

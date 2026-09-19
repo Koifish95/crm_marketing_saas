@@ -13,7 +13,7 @@ tags:
 
 # Product UX Overhaul Return (Phase 2)
 
-Work order: [[wip/WO-2026-09-19-pre-vps-product-quality]]. Evidence base: [[Product-Workflow-UX-Audit]]. Architecture: [[ADR-Product-Owned-Domains-Shared-Foundation]].
+Work order (archived): [[wip/archive/WO-2026-09-19-pre-vps-product-quality]]. Evidence base: [[Product-Workflow-UX-Audit]]. Architecture: [[ADR-Product-Owned-Domains-Shared-Foundation]].
 
 Phase 2 **code-shipped** the critical staff shell and the highest-friction daily workflows. Remaining visual polish is **explicitly deferred**, not ambiguous OPEN.
 

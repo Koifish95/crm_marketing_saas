@@ -1,11 +1,12 @@
 ---
 type: work-order
-status: active
+status: done
 id: WO-2026-09-19-pre-vps-product-quality
 milestone: none
 decision_refs:
   - "ADR-Product-Owned-Domains-Shared-Foundation"
   - "SaaS-Decisions#2026-09-19 — Sales Minimum V1 locked decisions for SIC dogfooding"
+  - "SaaS-Decisions#2026-09-19 — Pre-VPS release identity, migrations, and upgrade recreate"
 base_sha: "4bd015b20a9f5f188580a50cc171680af6328239"
 authorized: yes
 authorized_scope: |
@@ -35,10 +36,10 @@ Authorized by Scott’s current chat: follow [[wip/CRM_SaaS_Pre_VPS_Product_Qual
 
 **Successful criteria:** each phase SUCCESS or legitimate BLOCKED. Owner acceptance of official milestones is separate. Phase 1 is investigation only.
 
-**Stop:** do not skip Phase 1. Do not implement Phase 1 findings until Phase 1 audit is durable. Then Phase 2, then Phase 3.
+Archived after all three phases 2026-09-19. Return: [[history/WO-2026-09-19-pre-vps-product-quality-return]].
 
 ## Phase log
 
 - **Phase 1 SUCCESS** (2026-09-19) — investigation only. Durable audit: [[Product-Workflow-UX-Audit]]. No product implementation in Phase 1.
-- **Phase 2 code-shipped** (2026-09-19) — staff shell, MA convert/follow-up, Sales nav/workspaces. Return: [[Product-UX-Overhaul-Return]]. Deferred polish listed there.
-- **Phase 3** — in progress. Release/update lifecycle.
+- **Phase 2 SUCCESS** (2026-09-19) — staff shell, MA convert/follow-up, Sales nav/workspaces. Return: [[Product-UX-Overhaul-Return]]. Deferred polish listed there.
+- **Phase 3 SUCCESS** (2026-09-19) — release identity, upgrade recreate, Sales schemaVersion, Control Plane target image. Map: [[Product-Release-Update-Lifecycle]]. Full docker old→new rebuild drill not re-run this phase; S6 already proved volume-preserving upgrade.

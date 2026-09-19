@@ -16,7 +16,7 @@ tags:
 
 Phase 1 of the Pre-VPS Product Quality & Release Readiness Program. **Investigation only.** Findings are not implemented in this note.
 
-Program: [[wip/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program]]. Work order: [[wip/WO-2026-09-19-pre-vps-product-quality]]. Live map: [[Current-State]]. Architecture: [[ADR-Product-Owned-Domains-Shared-Foundation]]. Sales V1 context: [[Sales-SIC-Dogfooding-Readiness-Assessment]].
+Program: [[wip/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program]]. Work order (archived): [[wip/archive/WO-2026-09-19-pre-vps-product-quality]]. Live map: [[Current-State]]. Architecture: [[ADR-Product-Owned-Domains-Shared-Foundation]]. Sales V1 context: [[Sales-SIC-Dogfooding-Readiness-Assessment]].
 
 ---
 

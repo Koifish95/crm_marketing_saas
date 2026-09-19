@@ -19,6 +19,19 @@ describe('health combine', () => {
     expect(parseHealthBody(500, { ok: true, database: 'reachable' }).ok).toBe(false)
   })
 
+  it('captures release identity and schema version', () => {
+    expect(parseHealthBody(200, {
+      ok: true,
+      database: 'reachable',
+      releaseId: 'abc123',
+      schemaVersion: '0004_sales_v1_dogfood',
+    })).toMatchObject({
+      ok: true,
+      releaseId: 'abc123',
+      schemaVersion: '0004_sales_v1_dogfood',
+    })
+  })
+
   it('combines runtime and health', () => {
     expect(combineStatus('running', true)).toBe('healthy')
     expect(combineStatus('running', false)).toBe('unhealthy')

@@ -10,6 +10,8 @@ describe('C2 Sales docker contract', () => {
     expect(dockerfile).toMatch(/pnpm exec esbuild docker\/runtime-init.ts/)
     expect(dockerfile).not.toMatch(/node node_modules\/esbuild\/bin\/esbuild/)
     expect(dockerfile).toMatch(/COPY --from=build \/src\/node_modules\/@libsql/)
+    expect(dockerfile).toMatch(/ARG RELEASE_ID=dev/)
+    expect(dockerfile).toMatch(/ENV RELEASE_ID=\$\{RELEASE_ID\}/)
     expect(dockerfile).not.toMatch(/renzo/i)
     expect(dockerfile).not.toMatch(/-v/)
 
