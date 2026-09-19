@@ -10,6 +10,7 @@ import {
 import { activityQueueBucket } from '../../shared/utils/queue'
 import { inUtcRange, reportingRange, utcNowMs } from '../../shared/utils/time'
 import { listProposalSummaries, proposalDashboardCounts } from './proposals'
+import { listOpportunities } from './sales'
 
 function ms(value: Date | number | null | undefined) {
   if (value == null) {
@@ -138,6 +139,35 @@ export async function salesDashboard(db: Database, input: {
     }
   })
 
+  function namedActivity(activity: typeof activities[number]) {
+    const bucket = activityQueueBucket({
+      status: activity.status,
+      dueAt: activity.dueAt,
+      nowMs,
+    })
+    const opportunity = opportunities.find(row => row.id === activity.opportunityId)
+    return {
+      id: activity.id,
+      description: activity.description,
+      type: activity.type,
+      status: activity.status,
+      outcome: activity.outcome,
+      dueAt: activity.dueAt,
+      bucket,
+      opportunityId: activity.opportunityId,
+      opportunityName: opportunity?.name ?? null,
+      leadId: activity.leadId,
+    }
+  }
+
+  const workOverdue = activities.filter((activity) => {
+    return activityQueueBucket({ status: activity.status, dueAt: activity.dueAt, nowMs }) === 'overdue'
+  }).map(namedActivity)
+  const workDueToday = activities.filter((activity) => {
+    return activityQueueBucket({ status: activity.status, dueAt: activity.dueAt, nowMs }) === 'due_today'
+  }).map(namedActivity)
+  const openDecorated = (await listOpportunities(db)).filter(row => row.stage !== 'won' && row.stage !== 'lost')
+
   return {
     range: {
       preset,
@@ -168,6 +198,19 @@ export async function salesDashboard(db: Database, input: {
     campaigns: campaigns.map(campaign => campaignPerformance(campaign.id, campaign.name, campaign.budgetCents)),
     trackingLinks: tracking,
     proposals: proposalDashboardCounts(await listProposalSummaries(db)),
+    work: {
+      overdue: workOverdue.slice(0, 8),
+      dueToday: workDueToday.slice(0, 8),
+      openOpportunities: openDecorated.slice(0, 8).map(row => ({
+        id: row.id,
+        name: row.name,
+        companyName: row.companyName,
+        stage: row.stage,
+        amountCents: row.amountCents ?? 0,
+        mrrCents: row.mrrCents ?? 0,
+        nextActivity: row.nextActivity,
+      })),
+    },
   }
 }
 

@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { ACTIVITY_TYPES } from '#shared/utils/pipeline'
+import {
+  ACTIVITY_TYPES,
+  activityOutcomeLabel,
+  activityTypeLabel,
+} from '#shared/utils/pipeline'
+import { ACTIVITY_QUEUE_QUERY_VALUES, activityQueueFromQuery } from '#shared/utils/queue'
 
 definePageMeta({
   layout: 'internal',
@@ -17,6 +22,7 @@ type Activity = {
   description: string
   type: string
   status: string
+  outcome: string | null
   dueAt: string | Date | null
   completedAt: string | Date | null
   opportunityId: number | null
@@ -24,7 +30,11 @@ type Activity = {
   ownerUserId: number | null
 }
 
-const queue = ref<'overdue' | 'due_today' | 'upcoming' | 'open' | 'completed'>('open')
+const route = useRoute()
+const queues = ACTIVITY_QUEUE_QUERY_VALUES
+type Queue = (typeof queues)[number]
+
+const queue = ref<Queue>(activityQueueFromQuery(route.query.queue))
 const mine = ref(false)
 const description = ref('')
 const type = ref('call')
@@ -33,6 +43,11 @@ const opportunityId = ref('')
 const leadId = ref('')
 const errorMessage = ref('')
 const saving = ref(false)
+const completingId = ref<number | null>(null)
+
+watch(() => route.query.queue, (value) => {
+  queue.value = activityQueueFromQuery(value)
+})
 
 const { data: opportunities } = await useFetch<Opportunity[]>('/api/opportunities')
 const { data: leads } = await useFetch<Lead[]>('/api/leads')
@@ -47,6 +62,11 @@ function dueLabel(value: string | Date | null) {
     return 'No due date'
   }
   return new Date(value).toLocaleString()
+}
+
+async function setQueue(next: Queue) {
+  queue.value = next
+  await navigateTo({ path: '/activities', query: { queue: next } })
 }
 
 async function create() {
@@ -74,12 +94,28 @@ async function create() {
   }
 }
 
-async function complete(activity: Activity) {
-  await $fetch(`/api/activities/${activity.id}`, {
-    method: 'PATCH',
-    body: { completed: activity.status !== 'completed' },
-  })
-  await refresh()
+async function complete(activity: Activity, payload: {
+  outcome?: string
+  notes: string
+  next?: { type: string, description: string, dueAt: number }
+}) {
+  errorMessage.value = ''
+  try {
+    await $fetch(`/api/activities/${activity.id}`, {
+      method: 'PATCH',
+      body: {
+        completed: true,
+        outcome: payload.outcome,
+        notes: payload.notes || undefined,
+        nextActivity: payload.next,
+      },
+    })
+    completingId.value = null
+    await refresh()
+  } catch (caught: unknown) {
+    const err = caught as { data?: { message?: string } }
+    errorMessage.value = err.data?.message || 'Could not complete that activity.'
+  }
 }
 </script>
 
@@ -87,7 +123,7 @@ async function complete(activity: Activity) {
   <section class="space-y-6">
     <AppPageHeader
       title="Activities"
-      description="Sales follow-up queue. Overdue, due today, upcoming, and completed."
+      description="Sales follow-up queue. Complete an activity, record an outcome, and schedule the next attempt without leaving this page."
     />
     <AppAlert v-if="error || errorMessage">
       {{ errorMessage || 'Could not load activities.' }}
@@ -117,15 +153,19 @@ async function complete(activity: Activity) {
               :key="code"
               :value="code"
             >
-              {{ code }}
+              {{ activityTypeLabel(code) }}
             </option>
           </select>
         </AppField>
-        <AppField label="Due">
+        <AppField
+          label="Due"
+          required
+        >
           <input
             v-model="dueLocal"
             class="control"
             type="datetime-local"
+            required
           >
         </AppField>
         <AppField label="Lead">
@@ -174,11 +214,11 @@ async function complete(activity: Activity) {
     </AppPanel>
     <div class="flex flex-wrap items-center gap-2">
       <AppButton
-        v-for="code in (['overdue', 'due_today', 'upcoming', 'open', 'completed'] as const)"
+        v-for="code in queues"
         :key="code"
         type="button"
         :variant="queue === code ? 'primary' : 'secondary'"
-        @click="queue = code"
+        @click="setQueue(code)"
       >
         {{ code.replace('_', ' ') }}
       </AppButton>
@@ -205,21 +245,35 @@ async function complete(activity: Activity) {
       >
         <p
           class="record-item-title"
-          :class="{ 'line-through text-muted': activity.status === 'completed' }"
+          :class="{ 'line-through text-muted': activity.status === 'completed' || activity.status === 'cancelled' }"
         >
           {{ activity.description }}
         </p>
         <p class="record-item-meta">
-          {{ activity.type }} · {{ dueLabel(activity.dueAt) }}
+          {{ activityTypeLabel(activity.type) }}
+          · {{ activity.status }}
+          · {{ dueLabel(activity.dueAt) }}
+          <span v-if="activity.outcome">
+            · {{ activityOutcomeLabel(activity.outcome) }}
+          </span>
         </p>
-        <div class="record-item-actions">
+        <div
+          v-if="activity.status === 'open'"
+          class="record-item-actions"
+        >
           <AppButton
             variant="secondary"
-            @click="complete(activity)"
+            @click="completingId = completingId === activity.id ? null : activity.id"
           >
-            {{ activity.status === 'completed' ? 'Reopen' : 'Complete' }}
+            {{ completingId === activity.id ? 'Close' : 'Complete' }}
           </AppButton>
         </div>
+        <SalesActivityComplete
+          v-if="completingId === activity.id"
+          :activity-type="activity.type"
+          @cancel="completingId = null"
+          @complete="payload => complete(activity, payload)"
+        />
       </li>
     </ul>
   </section>

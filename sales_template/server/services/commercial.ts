@@ -6,7 +6,7 @@ import {
   salesOpportunities,
   salesOpportunityLines,
 } from '../database/schema'
-import { isOfferPricingType, lineMrrCents, lineOneTimeCents, type OfferPricingType } from '../../shared/utils/catalog'
+import { isOfferPricingType, lineMrrCents, lineOneTimeCents, SEEDED_OFFERS, type OfferPricingType } from '../../shared/utils/catalog'
 import { utcNowMs } from '../../shared/utils/time'
 
 function now() {
@@ -18,7 +18,27 @@ function blankToNull(value: string | null | undefined) {
   return trimmed ? trimmed : null
 }
 
+export async function ensureSeededOffers(db: Database) {
+  const stamp = now()
+  for (const offer of SEEDED_OFFERS) {
+    const [existing] = await db.select().from(salesOffers).where(eq(salesOffers.name, offer.name)).limit(1)
+    if (existing) {
+      continue
+    }
+    await db.insert(salesOffers).values({
+      name: offer.name,
+      description: offer.description,
+      pricingType: offer.pricingType,
+      defaultUnitPriceCents: offer.defaultUnitPriceCents,
+      active: true,
+      createdAt: stamp,
+      updatedAt: stamp,
+    })
+  }
+}
+
 export async function listOffers(db: Database, filters: { active?: boolean, search?: string } = {}) {
+  await ensureSeededOffers(db)
   const rows = await db.select().from(salesOffers).orderBy(salesOffers.name)
   return rows.filter((row) => {
     if (filters.active != null && row.active !== filters.active) {

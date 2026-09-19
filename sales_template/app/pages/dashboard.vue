@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { formatUsdFromCents } from '#shared/utils/money'
 import { REPORT_RANGE_PRESETS } from '#shared/utils/catalog'
-import { leadStageLabel } from '#shared/utils/pipeline'
+import { activityTypeLabel, leadStageLabel, opportunityStageLabel } from '#shared/utils/pipeline'
 
 definePageMeta({
   layout: 'internal',
@@ -34,6 +34,19 @@ type Dashboard = {
   campaigns: Array<{ id: number, name: string, clicks: number, leads: number, clickToLead: number | null, opportunities: number, wonCount: number, wonOneTimeCents: number, wonMrrCents: number, budgetCents: number | null }>
   trackingLinks: Array<{ id: number, label: string, clicks: number, leads: number, clickToLead: number | null }>
   proposals: { draft: number, issued: number, sent: number, accepted: number, declined: number, pastValidThrough: number }
+  work: {
+    overdue: Array<{ id: number, description: string, type: string, dueAt: string | Date | null, opportunityName: string | null }>
+    dueToday: Array<{ id: number, description: string, type: string, dueAt: string | Date | null, opportunityName: string | null }>
+    openOpportunities: Array<{
+      id: number
+      name: string
+      companyName: string
+      stage: string
+      amountCents: number
+      mrrCents: number
+      nextActivity: { description: string, type: string, dueAt: string | Date | null, bucket: string } | null
+    }>
+  }
 }
 
 const preset = ref('this_month')
@@ -67,7 +80,7 @@ const presetLabel: Record<string, string> = {
   <section class="space-y-6">
     <AppPageHeader
       title="Dashboard"
-      description="Operational current state plus period outcomes. Won uses won_at. Lost uses lost_at. Pipeline is current, not filtered by creation date. Not ROI."
+      description="Work today first. Metrics below are operational, not ROI. Outbound academies start as Company → Contacts → Opportunity."
     />
     <div class="flex flex-wrap items-end gap-3">
       <AppField label="Period">
@@ -115,6 +128,84 @@ const presetLabel: Record<string, string> = {
       Loading dashboard…
     </p>
     <template v-else-if="data">
+      <AppPanel title="Work today">
+        <div class="grid gap-4 lg:grid-cols-3">
+          <div>
+            <p class="text-sm font-semibold">
+              Overdue
+            </p>
+            <ul class="mt-2 space-y-2 text-sm">
+              <li
+                v-for="activity in data.work.overdue"
+                :key="activity.id"
+              >
+                <NuxtLink to="/activities?queue=overdue">
+                  {{ activity.description }}
+                </NuxtLink>
+                <span class="text-muted">
+                  · {{ activity.opportunityName || 'Unattached' }}
+                </span>
+              </li>
+            </ul>
+            <p
+              v-if="!data.work.overdue.length"
+              class="mt-2 text-sm text-muted"
+            >
+              Nothing overdue.
+            </p>
+          </div>
+          <div>
+            <p class="text-sm font-semibold">
+              Due today
+            </p>
+            <ul class="mt-2 space-y-2 text-sm">
+              <li
+                v-for="activity in data.work.dueToday"
+                :key="activity.id"
+              >
+                <NuxtLink to="/activities?queue=due_today">
+                  {{ activity.description }}
+                </NuxtLink>
+                <span class="text-muted">
+                  · {{ activity.opportunityName || 'Unattached' }}
+                </span>
+              </li>
+            </ul>
+            <p
+              v-if="!data.work.dueToday.length"
+              class="mt-2 text-sm text-muted"
+            >
+              Nothing due today.
+            </p>
+          </div>
+          <div>
+            <p class="text-sm font-semibold">
+              Active opportunities
+            </p>
+            <ul class="mt-2 space-y-2 text-sm">
+              <li
+                v-for="opportunity in data.work.openOpportunities"
+                :key="opportunity.id"
+              >
+                <NuxtLink :to="`/opportunities/${opportunity.id}`">
+                  {{ opportunity.name }}
+                </NuxtLink>
+                <span class="text-muted">
+                  · {{ opportunity.companyName }}
+                  · {{ opportunityStageLabel(opportunity.stage) }}
+                  · {{ opportunity.nextActivity ? activityTypeLabel(opportunity.nextActivity.type) : 'No next action' }}
+                </span>
+              </li>
+            </ul>
+            <p
+              v-if="!data.work.openOpportunities.length"
+              class="mt-2 text-sm text-muted"
+            >
+              No open opportunities.
+            </p>
+          </div>
+        </div>
+      </AppPanel>
       <div class="grid gap-3 sm:grid-cols-3">
         <NuxtLink
           to="/opportunities"

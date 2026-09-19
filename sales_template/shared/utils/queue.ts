@@ -9,7 +9,22 @@ export function localDateKey(ms: number, timeZone = DEFAULT_TIMEZONE) {
   }).format(new Date(ms))
 }
 
-export type ActivityQueueBucket = 'overdue' | 'due_today' | 'upcoming' | 'open' | 'completed' | 'cancelled'
+export const ACTIVITY_QUEUE_QUERY_VALUES = [
+  'overdue',
+  'due_today',
+  'upcoming',
+  'open',
+  'completed',
+  'cancelled',
+] as const
+
+export type ActivityQueueBucket = (typeof ACTIVITY_QUEUE_QUERY_VALUES)[number]
+
+export function activityQueueFromQuery(value: unknown, fallback: ActivityQueueBucket = 'open'): ActivityQueueBucket {
+  return (ACTIVITY_QUEUE_QUERY_VALUES as readonly string[]).includes(String(value))
+    ? value as ActivityQueueBucket
+    : fallback
+}
 
 export function activityQueueBucket(input: {
   status: string

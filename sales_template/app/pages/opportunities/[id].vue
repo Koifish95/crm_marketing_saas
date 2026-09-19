@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import {
   ACTIVE_OPPORTUNITY_STAGES,
+  ACTIVITY_TYPES,
   LOSS_REASONS,
+  activityOutcomeLabel,
+  activityTypeLabel,
   isTerminalOpportunityStage,
   lossReasonLabel,
   opportunityStageLabel,
@@ -68,7 +71,15 @@ type Line = {
 type Offer = { id: number, name: string, pricingType: string, defaultUnitPriceCents: number, active: boolean }
 type Source = { id: number, name: string }
 type Campaign = { id: number, name: string }
-type Activity = { id: number, description: string, status: string }
+type Activity = {
+  id: number
+  description: string
+  status: string
+  type: string
+  outcome: string | null
+  dueAt: string | Date | null
+  notes: string | null
+}
 type ProposalRevision = {
   id: number
   revision: number
@@ -106,7 +117,18 @@ const { data: contacts } = await useFetch<Contact[]>('/api/contacts', {
 const { data: activities, refresh: refreshActivities } = await useFetch<Activity[]>('/api/activities', {
   query: computed(() => ({ opportunityId: String(id.value) })),
 })
+type ServeHandoff = {
+  companyName: string
+  opportunityName: string
+  oneTimeCents: number
+  mrrCents: number
+  primaryContact: { name: string, email: string | null, phone: string | null } | null
+  lines: Array<{ description: string, pricingType: string, unitPriceCents: number }>
+  nextSteps: string[]
+}
+
 const { data: proposalBundle, refresh: refreshProposal } = await useFetch<ProposalBundle | null>(() => `/api/opportunities/${id.value}/proposal`)
+const { data: handoff, refresh: refreshHandoff } = await useFetch<ServeHandoff>(() => `/api/opportunities/${id.value}/handoff`)
 
 useHead({
   title: computed(() => opportunity.value?.name || 'Opportunity'),
@@ -122,6 +144,11 @@ const sourceDetail = ref('')
 const lossReason = ref('budget')
 const lossNotes = ref('')
 const activityDescription = ref('')
+const activityType = ref('call')
+const activityDue = ref('')
+const completingId = ref<number | null>(null)
+const cancelOpenOnClose = ref(true)
+const confirmClose = ref<'won' | 'lost' | null>(null)
 const lineDescription = ref('')
 const lineQuantity = ref('1')
 const linePrice = ref('')
@@ -218,7 +245,7 @@ const opportunityHeaderStatus = computed(() => {
   return `Open · ${opportunityStageLabel(stage)}`
 })
 
-async function save(nextStage?: 'proposal_quote' | 'decision') {
+async function save(nextStage?: 'working' | 'proposal_quote' | 'decision') {
   formError.value = ''
   notice.value = ''
   saving.value = true
@@ -246,13 +273,37 @@ async function save(nextStage?: 'proposal_quote' | 'decision') {
   }
 }
 
+const openActivities = computed(() => (activities.value || []).filter(row => row.status === 'open'))
+
+async function requestWon() {
+  if (openActivities.value.length) {
+    confirmClose.value = 'won'
+    return
+  }
+  await markWon()
+}
+
+async function requestLost() {
+  if (openActivities.value.length) {
+    confirmClose.value = 'lost'
+    return
+  }
+  await markLost()
+}
+
 async function markWon() {
   formError.value = ''
   saving.value = true
   try {
-    await $fetch(`/api/opportunities/${id.value}/won`, { method: 'POST' })
+    await $fetch(`/api/opportunities/${id.value}/won`, {
+      method: 'POST',
+      body: { cancelOpenActivities: cancelOpenOnClose.value },
+    })
+    confirmClose.value = null
     await refresh()
-    notice.value = 'Marked Won (signed agreement / SOW).'
+    await refreshActivities()
+    await refreshHandoff()
+    notice.value = 'Marked Won (signed agreement / SOW). Next: serve in Control Plane.'
   } catch (caught: unknown) {
     const err = caught as { data?: { message?: string } }
     formError.value = err.data?.message || 'Could not mark Won.'
@@ -267,9 +318,15 @@ async function markLost() {
   try {
     await $fetch(`/api/opportunities/${id.value}/lost`, {
       method: 'POST',
-      body: { lossReason: lossReason.value, lossNotes: lossNotes.value || undefined },
+      body: {
+        lossReason: lossReason.value,
+        lossNotes: lossNotes.value || undefined,
+        cancelOpenActivities: cancelOpenOnClose.value,
+      },
     })
+    confirmClose.value = null
     await refresh()
+    await refreshActivities()
     notice.value = 'Marked Lost.'
   } catch (caught: unknown) {
     const err = caught as { data?: { message?: string } }
@@ -299,13 +356,43 @@ async function addActivity() {
   try {
     await $fetch('/api/activities', {
       method: 'POST',
-      body: { opportunityId: id.value, description: activityDescription.value, type: 'task' },
+      body: {
+        opportunityId: id.value,
+        description: activityDescription.value,
+        type: activityType.value,
+        dueAt: activityDue.value ? new Date(activityDue.value).getTime() : undefined,
+      },
     })
     activityDescription.value = ''
+    activityDue.value = ''
     await refreshActivities()
   } catch (caught: unknown) {
     const err = caught as { data?: { message?: string } }
     formError.value = err.data?.message || 'Could not add activity.'
+  }
+}
+
+async function completeActivity(activity: Activity, payload: {
+  outcome?: string
+  notes: string
+  next?: { type: string, description: string, dueAt: number }
+}) {
+  formError.value = ''
+  try {
+    await $fetch(`/api/activities/${activity.id}`, {
+      method: 'PATCH',
+      body: {
+        completed: true,
+        outcome: payload.outcome,
+        notes: payload.notes || undefined,
+        nextActivity: payload.next,
+      },
+    })
+    completingId.value = null
+    await refreshActivities()
+  } catch (caught: unknown) {
+    const err = caught as { data?: { message?: string } }
+    formError.value = err.data?.message || 'Could not complete that activity.'
   }
 }
 
@@ -705,7 +792,7 @@ function companyName() {
       </p>
       <AppButton
         :loading="saving"
-        @click="markWon"
+        @click="requestWon"
       >
         Mark Won
       </AppButton>
@@ -736,10 +823,41 @@ function companyName() {
       <AppButton
         variant="secondary"
         :loading="saving"
-        @click="markLost"
+        @click="requestLost"
       >
         Mark Lost
       </AppButton>
+      <div
+        v-if="confirmClose"
+        class="rounded-md border border-navy-600/15 p-3 space-y-3"
+      >
+        <p class="text-sm">
+          {{ openActivities.length }} open {{ openActivities.length === 1 ? 'activity remains' : 'activities remain' }}.
+          Cancel them so they leave the daily queue? Completed history is kept. Reopen will not restore cancelled tasks.
+        </p>
+        <label class="touch-row">
+          <input
+            v-model="cancelOpenOnClose"
+            type="checkbox"
+          >
+          Cancel remaining open activities (recommended)
+        </label>
+        <div class="flex flex-wrap gap-2">
+          <AppButton
+            :loading="saving"
+            @click="confirmClose === 'won' ? markWon() : markLost()"
+          >
+            Confirm {{ confirmClose === 'won' ? 'Won' : 'Lost' }}
+          </AppButton>
+          <AppButton
+            type="button"
+            variant="secondary"
+            @click="confirmClose = null"
+          >
+            Back
+          </AppButton>
+        </div>
+      </div>
     </div>
     <div
       v-else-if="opportunity && terminal"
@@ -757,6 +875,46 @@ function companyName() {
       >
         Reopen
       </AppButton>
+      <div
+        v-if="opportunity.stage === 'won' && handoff"
+        class="rounded-md border border-navy-600/15 p-3 space-y-2"
+      >
+        <p class="text-sm font-semibold">
+          The sale is complete. Now serve the customer.
+        </p>
+        <p class="text-sm">
+          {{ handoff.companyName }}
+          · {{ formatUsdFromCents(handoff.oneTimeCents) }} one-time
+          · {{ formatUsdFromCents(handoff.mrrCents) }} MRR
+        </p>
+        <p
+          v-if="handoff.primaryContact"
+          class="text-sm"
+        >
+          Primary contact: {{ handoff.primaryContact.name }}
+          <span v-if="handoff.primaryContact.email">
+            · {{ handoff.primaryContact.email }}
+          </span>
+        </p>
+        <ul class="text-sm space-y-1">
+          <li
+            v-for="line in handoff.lines"
+            :key="line.description"
+          >
+            {{ line.description }}
+            · {{ line.pricingType === 'monthly' ? 'Monthly' : 'One-time' }}
+            · {{ formatUsdFromCents(line.unitPriceCents) }}
+          </li>
+        </ul>
+        <ol class="list-decimal pl-5 text-sm space-y-1">
+          <li
+            v-for="step in handoff.nextSteps"
+            :key="step"
+          >
+            {{ step }}
+          </li>
+        </ol>
+      </div>
     </div>
     <template #tabs>
       <div
@@ -1167,28 +1325,69 @@ function companyName() {
         </AppPanel>
         <AppPanel title="Activities">
           <form
-            class="mb-3 flex gap-2"
+            class="mb-3 grid gap-2 sm:grid-cols-2"
             @submit.prevent="addActivity"
           >
             <input
               v-model="activityDescription"
-              class="control flex-1"
-              placeholder="Follow-up"
+              class="control sm:col-span-2"
+              placeholder="Call owner"
               required
             >
-            <AppButton type="submit">
-              Add
-            </AppButton>
+            <select
+              v-model="activityType"
+              class="control"
+            >
+              <option
+                v-for="code in ACTIVITY_TYPES"
+                :key="code"
+                :value="code"
+              >
+                {{ activityTypeLabel(code) }}
+              </option>
+            </select>
+            <input
+              v-model="activityDue"
+              class="control"
+              type="datetime-local"
+              required
+            >
+            <div class="sm:col-span-2">
+              <AppButton type="submit">
+                Add activity
+              </AppButton>
+            </div>
           </form>
-          <ul class="space-y-2 text-sm">
+          <ul class="space-y-3 text-sm">
             <li
               v-for="activity in activities"
               :key="activity.id"
             >
-              {{ activity.description }}
-              <span class="text-muted">
-                · {{ activity.status }}
-              </span>
+              <p>
+                {{ activity.description }}
+                <span class="text-muted">
+                  · {{ activityTypeLabel(activity.type) }}
+                  · {{ activity.status }}
+                  · {{ activity.dueAt ? new Date(activity.dueAt).toLocaleString() : 'No due date' }}
+                  <span v-if="activity.outcome">
+                    · {{ activityOutcomeLabel(activity.outcome) }}
+                  </span>
+                </span>
+              </p>
+              <AppButton
+                v-if="activity.status === 'open'"
+                class="mt-1"
+                variant="secondary"
+                @click="completingId = completingId === activity.id ? null : activity.id"
+              >
+                {{ completingId === activity.id ? 'Close' : 'Complete' }}
+              </AppButton>
+              <SalesActivityComplete
+                v-if="completingId === activity.id"
+                :activity-type="activity.type"
+                @cancel="completingId = null"
+                @complete="payload => completeActivity(activity, payload)"
+              />
             </li>
           </ul>
         </AppPanel>

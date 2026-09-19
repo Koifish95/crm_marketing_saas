@@ -102,3 +102,6 @@ notes:
   hosting_node: repository_complete_awaiting_external
   hosting_node_date: 2026-09-19
   hosting_node_work_order: WO-2026-09-19-production-hosting-node
+  sales_minimum_v1: code_shipped
+  sales_minimum_v1_date: 2026-09-19
+  sales_minimum_v1_work_order: WO-2026-09-19-sales-minimum-v1

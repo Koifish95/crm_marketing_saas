@@ -78,13 +78,13 @@ describe('Sales domain', () => {
     expect(result.company.name).toBe('Alex Rivera')
     expect(result.opportunity.accountId).toBe(result.company.id)
     expect(result.opportunity.primaryContactId).toBe(result.contact.id)
-    expect(result.opportunity.stage).toBe('proposal_quote')
+    expect(result.opportunity.stage).toBe('working')
     expect(result.opportunity.sourceLeadId).toBe(lead.id)
     const stillThere = await convertLead(dbHandle.db, lead.id, await ownerId()).catch((error: Error) => error.message)
     expect(stillThere).toMatch(/already converted/)
   })
 
-  it('moves an opportunity Proposal/Quote → Decision → Won and requires Reopen before Lost', async () => {
+  it('moves an opportunity Working → Proposal/Quote → Decision → Won and requires Reopen before Lost', async () => {
     dbHandle = await openTestDatabase()
     const company = await createCompany(dbHandle.db, { name: 'Acme Analytics' })
     const contact = await createContact(dbHandle.db, {
@@ -99,8 +99,10 @@ describe('Sales domain', () => {
       name: 'Pilot engagement',
       ownerUserId: await ownerId(),
     })
-    expect(opportunity.stage).toBe('proposal_quote')
+    expect(opportunity.stage).toBe('working')
 
+    const quoting = await updateOpportunity(dbHandle.db, opportunity.id, { stage: 'proposal_quote' })
+    expect(quoting.stage).toBe('proposal_quote')
     const deciding = await updateOpportunity(dbHandle.db, opportunity.id, { stage: 'decision' })
     expect(deciding.stage).toBe('decision')
 
@@ -161,8 +163,9 @@ describe('Sales domain', () => {
       nowMs: Date.now(),
     })
     expect(bucket).toBe('overdue')
-    const done = await updateActivity(dbHandle.db, overdue.id, { completed: true })
+    const done = await updateActivity(dbHandle.db, overdue.id, { completed: true, outcome: 'no_answer' })
     expect(done.status).toBe('completed')
+    expect(done.outcome).toBe('no_answer')
     expect(done.completedAt).not.toBeNull()
     const open = await listActivities(dbHandle.db, { leadId: lead.id, queue: 'open' })
     expect(open.some(row => row.id === overdue.id)).toBe(false)

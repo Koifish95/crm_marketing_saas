@@ -10,17 +10,18 @@ export const LEAD_STAGE_LABELS: Record<LeadStage, string> = {
 
 export const OPEN_LEAD_STAGES = ['new', 'contacted', 'qualified'] as const
 
-export const OPPORTUNITY_STAGES = ['proposal_quote', 'decision', 'won', 'lost'] as const
+export const OPPORTUNITY_STAGES = ['working', 'proposal_quote', 'decision', 'won', 'lost'] as const
 export type OpportunityStage = (typeof OPPORTUNITY_STAGES)[number]
 
 export const OPPORTUNITY_STAGE_LABELS: Record<OpportunityStage, string> = {
+  working: 'Working',
   proposal_quote: 'Proposal / Quote',
   decision: 'Decision',
   won: 'Won',
   lost: 'Lost',
 }
 
-export const ACTIVE_OPPORTUNITY_STAGES = ['proposal_quote', 'decision'] as const
+export const ACTIVE_OPPORTUNITY_STAGES = ['working', 'proposal_quote', 'decision'] as const
 export const TERMINAL_OPPORTUNITY_STAGES = ['won', 'lost'] as const
 
 export const LOSS_REASONS = [
@@ -57,6 +58,27 @@ export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
 
 export const ACTIVITY_STATUSES = ['open', 'completed', 'cancelled'] as const
 export type ActivityStatus = (typeof ACTIVITY_STATUSES)[number]
+
+export const ACTIVITY_OUTCOMES = [
+  'reached',
+  'no_answer',
+  'left_message',
+  'meeting_held',
+  'no_show',
+  'other',
+] as const
+export type ActivityOutcome = (typeof ACTIVITY_OUTCOMES)[number]
+
+export const ACTIVITY_OUTCOME_LABELS: Record<ActivityOutcome, string> = {
+  reached: 'Reached',
+  no_answer: 'No Answer',
+  left_message: 'Left Message',
+  meeting_held: 'Meeting Held',
+  no_show: 'No Show',
+  other: 'Other',
+}
+
+export const OUTCOME_REQUIRED_ACTIVITY_TYPES: readonly ActivityType[] = ['call', 'email', 'meeting']
 
 export const NOTE_RECORD_KINDS = ['lead', 'company', 'contact', 'opportunity'] as const
 export type NoteRecordKind = (typeof NOTE_RECORD_KINDS)[number]
@@ -97,8 +119,24 @@ export function isActivityType(value: string): value is ActivityType {
   return (ACTIVITY_TYPES as readonly string[]).includes(value)
 }
 
+export function activityTypeLabel(type: string) {
+  return isActivityType(type) ? ACTIVITY_TYPE_LABELS[type] : type
+}
+
 export function isActivityStatus(value: string): value is ActivityStatus {
   return (ACTIVITY_STATUSES as readonly string[]).includes(value)
+}
+
+export function isActivityOutcome(value: string): value is ActivityOutcome {
+  return (ACTIVITY_OUTCOMES as readonly string[]).includes(value)
+}
+
+export function activityOutcomeLabel(outcome: string) {
+  return isActivityOutcome(outcome) ? ACTIVITY_OUTCOME_LABELS[outcome] : outcome
+}
+
+export function activityOutcomeRequired(type: string) {
+  return (OUTCOME_REQUIRED_ACTIVITY_TYPES as readonly string[]).includes(type)
 }
 
 export function isNoteRecordKind(value: string): value is NoteRecordKind {

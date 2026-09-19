@@ -23,12 +23,16 @@ export {
   OPPORTUNITY_STAGES,
 }
 
-export type { OpportunityStage, LeadStage, LossReason, ActivityType, ActivityStatus, NoteRecordKind } from '../../../shared/utils/pipeline'
+export type { OpportunityStage, LeadStage, LossReason, ActivityType, ActivityStatus, ActivityOutcome, NoteRecordKind } from '../../../shared/utils/pipeline'
 
 export const salesAccounts = sqliteTable('sales_accounts', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   notes: text('notes'),
+  website: text('website'),
+  phone: text('phone'),
+  city: text('city'),
+  state: text('state'),
   active: integer('active', { mode: 'boolean' }).notNull().default(true),
   lifecycle: text('lifecycle').notNull().default('prospect'),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
@@ -139,7 +143,7 @@ export const salesOpportunities = sqliteTable('sales_opportunities', {
   name: text('name').notNull(),
   amountCents: integer('amount_cents'),
   mrrCents: integer('mrr_cents'),
-  stage: text('stage').notNull().default('proposal_quote'),
+  stage: text('stage').notNull().default('working'),
   ownerUserId: integer('owner_user_id').references(() => users.id),
   lossReason: text('loss_reason'),
   lossNotes: text('loss_notes'),
@@ -218,6 +222,7 @@ export const salesActivities = sqliteTable('sales_activities', {
   status: text('status').notNull().default('open'),
   description: text('description').notNull(),
   notes: text('notes'),
+  outcome: text('outcome'),
   dueAt: integer('due_at', { mode: 'timestamp_ms' }),
   completedAt: integer('completed_at', { mode: 'timestamp_ms' }),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),

@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   ACTIVITY_STATUSES,
   ACTIVITY_TYPES,
+  ACTIVITY_OUTCOMES,
   LEAD_STAGES,
   LOSS_REASONS,
   NOTE_RECORD_KINDS,
@@ -20,6 +21,7 @@ export const opportunityStageSchema = z.enum(OPPORTUNITY_STAGES)
 export const lossReasonSchema = z.enum(LOSS_REASONS)
 export const activityTypeSchema = z.enum(ACTIVITY_TYPES)
 export const activityStatusSchema = z.enum(ACTIVITY_STATUSES)
+export const activityOutcomeSchema = z.enum(ACTIVITY_OUTCOMES)
 export const noteRecordKindSchema = z.enum(NOTE_RECORD_KINDS)
 export const campaignStatusSchema = z.enum(CAMPAIGN_STATUSES)
 export const companyLifecycleSchema = z.enum(COMPANY_LIFECYCLES)
@@ -32,6 +34,10 @@ const nullableId = z.coerce.number().int().positive().nullable().optional()
 export const createCompanySchema = z.object({
   name: z.string().trim().min(1).max(200),
   notes: z.string().trim().max(4000).optional(),
+  website: z.string().trim().max(200).optional(),
+  phone: z.string().trim().max(80).optional(),
+  city: z.string().trim().max(120).optional(),
+  state: z.string().trim().max(80).optional(),
   active: z.boolean().optional(),
   lifecycle: companyLifecycleSchema.optional(),
 })
@@ -39,6 +45,10 @@ export const createCompanySchema = z.object({
 export const patchCompanySchema = z.object({
   name: z.string().trim().min(1).max(200).optional(),
   notes: z.string().trim().max(4000).nullable().optional(),
+  website: z.string().trim().max(200).nullable().optional(),
+  phone: z.string().trim().max(80).nullable().optional(),
+  city: z.string().trim().max(120).nullable().optional(),
+  state: z.string().trim().max(80).nullable().optional(),
   active: z.boolean().optional(),
   lifecycle: companyLifecycleSchema.optional(),
 })
@@ -94,7 +104,7 @@ export const createOpportunitySchema = z.object({
   primaryContactId: z.coerce.number().int().positive().optional(),
   name: z.string().trim().min(1).max(200),
   amountCents: z.coerce.number().int().nonnegative().optional(),
-  stage: z.enum(['proposal_quote', 'decision']).optional(),
+  stage: z.enum(['working', 'proposal_quote', 'decision']).optional(),
   notes: z.string().trim().max(4000).optional(),
   ownerUserId: z.coerce.number().int().positive().optional(),
   sourceId: optionalId,
@@ -106,7 +116,7 @@ export const patchOpportunitySchema = z.object({
   accountId: z.coerce.number().int().positive().optional(),
   primaryContactId: z.coerce.number().int().positive().nullable().optional(),
   name: z.string().trim().min(1).max(200).optional(),
-  stage: z.enum(['proposal_quote', 'decision']).optional(),
+  stage: z.enum(['working', 'proposal_quote', 'decision']).optional(),
   notes: z.string().trim().max(4000).nullable().optional(),
   ownerUserId: z.coerce.number().int().positive().optional(),
   sourceId: nullableId,
@@ -117,6 +127,18 @@ export const patchOpportunitySchema = z.object({
 export const markLostSchema = z.object({
   lossReason: lossReasonSchema,
   lossNotes: z.string().trim().max(4000).optional(),
+  cancelOpenActivities: z.boolean().optional(),
+})
+
+export const markWonSchema = z.object({
+  cancelOpenActivities: z.boolean().optional(),
+})
+
+export const nextActivitySchema = z.object({
+  type: activityTypeSchema.optional(),
+  description: z.string().trim().min(1).max(2000),
+  dueAt: z.coerce.number().int(),
+  notes: z.string().trim().max(4000).optional(),
 })
 
 export const createActivitySchema = z.object({
@@ -128,7 +150,7 @@ export const createActivitySchema = z.object({
   type: activityTypeSchema.optional(),
   description: z.string().trim().min(1).max(2000),
   notes: z.string().trim().max(4000).optional(),
-  dueAt: z.coerce.number().int().optional(),
+  dueAt: z.coerce.number().int(),
 }).refine(value => value.accountId || value.contactId || value.opportunityId || value.leadId, {
   message: 'Attach this activity to a lead, company, contact, or opportunity.',
 })
@@ -139,10 +161,12 @@ export const patchActivitySchema = z.object({
   dueAt: z.coerce.number().int().nullable().optional(),
   type: activityTypeSchema.optional(),
   status: activityStatusSchema.optional(),
+  outcome: activityOutcomeSchema.nullable().optional(),
   ownerUserId: z.coerce.number().int().positive().optional(),
   completed: z.boolean().optional(),
   leadId: z.coerce.number().int().positive().nullable().optional(),
   opportunityId: z.coerce.number().int().positive().nullable().optional(),
+  nextActivity: nextActivitySchema.optional(),
 })
 
 export const createNoteSchema = z.object({

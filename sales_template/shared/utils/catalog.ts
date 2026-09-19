@@ -42,6 +42,21 @@ export const OFFER_PRICING_TYPE_LABELS: Record<OfferPricingType, string> = {
   monthly: 'Monthly',
 }
 
+export const SEEDED_OFFERS = [
+  {
+    name: 'Martial Arts CRM',
+    pricingType: 'monthly' as const,
+    defaultUnitPriceCents: 25000,
+    description: 'SIC dogfood starter offer. Edit price for other Sales tenants.',
+  },
+  {
+    name: 'Provisioning / Setup',
+    pricingType: 'one_time' as const,
+    defaultUnitPriceCents: 50000,
+    description: 'SIC dogfood starter offer. Edit price for other Sales tenants.',
+  },
+] as const
+
 export const INTAKE_FIELD_IDS = [
   'firstName',
   'lastName',

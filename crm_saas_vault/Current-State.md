@@ -39,7 +39,7 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | C2 / Beauty / S7–S11 | C2 **Successful** (2026-09-15). Beauty and S7–S11 **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 
-**Authorized work:** none (hosting-node repository work shipped 2026-09-19; live VPS/DNS/TLS remain external. Official S7/S8 remain **Not started**). Architecture law is [[ADR-Product-Owned-Domains-Shared-Foundation]] (2026-09-17). Hosting-node map: [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]]. Do not start C3, Beauty, SI migration, Core-domain promotion, package rename, or `apps/` moves. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Closeout: [[history/C2_closeout]]. Asset upload return: [[history/WO-2026-09-17-ma-multi-asset-upload-return]]. Architecture return: [[history/WO-2026-09-17-product-owned-domains-shared-foundation-return]]. Customer #1 sell-readiness: [[Martial-Arts-Customer-1-Sell-Readiness]], [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]].
+**Authorized work:** none (Sales Minimum V1 code-shipped 2026-09-19 for SIC dogfooding; not a platform milestone and not owner-accepted Successful. Hosting-node repository work shipped 2026-09-19; live VPS/DNS/TLS remain external. Official S7/S8 remain **Not started**). Architecture law is [[ADR-Product-Owned-Domains-Shared-Foundation]] (2026-09-17). Hosting-node map: [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]]. Do not start C3, Beauty, SI migration, Core-domain promotion, package rename, or `apps/` moves. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Closeout: [[history/C2_closeout]]. Asset upload return: [[history/WO-2026-09-17-ma-multi-asset-upload-return]]. Architecture return: [[history/WO-2026-09-17-product-owned-domains-shared-foundation-return]]. Customer #1 sell-readiness: [[Martial-Arts-Customer-1-Sell-Readiness]], [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]]. Sales V1 return: [[history/WO-2026-09-19-sales-minimum-v1-return]]. Assessment (investigation record, V1 closed): [[Sales-SIC-Dogfooding-Readiness-Assessment]].
 
 Lockfile: [[project-state.yaml]].
 
@@ -107,19 +107,25 @@ Customer #1 sell-readiness (repository-complete 2026-09-19): unique initial-acce
 
 Local: http://localhost:5030 (`pnpm dev`). Laptop Docker PRODUCTION `:5000`, STAGE `:5010`, DEV `:5020`.
 
-### Sales product (`sales_template/`) — C2A–B2 Successful; C2 Successful
+### Sales product (`sales_template/`) — C2A–B2 Successful; C2 Successful; Minimum V1 code-shipped
 
-Second working product consuming the shared foundation `@crm/core` (Nuxt `extends`). Package `sales-crm` (`private: true`). Local: http://localhost:5040 (`pnpm dev`). SQLite `file:./data/app.sqlite`. Provisioned sqlite is `file:/app/data/sqlite/crm.sqlite`. Drizzle journal `0000`–`0003` is **Sales-owned** (including `users` / RBAC / `app_settings` created in `0000_wide_cyclops`). Docker image **`crm-sales:c2`**. Proposal PDFs in provisioned envs use `SALES_PROPOSALS_DIR=/app/data/uploads/proposals` on the existing assets/uploads volume (S6 zip already includes `/app/data/uploads`).
+Second working product consuming the shared foundation `@crm/core` (Nuxt `extends`). Package `sales-crm` (`private: true`). Local: http://localhost:5040 (`pnpm dev`). SQLite `file:./data/app.sqlite`. Provisioned sqlite is `file:/app/data/sqlite/crm.sqlite`. Drizzle journal `0000`–`0004` is **Sales-owned** (including `users` / RBAC / `app_settings` created in `0000_wide_cyclops`; V1 firmographics/outcomes in `0004_sales_v1_dogfood`). Docker image **`crm-sales:c2`**. Proposal PDFs in provisioned envs use `SALES_PROPOSALS_DIR=/app/data/uploads/proposals` on the existing assets/uploads volume (S6 zip already includes `/app/data/uploads`).
 
 Sales already performed the architectural role of the second consumer: it shares foundation infrastructure and owns a **divergent** domain (not a Core Lead/Campaign). Do not describe Sales as still needing to be built to challenge Core.
 
-Domain: **Lead** (`sales_leads`; Company optional) → explicit **Convert Lead** → **Company** / Sales Account (`sales_accounts`) + Contact + Opportunity. Opportunity stages `proposal_quote` → `decision` → `won` \| `lost` (terminal until Reopen; structured loss reason). Operational Activities, chronological `sales_notes`, owners on Lead/Opportunity/Activity. Company and Opportunity workspaces. Permissions `VIEW_SALES` / `MANAGE_SALES`.
+**SIC outbound path (D1):** Company → Contacts → Opportunity. **Lead** remains for inbound/public intake. Convert still creates company + contact + opportunity and keeps the Lead.
 
-B1 adds Sales-owned Sources, Campaigns (no primary source), Campaign+Source Tracking Links, captured/current attribution, configuration-driven public intake (`/inquire`, `/t/{token}`), Offers, Opportunity commercial lines (one-time + MRR), Company lifecycle (`prospect` / `customer` / `former_customer`), dedicated `won_at` / `lost_at`, and baseline reporting. Public intake defaults **off**.
+**Pipeline (D2):** Working → Proposal/Quote → Decision → Won/Lost. Manual create and Lead convert default to **Working**. Existing `proposal_quote` records remain valid. A demo is a Meeting activity, not a stage.
+
+Domain: **Lead** (`sales_leads`; Company optional) → explicit **Convert Lead** → **Company** / Sales Account (`sales_accounts`, optional website/phone/city/state) + Contact + Opportunity. Operational Activities with required due dates, structured outcomes on call/email/meeting, and complete-and-schedule-next. Chronological `sales_notes`. Company list shows lifecycle (Prospect / Customer / Former Customer) separately from Active. Opportunity list shows company, stage, one-time, MRR, and next open activity. Dashboard **Work today** lists overdue, due today, and open opportunities. Won/Lost prompts to cancel remaining open activities (default yes; completed history kept; Reopen does not restore cancelled tasks). Won shows an operator serve checklist (no Control Plane auto-create). Permissions `VIEW_SALES` / `MANAGE_SALES`.
+
+B1 adds Sales-owned Sources, Campaigns (no primary source), Campaign+Source Tracking Links, captured/current attribution, configuration-driven public intake (`/inquire`, `/t/{token}`), Offers, Opportunity commercial lines (one-time + MRR), Company lifecycle (`prospect` / `customer` / `former_customer`), dedicated `won_at` / `lost_at`, and baseline reporting. Public intake defaults **off**. Seeded starter offers (editable, Sales-owned, not a platform catalog): Martial Arts CRM monthly $250 and Provisioning / Setup one-time $500.
 
 B2 adds a Sales-owned Proposal chain on each Opportunity: draft/issue/mark-sent/accept/decline/supersede, immutable issued commercial snapshots, instance letterhead (`sales.proposal_letterhead`), staff HTML preview, PDFKit-generated PDFs under `data/proposals/`, optional signed PDF upload. Accepted does **not** auto-Won. No browser e-sign, no CRM email, no customer portal.
 
-No additional Sales CRM features shipped in C2 (no e-sign, email, portal). Strategic Insights has **not** been migrated or cut over. C2 proof used disposable Control Plane account **C2 QA Test**, not lab-acme or SI mutation.
+Sales Minimum V1 is **code-shipped** for SIC to begin dogfooding. It is **not** a new C-track milestone and is **not** owner-accepted Successful. Stop further Sales feature work until real friction from dogfooding. Investigation record: [[Sales-SIC-Dogfooding-Readiness-Assessment]]. Return: [[history/WO-2026-09-19-sales-minimum-v1-return]].
+
+No additional Sales CRM features shipped in C2 (no e-sign, email, portal). Strategic Insights has **not** been migrated as a Control Plane customer. C2 proof used disposable Control Plane account **C2 QA Test**, not lab-acme or SI mutation.
 
 C2A owner-accepted 2026-09-11. Closeout: [[history/C2A_closeout]]. C2B owner-accepted 2026-09-12. Closeout: [[history/C2B_closeout]]. Slice A implementation return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. B1 owner-accepted 2026-09-12. Closeout: [[history/B1_closeout]]. Implementation return: [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]]. B2 owner-accepted 2026-09-13. Closeout: [[history/B2_closeout]]. Implementation return: [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system]]. C2 owner-accepted 2026-09-15. Closeout: [[history/C2_closeout]]. Implementation return: [[history/WO-2026-09-14-c2-product-instance-sales-catalog-return]]. Work order (archived): [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog]].
 
@@ -247,6 +253,7 @@ IMM-01–04 and NEAR-01–03 are **resolved / working**. Do not present them as 
 | Open NEAR/DEF | [[SaaS-Open-Questions]] |
 | Historical evidence | [[history/_index]] |
 | Customer #1 sell-readiness | [[Martial-Arts-Customer-1-Sell-Readiness]] |
+| Sales SIC dogfooding assessment (investigation + V1 status) | [[Sales-SIC-Dogfooding-Readiness-Assessment]] |
 | Customer #1 production deploy | [[Customer-1-Production-Deploy-Runbook]] |
 | Customer #1 backup/restore | [[Customer-1-Backup-Restore-Runbook]] |
 | Martial Arts product boundary | [[Martial-Arts-Product-Boundary]] |

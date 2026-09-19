@@ -65,7 +65,7 @@ async function create() {
   <section class="space-y-6">
     <AppPageHeader
       title="Leads"
-      description="Pre-opportunity commercial interest. Company is optional."
+      description="Inbound or public-intake interest. For outbound academies, create a Company first, then Contacts, then an Opportunity."
     />
     <AppAlert v-if="error || errorMessage">
       {{ errorMessage || 'Could not load leads.' }}

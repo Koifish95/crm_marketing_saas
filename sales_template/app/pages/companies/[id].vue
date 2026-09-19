@@ -13,12 +13,16 @@ type Company = {
   id: number
   name: string
   notes: string | null
+  website: string | null
+  phone: string | null
+  city: string | null
+  state: string | null
   active: boolean
   lifecycle: string
 }
 type Contact = { id: number, firstName: string, lastName: string }
 type Opportunity = { id: number, name: string, stage: string }
-type Activity = { id: number, description: string, status: string, dueAt: string | Date | null }
+type Activity = { id: number, description: string, status: string, type: string, dueAt: string | Date | null }
 
 const { data: company, error, pending, refresh } = await useFetch<Company>(() => `/api/companies/${id.value}`)
 const { data: contacts, refresh: refreshContacts } = await useFetch<Contact[]>('/api/contacts', {
@@ -37,6 +41,10 @@ useHead({
 
 const name = ref('')
 const notes = ref('')
+const website = ref('')
+const phone = ref('')
+const city = ref('')
+const state = ref('')
 const active = ref(true)
 const lifecycle = ref('prospect')
 const saving = ref(false)
@@ -49,6 +57,10 @@ watch(company, (value) => {
   }
   name.value = value.name
   notes.value = value.notes || ''
+  website.value = value.website || ''
+  phone.value = value.phone || ''
+  city.value = value.city || ''
+  state.value = value.state || ''
   active.value = value.active
   lifecycle.value = value.lifecycle || 'prospect'
 }, { immediate: true })
@@ -60,7 +72,16 @@ async function save() {
   try {
     await $fetch(`/api/companies/${id.value}`, {
       method: 'PATCH',
-      body: { name: name.value, notes: notes.value, active: active.value, lifecycle: lifecycle.value },
+      body: {
+        name: name.value,
+        notes: notes.value,
+        website: website.value,
+        phone: phone.value,
+        city: city.value,
+        state: state.value,
+        active: active.value,
+        lifecycle: lifecycle.value,
+      },
     })
     await refresh()
     await refreshContacts()
@@ -110,6 +131,30 @@ async function save() {
           v-model="name"
           class="control"
           required
+        >
+      </AppField>
+      <AppField label="Website">
+        <input
+          v-model="website"
+          class="control"
+        >
+      </AppField>
+      <AppField label="Phone">
+        <input
+          v-model="phone"
+          class="control"
+        >
+      </AppField>
+      <AppField label="City">
+        <input
+          v-model="city"
+          class="control"
+        >
+      </AppField>
+      <AppField label="State / region">
+        <input
+          v-model="state"
+          class="control"
         >
       </AppField>
       <AppField label="Notes">
@@ -184,6 +229,9 @@ async function save() {
             >
               <NuxtLink :to="`/opportunities/${opportunity.id}`">
                 {{ opportunity.name }}
+                <span class="text-muted">
+                  · {{ opportunity.stage }}
+                </span>
               </NuxtLink>
             </li>
           </ul>
@@ -207,6 +255,10 @@ async function save() {
               :key="activity.id"
             >
               {{ activity.description }}
+              <span class="text-muted">
+                · {{ activity.type }}
+                · {{ activity.dueAt ? new Date(activity.dueAt).toLocaleString() : 'No due date' }}
+              </span>
             </li>
           </ul>
           <p

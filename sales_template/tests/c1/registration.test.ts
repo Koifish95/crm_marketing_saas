@@ -9,13 +9,13 @@ import '../../lib/register-sales-shell'
 describe('C2A registration contracts', () => {
   it('composes Core admin nav with Sales items', () => {
     const staff = listNavItems({ role: 'STAFF', accessRights: ['VIEW_SALES'] }).map(item => item.label)
-    expect(staff).toEqual(['Dashboard', 'Leads', 'Companies', 'Contacts', 'Opportunities', 'Activities', 'Campaigns', 'Offers', 'Proposals'])
+    expect(staff).toEqual(['Dashboard', 'Companies', 'Leads', 'Contacts', 'Opportunities', 'Activities', 'Campaigns', 'Offers', 'Proposals'])
 
     const admin = listNavItems({ role: 'ADMIN' }).map(item => item.label)
     expect(admin).toEqual([
       'Dashboard',
-      'Leads',
       'Companies',
+      'Leads',
       'Contacts',
       'Opportunities',
       'Activities',

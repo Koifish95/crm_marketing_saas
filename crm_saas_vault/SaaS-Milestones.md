@@ -84,11 +84,12 @@ Not S-track. Do not call C2 “S7.” Do not call historical hostname work “S5
 | SI Sales B1 | Commercial model + acquisition foundation | **Successful** (2026-09-12). Not B2. Not C2. Evidence: [[history/B1_closeout]] |
 | SI Sales B2 | Proposal / document system | **Successful** (2026-09-13). Feature `84c0cc8`. Not C2. Evidence: [[history/B2_closeout]] |
 | C2 | Sales as second product + CP product catalog | **Successful** (2026-09-15). Evidence: [[history/C2_closeout]]. |
+| Sales Minimum V1 | SIC dogfooding operating slice (not a C-track ID) | **Code-shipped** (2026-09-19). Not owner-accepted Successful. Evidence: [[history/WO-2026-09-19-sales-minimum-v1-return]]. Do not start deferred Sales features until dogfood friction. |
 | C3 | Beauty as an independently owned product | Not started. Not a Core-proof exercise. |
 | D1 | Account vs Product Instance CP schema | **Accepted**, schema **minimal shipped** in C2 |
 | D2–D4 | MA leads / campaigns / public capture stay product-owned | **Accepted**; **modified** 2026-09-17 (Sales does not justify promotion) |
 
-C1 is not Map B Successful. C1 shipped a useful shared **application foundation**; it did not establish a shared CRM domain, and that remaining trajectory is superseded ([[ADR-Product-Owned-Domains-Shared-Foundation]]). C2A is **Successful** (not C2). C2B Slice A is **Successful** (not Slice B, not C2). SI Sales B1 is **Successful** (not B2, not C2). SI Sales B2 is **Successful** (not C2). C2 is **Successful**. Historical extraction narrative (not law): [[history/CRM_Core_Extraction_Implementation_Plan]].
+C1 is not Map B Successful. C1 shipped a useful shared **application foundation**; it did not establish a shared CRM domain, and that remaining trajectory is superseded ([[ADR-Product-Owned-Domains-Shared-Foundation]]). C2A is **Successful** (not C2). C2B Slice A is **Successful** (not Slice B, not C2). SI Sales B1 is **Successful** (not B2, not C2). SI Sales B2 is **Successful** (not C2). C2 is **Successful**. Historical extraction narrative (not law): [[history/CRM_Core_Extraction_Implementation_Plan]]. Sales Minimum V1 is **code-shipped** (2026-09-19) for SIC dogfooding; it is not a C-track milestone and not owner-accepted Successful.
 
 ---
 

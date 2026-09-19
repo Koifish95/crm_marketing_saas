@@ -8,6 +8,7 @@ import { SEEDED_USER_ROLES, SEEDED_USER_ROLE_RIGHTS } from '../shared/utils/acce
 import { loadLocalEnv } from '../server/utils/load-env'
 import { utcNowMs } from '../shared/utils/time'
 import { ensureSeededSources } from '../server/services/acquisition'
+import { ensureSeededOffers } from '../server/services/commercial'
 
 export const BOOTSTRAP_PASSWORD_REQUIRED
   = 'NUXT_AUTH_PASSWORD is required to seed an admin user. Seed will not invent a default password.'
@@ -76,6 +77,7 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
       roleRights: SEEDED_USER_ROLE_RIGHTS,
     })
     await ensureSeededSources(db)
+    await ensureSeededOffers(db)
 
     const [staffType] = await db.select().from(userTypes).where(eq(userTypes.code, 'STAFF')).limit(1)
     const [salesRole] = await db.select().from(userRoles).where(eq(userRoles.code, 'SALES_USER')).limit(1)

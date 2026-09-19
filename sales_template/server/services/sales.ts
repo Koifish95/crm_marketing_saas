@@ -11,6 +11,8 @@ import {
   users,
 } from '../database/schema'
 import {
+  activityOutcomeRequired,
+  isActivityOutcome,
   isActivityStatus,
   isActivityType,
   isLeadStage,
@@ -18,6 +20,7 @@ import {
   isNoteRecordKind,
   isOpportunityStage,
   splitDisplayName,
+  type ActivityOutcome,
   type ActivityStatus,
   type ActivityType,
   type LeadStage,
@@ -33,7 +36,7 @@ import {
   resolveAttributionInput,
   type AttributionSnapshot,
 } from './acquisition'
-import { addOpportunityLine } from './commercial'
+import { addOpportunityLine, listOpportunityLines } from './commercial'
 
 function now() {
   return new Date(utcNowMs())
@@ -105,6 +108,10 @@ export async function getCompany(db: Database, id: number) {
 export async function createCompany(db: Database, input: {
   name: string
   notes?: string
+  website?: string
+  phone?: string
+  city?: string
+  state?: string
   active?: boolean
   lifecycle?: CompanyLifecycle
 }) {
@@ -116,6 +123,10 @@ export async function createCompany(db: Database, input: {
   await db.insert(salesAccounts).values({
     name: input.name.trim(),
     notes: blankToNull(input.notes),
+    website: blankToNull(input.website),
+    phone: blankToNull(input.phone),
+    city: blankToNull(input.city),
+    state: blankToNull(input.state),
     active: input.active ?? true,
     lifecycle,
     createdAt,
@@ -131,6 +142,10 @@ export async function createCompany(db: Database, input: {
 export async function updateCompany(db: Database, id: number, input: {
   name?: string
   notes?: string | null
+  website?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
   active?: boolean
   lifecycle?: CompanyLifecycle
 }) {
@@ -141,6 +156,18 @@ export async function updateCompany(db: Database, id: number, input: {
   }
   if (input.notes !== undefined) {
     patch.notes = blankToNull(input.notes)
+  }
+  if (input.website !== undefined) {
+    patch.website = blankToNull(input.website)
+  }
+  if (input.phone !== undefined) {
+    patch.phone = blankToNull(input.phone)
+  }
+  if (input.city !== undefined) {
+    patch.city = blankToNull(input.city)
+  }
+  if (input.state !== undefined) {
+    patch.state = blankToNull(input.state)
   }
   if (input.active !== undefined) {
     patch.active = input.active
@@ -566,7 +593,10 @@ export async function listOpportunities(db: Database, filters: {
   ownerUserId?: number
 } = {}) {
   const rows = await db.select().from(salesOpportunities).orderBy(desc(salesOpportunities.updatedAt))
-  return rows.filter((row) => {
+  const companies = await db.select().from(salesAccounts)
+  const activities = await db.select().from(salesActivities)
+  const nowMs = utcNowMs()
+  const filtered = rows.filter((row) => {
     if (filters.accountId != null && row.accountId !== filters.accountId) {
       return false
     }
@@ -584,6 +614,51 @@ export async function listOpportunities(db: Database, filters: {
     }
     return true
   })
+  return filtered.map(row => decorateOpportunityRow(row, companies, activities, nowMs))
+}
+
+function nextOpenActivity(
+  activities: Array<typeof salesActivities.$inferSelect>,
+  opportunityId: number,
+  nowMs: number,
+) {
+  const open = activities.filter(row => row.opportunityId === opportunityId && row.status === 'open')
+  open.sort((left, right) => {
+    const leftDue = left.dueAt ? new Date(left.dueAt).getTime() : Number.POSITIVE_INFINITY
+    const rightDue = right.dueAt ? new Date(right.dueAt).getTime() : Number.POSITIVE_INFINITY
+    return leftDue - rightDue
+  })
+  const next = open[0]
+  if (!next) {
+    return null
+  }
+  return {
+    id: next.id,
+    description: next.description,
+    type: next.type,
+    status: next.status,
+    dueAt: next.dueAt,
+    bucket: activityQueueBucket({
+      status: next.status,
+      dueAt: next.dueAt,
+      nowMs,
+    }),
+  }
+}
+
+function decorateOpportunityRow(
+  row: typeof salesOpportunities.$inferSelect,
+  companies: Array<typeof salesAccounts.$inferSelect>,
+  activities: Array<typeof salesActivities.$inferSelect>,
+  nowMs: number,
+) {
+  const company = companies.find(item => item.id === row.accountId)
+  return {
+    ...row,
+    companyName: company?.name ?? `Company #${row.accountId}`,
+    companyLifecycle: company?.lifecycle ?? null,
+    nextActivity: nextOpenActivity(activities, row.id, nowMs),
+  }
 }
 
 export async function getOpportunity(db: Database, id: number) {
@@ -629,7 +704,7 @@ export async function createOpportunity(db: Database, input: {
   await requireAccount(db, input.accountId)
   await requireOwner(db, input.ownerUserId)
   await assertContactBelongsToAccount(db, input.primaryContactId, input.accountId)
-  const stage = input.stage ?? 'proposal_quote'
+  const stage = input.stage ?? 'working'
   if (stage === 'won' || stage === 'lost') {
     throw new DomainError('Mark Won or Lost with the dedicated action.')
   }
@@ -764,7 +839,10 @@ export async function updateOpportunity(db: Database, id: number, input: {
   return getOpportunity(db, id)
 }
 
-export async function markOpportunityWon(db: Database, id: number) {
+export async function markOpportunityWon(db: Database, id: number, input: {
+  cancelOpenActivities?: boolean
+  actorUserId?: number
+} = {}) {
   const current = await getOpportunity(db, id)
   if (current.stage === 'won') {
     return current
@@ -780,7 +858,7 @@ export async function markOpportunityWon(db: Database, id: number) {
     wonAt: closedAt,
     lostAt: null,
     updatedAt: closedAt,
-  }).where(eq(salesOpportunities.id, id))
+  }).where(eq(salesOpportunities.id, current.id))
   const company = await requireAccount(db, current.accountId)
   if (company.lifecycle === 'prospect') {
     await db.update(salesAccounts).set({
@@ -788,10 +866,18 @@ export async function markOpportunityWon(db: Database, id: number) {
       updatedAt: closedAt,
     }).where(eq(salesAccounts.id, company.id))
   }
+  if (input.cancelOpenActivities !== false) {
+    await cancelOpenActivitiesForOpportunity(db, id, 'Won', input.actorUserId)
+  }
   return getOpportunity(db, id)
 }
 
-export async function markOpportunityLost(db: Database, id: number, input: { lossReason: string, lossNotes?: string }) {
+export async function markOpportunityLost(db: Database, id: number, input: {
+  lossReason: string
+  lossNotes?: string
+  cancelOpenActivities?: boolean
+  actorUserId?: number
+}) {
   const current = await getOpportunity(db, id)
   if (current.stage === 'lost') {
     return current
@@ -814,7 +900,37 @@ export async function markOpportunityLost(db: Database, id: number, input: { los
     wonAt: null,
     updatedAt: now(),
   }).where(eq(salesOpportunities.id, id))
+  if (input.cancelOpenActivities !== false) {
+    await cancelOpenActivitiesForOpportunity(db, id, 'Lost', input.actorUserId)
+  }
   return getOpportunity(db, id)
+}
+
+async function cancelOpenActivitiesForOpportunity(
+  db: Database,
+  opportunityId: number,
+  terminal: 'Won' | 'Lost',
+  actorUserId?: number,
+) {
+  const open = await listActivities(db, { opportunityId, openOnly: true })
+  if (!open.length) {
+    return
+  }
+  const stamp = now()
+  for (const activity of open) {
+    await db.update(salesActivities).set({
+      status: 'cancelled',
+      updatedAt: stamp,
+    }).where(eq(salesActivities.id, activity.id))
+  }
+  if (actorUserId) {
+    await createNote(db, {
+      recordKind: 'opportunity',
+      recordId: opportunityId,
+      body: `Cancelled ${open.length} open ${open.length === 1 ? 'activity' : 'activities'} because the opportunity was marked ${terminal}. Completed history was kept. Reopen does not restore cancelled tasks — schedule new work.`,
+      authorUserId: actorUserId,
+    })
+  }
 }
 
 export async function reopenOpportunity(db: Database, id: number) {
@@ -896,10 +1012,13 @@ export async function createActivity(db: Database, input: {
   type?: ActivityType
   description: string
   notes?: string
-  dueAt?: number
+  dueAt: number
 }) {
   if (!input.accountId && !input.contactId && !input.opportunityId && !input.leadId) {
     throw new DomainError('Attach this activity to a lead, company, contact, or opportunity.')
+  }
+  if (!input.dueAt) {
+    throw new DomainError('Set a due date for this activity.')
   }
   await requireOwner(db, input.ownerUserId)
   let accountId = input.accountId ?? null
@@ -932,7 +1051,8 @@ export async function createActivity(db: Database, input: {
     status: 'open',
     description: input.description.trim(),
     notes: blankToNull(input.notes),
-    dueAt: input.dueAt ? new Date(input.dueAt) : null,
+    outcome: null,
+    dueAt: new Date(input.dueAt),
     completedAt: null,
     createdAt,
     updatedAt: createdAt,
@@ -950,10 +1070,17 @@ export async function updateActivity(db: Database, id: number, input: {
   dueAt?: number | null
   type?: ActivityType
   status?: ActivityStatus
+  outcome?: ActivityOutcome | null
   ownerUserId?: number
   completed?: boolean
   leadId?: number | null
   opportunityId?: number | null
+  nextActivity?: {
+    type?: ActivityType
+    description: string
+    dueAt: number
+    notes?: string
+  }
 }) {
   const current = await getActivity(db, id)
   if (input.ownerUserId != null) {
@@ -971,6 +1098,17 @@ export async function updateActivity(db: Database, id: number, input: {
   if (input.status && !isActivityStatus(input.status)) {
     throw new DomainError('Unknown activity status.')
   }
+  if (input.outcome && !isActivityOutcome(input.outcome)) {
+    throw new DomainError('Unknown activity outcome.')
+  }
+  const completing = input.completed === true || input.status === 'completed'
+  const type = input.type ?? current.type
+  if (completing && activityOutcomeRequired(type) && !input.outcome && !current.outcome) {
+    throw new DomainError('Choose an outcome before completing this activity.')
+  }
+  if (input.nextActivity && !completing) {
+    throw new DomainError('Schedule the next activity while completing the current one.')
+  }
   const patch: Partial<typeof salesActivities.$inferInsert> = { updatedAt: now() }
   if (input.description !== undefined) {
     patch.description = input.description.trim()
@@ -984,6 +1122,9 @@ export async function updateActivity(db: Database, id: number, input: {
   if (input.type !== undefined) {
     patch.type = input.type
   }
+  if (input.outcome !== undefined) {
+    patch.outcome = input.outcome
+  }
   if (input.ownerUserId !== undefined) {
     patch.ownerUserId = input.ownerUserId
   }
@@ -993,9 +1134,12 @@ export async function updateActivity(db: Database, id: number, input: {
   if (input.opportunityId !== undefined) {
     patch.opportunityId = input.opportunityId
   }
-  if (input.completed === true || input.status === 'completed') {
+  if (completing) {
     patch.status = 'completed'
     patch.completedAt = current.completedAt ?? now()
+    if (input.outcome) {
+      patch.outcome = input.outcome
+    }
   } else if (input.completed === false) {
     patch.status = 'open'
     patch.completedAt = null
@@ -1006,7 +1150,26 @@ export async function updateActivity(db: Database, id: number, input: {
     patch.completedAt = null
   }
   await db.update(salesActivities).set(patch).where(eq(salesActivities.id, id))
-  return getActivity(db, id)
+  const activity = await getActivity(db, id)
+  let nextActivity = null
+  if (completing && input.nextActivity) {
+    const ownerUserId = current.ownerUserId ?? input.ownerUserId
+    if (!ownerUserId) {
+      throw new DomainError('Owner is required to schedule the next activity.')
+    }
+    nextActivity = await createActivity(db, {
+      accountId: current.accountId ?? undefined,
+      contactId: current.contactId ?? undefined,
+      opportunityId: current.opportunityId ?? undefined,
+      leadId: current.leadId ?? undefined,
+      ownerUserId,
+      type: input.nextActivity.type ?? (isActivityType(type) ? type : 'task'),
+      description: input.nextActivity.description,
+      notes: input.nextActivity.notes,
+      dueAt: input.nextActivity.dueAt,
+    })
+  }
+  return { ...activity, nextActivity }
 }
 
 async function assertNoteRecord(db: Database, kind: NoteRecordKind, recordId: number) {
@@ -1059,6 +1222,46 @@ export async function createNote(db: Database, input: {
     .orderBy(desc(salesNotes.id))
     .limit(1)
   return created!
+}
+
+export async function opportunityServeHandoff(db: Database, id: number) {
+  const opportunity = await getOpportunity(db, id)
+  const company = await requireAccount(db, opportunity.accountId)
+  const contact = opportunity.primaryContactId
+    ? await requireContact(db, opportunity.primaryContactId)
+    : null
+  const lines = await listOpportunityLines(db, id)
+  return {
+    companyName: company.name,
+    companyLifecycle: company.lifecycle,
+    opportunityName: opportunity.name,
+    stage: opportunity.stage,
+    primaryContact: contact
+      ? {
+          id: contact.id,
+          name: `${contact.firstName} ${contact.lastName}`.trim(),
+          title: contact.title,
+          email: contact.email,
+          phone: contact.phone,
+        }
+      : null,
+    lines: lines.map(line => ({
+      description: line.description,
+      pricingType: line.pricingType,
+      quantity: line.quantity,
+      unitPriceCents: line.unitPriceCents,
+      oneTimeCents: line.oneTimeCents,
+      mrrCents: line.mrrCents,
+    })),
+    oneTimeCents: opportunity.amountCents ?? 0,
+    mrrCents: opportunity.mrrCents ?? 0,
+    nextSteps: [
+      'Create or reuse this customer in Control Plane',
+      'Add a Martial Arts product instance',
+      'Provision the environment',
+      'Continue onboarding outside Sales',
+    ],
+  }
 }
 
 export async function dashboardCounts(db: Database) {

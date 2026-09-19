@@ -14,9 +14,34 @@ tags:
 
 # Sales — SIC Dogfooding Readiness Assessment
 
-Investigation only. No Sales product changes were implemented. This note is the durable record for Scott and ChatGPT to decide the next work order. It is **not** authorization to implement.
+Investigation record from 2026-09-19. The gap tables below are **historical evidence** of what was missing at investigation time. They are not the live map.
 
-Related live notes: [[Current-State]], [[Platform-Architecture]], [[ADR-Product-Owned-Domains-Shared-Foundation]], [[Control-Plane]]. Official Sales slices C2A–B2 and C2 remain **Successful**; that means the shipped slices were accepted, not that Sales is ready for SIC to run a real Martial Arts CRM sales process every day.
+**Authorized Minimum V1 shipped 2026-09-19** (work order [[wip/archive/WO-2026-09-19-sales-minimum-v1]], return [[history/WO-2026-09-19-sales-minimum-v1-return]]). Live map: [[Current-State]]. Locked decisions: [[SaaS-Decisions#2026-09-19 — Sales Minimum V1 locked decisions for SIC dogfooding]].
+
+Related live notes: [[Current-State]], [[Platform-Architecture]], [[ADR-Product-Owned-Domains-Shared-Foundation]], [[Control-Plane]]. Official Sales slices C2A–B2 and C2 remain **Successful**. Sales Minimum V1 is **code-shipped** for SIC dogfooding; it is not a new platform milestone and is not owner-accepted Successful.
+
+---
+
+## Implementation status (2026-09-19)
+
+Do not conclude from the investigation tables that these gaps remain open.
+
+| ID | Investigation | Implemented |
+|---|---|---|
+| SALES-V1-001 | HIGH — complete + next missing | **SUCCESS** — complete with outcome/notes and schedule-next |
+| SALES-V1-002 | HIGH — pipeline starts at proposal_quote | **SUCCESS** — Working → Proposal/Quote → Decision → Won/Lost |
+| SALES-V1-003 | HIGH — lists hide next action / dollars | **SUCCESS** — opportunity list shows company, stage, $, MRR, next action |
+| SALES-V1-004 | HIGH — overdue deep-link ignored | **SUCCESS** — `/activities?queue=overdue` (and other queues) initialize the filter |
+| SALES-V1-005 | MEDIUM — Won leftover activities / no serve step | **SUCCESS** — prompt + default cancel; Won serve checklist only |
+| SALES-V1-006 | HIGH if Lead-first | **SUCCESS** — Company-first outbound copy; Lead kept for inbound |
+| SALES-V1-007 | MEDIUM — no website/phone/city | **SUCCESS** — optional website, phone, city, state |
+| SALES-V1-009 | MEDIUM — no structured outcomes | **SUCCESS** — reached / no_answer / left_message / meeting_held / no_show / other |
+| SALES-V1-013 | MEDIUM — demo as entity question | **SUCCESS** — demo is a Meeting activity (D6) |
+| SALES-V1-019 | LOW — empty offer catalog | **SUCCESS** — seed Martial Arts CRM monthly $250 + Provisioning/Setup one-time $500 as editable Sales offers, not a platform catalog |
+
+Deferred IDs (008, 010–012, 014–018, 020) remain deferred. Investigation executive summary below is **frozen as of the assessment**; current operating statement is in [[Current-State]].
+
+---
 
 ---
 

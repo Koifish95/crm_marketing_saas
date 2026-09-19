@@ -27,6 +27,29 @@ Decision: what we chose
 
 ---
 
+## 2026-09-19 — Sales Minimum V1 locked decisions for SIC dogfooding
+
+Status: accepted
+
+Context: SIC needs Sales as its primary internal CRM while selling Martial Arts CRM. The investigation [[Sales-SIC-Dogfooding-Readiness-Assessment]] listed gaps and eight open product decisions. Scott locked D1–D8 and authorized implementation of SALES-V1-001–007, 009, 013, 019.
+
+Decision:
+
+- **D1** SIC outbound is Company → Contacts → Opportunity. Lead remains for inbound/public intake. Do not merge or delete Lead.
+- **D2** Opportunity stages are Working → Proposal/Quote → Decision → Won/Lost. Existing `proposal_quote` records stay valid. A demo is an Activity, not a stage.
+- **D3** Keep commercial lines (monthly + one-time). No first-class setupFee/mrr fields, bundles, or cross-product pricing service.
+- **D4** Won is a checklist / explicit operator handoff only. No automatic Control Plane customer or provisioning.
+- **D5** Structured activity outcomes now: Reached, No Answer, Left Message, Meeting Held, No Show, Other. Required for call/email/meeting; optional for task/other.
+- **D6** A demo is a Meeting activity (due + outcome + notes). No Demo entity.
+- **D7** Keep Sales Offers. Seed Martial Arts CRM monthly $250 and Provisioning/Setup one-time $500 as editable SIC starter offers, not universal platform SKUs.
+- **D8** Won/Lost prompts about remaining open activities; default is cancel (history preserved). Reopen does not restore cancelled tasks; schedule new work.
+
+Sales owns this domain. Do not move it into `@crm/core`. After V1: stop development and dogfood.
+
+Evidence: [[history/WO-2026-09-19-sales-minimum-v1-return]]. Live map: [[Current-State]].
+
+---
+
 ## 2026-09-19 — Control Plane is the SIC hosting-node management plane
 
 Status: accepted
