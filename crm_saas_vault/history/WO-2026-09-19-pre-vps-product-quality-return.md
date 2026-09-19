@@ -4,7 +4,7 @@ status: done
 id: WO-2026-09-19-pre-vps-product-quality
 milestone: none
 base_sha: "4bd015b20a9f5f188580a50cc171680af6328239"
-result_sha: "3133558c4e1f0e4f88d5e06b3081e1d0cf756711"
+result_sha: "16f4a2588dd17c0d364f762844702d3442542444"
 implementation_result: shipped
 tests: "Phase 2: martial_arts follow-up tests updated and previously passing; sales registration labels. Phase 3: control_plane pnpm test 21 files / 107 tests pass; pnpm typecheck pass; pnpm lint pass. sales_template docker-contract + registration 2 files / 4 tests pass."
 decisions_discovered:
@@ -79,6 +79,7 @@ Local `:5030` / `:5040` were not running at Phase 3 verification. Phase 2 browse
 | Work order `base_sha` | `4bd015b20a9f5f188580a50cc171680af6328239` |
 | Phase 1 | `c60e851` |
 | Phase 2 | `3133558c4e1f0e4f88d5e06b3081e1d0cf756711` |
+| Phase 3 | `16f4a2588dd17c0d364f762844702d3442542444` |
 | `renzo_crm` | not modified |
 | Push | not requested |
 
