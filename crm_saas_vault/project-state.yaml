@@ -99,3 +99,6 @@ notes:
   core_migrator: not_planned
   ma_customer1_sell_readiness: repository_complete_awaiting_external
   ma_customer1_sell_readiness_date: 2026-09-19
+  hosting_node: repository_complete_awaiting_external
+  hosting_node_date: 2026-09-19
+  hosting_node_work_order: WO-2026-09-19-production-hosting-node

@@ -198,6 +198,8 @@ Operator auth before the control plane leaves localhost. Image story for a secon
 
 - [ ] **S7 Successful:** The control plane can leave loopback only with operator login. A second machine can run the same image without copying laptop sqlite. Laptop remains the development environment until VPS cutover.
 
+Pre-S7 repository path (2026-09-19, **not** this Successful checkbox): one Linux hosting node, Control Plane still loopback-only, SSH tunnel for operators, generated public edge. See [[Hosting-Node-Architecture]]. Do not mark S7 Successful from that work.
+
 ---
 
 ## S8 — Public Exposure
@@ -207,6 +209,8 @@ Reachable customer access: hostname shape `{slug}.{product-domain}`, TLS, real (
 **Not in this milestone:** Apex/www for Renzo. Cloudflare/Caddy locks from the Renzo hosting contract.
 
 - [ ] **S8 Successful:** Customer staff can hit `{slug}.{product-domain}`, sign in with a real password, and run the CRM, without touching `app.renzogracieutah.com`.
+
+Repo-side hostname/TLS workflow exists (PROD `public_hostname`, generated nginx, ACME scripts). Live DNS/TLS and the unset product domain remain this milestone. Temporary `*.strategicinsightsconsulting.net` names are not the product domain.
 
 ---
 

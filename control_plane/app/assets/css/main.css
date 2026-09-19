@@ -152,6 +152,17 @@ body {
   color: #5b6b7c;
 }
 
+.hostname-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.hostname-form input {
+  min-width: 18rem;
+}
+
 .search {
   max-width: 20rem;
 }

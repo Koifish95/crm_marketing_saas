@@ -39,7 +39,7 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | C2 / Beauty / S7–S11 | C2 **Successful** (2026-09-15). Beauty and S7–S11 **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 
-**Authorized work:** none (Customer #1 sell-readiness repository work shipped 2026-09-19; not a platform milestone). Architecture law is [[ADR-Product-Owned-Domains-Shared-Foundation]] (2026-09-17). Martial Arts sequential multi-file Asset upload shipped 2026-09-17 (template work; not a platform milestone). C2 remains **Successful**. Do not start C3, Beauty, S7, S8, SI migration, Core-domain promotion, package rename, or `apps/` moves. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Closeout: [[history/C2_closeout]]. Asset upload return: [[history/WO-2026-09-17-ma-multi-asset-upload-return]]. Architecture return: [[history/WO-2026-09-17-product-owned-domains-shared-foundation-return]]. Customer #1 sell-readiness: [[Martial-Arts-Customer-1-Sell-Readiness]], [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]].
+**Authorized work:** none (hosting-node repository work shipped 2026-09-19; live VPS/DNS/TLS remain external. Official S7/S8 remain **Not started**). Architecture law is [[ADR-Product-Owned-Domains-Shared-Foundation]] (2026-09-17). Hosting-node map: [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]]. Do not start C3, Beauty, SI migration, Core-domain promotion, package rename, or `apps/` moves. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Closeout: [[history/C2_closeout]]. Asset upload return: [[history/WO-2026-09-17-ma-multi-asset-upload-return]]. Architecture return: [[history/WO-2026-09-17-product-owned-domains-shared-foundation-return]]. Customer #1 sell-readiness: [[Martial-Arts-Customer-1-Sell-Readiness]], [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]].
 
 Lockfile: [[project-state.yaml]].
 
@@ -65,7 +65,7 @@ crm_marketing_saas/
 └── crm_saas_vault/              # this vault
 ```
 
-**Runtime:** Martial Arts, Sales, and Control Plane remain laptop Docker (plus local `pnpm dev` for MA :5030 and Sales :5040). Never `docker compose down -v`, never prune, never attach `webhosting_renzo_*` / leftover `renzo-*` volumes. Do not copy laptop sqlite onto the Pi. Do not touch `Projects/renzo_crm` or Koi-Pi PRODUCTION.
+**Runtime:** Martial Arts, Sales, and Control Plane run on a **laptop lab node** (`kind=laptop`) or a **Linux hosting node** (`kind=vps`, same local Docker). Laptop `pnpm dev` remains MA :5030 and Sales :5040. Control Plane is always `127.0.0.1:52100` (SSH tunnel from a remote operator). Never `docker compose down -v`, never prune, never attach `webhosting_renzo_*` / leftover `renzo-*` volumes. Do not copy laptop sqlite onto the Pi. Do not touch `Projects/renzo_crm` or Koi-Pi PRODUCTION.
 
 **Image tags in use:** `martial-arts-acquisition:s2` (Acme lab), `martial-arts-acquisition:s4` (provisioned MA), `crm-sales:c2` (provisioned Sales). Do not rename or retag existing MA images.
 
@@ -129,7 +129,7 @@ C1 units 1–3 **code-shipped** and **still in force**: pnpm workspace, thin Nux
 
 ### Control Plane (`control_plane/`)
 
-http://127.0.0.1:52100. Multi-page shell: Dashboard, Customers, Environments, Hosting Nodes, Settings. Observe + provision **product instances**. New customer = account only. Add Product Instance picks Martial Arts or Sales, creates that instance’s PROD+DEV, and provisions in the background. Extra non-PROD attaches to an instance. One-PROD per instance. Upgrade “non-PROD first” is instance-scoped. Gated decommission (volumes stay). Retry = continue/resume the same environments. Localhost `accessUrl`s. No operator login; non-loopback is 403 unless `CONTROL_PLANE_ALLOW_REMOTE` + token. Unique initial-access passwords (never `setup`). Details: [[Control-Plane]].
+http://127.0.0.1:52100. Multi-page shell: Dashboard, Customers, Environments, Hosting Nodes, Settings. Observe + provision **product instances**. New customer = account only. Add Product Instance picks Martial Arts or Sales, creates that instance’s PROD+DEV, and provisions in the background. Extra non-PROD attaches to an instance. One-PROD per instance. Upgrade “non-PROD first” is instance-scoped. Gated decommission (volumes stay). Retry = continue/resume the same environments. PROD may store `public_hostname`; access URL becomes `https://{hostname}`. Health URLs stay loopback. No operator login; non-loopback is 403 unless `CONTROL_PLANE_ALLOW_REMOTE` + token. Unique initial-access passwords (never `setup`). Hosting node: [[Hosting-Node-Architecture]]. Details: [[Control-Plane]].
 
 ### Environment lifecycle
 
@@ -161,15 +161,15 @@ Exact `docker inspect` + compose. Combined status: container running **and** `/a
 
 Do not assume any of these exist:
 
-- C3 Beauty as an independently owned product; S7–S11; **live** VPS / DNS / TLS
+- C3 Beauty as an independently owned product; official S7–S11 **Successful** marks; **live** VPS / DNS / TLS issuance
 - Browser e-sign, public signing portal, customer portal, CRM email send, document/theme CMS
 - Beauty product (sister business is the intended second **pilot**, not a shipped product)
 - Generic Lead / Campaign / Event / public-capture model in the foundation (not planned)
 - Option C account-management redesign (multiple instances of the same product, SI cutover)
-- VPS / remote nodes / image registry
-- Live DNS / TLS certificates / public hostnames (repo-side nginx edge templates exist under `deploy/customer-1/`)
+- Remote Docker API / multi-node orchestration / image registry as a product
+- Live DNS records / Let's Encrypt against a real hostname (repo-side ACME workflow exists)
 - Billing, Stripe, self-service signup
-- Remote Control Plane auth (or any CP login)
+- Remote Control Plane login (SSH tunnel only; loopback bind remains)
 - S-track rewritten around Core
 - `martial_arts_template` moved to `apps/`
 - `@crm/core` rename or split into `ui` / `auth` / `rbac` / `runtime`

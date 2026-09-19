@@ -57,10 +57,12 @@ export const environments = sqliteTable('environments', {
   hostPort: integer('host_port').notNull(),
   lifecycleStatus: text('lifecycle_status').notNull(),
   provisionError: text('provision_error'),
+  publicHostname: text('public_hostname'),
   createdAt: text('created_at').notNull(),
 }, table => [
   uniqueIndex('environments_slug_unique').on(table.slug),
   uniqueIndex('environments_container_unique').on(table.containerName),
+  uniqueIndex('environments_public_hostname_unique').on(table.publicHostname),
   index('environments_customer_id_idx').on(table.customerId),
   index('environments_product_instance_id_idx').on(table.productInstanceId),
 ])

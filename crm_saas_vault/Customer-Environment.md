@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-17
+updated: 2026-09-19
 aliases:
   - Environment unit
   - Customer Environment
@@ -45,7 +45,7 @@ Rules:
 
 Older notes may say “vertical” here. That means **product identity**, not CRM Core composition.
 
-A Hosting Node is **not** a child of an Environment. An Environment is **placed on** a node. Many environments may share a node, including environments from different accounts.
+A Hosting Node is **not** a child of an Environment. An Environment is **placed on** a node. Many environments may share a node, including environments from different accounts. Current kinds: `laptop` (operator lab) and `vps` (Linux hosting node). Both use `local-docker` on the same machine as the Control Plane.
 
 ## Current repository fact
 
@@ -104,6 +104,7 @@ Customer Environment
 | Assets | Per environment. Same isolation as the database. |
 | Deployed version | Per environment. DEV may run newer software than PROD. A Customer does not have one version. |
 | Secrets / runtime config | Environment-owned. See [[#Integration credentials]]. |
+| Public hostname | Optional. **PROD only.** Deployment configuration, not product identity. Derives `https://{hostname}` origin for nginx, cookies, and CSRF. See [[Hosting-Node-Architecture]]. |
 
 ## Default entitlement vs capability
 

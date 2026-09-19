@@ -102,6 +102,12 @@ describe('S4 provisioned env and compose', () => {
     expect(env.contents).not.toMatch(/Acquisition/)
     expect(env.contents).toMatch(/SALES_PROPOSALS_DIR="\/app\/data\/uploads\/proposals"/)
     expect(env.contents).toMatch(/EXPECTED_IMAGE="crm-sales:c2"/)
+    const salesCompose = readFileSync(
+      join(process.cwd(), '..', 'sales_template', 'docker-compose.provisioned.yml'),
+      'utf8',
+    )
+    expect(salesCompose).toMatch(/NUXT_PUBLIC_ORIGIN/)
+    expect(salesCompose).toMatch(/TRUSTED_PROXY_IPS/)
   })
 
   it('keeps the generic compose file parameterized and free of Renzo names', () => {
@@ -113,7 +119,8 @@ describe('S4 provisioned env and compose', () => {
     expect(compose).toMatch(/\$\{HOST_BIND:-0.0.0.0\}:\$\{HOST_PORT\}:5000/)
     expect(compose).toMatch(/\$\{SQLITE_VOLUME\}/)
     expect(compose).toMatch(/NUXT_AUTH_MUST_CHANGE_PASSWORD/)
-    expect(compose).not.toMatch(/NUXT_AUTH_PASSWORD:-\$\{NUXT_AUTH_PASSWORD:-setup\}/)
+    expect(compose).toMatch(/NUXT_PUBLIC_ORIGIN/)
+    expect(compose).toMatch(/TRUSTED_PROXY_IPS/)
     expect(compose).not.toMatch(/:-setup/)
     expect(compose).not.toMatch(/renzo/i)
     expect(compose).not.toMatch(/lab-acme/)

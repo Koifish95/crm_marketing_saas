@@ -64,6 +64,8 @@ export function toEnvironmentView(
     envFileExample: row.envFileExample,
     healthUrl: row.healthUrl,
     accessUrl: row.accessUrl,
+    publicHostname: row.publicHostname || null,
+    publicOrigin: row.publicHostname ? `https://${row.publicHostname}` : null,
     hostPort: row.hostPort,
     lifecycleStatus: row.lifecycleStatus,
     provisionError: row.provisionError,

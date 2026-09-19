@@ -2,7 +2,7 @@
 type: decision
 status: current
 area: process
-updated: 2026-09-17
+updated: 2026-09-19
 tags:
   - adr
   - saas
@@ -24,6 +24,26 @@ Decision: what we chose
 ```
 
 ---
+
+---
+
+## 2026-09-19 — Control Plane is the SIC hosting-node management plane
+
+Status: accepted
+
+Context: Customer #1 sell-readiness shipped laptop-oriented production-edge templates. SIC chose one Linux VPS hosting node, with the Control Plane as the real infrastructure-management plane, not a laptop-only utility. Official S7 still requires operator login before leaving loopback. Official S8 still requires a real product domain.
+
+Decision:
+
+- Co-locate the Control Plane on the hosting node with **local Docker**. Node `kind` is `laptop` or `vps`; driver is `local-docker`. No remote Docker API in this phase.
+- Keep Control Plane bind `127.0.0.1:52100`. Remote operators use SSH `-L 52100:127.0.0.1:52100`. Do not publish the Control Plane. Do not mark official S7 Successful.
+- Public identity belongs to the **PROD environment** as `public_hostname`. `NUXT_PUBLIC_ORIGIN`, nginx `server_name`, Secure cookies, and CSRF all derive from `https://{hostname}`. Temporary `ma-test.strategicinsightsconsulting.net` is configuration, not architecture.
+- Production edge is generated multi-vhost nginx (`deploy/edge/`). Linux uses host-network nginx → `127.0.0.1:{hostPort}` so `TRUSTED_PROXY_IPS=127.0.0.1` is true. Apps with a public hostname bind `127.0.0.1`.
+- ACME HTTP-01 is repo-side (`issue-cert.sh` / `renew-certs.sh`). Live issuance waits on DNS + VPS.
+- Do not mark official S8 Successful until a real product hostname is owner-accepted.
+- Provider portability: Linux + Docker + volumes + 80/443. No DigitalOcean API in the platform.
+
+Notes: [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]].
 
 ---
 

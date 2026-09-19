@@ -20,6 +20,8 @@ export type FleetEnvironment = {
   envFileExample: string
   healthUrl: string
   accessUrl: string
+  publicHostname?: string | null
+  publicOrigin?: string | null
   hostPort?: number
   lifecycleStatus?: string
   provisionError?: string | null

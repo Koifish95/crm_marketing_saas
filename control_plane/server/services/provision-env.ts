@@ -1,4 +1,4 @@
-import { chmodSync, mkdirSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, isAbsolute, join } from 'node:path'
 import { randomBytes } from 'node:crypto'
 import type { ProductDefinition } from '../products/catalog'
@@ -47,6 +47,23 @@ export function publicAppName(displayName: string, template: ProductDefinition['
   return template === 'plain' ? displayName : `${displayName} Acquisition`
 }
 
+export function publicEnvSettings(input: {
+  publicHostname?: string | null
+  hostBind?: string
+  nodeKind?: string
+}) {
+  const publicOrigin = input.publicHostname
+    ? `https://${input.publicHostname.trim().toLowerCase().replace(/\.$/, '')}`
+    : ''
+  const vpsBind = input.nodeKind === 'vps' || Boolean(publicOrigin)
+  return {
+    publicOrigin,
+    hostBind: input.hostBind || (vpsBind ? '127.0.0.1' : '0.0.0.0'),
+    trustedProxyIps: publicOrigin ? '127.0.0.1' : '',
+    sessionCookieSecure: publicOrigin ? 'true' : 'false',
+  }
+}
+
 export function renderProvisionedEnv(input: {
   composeProject: string
   containerName: string
@@ -63,18 +80,24 @@ export function renderProvisionedEnv(input: {
   hostBind?: string
   trustedProxyIps?: string
   releaseId?: string
+  publicHostname?: string | null
+  nodeKind?: string
   product?: Pick<ProductDefinition, 'appNameTemplate' | 'extraEnv'>
 }) {
   const product = input.product ?? MARTIAL_ARTS_PRODUCT
   const appEnv = input.type === 'PROD' ? 'production' : 'dev'
   const location = input.type === 'PROD' ? 'PROD' : 'DEV'
   const authPassword = resolveInitialAccessPassword(input.authPassword)
-  const hostBind = input.hostBind || '0.0.0.0'
+  const publicSettings = publicEnvSettings({
+    publicHostname: input.publicHostname,
+    hostBind: input.hostBind,
+    nodeKind: input.nodeKind,
+  })
   const lines = [
     envLine('COMPOSE_PROJECT', input.composeProject),
     envLine('CONTAINER_NAME', input.containerName),
     envLine('HOST_PORT', input.hostPort),
-    envLine('HOST_BIND', hostBind),
+    envLine('HOST_BIND', publicSettings.hostBind),
     envLine('SQLITE_VOLUME', input.sqliteVolume),
     envLine('ASSETS_VOLUME', input.assetsVolume),
     envLine('EXPECTED_IMAGE', input.expectedImage),
@@ -89,8 +112,9 @@ export function renderProvisionedEnv(input: {
     envLine('NUXT_PUBLIC_BRAND_NAME', input.displayName),
     envLine('NUXT_PUBLIC_BRAND_LOCATION', location),
     envLine('NUXT_PUBLIC_TIMEZONE', input.timezone),
-    envLine('SESSION_COOKIE_SECURE', 'false'),
-    envLine('TRUSTED_PROXY_IPS', input.trustedProxyIps || ''),
+    envLine('NUXT_PUBLIC_ORIGIN', publicSettings.publicOrigin),
+    envLine('SESSION_COOKIE_SECURE', publicSettings.sessionCookieSecure),
+    envLine('TRUSTED_PROXY_IPS', input.trustedProxyIps ?? publicSettings.trustedProxyIps),
     envLine('RELEASE_ID', input.releaseId || 'dev'),
     envLine('APP_BACKUP_DIR', '/app/data/sqlite/backups'),
     ...Object.entries(product.extraEnv).map(([key, value]) => envLine(key, value)),
@@ -100,6 +124,41 @@ export function renderProvisionedEnv(input: {
     authPassword,
     username: 'admin',
   }
+}
+
+export function patchEnvFileContents(contents: string, updates: Record<string, string>) {
+  const keys = new Set(Object.keys(updates))
+  const seen = new Set<string>()
+  const lines = contents.split(/\r?\n/)
+  const next = lines.map((line) => {
+    const match = line.match(/^([A-Z0-9_]+)=/)
+    const key = match?.[1]
+    if (!key || !keys.has(key)) {
+      return line
+    }
+    seen.add(key)
+    return envLine(key, updates[key] ?? '')
+  })
+  for (const key of keys) {
+    if (!seen.has(key)) {
+      const insertAt = next.length > 0 && next[next.length - 1] === '' ? next.length - 1 : next.length
+      next.splice(insertAt, 0, envLine(key, updates[key] ?? ''))
+    }
+  }
+  const body = next.join('\n')
+  return body.endsWith('\n') ? body : `${body}\n`
+}
+
+export function patchProvisionedEnvFile(
+  envFileLocal: string,
+  updates: Record<string, string>,
+  root = process.cwd(),
+) {
+  const path = provisionedEnvAbsolutePath(envFileLocal, root)
+  const current = existsSync(path) ? readFileSync(path, 'utf8') : ''
+  const next = patchEnvFileContents(current, updates)
+  writeSecretFile(path, next)
+  return path
 }
 
 export function writeSecretFile(path: string, contents: string) {

@@ -39,6 +39,7 @@ export async function listRegisteredEnvironments(db: Database) {
     envFileExample: row.environment.envFileExample,
     healthUrl: row.environment.healthUrl,
     accessUrl: row.environment.accessUrl,
+    publicHostname: row.environment.publicHostname,
     sqliteVolume: row.environment.sqliteVolume,
     assetsVolume: row.environment.assetsVolume,
     expectedImage: row.environment.expectedImage,

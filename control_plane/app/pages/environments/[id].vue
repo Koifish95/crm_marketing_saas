@@ -25,6 +25,8 @@ const revealing = ref(false)
 const upgrading = ref(false)
 const stopping = ref(false)
 const starting = ref(false)
+const assigningHostname = ref(false)
+const hostnameDraft = ref('')
 const confirmRestore = ref(false)
 const confirmStop = ref(false)
 const destinationDir = ref('')
@@ -107,6 +109,7 @@ watch(environmentId, () => {
 
 watch(() => env.value?.id, (id) => {
   if (id) {
+    hostnameDraft.value = env.value?.publicHostname || ''
     void loadRestorableBackups()
   }
 }, { immediate: true })
@@ -185,6 +188,39 @@ async function startEnvironment() {
     actionError.value = fetchMessage(error, 'Start failed.')
   } finally {
     starting.value = false
+  }
+}
+
+async function assignHostname() {
+  if (!env.value || assigningHostname.value || env.value.type !== 'PROD') {
+    return
+  }
+  assigningHostname.value = true
+  actionError.value = ''
+  actionNotice.value = 'Saving public hostname and regenerating the production edge…'
+  try {
+    const result = await $fetch<{
+      hostname: { hostname: string, publicOrigin: string, relaunchError?: string | null }
+      checkedAt: string
+      environments: FleetStatusResponse['environments']
+    }>(`/api/environments/${env.value.id}/hostname`, {
+      method: 'POST',
+      body: { hostname: hostnameDraft.value, relaunch: true },
+    })
+    if (result.checkedAt && result.environments) {
+      applyStatus({ checkedAt: result.checkedAt, environments: result.environments })
+    }
+    hostnameDraft.value = result.hostname.hostname
+    if (result.hostname.relaunchError) {
+      actionNotice.value = `Hostname saved as ${result.hostname.publicOrigin}. Relaunch needed: ${result.hostname.relaunchError}`
+      return
+    }
+    actionNotice.value = `Public origin is ${result.hostname.publicOrigin}. Edge config was rewritten from this hostname.`
+  } catch (error) {
+    actionNotice.value = ''
+    actionError.value = fetchMessage(error, 'Could not save the public hostname.')
+  } finally {
+    assigningHostname.value = false
   }
 }
 
@@ -514,6 +550,41 @@ async function decommission() {
           <dd>{{ env?.provisionError || '—' }}</dd>
           <dt>Access URL</dt>
           <dd><AppAccessLink :href="env?.accessUrl" /></dd>
+          <dt>Public hostname</dt>
+          <dd>
+            <template v-if="env?.type === 'PROD' && !decommissioned">
+              <form
+                class="hostname-form"
+                @submit.prevent="assignHostname"
+              >
+                <input
+                  v-model="hostnameDraft"
+                  type="text"
+                  name="hostname"
+                  autocomplete="off"
+                  placeholder="ma-test.example.com"
+                  :disabled="assigningHostname"
+                >
+                <button
+                  type="submit"
+                  :disabled="assigningHostname || !hostnameDraft.trim()"
+                  :aria-busy="assigningHostname"
+                >
+                  {{ assigningHostname ? 'Saving…' : 'Save hostname' }}
+                </button>
+              </form>
+              <p class="muted">
+                One source of truth. nginx, HTTPS origin, Secure cookies, and CSRF all use
+                <code>https://{{ hostnameDraft || env.publicHostname || 'hostname' }}</code>.
+                Temporary SIC names such as ma-test.strategicinsightsconsulting.net are configuration, not architecture.
+              </p>
+            </template>
+            <template v-else>
+              {{ env?.publicHostname || 'Not assigned. Loopback access only.' }}
+            </template>
+          </dd>
+          <dt>Public origin</dt>
+          <dd>{{ env?.publicOrigin || '—' }}</dd>
         </dl>
       </section>
       <section

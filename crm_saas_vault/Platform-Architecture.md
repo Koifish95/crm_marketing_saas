@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-17
+updated: 2026-09-19
 aliases:
   - ARCHITECTURE
   - Platform architecture
@@ -15,7 +15,7 @@ tags:
 
 Live **platform** architecture for `crm_marketing_saas`. This is not the Renzo gym stack; that evidence stays in [[Architecture]].
 
-Law: [[ADR-Product-Owned-Domains-Shared-Foundation]]. Historical Core+vertical ADR (partially superseded): [[ADR-CRM-Core-Vertical-Architecture]]. Index: [[SaaS-Decisions]]. Domain unit: [[Customer-Environment]]. Operator app: [[Control-Plane]]. What exists now: [[Current-State]].
+Law: [[ADR-Product-Owned-Domains-Shared-Foundation]]. Historical Core+vertical ADR (partially superseded): [[ADR-CRM-Core-Vertical-Architecture]]. Index: [[SaaS-Decisions]]. Domain unit: [[Customer-Environment]]. Operator app: [[Control-Plane]]. Hosting node: [[Hosting-Node-Architecture]]. What exists now: [[Current-State]].
 
 Do not treat this note as a work order. Implementation requires [[Work-Order-Protocol]].
 
@@ -51,6 +51,8 @@ Hosting Node
 - Switching products is not a normal env config change.
 
 **Shipped (C2 Successful, 2026-09-15):** `customers` + `product_instances` + `environments`. One account may own Martial Arts and Sales instances. One PROD per **product instance**. `industry_template` is a migration leftover (`unassigned` on new accounts with no MA instance). See [[Customer-Environment]].
+
+**Hosting node (2026-09-19, not official S7/S8):** Control Plane co-located with local Docker on `laptop` or `vps`. Public hostname is PROD environment configuration. Generated nginx edge. Loopback Control Plane + SSH tunnel. See [[Hosting-Node-Architecture]].
 
 Older notes may say “vertical” for the same idea (product identity on the instance). That does **not** mean “CRM Core vertical composition.”
 

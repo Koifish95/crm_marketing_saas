@@ -1,20 +1,21 @@
 import { and, eq } from 'drizzle-orm'
 import type { Database } from '../database'
-import { customers, environments, hostingNodes, productInstances } from '../database/schema'
+import { customers, environments, productInstances } from '../database/schema'
 import { createStableId } from '../../shared/utils/ids'
 import { backfillInstanceId, isProductId, requireProduct, UNASSIGNED_INDUSTRY, type ProductId } from '../products/catalog'
+import { accessUrlForEnvironment } from '../../shared/utils/public-hostname'
 import {
   DEFAULT_TIMEZONE,
   allocateHostPorts,
   assertProvisionSlug,
   defaultEnvironmentPair,
   extraEnvironmentNames,
-  accessUrlForPort,
   healthUrlForPort,
   type NonProdEnvironmentType,
 } from './provision-contract'
 import { listRegisteredEnvironments } from './registry'
 import { renderProvisionedEnv, writeInitialAccessFile, writeProvisionedEnvFile, generateInitialAccessPassword } from './provision-env'
+import { requireLocalHostingNode } from './hosting-node'
 
 export class ProvisionError extends Error {
   statusCode: number
@@ -65,6 +66,7 @@ export async function insertNamedEnvironment(db: Database, input: {
   productInstanceId: string
   productId: ProductId
   nodeId: string
+  nodeKind?: string
   names: NamedEnvironment
   hostPort: number
   filesRoot?: string
@@ -94,7 +96,8 @@ export async function insertNamedEnvironment(db: Database, input: {
     envFileLocal: envFile,
     envFileExample: envFile,
     healthUrl: healthUrlForPort(input.hostPort),
-    accessUrl: accessUrlForPort(input.hostPort),
+    accessUrl: accessUrlForEnvironment({ hostPort: input.hostPort }),
+    publicHostname: null,
     sqliteVolume: input.names.sqliteVolume,
     assetsVolume: input.names.assetsVolume,
     expectedImage: input.names.expectedImage,
@@ -115,6 +118,7 @@ export async function insertNamedEnvironment(db: Database, input: {
     adminEmail: input.customer.adminEmail,
     timezone: input.customer.timezone,
     authPassword: input.authPassword,
+    nodeKind: input.nodeKind,
     product,
   })
   writeProvisionedEnvFile(envFile, rendered.contents, input.filesRoot)
@@ -204,11 +208,7 @@ export async function createCustomerAccount(db: Database, input: {
 export const createCustomerWithDefaultEnvironments = createCustomerAccount
 
 async function requireLaptopNode(db: Database) {
-  const [node] = await db.select().from(hostingNodes).where(eq(hostingNodes.name, 'laptop')).limit(1)
-  if (!node) {
-    throw new ProvisionError('Laptop hosting node is not registered.', 500)
-  }
-  return node
+  return requireLocalHostingNode(db)
 }
 
 export async function addProductInstance(db: Database, customerId: string, input: {
@@ -279,6 +279,7 @@ export async function addProductInstance(db: Database, customerId: string, input
       productInstanceId: instanceId,
       productId: product.id,
       nodeId: node.id,
+      nodeKind: node.kind,
       names,
       hostPort: ports[created.length] as number,
       filesRoot: input.filesRoot,
@@ -339,6 +340,7 @@ export async function addExtraNonProdEnvironment(db: Database, productInstanceId
     productInstanceId: instance.id,
     productId: instance.productId,
     nodeId: node.id,
+    nodeKind: node.kind,
     names,
     hostPort: ports[0] as number,
     filesRoot: input.filesRoot,

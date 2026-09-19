@@ -1,0 +1,19 @@
+name: sic-production-edge
+
+# Generated companion files live beside this compose file.
+# Control Plane stays loopback-only and is never published here.
+
+services:
+  proxy:
+    image: nginx:1.27-alpine
+    container_name: sic-production-edge
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+      - ./acme:/var/www/acme:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

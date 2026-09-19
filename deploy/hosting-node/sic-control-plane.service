@@ -1,0 +1,17 @@
+[Unit]
+Description=SIC Control Plane (loopback)
+After=network.target docker.service
+Wants=docker.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/sic/crm_marketing_saas/control_plane
+EnvironmentFile=/etc/sic/control-plane.env
+ExecStart=/usr/bin/node /opt/sic/crm_marketing_saas/control_plane/.output/server/index.mjs
+Restart=on-failure
+RestartSec=5
+User=root
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

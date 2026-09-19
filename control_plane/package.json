@@ -9,6 +9,7 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
+    "start": "node .output/server/index.mjs",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx server/database/migrate.ts",
@@ -40,5 +41,9 @@
     "typescript": "^5.9.2",
     "vitest": "^4.1.11",
     "vue-tsc": "^3.3.11"
+  },
+  "optionalDependencies": {
+    "@libsql/linux-x64-gnu": "0.5.29",
+    "@libsql/linux-x64-musl": "0.5.29"
   }
 }

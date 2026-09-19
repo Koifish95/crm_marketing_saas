@@ -1,5 +1,6 @@
 import type { Database } from '../database'
 import { decommissionRegisteredEnvironment } from './docker-relaunch'
+import { generateProductionEdgeFilesFromRegistry } from './production-edge-sync'
 import { setLifecycleStatus } from './provision-runtime'
 import { getRegisteredEnvironment, listRegisteredEnvironments } from './registry'
 
@@ -30,6 +31,12 @@ export async function decommissionEnvironment(db: Database, id: string, filesRoo
     productInstance: row.productInstance,
   })
   await setLifecycleStatus(db, row.id, 'decommissioned')
+  const remaining = await listRegisteredEnvironments(db)
+  if (row.publicHostname || remaining.some(item => item.publicHostname) || process.env.EDGE_ROOT) {
+    generateProductionEdgeFilesFromRegistry(remaining, {
+      kind: row.node.kind === 'vps' ? 'vps' : 'laptop',
+    })
+  }
   return {
     id: row.id,
     slug: row.slug,

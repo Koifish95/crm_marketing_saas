@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-18
+updated: 2026-09-19
 aliases:
   - Platform control
   - Control module
@@ -13,7 +13,7 @@ tags:
 
 # Control plane
 
-S3 and S4 **Successful**. Operator app: `control_plane/` at http://127.0.0.1:52100 — multi-page shell (Dashboard, Customers, Environments, Hosting Nodes, Settings). Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]] (`Customers → New customer` then **Add product instance**). Current state: [[Current-State]]. Historical frontend status: [[wip/archive/S5_Control_Plane_Productization_Status]]. Historical audit: [[wip/archive/Control_Plane_Post_Productization_Audit]]. Handoffs: [[history/S3_closeout]], [[history/S4_closeout]].
+S3 and S4 **Successful**. Operator app: `control_plane/` at http://127.0.0.1:52100 — multi-page shell (Dashboard, Customers, Environments, Hosting Nodes, Settings). Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]] (`Customers → New customer` then **Add product instance**). Hosting node: [[Hosting-Node-Architecture]]. Current state: [[Current-State]]. Historical frontend status: [[wip/archive/S5_Control_Plane_Productization_Status]]. Historical audit: [[wip/archive/Control_Plane_Post_Productization_Audit]]. Handoffs: [[history/S3_closeout]], [[history/S4_closeout]].
 
 It is not another customer admin page and not the platform owner's CRM.
 
@@ -46,19 +46,22 @@ which customers exist
 → provision a Product Instance PROD+DEV pair (Martial Arts or Sales)
 ```
 
-Headlines still read “Acme BJJ · Martial Arts · PROD · healthy,” not a container id. Indexes are tables. Workspaces can Refresh, Retry, add a product instance, add extra non-PROD on an instance, gated-decommission (volumes stay), and use the **Lifecycle** tab (backup, restore, off-host copy, upgrade — S6 Successful). Configuration fields stay read-only. Start / Stop / bulk start-stop are implemented on `/environments` (not Relaunch). Current state: [[Current-State]].
+Headlines still read “Acme BJJ · Martial Arts · PROD · healthy,” not a container id. Indexes are tables. Workspaces can Refresh, Retry, add a product instance, add extra non-PROD on an instance, gated-decommission (volumes stay), assign a PROD public hostname, and use the **Lifecycle** tab (backup, restore, off-host copy, upgrade — S6 Successful). Start / Stop / bulk start-stop are implemented on `/environments` (not Relaunch). Current state: [[Current-State]].
 
-Laptop-only. Local Docker. Health on demand. Acme is seeded as a Martial Arts instance; new customers are accounts until the operator adds a product. No Docker socket in CRM containers.
+Laptop **or** Linux hosting node (`kind=laptop|vps`, `driver=local-docker`). Health on demand. Acme is seeded as a Martial Arts instance on laptop; VPS bootstrap sets `SKIP_LAB_SEED=true`. New customers are accounts until the operator adds a product. No Docker socket in CRM containers.
 
 C2 **Successful** (2026-09-15): one account may own Martial Arts and Sales instances. One PROD per instance. Add Product Instance returns after registry insert; Docker build/compose is server-side `provisioning` until `ready` or `failed` (`provision_error` retained). Retry continues the same rows. Upgrade gating is instance-scoped. Restore is selectable with PROD→DEV copy-down. The Control Plane does **not** track a CRM Core / foundation package version and does **not** inspect a product’s domain model. See [[Customer-Environment]] and [[SaaS-Decisions#2026-09-15 — Official C2 is Successful]].
 
+2026-09-19 hosting-node path: the Control Plane is the SIC infrastructure-management plane on one node. It stays loopback-only. Remote operators SSH-tunnel. Official S7 is **not** Successful.
+
 ## What it is not
 
-- Public hostname / TLS / DNS
-- Image registry / VPS / operator login
+- Public Control Plane website
+- Official S7 operator login
+- Official S8 live product domain
+- Image registry / multi-region / Kubernetes
 - Billing, self-service, ThePond replacement
 - Managing external Renzo
-- Operator login (loopback only; required before leaving localhost)
 
 ## Implementation (S3 facts + S6)
 
@@ -73,7 +76,9 @@ C2 **Successful** (2026-09-15): one account may own Martial Arts and Sales insta
 - Non-loopback requests are refused unless `CONTROL_PLANE_ALLOW_REMOTE=true` **and** `x-control-plane-token` matches `CONTROL_PLANE_TOKEN`
 - New Martial Arts/Sales envs get a unique initial-access password (never provisioned `setup`); env files and sidecar password files are `0600` where the OS allows
 - Fleet SQLite snapshot uses in-container `VACUUM INTO` + integrity_check, not a live `docker cp` of the database file
-- Customer #1 operator procedures: [[Customer-1-Production-Deploy-Runbook]], [[Customer-1-Backup-Restore-Runbook]], [[Martial-Arts-Customer-1-Sell-Readiness]]
+- Control Plane registry snapshot: `POST /api/control-plane/backup` (VACUUM INTO under `data/backups/control-plane/`)
+- PROD `POST .../hostname` `{ hostname }` writes `public_hostname`, derives `NUXT_PUBLIC_ORIGIN=https://{hostname}`, regenerates `deploy/edge/nginx.conf`
+- Customer #1 operator procedures: [[Customer-1-Production-Deploy-Runbook]], [[Customer-1-Backup-Restore-Runbook]], [[Martial-Arts-Customer-1-Sell-Readiness]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]]
 
 ## Safety rule
 

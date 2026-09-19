@@ -13,7 +13,11 @@ tags:
 
 # Customer #1 production deploy runbook
 
-Repository-side production host model for one Martial Arts academy. Laptop Control Plane remains operator-only at http://127.0.0.1:52100.
+Repository-side production host model for one Martial Arts academy. **Current hosting-node path:** assign the PROD hostname in the Control Plane so `deploy/edge/` is generated. See [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]].
+
+`deploy/customer-1/` remains a single-customer example. Do not hand-maintain nginx `server_name` separately from `public_hostname`.
+
+Laptop Control Plane remains operator-only at http://127.0.0.1:52100 (SSH tunnel on a VPS).
 
 **Not included here:** buying a VPS, changing DNS at the registrar, or issuing a real certificate. Those are external.
 
