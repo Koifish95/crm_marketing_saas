@@ -6,7 +6,7 @@ updated: 2026-09-19
 repo: crm_marketing_saas
 branch: working
 remote: https://github.com/Koifish95/crm_marketing_saas.git
-head_at_write: "2b659a532e7fbae9419469f4924afbf7795ba5a7"
+head_at_write: "cb303b87302e1310f4157cf73146a976cc7ff61e"
 
 canonical:
   bootstrap: Home.md

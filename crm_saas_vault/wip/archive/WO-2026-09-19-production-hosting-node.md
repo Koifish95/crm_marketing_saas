@@ -1,6 +1,6 @@
 ---
 type: work-order
-status: active
+status: done
 id: WO-2026-09-19-production-hosting-node
 milestone: none
 decision_refs:
