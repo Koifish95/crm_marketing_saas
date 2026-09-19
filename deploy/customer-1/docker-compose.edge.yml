@@ -1,0 +1,62 @@
+# Customer #1 production edge
+#
+# Laptop Control Plane stays on 127.0.0.1:52100. This compose is the
+# production host model for one Martial Arts academy:
+# nginx terminates TLS on 443 and proxies to the app bound on 127.0.0.1:5000.
+#
+# Actual DNS records, TLS certificates, and VPS credentials are external.
+# Do not publish container port 5000 on 0.0.0.0.
+
+name: customer1-ma-prod-edge
+
+services:
+  proxy:
+    image: nginx:1.27-alpine
+    container_name: customer1-ma-prod-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      - app
+    networks:
+      - edge
+
+  app:
+    image: ${EXPECTED_IMAGE:-martial-arts-acquisition:s4}
+    container_name: ${CONTAINER_NAME:-customer1-ma-prod-app}
+    init: true
+    restart: unless-stopped
+    env_file:
+      - path: .env.production
+        required: false
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "5000"
+      APP_ENV: production
+      NUXT_PUBLIC_APP_ENV: production
+      SESSION_COOKIE_SECURE: "true"
+      TRUSTED_PROXY_IPS: ${TRUSTED_PROXY_IPS:-127.0.0.1}
+      NUXT_PUBLIC_ORIGIN: ${NUXT_PUBLIC_ORIGIN:-https://REPLACE_WITH_CUSTOMER_HOSTNAME}
+      RELEASE_ID: ${RELEASE_ID:-dev}
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - sqlite:/app/data/sqlite
+      - assets:/app/data/uploads
+    networks:
+      - edge
+
+volumes:
+  sqlite:
+    name: ${SQLITE_VOLUME:-customer1-ma-prod-sqlite}
+  assets:
+    name: ${ASSETS_VOLUME:-customer1-ma-prod-assets}
+
+networks:
+  edge:
+    name: customer1-ma-prod-edge

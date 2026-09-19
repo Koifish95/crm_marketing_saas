@@ -1,6 +1,7 @@
 import tailwindcss from '@tailwindcss/vite'
 import { isForbiddenPort, PREFERRED_PORT } from './scripts/listen-port.mjs'
 import { publicBrand } from '@crm/core/shared/utils/brand'
+import { readAppEnv, sessionCookieSecure } from '@crm/core/shared/utils/app-env'
 
 const brand = publicBrand(process.env)
 
@@ -30,7 +31,7 @@ export default defineNuxtConfig({
       cookie: {
         httpOnly: true,
         sameSite: 'lax',
-        secure: process.env.SESSION_COOKIE_SECURE === 'true',
+        secure: sessionCookieSecure(readAppEnv(), process.env.SESSION_COOKIE_SECURE),
       },
     },
     public: {

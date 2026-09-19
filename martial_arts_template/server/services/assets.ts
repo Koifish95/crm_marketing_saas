@@ -8,6 +8,11 @@ import type { AssetMarketingUse } from '../../shared/schemas/enums'
 import { utcNowMs } from '../../shared/utils/time'
 import type { SessionUser } from './authorization'
 import { DomainError } from './errors'
+import {
+  DEFAULT_ALLOWED_UPLOAD_TYPES,
+  isAllowedUploadType,
+  uploadMaxBytes,
+} from '@crm/core/shared/utils/request-security'
 
 export function uploadsDirectory() {
   return process.env.ASSET_UPLOAD_DIR || join(process.cwd(), 'data', 'uploads')
@@ -72,6 +77,14 @@ export async function createAsset(
   if (!input.bytes.length) {
     throw new DomainError('Upload a file.')
   }
+  const maxBytes = uploadMaxBytes(process.env.ASSET_UPLOAD_MAX_BYTES)
+  if (input.bytes.length > maxBytes) {
+    throw new DomainError(`Upload exceeds the ${maxBytes} byte limit.`)
+  }
+  const mediaType = (input.mediaType || 'application/octet-stream').trim().toLowerCase()
+  if (!isAllowedUploadType(mediaType, DEFAULT_ALLOWED_UPLOAD_TYPES)) {
+    throw new DomainError(`Unsupported file type: ${mediaType}.`)
+  }
   const dir = uploadsDirectory()
   mkdirSync(dir, { recursive: true })
   const storedName = `${randomUUID()}`
@@ -82,7 +95,7 @@ export async function createAsset(
     const [row] = await db.insert(assets).values({
       displayName: input.displayName.trim() || input.originalFilename,
       originalFilename: input.originalFilename,
-      mediaType: input.mediaType || 'application/octet-stream',
+      mediaType,
       storagePath: storedName,
       description: input.description?.trim() || null,
       marketingUseStatus: 'UNKNOWN',

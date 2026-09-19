@@ -4,6 +4,7 @@ import { getRequestIP } from 'h3'
 import type { Database } from '../database'
 import { securityEvents, users } from '../database/schema'
 import { utcNowMs } from '../../shared/utils/time'
+import { parseIpList, trustedClientIp } from '@crm/core/shared/utils/request-security'
 
 export const SECURITY_ACTIONS = [
   'LOGIN_SUCCESS',
@@ -33,9 +34,18 @@ export type SecurityAction = typeof SECURITY_ACTIONS[number]
 export type SecurityResult = 'SUCCESS' | 'FAILURE' | 'DENIED'
 
 export function requestAuditContext(event: H3Event) {
+  const trustedProxies = parseIpList(process.env.TRUSTED_PROXY_IPS)
+  const remoteAddress = getRequestIP(event, { xForwardedFor: false })
+    || event.node.req.socket?.remoteAddress
+    || null
   const forwarded = event.node.req.headers['x-forwarded-for']
-  const forwardedIp = typeof forwarded === 'string' ? forwarded.split(',')[0]?.trim() : undefined
-  const ip = getRequestIP(event, { xForwardedFor: true }) || forwardedIp || event.node.req.socket?.remoteAddress || null
+  const ip = (event.context.clientIp as string | undefined)
+    || trustedClientIp({
+      remoteAddress,
+      forwardedFor: forwarded,
+      trustedProxies,
+    })
+    || null
   const header = event.node.req.headers['user-agent']
   const userAgent = typeof header === 'string' ? header.slice(0, 500) : null
   return { ip, userAgent }

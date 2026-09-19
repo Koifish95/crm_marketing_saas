@@ -36,3 +36,19 @@ export function inspectRegisteredContainer(containerName: string, registered: re
   })
   return runtimeFromInspect(result.status ?? 1, result.stdout ?? '', result.stderr ?? '')
 }
+
+export function inspectRegisteredImage(containerName: string, registered: readonly string[]) {
+  assertRegisteredContainerName(containerName, registered)
+  const result = spawnSync('docker', ['inspect', '-f', '{{.Image}} {{.Config.Image}}', containerName], {
+    encoding: 'utf8',
+    windowsHide: true,
+  })
+  if (result.status !== 0) {
+    return null
+  }
+  const [imageId, imageName] = (result.stdout || '').trim().split(/\s+/, 2)
+  if (!imageId) {
+    return null
+  }
+  return { imageId, imageName: imageName || '' }
+}

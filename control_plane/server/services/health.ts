@@ -4,6 +4,9 @@ export type HealthProbe = {
   ok: boolean
   database?: string
   error?: string
+  warnings?: string[]
+  releaseId?: string
+  schemaVersion?: string
 }
 
 const HEALTH_TIMEOUT_MS = 4000
@@ -18,12 +21,18 @@ export function parseHealthBody(status: number, body: unknown): HealthProbe {
   if (status !== 200 || !body || typeof body !== 'object') {
     return { ok: false, error: `HTTP ${status}` }
   }
-  const record = body as { ok?: unknown, database?: unknown }
+  const record = body as { ok?: unknown, database?: unknown, warnings?: unknown, releaseId?: unknown, schemaVersion?: unknown }
   const ok = record.ok === true && record.database === 'reachable'
+  const warnings = Array.isArray(record.warnings)
+    ? record.warnings.filter((item): item is string => typeof item === 'string')
+    : []
   return {
     ok,
     database: typeof record.database === 'string' ? record.database : undefined,
     error: ok ? undefined : 'health body was not ok + reachable',
+    warnings,
+    releaseId: typeof record.releaseId === 'string' ? record.releaseId : undefined,
+    schemaVersion: typeof record.schemaVersion === 'string' ? record.schemaVersion : undefined,
   }
 }
 

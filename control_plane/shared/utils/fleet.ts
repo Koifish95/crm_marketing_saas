@@ -1,5 +1,10 @@
 export type CombinedStatus = 'healthy' | 'stopped' | 'missing' | 'unhealthy' | 'unknown'
 export type OperatorStatus = CombinedStatus | 'provisioning' | 'failed' | 'decommissioned'
+export type OperatorAlert = {
+  kind: 'outage' | 'backup' | 'disk'
+  message: string
+  environmentId?: string
+}
 
 export type FleetEnvironment = {
   id: string
@@ -33,6 +38,10 @@ export type FleetEnvironment = {
     offhostPath?: string | null
     offhostCopiedAt?: string | null
   } | null
+  healthWarnings?: string[]
+  releaseId?: string | null
+  schemaVersion?: string | null
+  runningImage?: { imageId: string, imageName: string } | null
   customer: {
     id: string
     slug: string
@@ -76,6 +85,8 @@ export type FleetStatusResponse = {
   environments: FleetEnvironment[]
   customers?: FleetAccount[]
   productInstances?: FleetProductInstance[]
+  alerts?: OperatorAlert[]
+  diskWarning?: string | null
 }
 
 const STATUS_RANK: Record<CombinedStatus, number> = {
@@ -155,6 +166,35 @@ export function needsAttention(env: FleetEnvironment) {
     return true
   }
   return env.status === 'unhealthy' || env.status === 'unknown' || env.status === 'missing'
+}
+
+export function operatorAlerts(
+  environments: readonly FleetEnvironment[],
+  diskWarning?: string | null,
+): OperatorAlert[] {
+  const alerts: OperatorAlert[] = []
+  for (const env of environments) {
+    if (needsAttention(env)) {
+      alerts.push({
+        kind: 'outage',
+        environmentId: env.id,
+        message: `${env.headline} is ${env.status}.`,
+      })
+    }
+    for (const warning of env.healthWarnings || []) {
+      if (/backup failed/i.test(warning)) {
+        alerts.push({
+          kind: 'backup',
+          environmentId: env.id,
+          message: `${env.headline}: ${warning}`,
+        })
+      }
+    }
+  }
+  if (diskWarning) {
+    alerts.push({ kind: 'disk', message: diskWarning })
+  }
+  return alerts
 }
 
 function defaultProductInstance(env: FleetEnvironment) {

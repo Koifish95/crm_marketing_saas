@@ -34,6 +34,7 @@ import { BUSINESS_TIMEZONE, denverParts, utcNowMs } from '../../shared/utils/tim
 import { getDatabaseUrl, sqliteFilePath } from '../database'
 import { uploadsDirectory } from './assets'
 import { DomainError } from './errors'
+import { assertSqliteIntegrity, snapshotSqliteFile } from './sqlite-snapshot'
 
 export const BACKUP_MANIFEST_VERSION = 2
 export const BACKUP_SUPPORTED_MANIFEST_VERSIONS = [1, 2] as const
@@ -99,17 +100,16 @@ export async function createBackupArchive(input: {
   }
 
   const databaseUrl = input.databaseUrl ?? sqliteFileUrl(sqlitePath)
-  await checkpointSqlite(databaseUrl)
+  const snapshotPath = join(tmpdir(), `ma-sqlite-snapshot-${randomUUID()}.sqlite`)
+  try {
+    await snapshotSqliteFile(databaseUrl, snapshotPath)
+  } catch (error) {
+    throw new DomainError(error instanceof Error ? error.message : 'SQLite-safe backup failed.')
+  }
 
   const nowMs = input.nowMs ?? utcNowMs()
   const files = [BACKUP_MANIFEST_ENTRY, BACKUP_SQLITE_ENTRY]
   const zip = new ZipFile()
-  if (existsSync(`${sqlitePath}-wal`)) {
-    files.push(`${BACKUP_SQLITE_ENTRY}-wal`)
-  }
-  if (existsSync(`${sqlitePath}-shm`)) {
-    files.push(`${BACKUP_SQLITE_ENTRY}-shm`)
-  }
   const uploads = collectUploadEntries(input.uploadsDir)
   files.push(...uploads.names)
 
@@ -118,14 +118,12 @@ export async function createBackupArchive(input: {
     appEnv: input.appEnv,
     createdAt: nowMs,
     timezone: BUSINESS_TIMEZONE,
-    sqliteSha256: sha256File(sqlitePath),
+    sqliteSha256: sha256File(snapshotPath),
     uploadCount: uploads.count,
     files,
   }
   zip.addBuffer(Buffer.from(JSON.stringify(manifest)), BACKUP_MANIFEST_ENTRY)
-  zip.addFile(sqlitePath, BACKUP_SQLITE_ENTRY)
-  addSiblingIfPresent(zip, sqlitePath, '-wal')
-  addSiblingIfPresent(zip, sqlitePath, '-shm')
+  zip.addFile(snapshotPath, BACKUP_SQLITE_ENTRY)
   for (const upload of uploads.entries) {
     zip.addFile(upload.absolute, upload.zipName)
   }
@@ -237,6 +235,11 @@ export async function restoreBackupArchive(input: {
     replaceUploads(join(extractDir, 'uploads'), uploadsDir)
     restampIsolationFiles(uploadsDir, input.appEnv)
     await restampIsolationSetting(sqlitePath, input.appEnv)
+    try {
+      await assertSqliteIntegrity(sqlitePath)
+    } catch (error) {
+      throw new DomainError(error instanceof Error ? error.message : 'Restored SQLite failed integrity check.')
+    }
 
     return { sourceAppEnv: manifest.appEnv }
   } finally {
@@ -340,13 +343,6 @@ export async function saveRestoreUpload(req: IncomingMessage, maxBytes = backupM
 
 function sqliteFileUrl(sqlitePath: string) {
   return `file:${sqlitePath.replaceAll('\\', '/')}`
-}
-
-function addSiblingIfPresent(zip: ZipFile, sqlitePath: string, suffix: string) {
-  const sibling = `${sqlitePath}${suffix}`
-  if (existsSync(sibling)) {
-    zip.addFile(sibling, `${BACKUP_SQLITE_ENTRY}${suffix}`)
-  }
 }
 
 function collectUploadEntries(uploadsDir: string) {

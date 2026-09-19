@@ -14,7 +14,7 @@ import {
   type NonProdEnvironmentType,
 } from './provision-contract'
 import { listRegisteredEnvironments } from './registry'
-import { renderProvisionedEnv, writeProvisionedEnvFile } from './provision-env'
+import { renderProvisionedEnv, writeInitialAccessFile, writeProvisionedEnvFile, generateInitialAccessPassword } from './provision-env'
 
 export class ProvisionError extends Error {
   statusCode: number
@@ -69,6 +69,7 @@ export async function insertNamedEnvironment(db: Database, input: {
   hostPort: number
   filesRoot?: string
   now?: string
+  authPassword?: string
 }) {
   await assertOneProdPerInstance(db, input.productInstanceId, input.names.type)
   const [slugHit] = await db.select().from(environments).where(eq(environments.slug, input.names.slug)).limit(1)
@@ -102,7 +103,7 @@ export async function insertNamedEnvironment(db: Database, input: {
     lifecycleStatus: 'provisioning',
     createdAt: now,
   })
-  writeProvisionedEnvFile(envFile, renderProvisionedEnv({
+  const rendered = renderProvisionedEnv({
     composeProject: input.names.composeProject,
     containerName: input.names.containerName,
     hostPort: input.hostPort,
@@ -113,9 +114,24 @@ export async function insertNamedEnvironment(db: Database, input: {
     displayName: input.customer.displayName,
     adminEmail: input.customer.adminEmail,
     timezone: input.customer.timezone,
+    authPassword: input.authPassword,
     product,
-  }), input.filesRoot)
-  return { id, slug: input.names.slug, type: input.names.type, hostPort: input.hostPort, envFileLocal: envFile }
+  })
+  writeProvisionedEnvFile(envFile, rendered.contents, input.filesRoot)
+  writeInitialAccessFile(envFile, {
+    username: rendered.username,
+    password: rendered.authPassword,
+    email: input.customer.adminEmail,
+  }, input.filesRoot)
+  return {
+    id,
+    slug: input.names.slug,
+    type: input.names.type,
+    hostPort: input.hostPort,
+    envFileLocal: envFile,
+    initialUsername: rendered.username,
+    initialPassword: rendered.authPassword,
+  }
 }
 
 export function usedHostPorts(rows: { hostPort?: number, healthUrl: string }[]) {
@@ -242,7 +258,16 @@ export async function addProductInstance(db: Database, customerId: string, input
       .where(eq(customers.id, customerId))
   }
 
-  const created: { id: string, slug: string, type: string, hostPort: number, envFileLocal: string }[] = []
+  const created: {
+    id: string
+    slug: string
+    type: string
+    hostPort: number
+    envFileLocal: string
+    initialUsername: string
+    initialPassword: string
+  }[] = []
+  const authPassword = generateInitialAccessPassword()
   for (const names of defaultEnvironmentPair(customer.slug, product.id)) {
     created.push(await insertNamedEnvironment(db, {
       customer: {
@@ -258,6 +283,7 @@ export async function addProductInstance(db: Database, customerId: string, input
       hostPort: ports[created.length] as number,
       filesRoot: input.filesRoot,
       now,
+      authPassword,
     }))
   }
 
@@ -266,6 +292,8 @@ export async function addProductInstance(db: Database, customerId: string, input
     productInstanceId: instanceId,
     productId: product.id,
     displayName,
+    initialUsername: 'admin',
+    initialPassword: authPassword,
     environments: created,
   }
 }

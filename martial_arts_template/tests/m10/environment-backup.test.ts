@@ -13,7 +13,6 @@ import {
   backupFilename,
   createBackupArchive,
   restoreBackupArchive,
-  sha256File,
   validateBackupArchive,
 } from '../../server/services/environment-backup'
 import { DomainError } from '../../server/services/errors'
@@ -91,8 +90,9 @@ describe('M10 environment backup and restore', () => {
       })
       expect(backup.filename).toBe('martial-arts-production-2026-09-06-1430.zip')
       expect(backup.manifest.version).toBe(2)
-      expect(backup.manifest.sqliteSha256).toBe(sha256File(packedSqlite))
+      expect(backup.manifest.sqliteSha256).toMatch(/^[a-f0-9]{64}$/)
       expect(backup.manifest.files).toContain('uploads/asset.txt')
+      expect(backup.manifest.files).not.toContain('sqlite/app.sqlite-wal')
       expect(backup.manifest.uploadCount).toBe(1)
       await writeArchive(backup.stream, zipPath)
       const validated = await validateBackupArchive(zipPath)

@@ -11,6 +11,8 @@
     "./shared/utils/health": "./shared/utils/health.ts",
     "./shared/utils/identity": "./shared/utils/identity.ts",
     "./shared/utils/password-policy": "./lib/password-policy.ts",
+    "./shared/utils/bootstrap-password": "./lib/bootstrap-password.ts",
+    "./shared/utils/request-security": "./shared/utils/request-security.ts",
     "./shared/utils/record-workspace": "./lib/record-workspace.ts",
     "./shared/utils/nav": "./shared/utils/nav.ts",
     "./shared/utils/settings-registry": "./shared/utils/settings-registry.ts",

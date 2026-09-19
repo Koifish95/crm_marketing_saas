@@ -13,6 +13,7 @@ import { hashStaffPassword } from '../server/services/password'
 import { utcNowMs } from '../shared/utils/time'
 import { loadLocalEnv } from '../server/utils/load-env'
 import { readAppEnv } from '@crm/core/shared/utils/app-env'
+import { isForbiddenBootstrapPassword } from '@crm/core/shared/utils/bootstrap-password'
 
 export const BOOTSTRAP_PASSWORD_REQUIRED
   = 'NUXT_AUTH_PASSWORD is required to seed an admin user. Seed will not invent a default password.'
@@ -33,6 +34,9 @@ export function getBootstrapAdmin(env: NodeJS.Dict<string | undefined> = process
   const password = env.NUXT_AUTH_PASSWORD?.trim() || undefined
   if (!password) {
     throw new Error(BOOTSTRAP_PASSWORD_REQUIRED)
+  }
+  if (appEnv === 'production' && isForbiddenBootstrapPassword(password)) {
+    throw new Error('Refusing universal bootstrap password "setup" in production. Provision a unique initial-access password.')
   }
   const reset = env.NUXT_AUTH_RESET_PASSWORD === 'true'
   const mustChangePassword = env.NUXT_AUTH_MUST_CHANGE_PASSWORD === 'true'

@@ -1,5 +1,5 @@
 import type { Database } from '../database'
-import { inspectRegisteredContainer, type RuntimeState } from './docker-runtime'
+import { inspectRegisteredContainer, inspectRegisteredImage, type RuntimeState } from './docker-runtime'
 import { latestBackupsByEnvironment, summarizeBackup } from './fleet-backup'
 import { combineStatus, probeRegisteredHealth } from './health'
 import { environmentHeadline, listRegisteredEnvironments } from './registry'
@@ -16,7 +16,15 @@ export async function observeRegisteredEnvironments(db: Database) {
       ? await probeRegisteredHealth(row.healthUrl, registeredHealth)
       : { ok: false as const, error: 'not running' }
     const last = backups.get(row.id)
-    views.push(toEnvironmentView(row, runtime, health.ok, health.error, last ? summarizeBackup(last) : null))
+    const runningImage = runtime === 'running'
+      ? inspectRegisteredImage(row.containerName, registeredNames)
+      : null
+    views.push(toEnvironmentView(row, runtime, health.ok, health.error, last ? summarizeBackup(last) : null, {
+      warnings: health.warnings,
+      releaseId: health.releaseId,
+      schemaVersion: health.schemaVersion,
+      runningImage,
+    }))
   }
   return views
 }
@@ -27,6 +35,12 @@ export function toEnvironmentView(
   healthOk: boolean,
   healthError?: string,
   lastBackup: ReturnType<typeof summarizeBackup> | null = null,
+  extras: {
+    warnings?: string[]
+    releaseId?: string
+    schemaVersion?: string
+    runningImage?: { imageId: string, imageName: string } | null
+  } = {},
 ) {
   const status = combineStatus(runtime, runtime === 'running' ? healthOk : null)
   return {
@@ -62,5 +76,9 @@ export function toEnvironmentView(
     healthOk,
     healthError,
     lastBackup,
+    healthWarnings: extras.warnings || [],
+    releaseId: extras.releaseId || null,
+    schemaVersion: extras.schemaVersion || null,
+    runningImage: extras.runningImage || null,
   }
 }

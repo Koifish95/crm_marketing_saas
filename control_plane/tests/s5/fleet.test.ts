@@ -10,6 +10,7 @@ import {
   isStartableEnvironment,
   isStoppableEnvironment,
   operatorEnvironmentStatus,
+  operatorAlerts,
   planBulkLifecycle,
   shortProvisionError,
   summarizeFleet,
@@ -184,6 +185,17 @@ describe('fleet grouping', () => {
     expect(sales?.provisionError).toBe('Local image build failed.')
     expect(shortProvisionError(`${'x'.repeat(200)}ERROR: failed to build`)).toMatch(/ERROR: failed to build$/)
     expect(summarizeFleet([martialArts, salesProd, salesDev]).needsAttention.map(row => row.id)).toEqual(['sales-dev'])
+  })
+
+  it('emits operator alerts for outages, backup failures, and disk pressure', () => {
+    const down = env({
+      id: 'down',
+      status: 'unhealthy',
+      type: 'PROD',
+      healthWarnings: ['Backup failed: disk full'],
+    })
+    const alerts = operatorAlerts([down], 'Free disk is below 2 GB.')
+    expect(alerts.map(row => row.kind).sort()).toEqual(['backup', 'disk', 'outage'])
   })
 })
 

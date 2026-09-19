@@ -1,8 +1,24 @@
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { chmodSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, isAbsolute, join } from 'node:path'
 import { randomBytes } from 'node:crypto'
 import type { ProductDefinition } from '../products/catalog'
 import { MARTIAL_ARTS_PRODUCT } from '../products/catalog'
+
+const FORBIDDEN_BOOTSTRAP_PASSWORDS = ['setup']
+
+export function isForbiddenBootstrapPassword(password: string) {
+  return FORBIDDEN_BOOTSTRAP_PASSWORDS.includes(password.trim().toLowerCase())
+}
+
+export function generateInitialAccessPassword() {
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const password = `A${randomBytes(12).toString('base64url')}!`
+    if (password.length >= 8 && /[A-Z]/.test(password) && /[^A-Za-z0-9]/.test(password) && !isForbiddenBootstrapPassword(password)) {
+      return password
+    }
+  }
+  throw new Error('Unable to generate a unique initial-access password.')
+}
 
 export function provisionedEnvAbsolutePath(envFileLocal: string, root = process.cwd()) {
   return isAbsolute(envFileLocal) ? envFileLocal : join(root, envFileLocal)
@@ -10,6 +26,17 @@ export function provisionedEnvAbsolutePath(envFileLocal: string, root = process.
 
 export function randomSessionPassword() {
   return randomBytes(24).toString('hex')
+}
+
+export function resolveInitialAccessPassword(explicit?: string) {
+  const password = explicit?.trim()
+  if (!password) {
+    return generateInitialAccessPassword()
+  }
+  if (isForbiddenBootstrapPassword(password)) {
+    throw new Error('Refusing universal bootstrap password "setup". Provision a unique initial-access password.')
+  }
+  return password
 }
 
 function envLine(key: string, value: string | number) {
@@ -32,15 +59,22 @@ export function renderProvisionedEnv(input: {
   adminEmail: string
   timezone: string
   sessionPassword?: string
+  authPassword?: string
+  hostBind?: string
+  trustedProxyIps?: string
+  releaseId?: string
   product?: Pick<ProductDefinition, 'appNameTemplate' | 'extraEnv'>
 }) {
   const product = input.product ?? MARTIAL_ARTS_PRODUCT
   const appEnv = input.type === 'PROD' ? 'production' : 'dev'
   const location = input.type === 'PROD' ? 'PROD' : 'DEV'
+  const authPassword = resolveInitialAccessPassword(input.authPassword)
+  const hostBind = input.hostBind || '0.0.0.0'
   const lines = [
     envLine('COMPOSE_PROJECT', input.composeProject),
     envLine('CONTAINER_NAME', input.containerName),
     envLine('HOST_PORT', input.hostPort),
+    envLine('HOST_BIND', hostBind),
     envLine('SQLITE_VOLUME', input.sqliteVolume),
     envLine('ASSETS_VOLUME', input.assetsVolume),
     envLine('EXPECTED_IMAGE', input.expectedImage),
@@ -48,7 +82,7 @@ export function renderProvisionedEnv(input: {
     envLine('NUXT_SESSION_PASSWORD', input.sessionPassword ?? randomSessionPassword()),
     envLine('NUXT_AUTH_USERNAME', 'admin'),
     envLine('NUXT_AUTH_EMAIL', input.adminEmail),
-    envLine('NUXT_AUTH_PASSWORD', 'setup'),
+    envLine('NUXT_AUTH_PASSWORD', authPassword),
     envLine('NUXT_AUTH_MUST_CHANGE_PASSWORD', 'true'),
     envLine('NUXT_AUTH_RESET_PASSWORD', 'false'),
     envLine('NUXT_PUBLIC_APP_NAME', publicAppName(input.displayName, product.appNameTemplate)),
@@ -56,14 +90,47 @@ export function renderProvisionedEnv(input: {
     envLine('NUXT_PUBLIC_BRAND_LOCATION', location),
     envLine('NUXT_PUBLIC_TIMEZONE', input.timezone),
     envLine('SESSION_COOKIE_SECURE', 'false'),
+    envLine('TRUSTED_PROXY_IPS', input.trustedProxyIps || ''),
+    envLine('RELEASE_ID', input.releaseId || 'dev'),
+    envLine('APP_BACKUP_DIR', '/app/data/sqlite/backups'),
     ...Object.entries(product.extraEnv).map(([key, value]) => envLine(key, value)),
   ]
-  return `${lines.join('\n')}\n`
+  return {
+    contents: `${lines.join('\n')}\n`,
+    authPassword,
+    username: 'admin',
+  }
+}
+
+export function writeSecretFile(path: string, contents: string) {
+  mkdirSync(dirname(path), { recursive: true })
+  writeFileSync(path, contents, { encoding: 'utf8', mode: 0o600 })
+  try {
+    chmodSync(path, 0o600)
+  } catch {
+    // Windows may ignore POSIX modes.
+  }
+  return path
 }
 
 export function writeProvisionedEnvFile(envFileLocal: string, contents: string, root = process.cwd()) {
-  const path = provisionedEnvAbsolutePath(envFileLocal, root)
-  mkdirSync(dirname(path), { recursive: true })
-  writeFileSync(path, contents, 'utf8')
-  return path
+  return writeSecretFile(provisionedEnvAbsolutePath(envFileLocal, root), contents)
+}
+
+export function writeInitialAccessFile(envFileLocal: string, input: {
+  username: string
+  password: string
+  email: string
+}, root = process.cwd()) {
+  const envPath = provisionedEnvAbsolutePath(envFileLocal, root)
+  const path = envPath.replace(/\.env$/i, '.initial-access.txt')
+  const body = [
+    'Martial Arts CRM initial access. Deliver once, then the academy admin must change this password.',
+    `username=${input.username}`,
+    `email=${input.email}`,
+    `password=${input.password}`,
+    'mustChangePassword=true',
+    '',
+  ].join('\n')
+  return writeSecretFile(path, body)
 }

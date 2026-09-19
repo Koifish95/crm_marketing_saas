@@ -1,7 +1,8 @@
 <script setup lang="ts">
 useHead({ title: 'Dashboard' })
 
-const { error, pending, refreshing, summary, checkedAt, refreshStatus } = await useFleetStatus()
+const { error, pending, refreshing, summary, checkedAt, refreshStatus, data } = await useFleetStatus()
+const alerts = computed(() => data.value?.alerts || [])
 </script>
 
 <template>
@@ -20,6 +21,22 @@ const { error, pending, refreshing, summary, checkedAt, refreshStatus } = await 
       :pending="pending && !checkedAt"
       :error="error"
     >
+      <section
+        v-if="alerts.length"
+        class="card"
+        aria-label="Operator alerts"
+      >
+        <h2>Operator alerts</h2>
+        <ul>
+          <li
+            v-for="(alert, index) in alerts"
+            :key="`${alert.kind}-${alert.environmentId || index}`"
+          >
+            <strong>{{ alert.kind }}</strong>
+            — {{ alert.message }}
+          </li>
+        </ul>
+      </section>
       <section
         class="summary-grid"
         aria-label="Fleet summary"

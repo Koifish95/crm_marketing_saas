@@ -27,8 +27,12 @@ export function imageInspectArgs(image = MARTIAL_ARTS_PRODUCT.image) {
   return ['image', 'inspect', image]
 }
 
+export function currentReleaseId(env: NodeJS.Dict<string | undefined> = process.env) {
+  return (env.RELEASE_ID || env.GIT_SHA || 'dev').trim() || 'dev'
+}
+
 export function imageBuildArgs(image = MARTIAL_ARTS_PRODUCT.image, dockerfile = MARTIAL_ARTS_PRODUCT.dockerfile) {
-  return ['build', '-t', image, '-f', dockerfile, '.']
+  return ['build', '-t', image, '-f', dockerfile, '--build-arg', `RELEASE_ID=${currentReleaseId()}`, '.']
 }
 
 export function ensureLocalImage(

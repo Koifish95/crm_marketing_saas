@@ -96,6 +96,14 @@ async function seedFresh(env: {
 }
 
 describe('M10A production bootstrap safety', () => {
+  it('refuses the universal setup password when seeding production', async () => {
+    await expect(seedFresh({
+      APP_ENV: 'production',
+      NODE_ENV: 'production',
+      NUXT_AUTH_PASSWORD: 'setup',
+      NUXT_AUTH_RESET_PASSWORD: 'false',
+    })).rejects.toThrow(/unique initial-access password/)
+  })
   it('refuses to seed production when no password is configured', async () => {
     await expect(seedFresh({
       APP_ENV: 'production',
@@ -138,14 +146,15 @@ describe('M10A production bootstrap safety', () => {
       NODE_ENV: 'production',
       NUXT_AUTH_USERNAME: 'admin',
       NUXT_AUTH_EMAIL: 'admin@customer.local',
-      NUXT_AUTH_PASSWORD: 'setup',
+      NUXT_AUTH_PASSWORD: 'UniquePass1!',
       NUXT_AUTH_MUST_CHANGE_PASSWORD: 'true',
       NUXT_AUTH_RESET_PASSWORD: 'false',
     })
     try {
       const [admin] = await ctx.db.select().from(users).where(eq(users.email, 'admin@customer.local'))
       expect(admin?.mustChangePassword).toBe(true)
-      expect(await verifyStaffPassword(admin!.passwordHash!, 'setup')).toBe(true)
+      expect(await verifyStaffPassword(admin!.passwordHash!, 'UniquePass1!')).toBe(true)
+      expect(await verifyStaffPassword(admin!.passwordHash!, 'setup')).toBe(false)
     } finally {
       await ctx.close()
     }

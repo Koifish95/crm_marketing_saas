@@ -7,6 +7,7 @@ import { assertSafeVolumeName, findSqliteFilename } from '../../shared/utils/fle
 import { inspectRegisteredContainer } from './docker-runtime'
 
 const FORBIDDEN = ['-v', '--volumes', 'prune', 'down']
+const SQLITE_CANDIDATES = ['/app/data/sqlite/crm.sqlite', '/app/data/sqlite/app.sqlite']
 
 function docker(args: string[]) {
   if (args.some(part => FORBIDDEN.some(token => part === token || part.includes(token)))) {
@@ -19,10 +20,8 @@ function docker(args: string[]) {
   return result
 }
 
-function copyFromContainer(containerName: string, dest: string) {
-  mkdirSync(join(dest, 'sqlite'), { recursive: true })
+function copyUploadsFromContainer(containerName: string, dest: string) {
   mkdirSync(join(dest, 'uploads'), { recursive: true })
-  docker(['cp', `${containerName}:/app/data/sqlite/.`, join(dest, 'sqlite')])
   try {
     docker(['cp', `${containerName}:/app/data/uploads/.`, join(dest, 'uploads')])
   } catch {
@@ -30,12 +29,41 @@ function copyFromContainer(containerName: string, dest: string) {
   }
 }
 
+function snapshotFromRunningContainer(containerName: string, dest: string) {
+  const sqliteDir = join(dest, 'sqlite')
+  mkdirSync(sqliteDir, { recursive: true })
+  const snapshotInContainer = '/tmp/ma-sqlite-snapshot.sqlite'
+  let lastError: Error | undefined
+  for (const src of SQLITE_CANDIDATES) {
+    try {
+      docker(['exec', containerName, 'node', 'docker/sqlite-snapshot.cjs', src, snapshotInContainer])
+      const filename = src.split('/').pop() || 'crm.sqlite'
+      docker(['cp', `${containerName}:${snapshotInContainer}`, join(sqliteDir, filename)])
+      spawnSync('docker', ['exec', containerName, 'rm', '-f', snapshotInContainer], {
+        encoding: 'utf8',
+        windowsHide: true,
+      })
+      copyUploadsFromContainer(containerName, dest)
+      return
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error('SQLite-safe snapshot failed.')
+    }
+  }
+  throw new Error(lastError?.message || 'SQLite-safe snapshot failed. Rebuild the customer image so docker/sqlite-snapshot.cjs is present.')
+}
+
 function copyFromVolume(volume: string, dest: string) {
   assertSafeVolumeName(volume)
   mkdirSync(dest, { recursive: true })
   const helper = `fleet-backup-copy-${Date.now()}`
   spawnSync('docker', ['rm', '-f', helper], { encoding: 'utf8', windowsHide: true })
-  docker(['run', '-d', '--name', helper, '-v', `${volume}:/src`, 'alpine:3.20', 'sleep', '60'])
+  const run = spawnSync('docker', ['run', '-d', '--name', helper, '-v', `${volume}:/src`, 'alpine:3.20', 'sleep', '60'], {
+    encoding: 'utf8',
+    windowsHide: true,
+  })
+  if (run.status !== 0) {
+    throw new Error(run.stderr?.trim() || run.stdout?.trim() || 'Volume copy helper failed.')
+  }
   try {
     docker(['cp', `${helper}:/src/.`, dest])
   } finally {
@@ -47,7 +75,13 @@ function copyIntoVolume(volume: string, source: string) {
   assertSafeVolumeName(volume)
   const helper = `fleet-backup-restore-${Date.now()}`
   spawnSync('docker', ['rm', '-f', helper], { encoding: 'utf8', windowsHide: true })
-  docker(['run', '-d', '--name', helper, '-v', `${volume}:/dest`, 'alpine:3.20', 'sleep', '60'])
+  const run = spawnSync('docker', ['run', '-d', '--name', helper, '-v', `${volume}:/dest`, 'alpine:3.20', 'sleep', '60'], {
+    encoding: 'utf8',
+    windowsHide: true,
+  })
+  if (run.status !== 0) {
+    throw new Error(run.stderr?.trim() || run.stdout?.trim() || 'Volume restore helper failed.')
+  }
   try {
     docker(['cp', `${source}/.`, `${helper}:/dest`])
   } finally {
@@ -66,7 +100,7 @@ export function snapshotRegisteredEnvironment(input: {
   mkdirSync(dest, { recursive: true })
   const runtime = inspectRegisteredContainer(input.containerName, input.registeredNames)
   if (runtime === 'running') {
-    copyFromContainer(input.containerName, dest)
+    snapshotFromRunningContainer(input.containerName, dest)
   } else {
     copyFromVolume(input.sqliteVolume, join(dest, 'sqlite'))
     try {
