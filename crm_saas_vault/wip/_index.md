@@ -17,7 +17,7 @@ Processed and superseded material lives in [[wip/archive/_index|wip/archive/]] o
 
 ## Active work order
 
-None. `authorization.active_work_order` is null. Architecture law: [[ADR-Product-Owned-Domains-Shared-Foundation]] (2026-09-17). Sales Minimum V1 code-shipped 2026-09-19: [[wip/archive/WO-2026-09-19-sales-minimum-v1]], [[history/WO-2026-09-19-sales-minimum-v1-return]]. Do not start deferred Sales features, C3, Beauty, S7, S8, SI migration, Core-domain promotion, or `@crm/core` rename. Next Sales requirements should come from SIC dogfooding.
+[[wip/WO-2026-09-19-pre-vps-product-quality]] — Pre-VPS product quality & release readiness program. Phase 1 audit **complete** ([[Product-Workflow-UX-Audit]]). Phase 2 UI/UX overhaul is next. Program: [[wip/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program]].
 
 ## Current communication (not a work order)
 
