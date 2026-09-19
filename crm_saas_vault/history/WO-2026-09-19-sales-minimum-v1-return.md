@@ -4,7 +4,7 @@ status: done
 id: WO-2026-09-19-sales-minimum-v1
 milestone: none
 base_sha: "d66727e002f8bcd4255a5633959e2a7371649287"
-result_sha: "pending-commit"
+result_sha: "1fbbdea037545bc233d53cbf4b2bcf49a9e59df5"
 implementation_result: shipped
 tests: "sales_template pnpm test 9 files / 50 tests pass; pnpm lint pass; pnpm typecheck pass; pnpm build pass. Architecture and Docker contract tests included in that suite."
 decisions_discovered: []
