@@ -27,7 +27,12 @@ const adding = ref(false)
 const addingProduct = ref(false)
 const retrying = ref(false)
 const decommissioning = ref(false)
+const deactivating = ref(false)
+const reactivating = ref(false)
+const instanceBusy = ref('')
 const confirmDecommission = ref(false)
+const confirmDeactivate = ref(false)
+const deactivateNote = ref('')
 const actionError = ref('')
 const actionNotice = ref('')
 const watchingProvision = ref(false)
@@ -97,7 +102,7 @@ async function retryProvision() {
   actionNotice.value = 'Retry accepted. Continuing the existing environments. Same volumes. Image build can take several minutes.'
   try {
     await $fetch(`/api/customers/${customer.value.id}/provision`, { method: 'POST' })
-    await refreshStatus()
+    await refreshWorkspace()
     await watchUntilSettled()
   } catch (error) {
     actionNotice.value = ''
@@ -120,12 +125,12 @@ async function addProduct() {
       body: productInstanceRequestBody(productForm),
     })
     productForm.productId = ''
-    await refreshStatus()
+    await refreshWorkspace()
     await watchUntilSettled()
   } catch (error) {
     actionNotice.value = ''
     actionError.value = fetchMessage(error, 'Add product failed.')
-    await refreshStatus()
+    await refreshWorkspace()
   } finally {
     addingProduct.value = false
   }
@@ -144,12 +149,12 @@ async function addExtra() {
       body: extraEnvironmentRequestBody(extra),
     })
     extra.displayName = ''
-    await refreshStatus()
+    await refreshWorkspace()
     await watchUntilSettled()
   } catch (error) {
     actionNotice.value = ''
     actionError.value = fetchMessage(error, 'Add environment failed.')
-    await refreshStatus()
+    await refreshWorkspace()
   } finally {
     adding.value = false
   }
@@ -164,12 +169,71 @@ async function decommissionCustomer() {
   actionNotice.value = ''
   try {
     await $fetch(`/api/customers/${customer.value.id}/decommission`, { method: 'POST' })
-    await refreshStatus()
+    await refreshWorkspace()
   } catch (error) {
     actionError.value = fetchMessage(error, 'Decommission failed.')
   } finally {
     decommissioning.value = false
   }
+}
+
+async function deactivateThisCustomer() {
+  if (!customer.value || !confirmDeactivate.value) {
+    return
+  }
+  deactivating.value = true
+  actionError.value = ''
+  try {
+    await $fetch(`/api/customers/${customer.value.id}/deactivate`, {
+      method: 'POST',
+      body: { note: deactivateNote.value },
+    })
+    confirmDeactivate.value = false
+    await refreshWorkspace()
+    actionNotice.value = 'Customer is inactive. Running environments were stopped. Data remains.'
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Deactivate failed.')
+  } finally {
+    deactivating.value = false
+  }
+}
+
+async function reactivateThisCustomer() {
+  if (!customer.value) {
+    return
+  }
+  reactivating.value = true
+  actionError.value = ''
+  try {
+    await $fetch(`/api/customers/${customer.value.id}/reactivate`, { method: 'POST' })
+    await refreshWorkspace()
+    actionNotice.value = 'Customer is active again. Product instances are active. Start environments from each environment workspace.'
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Reactivate failed.')
+  } finally {
+    reactivating.value = false
+  }
+}
+
+async function setInstanceStatus(id: string, action: 'deactivate' | 'reactivate') {
+  instanceBusy.value = id
+  actionError.value = ''
+  try {
+    await $fetch(`/api/product-instances/${id}/${action}`, { method: 'POST' })
+    await refreshWorkspace()
+  } catch (error) {
+    actionError.value = fetchMessage(error, `${action} failed.`)
+  } finally {
+    instanceBusy.value = ''
+  }
+}
+
+const { data: history, refresh: refreshHistory } = await useFetch<{ events: { id: string, createdAt: string, action: string, summary: string }[] }>(
+  () => `/api/events?customerId=${customerId.value}&limit=40`,
+)
+
+async function refreshWorkspace() {
+  await Promise.all([refreshStatus(), refreshHistory()])
 }
 
 useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.displayName}` : 'Customer') })
@@ -185,7 +249,7 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
         <AppRefreshButton
           :pending="pending"
           :refreshing="refreshing"
-          @refresh="refreshStatus"
+          @refresh="refreshWorkspace"
         />
         <button
           v-if="canRetry"
@@ -245,6 +309,8 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
           <dd>{{ customer?.instanceCount || 0 }}</dd>
           <dt>Overall</dt>
           <dd><AppStatusBadge :status="customer?.overall || 'unknown'" /></dd>
+          <dt>Lifecycle</dt>
+          <dd><AppStatusBadge :status="customer?.status || 'active'" /></dd>
           <dt>Hosting node</dt>
           <dd>{{ customer?.environments[0]?.node.name || '—' }}</dd>
         </dl>
@@ -300,13 +366,14 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
         </p>
         <AppDataTable
           label="Product instances"
-          :columns="['Product', 'PROD', 'DEV', 'Envs', 'Overall', 'Detail']"
+          :columns="['Product', 'Lifecycle', 'PROD', 'DEV', 'Envs', 'Detail', 'Actions']"
         >
           <tr
             v-for="instance in customer?.instances"
             :key="instance.id"
           >
             <td>{{ instance.displayName }}</td>
+            <td><AppStatusBadge :status="instance.status || 'active'" /></td>
             <td>
               <AppStatusBadge
                 v-if="instance.prod"
@@ -328,9 +395,27 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
               >—</span>
             </td>
             <td>{{ instance.environmentCount }}</td>
-            <td><AppStatusBadge :status="instance.overall || 'unknown'" /></td>
             <td class="muted">
               {{ shortProvisionError(instance.provisionError) || '—' }}
+            </td>
+            <td>
+              <button
+                v-if="(instance.status || 'active') !== 'inactive'"
+                type="button"
+                class="secondary"
+                :disabled="instanceBusy === instance.id"
+                @click="setInstanceStatus(instance.id, 'deactivate')"
+              >
+                Deactivate
+              </button>
+              <button
+                v-else
+                type="button"
+                :disabled="instanceBusy === instance.id || (customer?.status === 'inactive')"
+                @click="setInstanceStatus(instance.id, 'reactivate')"
+              >
+                Reactivate
+              </button>
             </td>
           </tr>
         </AppDataTable>
@@ -425,31 +510,101 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
         </AppDataTable>
       </section>
       <section
+        v-else-if="tab === 'history'"
+        id="panel-history"
+        role="tabpanel"
+        aria-labelledby="tab-history"
+      >
+        <p
+          v-if="!history?.events?.length"
+          class="muted"
+        >
+          No events recorded for this customer yet.
+        </p>
+        <AppDataTable
+          v-else
+          label="Customer history"
+          :columns="['When', 'Action', 'Summary']"
+        >
+          <tr
+            v-for="event in history.events"
+            :key="event.id"
+          >
+            <td>{{ event.createdAt }}</td>
+            <td>{{ event.action }}</td>
+            <td>{{ event.summary }}</td>
+          </tr>
+        </AppDataTable>
+      </section>
+      <section
         v-else
         id="panel-configuration"
         role="tabpanel"
         aria-labelledby="tab-configuration"
       >
         <p class="muted">
-          Read-only. There is no customer edit API.
+          Read-only identity. Cancellation uses Deactivate, not Delete. Permanent customer deletion is not implemented.
         </p>
         <dl class="dl">
           <dt>Timezone</dt>
           <dd>{{ customer?.timezone }}</dd>
           <dt>Admin email</dt>
           <dd>{{ customer?.adminEmail }}</dd>
-          <dt>Products</dt>
-          <dd>{{ customer?.instanceCount || 0 }}</dd>
-          <dt>Environments</dt>
-          <dd>{{ customer?.environmentCount }}</dd>
+          <dt>Lifecycle</dt>
+          <dd><AppStatusBadge :status="customer?.status || 'active'" /></dd>
+          <dt>Deactivated</dt>
+          <dd>{{ customer?.deactivatedAt || '—' }}</dd>
         </dl>
+        <form
+          v-if="(customer?.status || 'active') !== 'inactive'"
+          class="card"
+          @submit.prevent="deactivateThisCustomer"
+        >
+          <p>
+            Deactivate keeps this account and all environment records. Running processes are stopped. This is not Decommission and not Archive & Delete.
+          </p>
+          <label>
+            Note
+            <input
+              v-model="deactivateNote"
+              placeholder="Optional reason"
+            >
+          </label>
+          <label>
+            <input
+              v-model="confirmDeactivate"
+              type="checkbox"
+            >
+            I understand the customer becomes inactive and environments are stopped.
+          </label>
+          <button
+            type="submit"
+            class="secondary"
+            :disabled="!confirmDeactivate || deactivating || !customer"
+          >
+            {{ deactivating ? 'Deactivating…' : 'Deactivate customer' }}
+          </button>
+        </form>
+        <div
+          v-else
+          class="card"
+        >
+          <p>This customer is inactive. Product instances stay in history. Start environments only after reactivate.</p>
+          <button
+            type="button"
+            :disabled="reactivating"
+            @click="reactivateThisCustomer"
+          >
+            {{ reactivating ? 'Reactivating…' : 'Reactivate customer' }}
+          </button>
+        </div>
         <form
           v-if="hasEnvironments && !allDecommissioned"
           class="card"
           @submit.prevent="decommissionCustomer"
         >
           <p>
-            Decommission every environment for this customer. This stops and removes processes only. Volumes stay. This is not Stop. It never runs compose down -v.
+            Decommission every remaining live environment for this customer. Processes go away. Volumes stay. This is not Archive & Delete.
           </p>
           <label>
             <input
@@ -462,23 +617,10 @@ useHead({ title: computed(() => customer.value ? `Customer · ${customer.value.d
             type="submit"
             class="secondary"
             :disabled="!confirmDecommission || decommissioning || !customer"
-            :aria-busy="decommissioning"
           >
-            {{ decommissioning ? 'Decommissioning…' : 'Decommission customer' }}
+            {{ decommissioning ? 'Decommissioning…' : 'Decommission all environments' }}
           </button>
         </form>
-        <p
-          v-else-if="allDecommissioned"
-          class="muted"
-        >
-          All environments for this customer are decommissioned. Volumes were left in place.
-        </p>
-        <p
-          v-else
-          class="muted"
-        >
-          This account has no environments yet.
-        </p>
       </section>
     </AppAsyncPanel>
   </main>

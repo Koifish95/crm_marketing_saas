@@ -3,11 +3,14 @@ useHead({ title: 'Dashboard' })
 
 const { error, pending, refreshing, summary, checkedAt, refreshStatus, data } = await useFleetStatus()
 const alerts = computed(() => data.value?.alerts || [])
+const { data: eventsPayload } = await useFetch<{ events: { id: string, createdAt: string, action: string, summary: string }[] }>('/api/events', {
+  query: { limit: 12 },
+})
 </script>
 
 <template>
   <main class="page">
-    <AppPageHeader title="Dashboard">
+    <AppPageHeader title="Operations overview">
       <template #actions>
         <AppRefreshButton
           :pending="pending"
@@ -22,31 +25,31 @@ const alerts = computed(() => data.value?.alerts || [])
       :error="error"
     >
       <section
-        v-if="alerts.length"
-        class="card"
-        aria-label="Operator alerts"
-      >
-        <h2>Operator alerts</h2>
-        <ul>
-          <li
-            v-for="(alert, index) in alerts"
-            :key="`${alert.kind}-${alert.environmentId || index}`"
-          >
-            <strong>{{ alert.kind }}</strong>
-            — {{ alert.message }}
-          </li>
-        </ul>
-      </section>
-      <section
         class="summary-grid"
         aria-label="Fleet summary"
       >
         <article class="card">
           <p class="muted">
-            Customers
+            Active customers
           </p>
           <p class="headline">
-            {{ summary.customerCount }}
+            {{ summary.activeCustomerCount }}
+          </p>
+        </article>
+        <article class="card">
+          <p class="muted">
+            Inactive customers
+          </p>
+          <p class="headline">
+            {{ summary.inactiveCustomerCount }}
+          </p>
+        </article>
+        <article class="card">
+          <p class="muted">
+            Active products
+          </p>
+          <p class="headline">
+            {{ summary.activeInstanceCount }}
           </p>
         </article>
         <article class="card">
@@ -67,26 +70,18 @@ const alerts = computed(() => data.value?.alerts || [])
         </article>
         <article class="card">
           <p class="muted">
-            DEV
+            Non-PROD
           </p>
           <p class="headline">
-            {{ summary.devCount }}
+            {{ summary.nonProdCount }}
           </p>
         </article>
         <article class="card">
           <p class="muted">
-            Healthy
+            Running
           </p>
           <p class="headline">
-            {{ summary.healthyCount }}
-          </p>
-        </article>
-        <article class="card">
-          <p class="muted">
-            Unhealthy
-          </p>
-          <p class="headline">
-            {{ summary.unhealthyCount }}
+            {{ summary.runningCount }}
           </p>
         </article>
         <article class="card">
@@ -99,50 +94,82 @@ const alerts = computed(() => data.value?.alerts || [])
         </article>
         <article class="card">
           <p class="muted">
-            Missing
+            Unhealthy
           </p>
           <p class="headline">
-            {{ summary.missingCount }}
+            {{ summary.unhealthyCount }}
           </p>
         </article>
         <article class="card">
           <p class="muted">
-            Hosting nodes
+            Failed provision
           </p>
           <p class="headline">
-            {{ summary.nodeCount }}
+            {{ summary.failedCount }}
+          </p>
+        </article>
+        <article class="card">
+          <p class="muted">
+            Decommissioned
+          </p>
+          <p class="headline">
+            {{ summary.decommissionedCount }}
+          </p>
+        </article>
+        <article class="card">
+          <p class="muted">
+            Archived
+          </p>
+          <p class="headline">
+            {{ summary.archivedCount }}
           </p>
         </article>
       </section>
       <h2>Needs attention</h2>
       <p
-        v-if="summary.needsAttention.length === 0"
+        v-if="alerts.length === 0"
         class="muted"
       >
-        No unhealthy, unknown, or missing environments.
+        No provisioning failures, outages, backup gaps, off-host gaps, or DEV/PROD release mismatches from current data.
+      </p>
+      <ul
+        v-else
+        class="attention-list"
+      >
+        <li
+          v-for="(alert, index) in alerts"
+          :key="`${alert.kind}-${alert.environmentId || index}`"
+        >
+          <strong>{{ alert.kind }}</strong>
+          —
+          <NuxtLink
+            v-if="alert.environmentId"
+            :to="`/environments/${alert.environmentId}`"
+          >
+            {{ alert.message }}
+          </NuxtLink>
+          <span v-else>{{ alert.message }}</span>
+        </li>
+      </ul>
+      <h2>Recent activity</h2>
+      <p
+        v-if="!eventsPayload?.events?.length"
+        class="muted"
+      >
+        No operator events recorded yet. Start, stop, backup, upgrade, deactivate, and archive write here.
       </p>
       <AppDataTable
         v-else
-        label="Environments that need attention"
-        :columns="['Customer', 'Environment', 'Status', 'Runtime', 'Access']"
+        label="Recent operator events"
+        :columns="['When', 'Action', 'Summary']"
       >
         <tr
-          v-for="env in summary.needsAttention"
-          :key="env.id"
+          v-for="event in eventsPayload.events"
+          :key="event.id"
         >
-          <td>
-            <NuxtLink :to="`/customers/${env.customer.id}`">
-              {{ env.customer.displayName }}
-            </NuxtLink>
-          </td>
-          <td>
-            <NuxtLink :to="`/environments/${env.id}`">
-              {{ env.type }}
-            </NuxtLink>
-          </td>
-          <td><AppStatusBadge :status="env.status" /></td>
-          <td>{{ env.runtime }}</td>
-          <td><AppAccessLink :href="env.accessUrl" /></td>
+          <td>{{ event.createdAt }}</td>
+          <td>{{ event.action }}</td>
+          <td>{{ event.summary }}</td>
         </tr>
       </AppDataTable>
     </AppAsyncPanel>

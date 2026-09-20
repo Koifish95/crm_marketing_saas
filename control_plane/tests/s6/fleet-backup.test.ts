@@ -220,9 +220,10 @@ describe('S6 fleet backup contract', () => {
     rmSync(root, { recursive: true, force: true })
   })
 
-  it('refuses decommissioned environments and finds sqlite filenames', () => {
+  it('refuses archived backups and still allows decommissioned volume backup', () => {
     expect(environmentBackupGuard(null)?.statusCode).toBe(404)
-    expect(environmentBackupGuard({ lifecycleStatus: 'decommissioned' })?.statusCode).toBe(409)
+    expect(environmentBackupGuard({ lifecycleStatus: 'archived' })?.statusCode).toBe(409)
+    expect(environmentBackupGuard({ lifecycleStatus: 'decommissioned' })).toBeNull()
     expect(environmentBackupGuard({ lifecycleStatus: 'ready' })).toBeNull()
     expect(findSqliteFilename(['crm.sqlite', 'uploads'])).toBe('crm.sqlite')
     expect(findSqliteFilename(['app.sqlite'])).toBe('app.sqlite')

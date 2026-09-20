@@ -180,8 +180,21 @@ export function environmentBackupGuard(row: { lifecycleStatus: string } | null) 
   if (!row) {
     return { statusCode: 404, statusMessage: 'Environment not registered.' }
   }
+  if (row.lifecycleStatus === 'archived') {
+    return { statusCode: 409, statusMessage: 'Archived environments cannot be backed up or restored. The final backup was retained.' }
+  }
+  return null
+}
+
+export function environmentRestoreGuard(row: { lifecycleStatus: string } | null) {
+  if (!row) {
+    return { statusCode: 404, statusMessage: 'Environment not registered.' }
+  }
+  if (row.lifecycleStatus === 'archived') {
+    return { statusCode: 409, statusMessage: 'Archived environments cannot be restored. Use the retained final backup as a file, not a live restore.' }
+  }
   if (row.lifecycleStatus === 'decommissioned') {
-    return { statusCode: 409, statusMessage: 'Decommissioned environments cannot be backed up or restored.' }
+    return { statusCode: 409, statusMessage: 'Decommissioned environments cannot be restored. Relaunch is not available until the process exists; Archive & Delete is the retirement path.' }
   }
   return null
 }

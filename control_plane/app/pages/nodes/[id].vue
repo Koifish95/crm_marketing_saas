@@ -33,9 +33,13 @@ useHead({ title: computed(() => node.value ? `Hosting node · ${node.value.name}
         <dt>Node ID</dt>
         <dd>{{ node?.id }}</dd>
         <dt>Kind</dt>
-        <dd>{{ node?.kind }}</dd>
+        <dd>{{ node?.kind }} {{ node?.kind === 'vps' ? '(accepted architecture; live VPS is not Successful yet)' : '(this laptop lab node)' }}</dd>
         <dt>Driver</dt>
         <dd>{{ node?.driver }}</dd>
+        <dt>Running</dt>
+        <dd>{{ node?.environments.filter(env => env.runtime === 'running').length }}</dd>
+        <dt>Unhealthy</dt>
+        <dd>{{ node?.environments.filter(env => env.status === 'unhealthy').length }}</dd>
         <dt>Overall</dt>
         <dd><AppStatusBadge :status="node?.overall || 'unknown'" /></dd>
       </dl>

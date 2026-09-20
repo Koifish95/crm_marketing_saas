@@ -1,6 +1,7 @@
 import { useDb } from '../database'
 import { observeRegisteredEnvironments } from '../services/observe'
 import { listCustomers, listProductInstances } from '../services/registry'
+import { buildOperatorReports } from '../../shared/utils/operator-reports'
 import { operatorAlerts } from '../../shared/utils/fleet'
 import { statfs } from 'node:fs/promises'
 
@@ -25,34 +26,17 @@ async function controlPlaneDiskWarning() {
 export default defineEventHandler(async () => {
   const db = useDb()
   const environments = await observeRegisteredEnvironments(db)
+  const customers = await listCustomers(db)
+  const productInstances = await listProductInstances(db)
   const diskWarning = await controlPlaneDiskWarning()
   return {
     checkedAt: new Date().toISOString(),
-    environments,
-    customers: (await listCustomers(db)).map(row => ({
-      id: row.id,
-      slug: row.slug,
-      displayName: row.displayName,
-      timezone: row.timezone,
-      adminEmail: row.adminEmail,
-      industryTemplate: row.industryTemplate,
-      status: row.status,
-      deactivatedAt: row.deactivatedAt,
-      deactivatedNote: row.deactivatedNote,
-      reactivatedAt: row.reactivatedAt,
-    })),
-    productInstances: (await listProductInstances(db)).map(row => ({
-      id: row.id,
-      customerId: row.customerId,
-      productId: row.productId,
-      displayName: row.displayName,
-      slug: row.slug,
-      status: row.status,
-      deactivatedAt: row.deactivatedAt,
-      deactivatedNote: row.deactivatedNote,
-      reactivatedAt: row.reactivatedAt,
-    })),
+    reports: buildOperatorReports({
+      environments,
+      customers,
+      productInstances,
+      diskWarning,
+    }),
     alerts: operatorAlerts(environments, diskWarning),
-    diskWarning,
   }
 })

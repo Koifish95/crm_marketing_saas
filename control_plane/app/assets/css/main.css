@@ -299,6 +299,66 @@ button.secondary {
 .status-provisioning { background: #cfe2ff; color: #084298; }
 .status-failed { background: #f8d7da; color: #842029; }
 .status-decommissioned { background: #e9ecef; color: #495057; }
+.status-archived { background: #212529; color: #f8f9fa; }
+.status-inactive { background: #fff3cd; color: #664d03; }
+.status-active { background: #d8f3dc; color: #1b4332; }
+
+button.danger,
+.button.danger {
+  background: #842029;
+  border-color: #842029;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: end;
+  margin: 0.75rem 0;
+}
+
+.filters label {
+  margin: 0;
+  min-width: 9rem;
+}
+
+.filters .search {
+  max-width: 16rem;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(18, 32, 51, 0.45);
+}
+
+.dialog {
+  width: min(36rem, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 0.5rem;
+  padding: 1.1rem 1.2rem 1.2rem;
+}
+
+.attention-list {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.attention-list a {
+  color: #1f3a5f;
+  font-weight: 650;
+}
+
+.page {
+  max-width: 84rem;
+}
 
 label {
   display: block;

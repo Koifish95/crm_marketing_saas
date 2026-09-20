@@ -4,6 +4,7 @@ import { spawnSync, type SpawnSyncReturns } from 'node:child_process'
 import { LAB_ENVIRONMENTS } from '../database/lab-seed'
 import { isProductId, requireProduct } from '../products/catalog'
 import { PROVISIONED_COMPOSE_FILE } from './provision-contract'
+import { assertSafeVolumeName } from '../../shared/utils/fleet-backup'
 
 const FORBIDDEN = ['-v', '--volumes', 'prune', 'down']
 const LAB_COMPOSE = LAB_ENVIRONMENTS.map(row => row.composeFile)
@@ -325,4 +326,38 @@ export function relaunchRegisteredEnvironment(input: ComposeTarget) {
     args: command.args,
     stdout: result.stdout,
   }
+}
+
+export function volumeRemoveArgs(name: string) {
+  assertSafeVolumeName(name)
+  const args = ['volume', 'rm', name]
+  if (args.some(part => FORBIDDEN.some(token => part === token || part.includes(token)))) {
+    throw new Error('Refusing a forbidden Docker argument.')
+  }
+  return args
+}
+
+export function assertOwnedVolumeName(name: string, owned: readonly string[]) {
+  assertSafeVolumeName(name)
+  if (!owned.includes(name)) {
+    throw new Error(`Refusing volume ${name}. Exact registered environment volumes only.`)
+  }
+}
+
+export function removeRegisteredVolumes(names: readonly string[], owned: readonly string[]) {
+  const unique = [...new Set(names)]
+  const removed: string[] = []
+  for (const name of unique) {
+    assertOwnedVolumeName(name, owned)
+    const args = volumeRemoveArgs(name)
+    const result = spawnDocker(args, process.cwd())
+    if (result.status !== 0) {
+      const text = `${result.stderr || ''} ${result.stdout || ''}`
+      if (!/no such volume/i.test(text)) {
+        throw new Error(dockerFailureMessage(result, `Volume remove failed for ${name}.`))
+      }
+    }
+    removed.push(name)
+  }
+  return removed
 }

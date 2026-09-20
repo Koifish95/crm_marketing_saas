@@ -206,6 +206,7 @@ export function routesFromEnvironments(rows: readonly {
   return rows
     .filter(row => row.type === 'PROD'
       && row.lifecycleStatus !== 'decommissioned'
+      && row.lifecycleStatus !== 'archived'
       && Boolean(row.publicHostname)
       && row.hostPort !== CONTROL_PLANE_PORT)
     .map(row => ({

@@ -1,6 +1,7 @@
 import type { Database } from '../database'
 import { decommissionRegisteredEnvironment } from './docker-relaunch'
 import { generateProductionEdgeFilesFromRegistry } from './production-edge-sync'
+import { recordOperatorEvent } from './operator-events'
 import { setLifecycleStatus } from './provision-runtime'
 import { getRegisteredEnvironment, listRegisteredEnvironments } from './registry'
 
@@ -18,6 +19,9 @@ export async function decommissionEnvironment(db: Database, id: string, filesRoo
   if (!row) {
     throw new DecommissionError('Environment not registered.', 404)
   }
+  if (row.lifecycleStatus === 'archived') {
+    throw new DecommissionError('Archived environments cannot be decommissioned.', 409)
+  }
   if (row.lifecycleStatus === 'decommissioned') {
     return { id: row.id, slug: row.slug, lifecycleStatus: 'decommissioned' as const, args: [] as string[] }
   }
@@ -31,6 +35,13 @@ export async function decommissionEnvironment(db: Database, id: string, filesRoo
     productInstance: row.productInstance,
   })
   await setLifecycleStatus(db, row.id, 'decommissioned')
+  await recordOperatorEvent(db, {
+    action: 'environment.decommission',
+    summary: `Decommissioned ${row.slug}. Volumes were left in place.`,
+    customerId: row.customer.id,
+    productInstanceId: row.productInstance.id,
+    environmentId: row.id,
+  })
   const remaining = await listRegisteredEnvironments(db)
   if (row.publicHostname || remaining.some(item => item.publicHostname) || process.env.EDGE_ROOT) {
     generateProductionEdgeFilesFromRegistry(remaining, {
@@ -52,6 +63,9 @@ export async function decommissionCustomer(db: Database, customerId: string, fil
   }
   const environments = []
   for (const row of rows) {
+    if (row.lifecycleStatus === 'archived') {
+      continue
+    }
     environments.push(await decommissionEnvironment(db, row.id, filesRoot))
   }
   return { customerId, environments }

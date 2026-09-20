@@ -2,11 +2,14 @@ import { describe, expect, it } from 'vitest'
 import { CUSTOMER_TABS, ENVIRONMENT_TABS, OPERATOR_NAV, navLinkActive } from '../../shared/utils/nav'
 
 describe('operator shell navigation', () => {
-  it('lists the five operator destinations', () => {
+  it('lists the operator destinations', () => {
     expect(OPERATOR_NAV.map(link => [link.to, link.label])).toEqual([
       ['/', 'Dashboard'],
       ['/customers', 'Customers'],
+      ['/products', 'Products'],
       ['/environments', 'Environments'],
+      ['/backups', 'Backups'],
+      ['/reports', 'Reports'],
       ['/nodes', 'Hosting Nodes'],
       ['/settings', 'Settings'],
     ])
@@ -25,8 +28,8 @@ describe('operator shell navigation', () => {
     expect(navLinkActive('/environments', customers)).toBe(false)
   })
 
-  it('defines the existing workspace tabs', () => {
-    expect(CUSTOMER_TABS.map(tab => tab.id)).toEqual(['overview', 'products', 'environments', 'configuration'])
-    expect(ENVIRONMENT_TABS.map(tab => tab.id)).toEqual(['overview', 'runtime', 'lifecycle', 'configuration'])
+  it('defines the workspace tabs', () => {
+    expect(CUSTOMER_TABS.map(tab => tab.id)).toEqual(['overview', 'products', 'environments', 'history', 'configuration'])
+    expect(ENVIRONMENT_TABS.map(tab => tab.id)).toEqual(['overview', 'runtime', 'backup', 'release', 'network', 'history'])
   })
 })

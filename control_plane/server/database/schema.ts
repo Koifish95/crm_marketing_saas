@@ -7,6 +7,10 @@ export const customers = sqliteTable('customers', {
   industryTemplate: text('industry_template').notNull(),
   timezone: text('timezone').notNull(),
   adminEmail: text('admin_email').notNull(),
+  status: text('status').notNull().default('active'),
+  deactivatedAt: text('deactivated_at'),
+  deactivatedNote: text('deactivated_note'),
+  reactivatedAt: text('reactivated_at'),
   createdAt: text('created_at').notNull(),
 }, table => [
   uniqueIndex('customers_slug_unique').on(table.slug),
@@ -18,6 +22,10 @@ export const productInstances = sqliteTable('product_instances', {
   productId: text('product_id').notNull(),
   displayName: text('display_name').notNull(),
   slug: text('slug').notNull(),
+  status: text('status').notNull().default('active'),
+  deactivatedAt: text('deactivated_at'),
+  deactivatedNote: text('deactivated_note'),
+  reactivatedAt: text('reactivated_at'),
   createdAt: text('created_at').notNull(),
 }, table => [
   uniqueIndex('product_instances_customer_product_unique').on(table.customerId, table.productId),
@@ -58,6 +66,14 @@ export const environments = sqliteTable('environments', {
   lifecycleStatus: text('lifecycle_status').notNull(),
   provisionError: text('provision_error'),
   publicHostname: text('public_hostname'),
+  archivedAt: text('archived_at'),
+  archiveNote: text('archive_note'),
+  finalBackupId: text('final_backup_id'),
+  finalReleaseId: text('final_release_id'),
+  finalSchemaVersion: text('final_schema_version'),
+  finalExpectedImage: text('final_expected_image'),
+  formerPublicHostname: text('former_public_hostname'),
+  dataRemovedAt: text('data_removed_at'),
   createdAt: text('created_at').notNull(),
 }, table => [
   uniqueIndex('environments_slug_unique').on(table.slug),
@@ -80,4 +96,19 @@ export const environmentBackups = sqliteTable('environment_backups', {
   previousExpectedImage: text('previous_expected_image'),
 }, table => [
   index('environment_backups_environment_id_idx').on(table.environmentId),
+])
+
+export const operatorEvents = sqliteTable('operator_events', {
+  id: text('id').primaryKey(),
+  createdAt: text('created_at').notNull(),
+  action: text('action').notNull(),
+  customerId: text('customer_id'),
+  productInstanceId: text('product_instance_id'),
+  environmentId: text('environment_id'),
+  summary: text('summary').notNull(),
+  detail: text('detail'),
+}, table => [
+  index('operator_events_created_at_idx').on(table.createdAt),
+  index('operator_events_customer_id_idx').on(table.customerId),
+  index('operator_events_environment_id_idx').on(table.environmentId),
 ])

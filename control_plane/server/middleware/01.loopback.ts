@@ -1,11 +1,10 @@
-function isLoopback(address: string | undefined) {
-  const value = (address || '').replace(/^::ffff:/, '').toLowerCase()
-  return value === '127.0.0.1' || value === '::1' || value === 'localhost'
-}
+import { isLoopbackConnection } from '../../shared/utils/loopback'
 
 export default defineEventHandler((event) => {
   const remote = event.node.req.socket?.remoteAddress
-  if (isLoopback(remote)) {
+  const forwardedFor = getHeader(event, 'x-forwarded-for')
+  const realIp = getHeader(event, 'x-real-ip')
+  if (isLoopbackConnection({ remoteAddress: remote, forwardedFor, realIp })) {
     return
   }
   if (process.env.CONTROL_PLANE_ALLOW_REMOTE === 'true' && process.env.CONTROL_PLANE_TOKEN) {

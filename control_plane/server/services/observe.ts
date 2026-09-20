@@ -11,6 +11,14 @@ export async function observeRegisteredEnvironments(db: Database) {
   const registeredHealth = rows.map(row => row.healthUrl)
   const views = []
   for (const row of rows.sort((left, right) => left.type.localeCompare(right.type) * -1)) {
+    if (row.lifecycleStatus === 'archived') {
+      views.push(toEnvironmentView(row, 'missing', false, 'archived', lastBackupFor(row.id, backups), {
+        runningImage: null,
+        releaseId: row.finalReleaseId || undefined,
+        schemaVersion: row.finalSchemaVersion || undefined,
+      }))
+      continue
+    }
     const runtime = inspectRegisteredContainer(row.containerName, registeredNames)
     const health = runtime === 'running'
       ? await probeRegisteredHealth(row.healthUrl, registeredHealth)
@@ -82,5 +90,21 @@ export function toEnvironmentView(
     releaseId: extras.releaseId || null,
     schemaVersion: extras.schemaVersion || null,
     runningImage: extras.runningImage || null,
+    archivedAt: row.archivedAt || null,
+    archiveNote: row.archiveNote || null,
+    finalBackupId: row.finalBackupId || null,
+    finalReleaseId: row.finalReleaseId || null,
+    finalSchemaVersion: row.finalSchemaVersion || null,
+    finalExpectedImage: row.finalExpectedImage || null,
+    formerPublicHostname: row.formerPublicHostname || null,
+    dataRemovedAt: row.dataRemovedAt || null,
   }
+}
+
+function lastBackupFor(
+  environmentId: string,
+  backups: Awaited<ReturnType<typeof latestBackupsByEnvironment>>,
+) {
+  const last = backups.get(environmentId)
+  return last ? summarizeBackup(last) : null
 }

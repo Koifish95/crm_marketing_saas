@@ -18,6 +18,11 @@ const tab = ref('overview')
 const relaunching = ref(false)
 const retrying = ref(false)
 const decommissioning = ref(false)
+const archiving = ref(false)
+const confirmArchiveSlug = ref('')
+const confirmArchivePhrase = ref('')
+const skipOffhost = ref(false)
+const showArchiveDialog = ref(false)
 const backingUp = ref(false)
 const restoring = ref(false)
 const copying = ref(false)
@@ -42,6 +47,8 @@ const loadingBackups = ref(false)
 const environmentId = computed(() => String(route.params.id || ''))
 const env = computed(() => findById(environments.value, environmentId.value))
 const decommissioned = computed(() => env.value?.lifecycleStatus === 'decommissioned')
+const archived = computed(() => env.value?.lifecycleStatus === 'archived')
+const retired = computed(() => decommissioned.value || archived.value)
 const retryable = computed(() => isRetryableLifecycle(env.value?.lifecycleStatus))
 const provisioning = computed(() => env.value?.lifecycleStatus === 'provisioning')
 const operatorStatus = computed(() => env.value ? operatorEnvironmentStatus(env.value) : 'unknown')
@@ -271,7 +278,7 @@ async function retryProvision() {
   actionNotice.value = 'Retry accepted. Continuing this environment. Same volumes. Image build can take several minutes.'
   try {
     await $fetch(`/api/environments/${env.value.id}/provision`, { method: 'POST' })
-    await refreshStatus()
+    await refreshWorkspace()
     const outcome = await pollFleetUntilHealthy({
       isHealthy: () => findById(environments.value, environmentId.value)?.lifecycleStatus !== 'provisioning',
       refresh: refreshStatus,
@@ -292,7 +299,7 @@ async function retryProvision() {
   } catch (error) {
     actionNotice.value = ''
     actionError.value = fetchMessage(error, 'Retry failed.')
-    await refreshStatus()
+    await refreshWorkspace()
   } finally {
     retrying.value = false
   }
@@ -309,7 +316,7 @@ async function backupEnvironment() {
     const result = await $fetch<{ backup: FleetBackupSummary }>(`/api/environments/${env.value.id}/backup`, {
       method: 'POST',
     })
-    await refreshStatus()
+    await refreshWorkspace()
     await loadRestorableBackups()
     const timezone = env.value.customer.timezone
     actionNotice.value = formatBackupCreatedNotice({
@@ -356,7 +363,7 @@ async function copyOffhost() {
       method: 'POST',
       body: { destinationDir: destinationDir.value },
     })
-    await refreshStatus()
+    await refreshWorkspace()
     actionNotice.value = formatOffhostCopyNotice(result.backup)
   } catch (error) {
     actionNotice.value = ''
@@ -385,7 +392,7 @@ async function restoreEnvironment() {
       method: 'POST',
       body: { confirm: true, backupId: selectedBackupId.value },
     })
-    await refreshStatus()
+    await refreshWorkspace()
     await loadRestorableBackups()
     confirmRestore.value = false
     const kind = result.kind === 'copy-down' ? 'copy-down' : 'rollback'
@@ -420,7 +427,7 @@ async function upgradeEnvironment() {
       method: 'POST',
       body: { expectedImage: targetImage.value.trim() || undefined },
     })
-    await refreshStatus()
+    await refreshWorkspace()
     actionNotice.value = [
       `Upgrade finished.`,
       `${result.previousImage} → ${result.expectedImage}.`,
@@ -430,7 +437,7 @@ async function upgradeEnvironment() {
     ].join(' ')
   } catch (error) {
     actionError.value = fetchMessage(error, 'Upgrade failed.')
-    await refreshStatus()
+    await refreshWorkspace()
   } finally {
     upgrading.value = false
   }
@@ -445,12 +452,49 @@ async function decommission() {
   actionNotice.value = ''
   try {
     await $fetch(`/api/environments/${env.value.id}/decommission`, { method: 'POST' })
-    await refreshStatus()
+    await refreshWorkspace()
+    actionNotice.value = 'Decommissioned. Process is gone. Volumes stay. This is not Archive & Delete.'
   } catch (error) {
     actionError.value = fetchMessage(error, 'Decommission failed.')
   } finally {
     decommissioning.value = false
   }
+}
+
+async function archiveEnvironment() {
+  if (!env.value || archiving.value) {
+    return
+  }
+  archiving.value = true
+  actionError.value = ''
+  actionNotice.value = 'Archive & Delete: final backup, then exact volume removal…'
+  try {
+    await $fetch(`/api/environments/${env.value.id}/archive`, {
+      method: 'POST',
+      body: {
+        confirmSlug: confirmArchiveSlug.value,
+        confirmPhrase: confirmArchivePhrase.value,
+        destinationDir: destinationDir.value || undefined,
+        skipOffhost: env.value.type === 'PROD' ? false : skipOffhost.value,
+        note: 'Operator Archive & Delete',
+      },
+    })
+    showArchiveDialog.value = false
+    await refreshWorkspace()
+    actionNotice.value = 'Archived. Live volumes were removed. The Control Plane row and final backup remain.'
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Archive & Delete failed.')
+  } finally {
+    archiving.value = false
+  }
+}
+
+const { data: history, refresh: refreshHistory } = await useFetch<{ events: { id: string, createdAt: string, action: string, summary: string }[] }>(
+  () => `/api/events?environmentId=${environmentId.value}&limit=40`,
+)
+
+async function refreshWorkspace() {
+  await Promise.all([refreshStatus(), refreshHistory()])
 }
 </script>
 
@@ -470,7 +514,7 @@ async function decommission() {
         <AppRefreshButton
           :pending="pending"
           :refreshing="refreshing"
-          @refresh="refreshStatus"
+          @refresh="refreshWorkspace"
         />
         <a
           v-if="env?.accessUrl"
@@ -497,7 +541,7 @@ async function decommission() {
         </button>
         <button
           type="button"
-          :disabled="relaunching || !env || decommissioned || retryable"
+          :disabled="relaunching || !env || retired || retryable"
           :aria-busy="relaunching"
           @click="relaunch"
         >
@@ -635,48 +679,6 @@ async function decommission() {
           <dt>Access URL</dt>
           <dd><AppAccessLink :href="env?.accessUrl" /></dd>
         </dl>
-      </section>
-      <section
-        v-else-if="tab === 'lifecycle'"
-        id="panel-lifecycle"
-        role="tabpanel"
-        aria-labelledby="tab-lifecycle"
-      >
-        <p class="muted">
-          Backup and restore replace this environment’s data only. Choose a specific backup. Same-product PROD → DEV copy-down is allowed. DEV → PROD is not. Siblings stay. Volumes are not deleted. Retry continues provision; upgrade is a separate gated action.
-        </p>
-        <dl class="dl">
-          <dt>Last backup</dt>
-          <dd v-if="env?.lastBackup">
-            {{ formatBackupCreatedAt(env.lastBackup.createdAt, env.customer.timezone) }}
-            <div class="muted">
-              {{ env.lastBackup.createdAt }}
-            </div>
-          </dd>
-          <dd v-else>
-            none
-          </dd>
-          <dt>Size</dt>
-          <dd>{{ env?.lastBackup ? formatBackupSize(env.lastBackup.bytes) : '—' }}</dd>
-          <dt>Same-host zip</dt>
-          <dd>
-            <button
-              v-if="env?.lastBackup?.zipPath"
-              type="button"
-              class="path-link"
-              :disabled="revealing"
-              :aria-busy="revealing"
-              @click="revealBackup"
-            >
-              {{ env.lastBackup.zipPath }}
-            </button>
-            <template v-else>
-              —
-            </template>
-          </dd>
-          <dt>Off-host copy</dt>
-          <dd>{{ env?.lastBackup?.offhostPath || 'not copied' }}</dd>
-        </dl>
         <div class="card">
           <p>
             Start resumes this registered environment with the same image, volumes, ports, and identity. It does not rebuild. Missing containers need Relaunch.
@@ -713,6 +715,48 @@ async function decommission() {
             {{ stopping ? 'Stopping…' : 'Stop Environment' }}
           </button>
         </form>
+      </section>
+      <section
+        v-else-if="tab === 'backup'"
+        id="panel-backup"
+        role="tabpanel"
+        aria-labelledby="tab-backup"
+      >
+        <p class="muted">
+          Backup and restore replace this environment’s data only. Choose a specific backup. Same-product PROD → DEV copy-down is allowed. DEV → PROD is not. Siblings stay. Volumes are not deleted. Retry continues provision; upgrade is a separate gated action.
+        </p>
+        <dl class="dl">
+          <dt>Last backup</dt>
+          <dd v-if="env?.lastBackup">
+            {{ formatBackupCreatedAt(env.lastBackup.createdAt, env.customer.timezone) }}
+            <div class="muted">
+              {{ env.lastBackup.createdAt }}
+            </div>
+          </dd>
+          <dd v-else>
+            none
+          </dd>
+          <dt>Size</dt>
+          <dd>{{ env?.lastBackup ? formatBackupSize(env.lastBackup.bytes) : '—' }}</dd>
+          <dt>Same-host zip</dt>
+          <dd>
+            <button
+              v-if="env?.lastBackup?.zipPath"
+              type="button"
+              class="path-link"
+              :disabled="revealing"
+              :aria-busy="revealing"
+              @click="revealBackup"
+            >
+              {{ env.lastBackup.zipPath }}
+            </button>
+            <template v-else>
+              —
+            </template>
+          </dd>
+          <dt>Off-host copy</dt>
+          <dd>{{ env?.lastBackup?.offhostPath || 'not copied' }}</dd>
+        </dl>
         <div class="card">
           <button
             type="button"
@@ -812,12 +856,79 @@ async function decommission() {
           <button
             type="submit"
             class="secondary"
-            :disabled="!confirmRestore || restoring || !env || decommissioned || !selectedBackup?.available"
+            :disabled="!confirmRestore || restoring || !env || retired || !selectedBackup?.available"
             :aria-busy="restoring"
           >
             {{ restoring ? 'Restoring…' : 'Restore' }}
           </button>
         </form>
+        <form
+          v-if="!retired"
+          class="card"
+          @submit.prevent="decommission"
+        >
+          <p>
+            <strong>Decommission</strong> removes the process. Volumes stay. Start/Relaunch are blocked. This is not Archive & Delete.
+          </p>
+          <label>
+            <input
+              v-model="confirmDecommission"
+              type="checkbox"
+            >
+            I understand volumes stay and data is not deleted.
+          </label>
+          <button
+            type="submit"
+            class="secondary"
+            :disabled="!confirmDecommission || decommissioning || !env"
+          >
+            {{ decommissioning ? 'Decommissioning…' : 'Decommission process' }}
+          </button>
+        </form>
+        <div
+          v-if="!archived"
+          class="card"
+        >
+          <p>
+            <strong>Archive & Delete</strong> is final retirement of live data. It creates a final backup, copies off-host when required, removes the exact registered container, then removes only this environment’s sqlite and assets volumes. The Control Plane row remains. Siblings stay. Never prune. Never compose down -v.
+          </p>
+          <button
+            type="button"
+            class="danger"
+            :disabled="!env"
+            @click="showArchiveDialog = true"
+          >
+            Archive & Delete…
+          </button>
+        </div>
+        <p
+          v-else
+          class="muted"
+        >
+          Archived {{ env?.archivedAt }}. Final backup {{ env?.finalBackupId }}. Data removed {{ env?.dataRemovedAt }}.
+        </p>
+      </section>
+      <section
+        v-else-if="tab === 'release'"
+        id="panel-release"
+        role="tabpanel"
+        aria-labelledby="tab-release"
+      >
+        <p class="muted">
+          Safe path: backup DEV → upgrade DEV → validate → backup PROD → upgrade PROD → validate. No mass deploy. Rollback is Restore plus the previous image — do not downgrade SQLite.
+        </p>
+        <dl class="dl">
+          <dt>Expected image</dt>
+          <dd>{{ env?.expectedImage }}</dd>
+          <dt>Running image</dt>
+          <dd>{{ env?.runningImage?.imageName || '—' }}</dd>
+          <dt>Release ID</dt>
+          <dd>{{ env?.releaseId || '—' }}</dd>
+          <dt>Schema</dt>
+          <dd>{{ env?.schemaVersion || '—' }}</dd>
+          <dt>Last backup</dt>
+          <dd>{{ env?.lastBackup ? formatBackupCreatedAt(env.lastBackup.createdAt, env.customer.timezone) : 'none — backup before PROD upgrade' }}</dd>
+        </dl>
         <form
           class="card"
           @submit.prevent="upgradeEnvironment"
@@ -845,67 +956,102 @@ async function decommission() {
         </form>
       </section>
       <section
-        v-else
-        id="panel-configuration"
+        v-else-if="tab === 'network'"
+        id="panel-network"
         role="tabpanel"
-        aria-labelledby="tab-configuration"
+        aria-labelledby="tab-network"
       >
         <p class="muted">
-          Read-only. There is no environment edit API.
+          Live TLS issuance is official S8 / external. This page shows hostname configuration the Control Plane actually stores. It does not probe certificate expiry.
         </p>
+        <dl class="dl">
+          <dt>Access URL</dt>
+          <dd><AppAccessLink :href="env?.accessUrl" /></dd>
+          <dt>Host port</dt>
+          <dd>{{ env?.hostPort ?? '—' }}</dd>
+          <dt>Public hostname</dt>
+          <dd>{{ env?.publicHostname || env?.formerPublicHostname || 'Not assigned. Loopback access only.' }}</dd>
+          <dt>Public origin</dt>
+          <dd>{{ env?.publicOrigin || '—' }}</dd>
+          <dt>Edge / TLS</dt>
+          <dd>{{ env?.publicHostname ? 'Hostname saved; nginx templates regenerate. Live certificate status is unknown until DNS/TLS exist.' : 'No public hostname.' }}</dd>
+        </dl>
+      </section>
+      <section
+        v-else-if="tab === 'history'"
+        id="panel-history"
+        role="tabpanel"
+        aria-labelledby="tab-history"
+      >
+        <p
+          v-if="!history?.events?.length"
+          class="muted"
+        >
+          No events recorded for this environment yet.
+        </p>
+        <AppDataTable
+          v-else
+          label="Environment history"
+          :columns="['When', 'Action', 'Summary']"
+        >
+          <tr
+            v-for="event in history.events"
+            :key="event.id"
+          >
+            <td>{{ event.createdAt }}</td>
+            <td>{{ event.action }}</td>
+            <td>{{ event.summary }}</td>
+          </tr>
+        </AppDataTable>
         <dl class="dl">
           <dt>Slug</dt>
           <dd>{{ env?.slug }}</dd>
-          <dt>Host port</dt>
-          <dd>{{ env?.hostPort ?? '—' }}</dd>
-          <dt>Health URL</dt>
-          <dd>{{ env?.healthUrl }}</dd>
-          <dt>Compose file</dt>
-          <dd>{{ env?.composeFile }}</dd>
-          <dt>Compose project</dt>
-          <dd>{{ env?.composeProject || '—' }}</dd>
-          <dt>Env file</dt>
-          <dd>{{ env?.envFileLocal }}</dd>
+          <dt>Container</dt>
+          <dd>{{ env?.containerName }}</dd>
           <dt>SQLite volume</dt>
           <dd>{{ env?.sqliteVolume }}</dd>
           <dt>Assets volume</dt>
           <dd>{{ env?.assetsVolume }}</dd>
-          <dt>Isolation marker</dt>
-          <dd>{{ env?.isolationMarker }}</dd>
-          <dt>Lifecycle</dt>
-          <dd>{{ env?.lifecycleStatus || '—' }}</dd>
+          <dt>Compose</dt>
+          <dd>{{ env?.composeFile }}</dd>
         </dl>
-        <form
-          v-if="!decommissioned"
-          class="card"
-          @submit.prevent="decommission"
-        >
-          <p>
-            This stops and removes the process only. Volumes stay. This is not Stop. It never runs compose down -v.
-          </p>
-          <label>
-            <input
-              v-model="confirmDecommission"
-              type="checkbox"
-            >
-            I understand volumes stay and data is not deleted.
-          </label>
-          <button
-            type="submit"
-            class="secondary"
-            :disabled="!confirmDecommission || decommissioning || !env"
-            :aria-busy="decommissioning"
-          >
-            {{ decommissioning ? 'Decommissioning…' : 'Decommission' }}
-          </button>
-        </form>
-        <p
-          v-else
-          class="muted"
-        >
-          This environment is decommissioned. Volumes were left in place.
-        </p>
       </section>
+      <AppConfirmDialog
+        v-if="showArchiveDialog"
+        title="Archive & Delete this environment?"
+        confirm-label="Archive & Delete"
+        danger
+        :phrase="env?.slug"
+        confirm-text="Type the environment slug"
+        second-phrase="ARCHIVE AND DELETE"
+        second-confirm-text="Type ARCHIVE AND DELETE"
+        @cancel="showArchiveDialog = false"
+        @confirm="confirmArchiveSlug = env?.slug || ''; confirmArchivePhrase = 'ARCHIVE AND DELETE'; archiveEnvironment()"
+      >
+        <p>This will stop the process if needed, create a final backup, copy it off-host unless you skip that for non-PROD, then delete only {{ env?.sqliteVolume }} and {{ env?.assetsVolume }}.</p>
+        <p>The Control Plane history row remains. Sibling environments are not touched. Type the slug <strong>{{ env?.slug }}</strong>.</p>
+        <label v-if="env?.type !== 'PROD'">
+          Off-host folder (optional if skipping)
+          <input
+            v-model="destinationDir"
+            placeholder="Existing folder path"
+          >
+        </label>
+        <label v-else>
+          Off-host folder (required for PROD)
+          <input
+            v-model="destinationDir"
+            placeholder="Existing folder path"
+          >
+        </label>
+        <label v-if="env?.type !== 'PROD'">
+          <input
+            v-model="skipOffhost"
+            type="checkbox"
+          >
+          Skip off-host copy for this non-PROD environment
+        </label>
+      </AppConfirmDialog>
     </AppAsyncPanel>
   </main>
 </template>

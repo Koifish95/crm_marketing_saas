@@ -1,7 +1,10 @@
+import { environmentAttention } from './operator-filters'
+import { isActiveStatus } from './lifecycle'
+
 export type CombinedStatus = 'healthy' | 'stopped' | 'missing' | 'unhealthy' | 'unknown'
-export type OperatorStatus = CombinedStatus | 'provisioning' | 'failed' | 'decommissioned'
+export type OperatorStatus = CombinedStatus | 'provisioning' | 'failed' | 'decommissioned' | 'archived'
 export type OperatorAlert = {
-  kind: 'outage' | 'backup' | 'disk'
+  kind: 'outage' | 'provision' | 'backup' | 'offhost' | 'release' | 'disk'
   message: string
   environmentId?: string
 }
@@ -24,6 +27,14 @@ export type FleetEnvironment = {
   publicOrigin?: string | null
   hostPort?: number
   lifecycleStatus?: string
+  archivedAt?: string | null
+  archiveNote?: string | null
+  finalBackupId?: string | null
+  finalReleaseId?: string | null
+  finalSchemaVersion?: string | null
+  finalExpectedImage?: string | null
+  formerPublicHostname?: string | null
+  dataRemovedAt?: string | null
   provisionError?: string | null
   expectedImage: string
   sqliteVolume: string
@@ -50,12 +61,14 @@ export type FleetEnvironment = {
     displayName: string
     timezone: string
     adminEmail: string
+    status?: string
   }
   productInstance?: {
     id: string
     productId: string
     displayName: string
     slug: string
+    status?: string
   }
   node: {
     id: string
@@ -72,6 +85,10 @@ export type FleetAccount = {
   timezone: string
   adminEmail: string
   industryTemplate?: string
+  status?: string
+  deactivatedAt?: string | null
+  deactivatedNote?: string | null
+  reactivatedAt?: string | null
 }
 
 export type FleetProductInstance = {
@@ -80,6 +97,10 @@ export type FleetProductInstance = {
   productId: string
   displayName: string
   slug: string
+  status?: string
+  deactivatedAt?: string | null
+  deactivatedNote?: string | null
+  reactivatedAt?: string | null
 }
 
 export type FleetStatusResponse = {
@@ -108,6 +129,7 @@ const OPERATOR_RANK: Record<OperatorStatus, number> = {
   stopped: 3,
   healthy: 2,
   decommissioned: 1,
+  archived: 0,
 }
 
 export function worstStatus(statuses: readonly CombinedStatus[]): CombinedStatus {
@@ -123,6 +145,9 @@ export function operatorEnvironmentStatus(env: {
   status: CombinedStatus
   lifecycleStatus?: string
 }): OperatorStatus {
+  if (env.lifecycleStatus === 'archived') {
+    return 'archived'
+  }
   if (env.lifecycleStatus === 'decommissioned') {
     return 'decommissioned'
   }
@@ -136,8 +161,11 @@ export function operatorEnvironmentStatus(env: {
 }
 
 export function worstOperatorStatus(statuses: readonly OperatorStatus[]): OperatorStatus {
-  const live = statuses.filter(status => status !== 'decommissioned')
+  const live = statuses.filter(status => status !== 'decommissioned' && status !== 'archived')
   if (live.length === 0) {
+    if (statuses.includes('archived') && statuses.every(status => status === 'archived')) {
+      return 'archived'
+    }
     return statuses.length === 0 ? 'unknown' : 'decommissioned'
   }
   return live.reduce((worst, status) => (
@@ -161,7 +189,7 @@ export function shortProvisionError(error?: string | null, max = 180) {
 }
 
 export function needsAttention(env: FleetEnvironment) {
-  if (env.lifecycleStatus === 'decommissioned' || env.lifecycleStatus === 'provisioning') {
+  if (env.lifecycleStatus === 'decommissioned' || env.lifecycleStatus === 'provisioning' || env.lifecycleStatus === 'archived') {
     return false
   }
   if (env.lifecycleStatus === 'failed') {
@@ -174,14 +202,22 @@ export function operatorAlerts(
   environments: readonly FleetEnvironment[],
   diskWarning?: string | null,
 ): OperatorAlert[] {
-  const alerts: OperatorAlert[] = []
+  const grouped = new Map<string, FleetEnvironment[]>()
   for (const env of environments) {
-    if (needsAttention(env)) {
-      alerts.push({
-        kind: 'outage',
-        environmentId: env.id,
-        message: `${env.headline} is ${env.status}.`,
-      })
+    const key = env.productInstance?.id || env.customer.id
+    grouped.set(key, [...(grouped.get(key) || []), env])
+  }
+  const alerts: OperatorAlert[] = []
+  const seen = new Set<string>()
+  for (const env of environments) {
+    const instanceEnvs = grouped.get(env.productInstance?.id || env.customer.id) || [env]
+    for (const alert of environmentAttention(env, instanceEnvs)) {
+      const key = `${alert.kind}:${alert.environmentId}:${alert.message}`
+      if (seen.has(key)) {
+        continue
+      }
+      seen.add(key)
+      alerts.push(alert)
     }
     for (const warning of env.healthWarnings || []) {
       if (/backup failed/i.test(warning)) {
@@ -252,6 +288,10 @@ export function groupCustomers(
     displayName: string
     timezone: string
     adminEmail: string
+    status?: string
+    deactivatedAt?: string | null
+    deactivatedNote?: string | null
+    reactivatedAt?: string | null
     environments: FleetEnvironment[]
   }>()
   for (const account of accounts) {
@@ -261,6 +301,10 @@ export function groupCustomers(
       displayName: account.displayName,
       timezone: account.timezone,
       adminEmail: account.adminEmail,
+      status: account.status,
+      deactivatedAt: account.deactivatedAt,
+      deactivatedNote: account.deactivatedNote,
+      reactivatedAt: account.reactivatedAt,
       environments: [],
     })
   }
@@ -336,11 +380,20 @@ export function summarizeFleet(
     environmentCount: environments.length,
     prodCount: environments.filter(env => env.type === 'PROD').length,
     devCount: environments.filter(env => env.type === 'DEV').length,
+    nonProdCount: environments.filter(env => env.type !== 'PROD').length,
     healthyCount: byStatus('healthy'),
     unhealthyCount: byStatus('unhealthy'),
     stoppedCount: byStatus('stopped'),
     missingCount: byStatus('missing'),
     unknownCount: byStatus('unknown'),
+    runningCount: environments.filter(env => env.runtime === 'running').length,
+    failedCount: environments.filter(env => env.lifecycleStatus === 'failed').length,
+    provisioningCount: environments.filter(env => env.lifecycleStatus === 'provisioning').length,
+    decommissionedCount: environments.filter(env => env.lifecycleStatus === 'decommissioned').length,
+    archivedCount: environments.filter(env => env.lifecycleStatus === 'archived').length,
+    activeCustomerCount: customers.filter(row => (row.status || 'active') !== 'inactive').length,
+    inactiveCustomerCount: customers.filter(row => row.status === 'inactive').length,
+    activeInstanceCount: instances.filter(row => (row.status || 'active') !== 'inactive').length,
     nodeCount: nodes.length,
     needsAttention: environments.filter(needsAttention),
     customers,
@@ -379,17 +432,26 @@ export function isBlockedLifecycle(lifecycleStatus?: string) {
   return lifecycleStatus === 'decommissioned'
     || lifecycleStatus === 'provisioning'
     || lifecycleStatus === 'failed'
+    || lifecycleStatus === 'archived'
 }
 
-export function isStartableEnvironment(env: { status: CombinedStatus, lifecycleStatus?: string }) {
+export function isStartableEnvironment(env: {
+  status: CombinedStatus
+  lifecycleStatus?: string
+  customer?: { status?: string }
+  productInstance?: { status?: string }
+}) {
   if (isBlockedLifecycle(env.lifecycleStatus)) {
+    return false
+  }
+  if (!isActiveStatus(env.customer?.status) || !isActiveStatus(env.productInstance?.status)) {
     return false
   }
   return env.status === 'stopped'
 }
 
 export function isStoppableEnvironment(env: { status: CombinedStatus, runtime?: string, lifecycleStatus?: string }) {
-  if (env.lifecycleStatus === 'decommissioned') {
+  if (env.lifecycleStatus === 'decommissioned' || env.lifecycleStatus === 'archived') {
     return false
   }
   if (env.runtime === 'running') {
@@ -427,12 +489,14 @@ export function planBulkLifecycle(input: {
       planned.push({ id, slug: id, outcome: 'failed', message: 'Environment not registered.' })
       continue
     }
-    if (env.lifecycleStatus === 'decommissioned') {
+    if (env.lifecycleStatus === 'decommissioned' || env.lifecycleStatus === 'archived') {
       planned.push({
         id,
         slug: env.slug,
         outcome: 'failed',
-        message: `Decommissioned environments cannot be ${verb === 'start' ? 'started' : 'stopped'}.`,
+        message: env.lifecycleStatus === 'archived'
+          ? `Archived environments cannot be ${verb === 'start' ? 'started' : 'stopped'}.`
+          : `Decommissioned environments cannot be ${verb === 'start' ? 'started' : 'stopped'}.`,
       })
       continue
     }

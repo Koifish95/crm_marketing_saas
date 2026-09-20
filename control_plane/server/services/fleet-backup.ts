@@ -8,6 +8,7 @@ import { environmentBackups, environments } from '../database/schema'
 import {
   backupZipFileName,
   environmentBackupGuard,
+  environmentRestoreGuard,
   existingBackupFileMessage,
   findSqliteFilename,
   fleetBackupRelativeDir,
@@ -309,6 +310,10 @@ export async function resolveRestoreRequest(
     throw new FleetBackupError('backupId is required.', 400)
   }
   const target = requireEnvironment(await getRegisteredEnvironment(db, targetId))
+  const restoreGuard = environmentRestoreGuard(target)
+  if (restoreGuard) {
+    throw new FleetBackupError(restoreGuard.statusMessage, restoreGuard.statusCode)
+  }
   const [backup] = await db.select().from(environmentBackups)
     .where(eq(environmentBackups.id, idValue))
     .limit(1)
