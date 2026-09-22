@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-19
+updated: 2026-09-20
 aliases:
   - CURRENT_STATE
   - Current state
@@ -39,7 +39,7 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | C2 / Beauty / S7–S11 | C2 **Successful** (2026-09-15). Beauty and S7–S11 **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
 
-**Authorized work:** none. Pre-VPS product quality & release readiness **complete** (2026-09-19): Phase 1 [[Product-Workflow-UX-Audit]], Phase 2 [[Product-UX-Overhaul-Return]], Phase 3 [[Product-Release-Update-Lifecycle]] (return [[history/WO-2026-09-19-pre-vps-product-quality-return]]). Sales Minimum V1 remains **code-shipped** for SIC dogfooding; not a platform milestone and not owner-accepted Successful. Hosting-node repository work shipped 2026-09-19; live VPS/DNS/TLS remain external. Official S7/S8 remain **Not started**. Architecture law is [[ADR-Product-Owned-Domains-Shared-Foundation]] (2026-09-17). Hosting-node map: [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]]. Do not start C3, Beauty, SI migration, Core-domain promotion, package rename, or `apps/` moves. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Closeout: [[history/C2_closeout]]. Asset upload return: [[history/WO-2026-09-17-ma-multi-asset-upload-return]]. Architecture return: [[history/WO-2026-09-17-product-owned-domains-shared-foundation-return]]. Customer #1 sell-readiness: [[Martial-Arts-Customer-1-Sell-Readiness]], [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]]. Sales V1 return: [[history/WO-2026-09-19-sales-minimum-v1-return]]. Assessment (investigation record, V1 closed): [[Sales-SIC-Dogfooding-Readiness-Assessment]].
+**Authorized work:** none. Control Plane operator experience & lifecycle **code-shipped** (2026-09-20): audit [[Control-Plane-Operator-UX-Audit]], return [[history/WO-2026-09-19-cp-operator-experience-return]]. Not an official S-track Successful. Pre-VPS product quality & release readiness **complete** (2026-09-19): Phase 1 [[Product-Workflow-UX-Audit]], Phase 2 [[Product-UX-Overhaul-Return]], Phase 3 [[Product-Release-Update-Lifecycle]] (return [[history/WO-2026-09-19-pre-vps-product-quality-return]]). Sales Minimum V1 remains **code-shipped** for SIC dogfooding; not a platform milestone and not owner-accepted Successful. Hosting-node repository work shipped 2026-09-19; live VPS/DNS/TLS remain external. Official S7/S8 remain **Not started**. Architecture law is [[ADR-Product-Owned-Domains-Shared-Foundation]] (2026-09-17). Hosting-node map: [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]]. Do not start C3, Beauty, SI migration, Core-domain promotion, package rename, or `apps/` moves. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Closeout: [[history/C2_closeout]]. Asset upload return: [[history/WO-2026-09-17-ma-multi-asset-upload-return]]. Architecture return: [[history/WO-2026-09-17-product-owned-domains-shared-foundation-return]]. Customer #1 sell-readiness: [[Martial-Arts-Customer-1-Sell-Readiness]], [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]]. Sales V1 return: [[history/WO-2026-09-19-sales-minimum-v1-return]]. Assessment (investigation record, V1 closed): [[Sales-SIC-Dogfooding-Readiness-Assessment]].
 
 Lockfile: [[project-state.yaml]].
 
@@ -62,6 +62,7 @@ crm_marketing_saas/
 ├── martial_arts_template/       # Martial Arts product; local :5030; Docker :5000/:5010/:5020
 ├── sales_template/              # Sales product (sales-crm); local :5040; Docker image crm-sales:c2
 ├── control_plane/               # NOT in the workspace; http://127.0.0.1:52100
+├── docs/                        # customer/staff/operator docs (derived; not this map)
 └── crm_saas_vault/              # this vault
 ```
 
@@ -135,7 +136,7 @@ C1 units 1–3 **code-shipped** and **still in force**: pnpm workspace, thin Nux
 
 ### Control Plane (`control_plane/`)
 
-http://127.0.0.1:52100. Multi-page shell: Dashboard, Customers, Environments, Hosting Nodes, Settings. Observe + provision **product instances**. New customer = account only. Add Product Instance picks Martial Arts or Sales, creates that instance’s PROD+DEV, and provisions in the background. Extra non-PROD attaches to an instance. One-PROD per instance. Upgrade “non-PROD first” is instance-scoped. Gated decommission (volumes stay). Retry = continue/resume the same environments. PROD may store `public_hostname`; access URL becomes `https://{hostname}`. Health URLs stay loopback. No operator login; non-loopback is 403 unless `CONTROL_PLANE_ALLOW_REMOTE` + token. Unique initial-access passwords (never `setup`). Hosting node: [[Hosting-Node-Architecture]]. Details: [[Control-Plane]].
+http://127.0.0.1:52100. Multi-page shell: Dashboard, Customers, Products, Environments, Backups, Reports, Hosting Nodes, Settings. Observe + provision **product instances**. Customers default to **active**; deactivate/reactivate keeps the account. Product instances deactivate independently (customer deactivate also marks them inactive and stops their live processes; customer reactivate restores instance `active` without starting Docker). New customer = account only. Add Product Instance picks Martial Arts or Sales, creates that instance’s PROD+DEV, and provisions in the background. Extra non-PROD attaches to an instance. One-PROD per instance. Upgrade “non-PROD first” is instance-scoped. **Stop** = process halt. **Decommission** = process gone, volumes stay. **Archive & Delete** = final backup + exact registered volume remove; row stays `archived`. Retry = continue/resume the same environments. PROD may store `public_hostname`; access URL becomes `https://{hostname}`. Health URLs stay loopback. No operator login; non-loopback is 403 unless `CONTROL_PLANE_ALLOW_REMOTE` + token. Unique initial-access passwords (never `setup`). Hosting node: [[Hosting-Node-Architecture]]. Details: [[Control-Plane]]. Operator UX audit: [[Control-Plane-Operator-UX-Audit]].
 
 ### Environment lifecycle
 
@@ -146,6 +147,7 @@ http://127.0.0.1:52100. Multi-page shell: Dashboard, Customers, Environments, Ho
 | Stop | `compose stop app` · `POST .../stop` | Halt process. Never sets `decommissioned` |
 | Bulk start/stop | `POST .../bulk/start` · `.../bulk/stop` | Sequential; `{ scope: selected\|all, ids? }` |
 | Decommission | `compose rm -f --stop app` | Sets `decommissioned`. Volumes stay |
+| Archive & Delete | `POST .../archive` | Final backup, exact `docker volume rm` of this env’s sqlite/assets, row stays `archived`. Type slug + `ARCHIVE AND DELETE`. PROD cannot skip off-host. |
 
 Start All / Stop All = eligible **registered fleet**, not the table filter. Eligibility: [[Control-Plane]].
 
@@ -155,7 +157,7 @@ Sales-led. `Customers → New customer` creates the **account only**. From the c
 
 ### Backup / restore (official S6 Successful; C2 copy-down included)
 
-Lifecycle tab: same-host zip, **selectable backup history**, gated restore, off-host copy to an existing folder, backup-gated local upgrade, Explorer reveal (`POST .../backup/reveal` with `{ backupId }`, path must stay under `data/backups/`). Restore requires `{ confirm, backupId }` — it does not silently use the latest zip. Server-side policy: same customer + same Product Instance; same-environment rollback; **PROD → DEV copy-down**; never DEV → PROD; never cross-product or cross-customer. Snapshot is SQLite via **VACUUM INTO** + persistent uploads (including Sales proposal PDFs). Target identity/port/compose/secrets stay. Retention 14 days. Runbooks: [[S6-Fleet-Runbook]], [[Customer-1-Backup-Restore-Runbook]].
+Environment **Backup** tab: same-host zip, **selectable backup history**, gated restore, off-host copy to an existing folder, Explorer reveal (`POST .../backup/reveal` with `{ backupId }`, path must stay under `data/backups/`). Fleet list: `/backups`. Restore requires `{ confirm, backupId }` — it does not silently use the latest zip. Server-side policy: same customer + same Product Instance; same-environment rollback; **PROD → DEV copy-down**; never DEV → PROD; never cross-product or cross-customer. Decommissioned environments may still be backed up (volumes exist); archived environments may not. Snapshot is SQLite via **VACUUM INTO** + persistent uploads (including Sales proposal PDFs). Target identity/port/compose/secrets stay. Retention 14 days. Stale-backup attention is a 7-day heuristic, not a retention policy. Runbooks: [[S6-Fleet-Runbook]], [[Customer-1-Backup-Restore-Runbook]].
 
 ### Docker / runtime
 
@@ -257,6 +259,7 @@ IMM-01–04 and NEAR-01–03 are **resolved / working**. Do not present them as 
 | Pre-VPS workflow/UX audit (Phase 1) | [[Product-Workflow-UX-Audit]] |
 | Pre-VPS UX overhaul return (Phase 2) | [[Product-UX-Overhaul-Return]] |
 | Pre-VPS release/update lifecycle (Phase 3) | [[Product-Release-Update-Lifecycle]] |
+| Product / operator documentation package (derived; not this map) | `docs/1 - README.md` |
 | Customer #1 production deploy | [[Customer-1-Production-Deploy-Runbook]] |
 | Customer #1 backup/restore | [[Customer-1-Backup-Restore-Runbook]] |
 | Martial Arts product boundary | [[Martial-Arts-Product-Boundary]] |

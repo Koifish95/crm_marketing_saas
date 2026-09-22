@@ -29,6 +29,7 @@ The source code is the implementation. Durable notes are the map: read them firs
 | [[Workspace]] | Cursor workspace map (three remotes). Twin of `C:\Users\Scoy9\Projects\AGENTS.md`. Historical for *this* repo’s identity. |
 | [[wip/_index\|wip/]] | Direct Scott ↔ Cursor communication. At most one active work order + return. **WIP communicates work but never defines durable project truth.** |
 | `wip/archive/` | Processed communication. Do not treat as the map. |
+| Repo-root `docs/` | Customer, staff, and SIC operator documentation **derived** from this vault and the code. Not architecture law. Not a second current-state. Start at `docs/1 - README.md`; numbered filenames are the owner/operator reading order. |
 
 Do not delete WIP after incorporating it. Copy durable facts into permanent notes and leave a source link. Then move the wip file to `wip/archive/` or `history/`.
 

@@ -70,6 +70,8 @@ S0 Workspace split
 
 S0–S6 are Successful. Official S7 is not started. Evidence: [[history/S5_closeout]], [[history/S6_closeout]].
 
+Control Plane operator experience (2026-09-20) is **code-shipped**, not a new S ID and not Successful: [[history/WO-2026-09-19-cp-operator-experience-return]]. It does not authorize S7.
+
 The 2026-09-11 Core ADR placed product family locally **before** production VPS. That C-track *priority* remains. Architecture law is now [[ADR-Product-Owned-Domains-Shared-Foundation]] (not a silent rewrite of S7). State both.
 
 ## Status (C-track — architecture; separate IDs)

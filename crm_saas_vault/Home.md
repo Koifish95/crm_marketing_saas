@@ -69,6 +69,8 @@ Git: this folder is its own repo; `origin` is https://github.com/Koifish95/crm_m
 
 Supporting live notes (not a second current-state): [[Customer-Environment]], [[Control-Plane]], [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]], [[S2-Hand-Boot-Checklist]], [[S3-Control-Plane-Runbook]], [[S4-Provision-Runbook]], [[S6-Fleet-Runbook]], [[SaaS-ToDo]], [[Martial-Arts-Customer-1-Sell-Readiness]], [[Customer-1-Production-Deploy-Runbook]], [[Martial-Arts-Product-Boundary]], [[Sales-SIC-Dogfooding-Readiness-Assessment]], [[Product-Workflow-UX-Audit]], [[Product-UX-Overhaul-Return]], [[Product-Release-Update-Lifecycle]].
 
+Customer/staff/operator documentation (derived from this vault + code; **not** a second current-state): `docs/1 - README.md` at the repository root. Owner/operator reading order is the numbered filenames in `docs/`.
+
 ---
 
 ## Two tracks

@@ -2,7 +2,7 @@
 type: decision
 status: current
 area: process
-updated: 2026-09-19
+updated: 2026-09-20
 tags:
   - adr
   - saas
@@ -24,6 +24,25 @@ Decision: what we chose
 ```
 
 ---
+
+---
+
+## 2026-09-20 — Control Plane customer/product/environment operator lifecycle
+
+Status: accepted
+
+Context: Before VPS activation the Control Plane had S6 APIs but lists were becoming messy, Stop/Decommission were easy to confuse, and there was no safe final retirement of live volumes.
+
+Decision:
+
+- Treat the Control Plane as an SIC internal operations product. Do not invent telemetry we do not collect.
+- Customer and Product Instance: `active` ⇄ `inactive`. No permanent customer deletion in this slice.
+- Environment Stop = `compose stop`. Decommission = process gone, volumes stay. Archive & Delete = final backup + exact registered sqlite/assets `docker volume rm`; the registry row remains `archived`.
+- Archive confirmation is the environment slug plus `ARCHIVE AND DELETE`. PROD cannot skip off-host copy. Lab-acme and `renzo`/`webhosting` names are refused.
+- Pause is not a distinct action.
+- Bulk destructive delete, bulk restore, and bulk PROD upgrade remain forbidden.
+
+Evidence: [[history/WO-2026-09-19-cp-operator-experience-return]], [[Control-Plane-Operator-UX-Audit]].
 
 ---
 
