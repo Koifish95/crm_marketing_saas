@@ -12,6 +12,11 @@ export async function seedRegistry(databaseUrl = getDatabaseUrl()) {
   try {
     await client.execute('PRAGMA foreign_keys = ON')
 
+    if (process.env.SKIP_LAB_SEED === 'true') {
+      const localNode = await ensureHostingNode(db, localHostingNodeSpec())
+      return { customerId: null, nodeId: localNode.id, productInstanceId: null }
+    }
+
     const [existingLabNode] = await db.select().from(hostingNodes).where(eq(hostingNodes.name, LAB_NODE_NAME)).limit(1)
     const labNodeId = existingLabNode?.id ?? createStableId()
     if (!existingLabNode) {
@@ -24,11 +29,7 @@ export async function seedRegistry(databaseUrl = getDatabaseUrl()) {
       })
     }
 
-    const localNode = await ensureHostingNode(db, localHostingNodeSpec())
-
-    if (process.env.SKIP_LAB_SEED === 'true') {
-      return { customerId: null, nodeId: localNode.id, productInstanceId: null }
-    }
+    await ensureHostingNode(db, localHostingNodeSpec())
 
     const [existingCustomer] = await db.select().from(customers).where(eq(customers.slug, LAB_CUSTOMER_SLUG)).limit(1)
     const customerId = existingCustomer?.id ?? createStableId()

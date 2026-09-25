@@ -103,11 +103,19 @@ export type FleetProductInstance = {
   reactivatedAt?: string | null
 }
 
+export type FleetHostingNode = {
+  id: string
+  name: string
+  kind: string
+  driver: string
+}
+
 export type FleetStatusResponse = {
   checkedAt: string
   environments: FleetEnvironment[]
   customers?: FleetAccount[]
   productInstances?: FleetProductInstance[]
+  hostingNodes?: FleetHostingNode[]
   alerts?: OperatorAlert[]
   diskWarning?: string | null
 }
@@ -339,7 +347,10 @@ export function groupCustomers(
     .sort((left, right) => left.displayName.localeCompare(right.displayName))
 }
 
-export function groupNodes(environments: readonly FleetEnvironment[]) {
+export function groupNodes(
+  environments: readonly FleetEnvironment[],
+  registeredNodes: readonly FleetHostingNode[] = [],
+) {
   const byId = new Map<string, {
     id: string
     name: string
@@ -347,6 +358,12 @@ export function groupNodes(environments: readonly FleetEnvironment[]) {
     driver: string
     environments: FleetEnvironment[]
   }>()
+  for (const node of registeredNodes) {
+    byId.set(node.id, {
+      ...node,
+      environments: [],
+    })
+  }
   for (const env of environments) {
     const existing = byId.get(env.node.id)
     if (existing) {
@@ -371,9 +388,10 @@ export function summarizeFleet(
   environments: readonly FleetEnvironment[],
   accounts: readonly FleetAccount[] = [],
   instances: readonly FleetProductInstance[] = [],
+  registeredNodes: readonly FleetHostingNode[] = [],
 ) {
   const customers = groupCustomers(environments, accounts, instances)
-  const nodes = groupNodes(environments)
+  const nodes = groupNodes(environments, registeredNodes)
   const byStatus = (status: CombinedStatus) => environments.filter(env => env.status === status).length
   return {
     customerCount: customers.length,

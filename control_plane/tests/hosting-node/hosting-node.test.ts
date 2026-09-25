@@ -16,6 +16,9 @@ import { patchEnvFileContents, publicEnvSettings, renderProvisionedEnv } from '.
 import { createDb } from '../../server/database'
 import { migrateDatabase } from '../../server/database/migrate'
 import { seedRegistry } from '../../server/database/seed'
+import { customers, environments, hostingNodes, productInstances } from '../../server/database/schema'
+import { LAB_CUSTOMER_SLUG, LAB_NODE_NAME } from '../../server/database/lab-seed'
+import { summarizeFleet } from '../../shared/utils/fleet'
 import { addProductInstance, createCustomerAccount } from '../../server/services/provision-registry'
 import { assignPublicHostname } from '../../server/services/public-hostname'
 import { listRegisteredEnvironments } from '../../server/services/registry'
@@ -127,6 +130,64 @@ describe('production edge generator', () => {
 })
 
 describe('hosting node identity', () => {
+  it('production seed ensures only the configured vps node', async () => {
+    process.env.SKIP_LAB_SEED = 'true'
+    process.env.HOSTING_NODE_NAME = 'vps-1'
+    process.env.HOSTING_NODE_KIND = 'vps'
+    const root = tmpRoot()
+    const url = `file:${join(root, 'control-plane.sqlite').replaceAll('\\', '/')}`
+    await migrateDatabase(url)
+    const seeded = await seedRegistry(url)
+    const { client, db } = createDb(url)
+    try {
+      const nodes = await db.select().from(hostingNodes)
+      const customerRows = await db.select().from(customers)
+      const instanceRows = await db.select().from(productInstances)
+      const environmentRows = await db.select().from(environments)
+      expect(nodes.map(row => row.name)).toEqual(['vps-1'])
+      expect(nodes[0]).toMatchObject({ kind: 'vps', driver: 'local-docker' })
+      expect(seeded.nodeId).toBe(nodes[0]?.id)
+      expect(customerRows).toEqual([])
+      expect(instanceRows).toEqual([])
+      expect(environmentRows).toEqual([])
+      expect(nodes.some(row => row.name === LAB_NODE_NAME)).toBe(false)
+      expect(customerRows.some(row => row.slug === LAB_CUSTOMER_SLUG)).toBe(false)
+      const summary = summarizeFleet([], [], [], nodes.map(row => ({
+        id: row.id,
+        name: row.name,
+        kind: row.kind,
+        driver: row.driver,
+      })))
+      expect(summary.nodeCount).toBe(1)
+      expect(summary.nodes[0]).toMatchObject({
+        name: 'vps-1',
+        kind: 'vps',
+        driver: 'local-docker',
+        environmentCount: 0,
+      })
+    } finally {
+      client.close()
+    }
+  })
+
+  it('development seed still creates the lab customer on the laptop node', async () => {
+    const root = tmpRoot()
+    const url = `file:${join(root, 'control-plane.sqlite').replaceAll('\\', '/')}`
+    await migrateDatabase(url)
+    await seedRegistry(url)
+    const { client, db } = createDb(url)
+    try {
+      const nodes = await db.select().from(hostingNodes)
+      const customerRows = await db.select().from(customers)
+      const environmentRows = await db.select().from(environments)
+      expect(nodes.map(row => row.name)).toEqual([LAB_NODE_NAME])
+      expect(customerRows.map(row => row.slug)).toEqual([LAB_CUSTOMER_SLUG])
+      expect(environmentRows.map(row => row.slug).sort()).toEqual(['lab-acme-dev', 'lab-acme-prod'])
+    } finally {
+      client.close()
+    }
+  })
+
   it('defaults to laptop and can be a vps local-docker node', () => {
     expect(localHostingNodeSpec()).toEqual({ name: 'laptop', kind: 'laptop', driver: 'local-docker' })
     process.env.HOSTING_NODE_NAME = 'vps-1'

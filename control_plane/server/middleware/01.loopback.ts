@@ -1,7 +1,11 @@
-import { isLoopbackConnection } from '../../shared/utils/loopback'
+import { isLoopbackConnection, isNitroInProcessSocket } from '../../shared/utils/loopback'
 
 export default defineEventHandler((event) => {
-  const remote = event.node.req.socket?.remoteAddress
+  const socket = event.node.req.socket
+  if (isNitroInProcessSocket(socket)) {
+    return
+  }
+  const remote = socket?.remoteAddress
   const forwardedFor = getHeader(event, 'x-forwarded-for')
   const realIp = getHeader(event, 'x-real-ip')
   if (isLoopbackConnection({ remoteAddress: remote, forwardedFor, realIp })) {

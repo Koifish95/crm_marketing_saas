@@ -46,7 +46,7 @@ export HOSTING_NODE_NAME=vps-1
 sudo ./deploy/hosting-node/bootstrap.sh
 ```
 
-The script installs Docker and Node 22, clones `working`, builds the Control Plane, migrates sqlite, seeds the `vps-1` node **without** lab-acme (`SKIP_LAB_SEED=true`), enables systemd `sic-control-plane`, opens UFW 22/80/443, and starts the production-edge nginx container on host network.
+The script installs Docker and Node 22, clones `working`, builds the Control Plane, migrates sqlite, seeds the configured hosting node **without** the laptop lab node or lab-acme (`SKIP_LAB_SEED=true`), enables systemd `sic-control-plane`, opens UFW 22/80/443, and starts the production-edge nginx container on host network. A node with zero environments is still a hosting node and appears on Hosting Nodes.
 
 Environment file: `/etc/sic/control-plane.env` (mode 0600). Example: `deploy/hosting-node/env.control-plane.example`.
 

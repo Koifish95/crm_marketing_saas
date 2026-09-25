@@ -1,5 +1,9 @@
+import { createServer } from 'node:http'
+import { Socket } from 'node:net'
+import { createApp, eventHandler, toNodeListener } from 'h3'
+import { fetchNodeRequestHandler } from 'node-mock-http'
 import { describe, expect, it } from 'vitest'
-import { isLoopbackAddress, isLoopbackConnection, normalizeIp } from '../../shared/utils/loopback'
+import { isLoopbackAddress, isLoopbackConnection, isNitroInProcessSocket, normalizeIp } from '../../shared/utils/loopback'
 
 describe('control plane loopback', () => {
   it('accepts IPv4, localhost, and IPv6 loopback forms', () => {
@@ -51,5 +55,61 @@ describe('control plane loopback', () => {
       forwardedFor: '127.0.0.1, 8.8.8.8',
     })).toBe(true)
     expect(isLoopbackConnection({})).toBe(false)
+  })
+
+  it('accepts Nitro in-process sockets and still rejects a missing or spoofed peer', () => {
+    expect(isNitroInProcessSocket(undefined)).toBe(false)
+    expect(isNitroInProcessSocket(null)).toBe(false)
+    expect(isNitroInProcessSocket({})).toBe(false)
+    const tcpPeer = new Socket()
+    Object.defineProperty(tcpPeer, 'remoteAddress', { value: '8.8.8.8' })
+    Object.assign(tcpPeer, { __unenv__: {} })
+    expect(isNitroInProcessSocket(tcpPeer)).toBe(false)
+    expect(isLoopbackConnection({
+      remoteAddress: tcpPeer.remoteAddress,
+      forwardedFor: '127.0.0.1',
+    })).toBe(false)
+  })
+
+  it('allows a Nitro localFetch SSR call and a real loopback TCP peer', async () => {
+    const app = createApp()
+    app.use(eventHandler((event) => {
+      const socket = event.node.req.socket
+      const forwardedFor = event.node.req.headers['x-forwarded-for']
+      const realIp = event.node.req.headers['x-real-ip']
+      const allowed = isNitroInProcessSocket(socket) || isLoopbackConnection({
+        remoteAddress: socket?.remoteAddress,
+        forwardedFor: Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor,
+        realIp: Array.isArray(realIp) ? realIp[0] : realIp,
+      })
+      if (!allowed) {
+        event.node.res.statusCode = 403
+        return { ok: false }
+      }
+      return { ok: true }
+    }))
+    const handler = toNodeListener(app)
+
+    const local = await fetchNodeRequestHandler(handler, '/api/status')
+    expect(local.status).toBe(200)
+    expect(await local.json()).toEqual({ ok: true })
+
+    const server = createServer(handler)
+    await new Promise<void>((resolve) => {
+      server.listen(0, '127.0.0.1', () => resolve())
+    })
+    try {
+      const address = server.address()
+      if (!address || typeof address === 'string') {
+        throw new Error('expected a TCP port')
+      }
+      const response = await fetch(`http://127.0.0.1:${address.port}/api/status`)
+      expect(response.status).toBe(200)
+      expect(await response.json()).toEqual({ ok: true })
+    } finally {
+      await new Promise<void>((resolve, reject) => {
+        server.close(error => error ? reject(error) : resolve())
+      })
+    }
   })
 })

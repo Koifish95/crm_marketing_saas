@@ -1,6 +1,6 @@
 import { useDb } from '../database'
 import { observeRegisteredEnvironments } from '../services/observe'
-import { listCustomers, listProductInstances } from '../services/registry'
+import { listCustomers, listHostingNodes, listProductInstances } from '../services/registry'
 import { operatorAlerts } from '../../shared/utils/fleet'
 import { statfs } from 'node:fs/promises'
 
@@ -51,6 +51,12 @@ export default defineEventHandler(async () => {
       deactivatedAt: row.deactivatedAt,
       deactivatedNote: row.deactivatedNote,
       reactivatedAt: row.reactivatedAt,
+    })),
+    hostingNodes: (await listHostingNodes(db)).map(row => ({
+      id: row.id,
+      name: row.name,
+      kind: row.kind,
+      driver: row.driver,
     })),
     alerts: operatorAlerts(environments, diskWarning),
     diskWarning,

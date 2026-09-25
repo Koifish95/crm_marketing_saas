@@ -47,7 +47,7 @@ pnpm dev
 
 Browse **http://127.0.0.1:52100** only.
 
-Seed (unless `SKIP_LAB_SEED=true`): customer **lab-acme** / Acme BJJ, node laptop, envs `lab-acme-prod` and `lab-acme-dev`. Registry file: `control_plane/data/control-plane.sqlite` (gitignored). Live rows may exist that are **not** in git — do not document live sqlite as product spec.
+Seed without `SKIP_LAB_SEED`: customer **lab-acme** / Acme BJJ, node laptop, envs `lab-acme-prod` and `lab-acme-dev`. With `SKIP_LAB_SEED=true`, seed ensures only the configured hosting node (`HOSTING_NODE_NAME` / `HOSTING_NODE_KIND`) and does not create the laptop node or lab-acme. Registry file: `control_plane/data/control-plane.sqlite` (gitignored). Live rows may exist that are **not** in git — do not document live sqlite as product spec.
 
 Acme labs (Martial Arts `:s2` image), if you still need them:
 

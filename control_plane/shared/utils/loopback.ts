@@ -1,3 +1,5 @@
+import { Socket } from 'node:net'
+
 export function firstForwardedFor(header: string | undefined | null): string | undefined {
   const first = (header || '').split(',')[0]?.trim()
   return first || undefined
@@ -57,4 +59,17 @@ export function isLoopbackConnection(input: {
   }
   return isLoopbackAddress(firstForwardedFor(input.forwardedFor))
     || isLoopbackAddress(input.realIp)
+}
+
+/**
+ * Nitro SSR calls same-origin routes through `node-mock-http`, which builds an
+ * unenv socket with an empty remoteAddress. A real TCP peer is always `node:net.Socket`.
+ * Missing sockets and plain objects are not this path.
+ */
+export function isNitroInProcessSocket(socket: object | null | undefined): boolean {
+  if (!socket || socket instanceof Socket) {
+    return false
+  }
+  const marker = (socket as { __unenv__?: unknown }).__unenv__
+  return marker !== null && typeof marker === 'object'
 }

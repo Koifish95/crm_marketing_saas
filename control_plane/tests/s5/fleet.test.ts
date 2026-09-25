@@ -127,6 +127,36 @@ describe('fleet grouping', () => {
     expect(worstStatus([])).toBe('unknown')
   })
 
+  it('lists a registered hosting node that has no environments', () => {
+    const summary = summarizeFleet([], [], [], [{
+      id: 'node-vps',
+      name: 'vps-1',
+      kind: 'vps',
+      driver: 'local-docker',
+    }])
+    expect(summary.environmentCount).toBe(0)
+    expect(summary.nodeCount).toBe(1)
+    expect(summary.nodes[0]).toMatchObject({
+      id: 'node-vps',
+      name: 'vps-1',
+      kind: 'vps',
+      driver: 'local-docker',
+      environmentCount: 0,
+      environments: [],
+    })
+  })
+
+  it('aggregates environments onto one registered node', () => {
+    const node = { id: 'node-vps', name: 'vps-1', kind: 'vps', driver: 'local-docker' }
+    const summary = summarizeFleet([
+      env({ id: 'prod', status: 'healthy', type: 'PROD', node }),
+      env({ id: 'dev', status: 'stopped', type: 'DEV', node, runtime: 'stopped' }),
+    ], [], [], [node])
+    expect(summary.nodeCount).toBe(1)
+    expect(summary.nodes[0]?.environmentCount).toBe(2)
+    expect(summary.nodes[0]?.environments.map(row => row.id).sort()).toEqual(['dev', 'prod'])
+  })
+
   it('keeps client-side index filters usable beyond a handful of rows', () => {
     const rows = Array.from({ length: 12 }, (_, index) => env({
       id: `env-${index}`,

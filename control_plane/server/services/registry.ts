@@ -6,6 +6,10 @@ export async function listCustomers(db: Database) {
   return db.select().from(customers)
 }
 
+export async function listHostingNodes(db: Database) {
+  return db.select().from(hostingNodes)
+}
+
 export async function listProductInstances(db: Database) {
   return db.select().from(productInstances)
 }
