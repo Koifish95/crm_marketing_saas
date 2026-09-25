@@ -80,10 +80,12 @@ pnpm db:migrate
 SKIP_LAB_SEED=true HOSTING_NODE_NAME="$NODE_NAME" HOSTING_NODE_KIND=vps pnpm db:seed
 
 install -m 0755 "$SIC_ROOT/deploy/hosting-node/backup-control-plane.sh" /usr/local/sbin/sic-backup-control-plane
+install -m 0755 "$SIC_ROOT/deploy/hosting-node/offhost-backup.sh" /usr/local/sbin/sic-offhost-backup
 install -m 0755 "$SIC_ROOT/deploy/edge/renew-certs.sh" /usr/local/sbin/sic-renew-certs
 cat >/etc/cron.d/sic-hosting-node <<EOF
 15 2 * * * root /usr/local/sbin/sic-backup-control-plane
-20 3 * * * root /usr/local/sbin/sic-renew-certs
+30 2 * * * root /usr/local/sbin/sic-offhost-backup
+20 3 * * * root EDGE_ROOT=$SIC_ROOT/deploy/edge /usr/local/sbin/sic-renew-certs
 EOF
 
 systemctl daemon-reload

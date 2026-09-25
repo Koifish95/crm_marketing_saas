@@ -76,20 +76,23 @@ Browse `http://127.0.0.1:52100`. The loopback middleware sees a local connection
 
 ## Backup
 
-- Customer environments: existing Fleet Lifecycle backup (VACUUM INTO sqlite + assets).
-- Control Plane registry: `POST /api/control-plane/backup` or `/usr/local/sbin/sic-backup-control-plane` (cron 02:15 UTC).
-- Off-host: rsync/rclone `/var/lib/sic/backups` and `control_plane/data/backups` to an operator-owned destination. Credentials are external.
+- Customer environments: Fleet Lifecycle backup (sqlite + assets zip). Retention 14 days on the Control Plane host.
+- Control Plane registry: `/usr/local/sbin/sic-backup-control-plane` at 02:15 UTC. That file stays on this VPS.
+- Off-host bundle: `/usr/local/sbin/sic-offhost-backup` at 02:30 UTC. It backs up every live PROD environment, copies that zip plus the PROD env file and the Control Plane sqlite, and records the off-host path. Retention 14 days on the destination.
+- The destination is `SIC_OFFHOST_DEST` in `/etc/sic/offhost.env`. The script exits non-zero if that directory is missing or is on the same filesystem as `/opt/sic`. A second folder on this droplet is not off-host. Status is written to `/var/lib/sic/backups/offhost-status.txt`. The Control Plane also alerts when a PROD backup has no off-host path.
 
-Full node-loss recovery: restore CP sqlite, restore environment zip(s) onto the same volume names, start compose, regenerate edge from hostnames.
+Full node-loss recovery: restore the Control Plane sqlite, restore the PROD zip onto the same volume names, restore the env file, start compose, point DNS at the new IP, issue a new certificate. Do not treat `/var/lib/sic/backups` as the recovery copy.
 
 ---
 
 ## Restart
 
-`systemd` restarts the Control Plane. App containers use `restart: unless-stopped`. Edge nginx uses `restart: unless-stopped`. Host reboot brings all three back without publishing 52100.
+`systemd` starts Docker and `sic-control-plane` on boot (`enabled`). App containers and `sic-production-edge` use `restart: unless-stopped`. UFW is persistent. nginx.conf, certificates under `deploy/edge/certs/`, and the renewal cron survive reboot because they are files on the root disk.
+
+Do not reboot the production VPS until Scott is present. After reboot, check SSH, `systemctl is-active docker sic-control-plane`, `docker ps` for the edge and Acme containers, `https://acme.nuxxion.com/api/health`, loopback-only `52100`, and that `52200` and `52201` are not on `0.0.0.0`.
 
 ---
 
-## Temporary domain
+## Live hostname
 
-`ma-test.strategicinsightsconsulting.net` is a validation hostname. Replacing it with `academy.future-product-domain.com` is a hostname save + new certificate. Do not rebuild application source for domain reasons.
+Acme PROD is `acme.nuxxion.com` (A record `157.245.136.47`, Let's Encrypt through 2026-12-24). Further customers use `{slug}.nuxxion.com`. DEV is not published.

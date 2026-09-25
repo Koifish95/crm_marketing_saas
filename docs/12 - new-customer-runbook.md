@@ -65,23 +65,25 @@ Architecture: [Platform](4 - platform.md). Commands: [Operator guide](11 - sic-o
 - [ ] Offers/prices
 - [ ] Public intake left **off** unless they asked for `/inquire`
 
-### 6. Hostname (PROD only) — **not live-official**
+### 6. Hostname (PROD only)
+
+Proven shape: `{slug}.nuxxion.com`. Acme is `https://acme.nuxxion.com`.
 
 - [ ] Save public hostname in Control Plane
-- [ ] DNS A/AAAA at registrar (**external**)
-- [ ] Issue certificate (`deploy/edge/issue-cert.sh`) (**external ACME; not official S8**)
-- [ ] Save hostname again / reload edge
-- [ ] `https://{hostname}/api/health` from a valid network path (NAT hairpin may fail on LAN)
-- [ ] Login over HTTPS; CSRF origin matches
-
-Until this block is done, give staff the loopback/host-port URL and **do not** claim public HTTPS.
+- [ ] DNS A record to the VPS public IP. No AAAA unless the node listens on IPv6.
+- [ ] `EDGE_ROOT=/opt/sic/crm_marketing_saas/deploy/edge bash deploy/edge/issue-cert.sh {hostname} scottc@nuxxion.com`
+- [ ] Save hostname again so nginx enables 443
+- [ ] `https://{hostname}/api/health` from outside the VPS
+- [ ] Login over HTTPS; cookie is `Secure`; a foreign `Origin` is rejected
 
 ### 7. Backup verification
 
-- [ ] Control Plane → PROD → **Backup**
-- [ ] Zip appears; optionally **Copy off-host** to an existing folder you control
-- [ ] Optional: copy-down that PROD backup into DEV and confirm DEV still isolated
-- [ ] Do **not** test restore by overwriting PROD without a second backup
+- [ ] `/etc/sic/offhost.env` sets `SIC_OFFHOST_DEST` to a directory that is **not** on the VPS disk
+- [ ] `/usr/local/sbin/sic-offhost-backup` exits 0 and `/var/lib/sic/backups/offhost-status.txt` starts with a timestamp and `OK`
+- [ ] Control Plane no longer shows “no recorded off-host backup copy” for that PROD
+- [ ] Do **not** restore that zip over PROD unless a second copy exists
+
+Add Product still creates DEV. Stop DEV if the customer will not use it. A normal academy does not need it.
 
 ### 8. Handoff to the customer
 
