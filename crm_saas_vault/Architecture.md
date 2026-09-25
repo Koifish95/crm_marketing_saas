@@ -28,7 +28,7 @@ One Nuxt 4 application: Vue UI, Nitro API, Drizzle, SQLite file. No Express/Fast
 
 PostgreSQL is the later production database if SQLite’s limits show up. Do not write SQLite-only application logic.
 
-Validation lives in `shared/schemas/`. Timestamp conversion lives in `shared/utils/time.ts`. Do not scatter timezone math in Vue. Staff-facing enum labels live in `shared/utils/labels.ts`. Password policy helpers: `shared/utils/password-policy.ts`. User administration: `server/services/users.ts`. Access Rights: `server/services/access-rights.ts` and `requireAccessRight`. Audit: `server/services/security-audit.ts`. UI tokens and primitives: [[Design-System]]. Auth/RBAC: [[Authentication]]. Marketing operations: [[wip/M9_Implementation_Handoff_2026-09-02]]. Primary Record Workspace: [[wip/M9_Primary_Record_Workspace_Handoff_2026-09-03]].
+Validation lives in `shared/schemas/`. Timestamp conversion lives in `shared/utils/time.ts`. Do not scatter timezone math in Vue. Staff-facing enum labels live in `shared/utils/labels.ts`. Password policy helpers: `shared/utils/password-policy.ts`. User administration: `server/services/users.ts`. Access Rights: `server/services/access-rights.ts` and `requireAccessRight`. Audit: `server/services/security-audit.ts`. UI tokens and primitives: [[Design-System]]. Auth/RBAC: [[Authentication]]. Marketing operations: [[wip/M9_Implementation_Handoff_2026-09-02]]. Primary Record Workspace: [[wip/M9_Primary_Record_Workspace_Handoff_2026-09-03]]
 
 ## Principles
 
