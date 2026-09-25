@@ -35,11 +35,11 @@ export function getBootstrapAdmin(env: NodeJS.Dict<string | undefined> = process
   if (!password) {
     throw new Error(BOOTSTRAP_PASSWORD_REQUIRED)
   }
-  if (appEnv === 'production' && isForbiddenBootstrapPassword(password)) {
-    throw new Error('Refusing universal bootstrap password "setup" in production. Provision a unique initial-access password.')
-  }
   const reset = env.NUXT_AUTH_RESET_PASSWORD === 'true'
   const mustChangePassword = env.NUXT_AUTH_MUST_CHANGE_PASSWORD === 'true'
+  if (appEnv === 'production' && isForbiddenBootstrapPassword(password) && !mustChangePassword) {
+    throw new Error('Refusing universal bootstrap password "setup" as a permanent production password. Set NUXT_AUTH_MUST_CHANGE_PASSWORD=true for the initial admin/setup login.')
+  }
   return { username, email, password, reset, mustChangePassword, appEnv }
 }
 

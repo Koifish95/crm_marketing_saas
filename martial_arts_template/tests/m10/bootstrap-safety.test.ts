@@ -96,13 +96,32 @@ async function seedFresh(env: {
 }
 
 describe('M10A production bootstrap safety', () => {
-  it('refuses the universal setup password when seeding production', async () => {
+  it('refuses setup as a permanent production password', async () => {
     await expect(seedFresh({
       APP_ENV: 'production',
       NODE_ENV: 'production',
       NUXT_AUTH_PASSWORD: 'setup',
+      NUXT_AUTH_MUST_CHANGE_PASSWORD: 'false',
       NUXT_AUTH_RESET_PASSWORD: 'false',
-    })).rejects.toThrow(/unique initial-access password/)
+    })).rejects.toThrow(/permanent production password/)
+  })
+
+  it('seeds production admin/setup when the first login must change it', async () => {
+    const seeded = await seedFresh({
+      APP_ENV: 'production',
+      NODE_ENV: 'production',
+      NUXT_AUTH_USERNAME: 'admin',
+      NUXT_AUTH_PASSWORD: 'setup',
+      NUXT_AUTH_MUST_CHANGE_PASSWORD: 'true',
+      NUXT_AUTH_RESET_PASSWORD: 'false',
+    })
+    try {
+      const [admin] = await seeded.db.select().from(users).where(eq(users.username, 'admin'))
+      expect(admin?.mustChangePassword).toBe(true)
+      expect(await verifyStaffPassword(admin!.passwordHash!, 'setup')).toBe(true)
+    } finally {
+      await seeded.close()
+    }
   })
   it('refuses to seed production when no password is configured', async () => {
     await expect(seedFresh({

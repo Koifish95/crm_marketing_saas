@@ -76,7 +76,7 @@ C2 **Successful** (2026-09-15): one account may own Martial Arts and Sales insta
 - Operator events: `GET /api/events`. Reports: `GET /api/reports`. Fleet backups: `GET /api/backups`.
 - No operator login; loopback bind
 - Non-loopback requests are refused unless `CONTROL_PLANE_ALLOW_REMOTE=true` **and** `x-control-plane-token` matches `CONTROL_PLANE_TOKEN`
-- New Martial Arts/Sales envs get a unique initial-access password (never provisioned `setup`); env files and sidecar password files are `0600` where the OS allows
+- New Martial Arts/Sales envs start as `admin` / `setup` with `mustChangePassword`; first login opens `/account/password`. Env files are `0600` where the OS allows. The Control Plane does not store the password chosen after that.
 - Fleet SQLite snapshot uses in-container `VACUUM INTO` + integrity_check, not a live `docker cp` of the database file
 - Control Plane registry snapshot: `POST /api/control-plane/backup` (VACUUM INTO under `data/backups/control-plane/`)
 - PROD `POST .../hostname` `{ hostname }` writes `public_hostname`, derives `NUXT_PUBLIC_ORIGIN=https://{hostname}`, regenerates `deploy/edge/nginx.conf`

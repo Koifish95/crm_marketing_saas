@@ -27,6 +27,18 @@ Decision: what we chose
 
 ---
 
+## 2026-09-24 — Provisioned environments unwrap with admin / setup
+
+Status: accepted
+
+Context: Sell-readiness replaced the 2026-09-09 bootstrap (`admin` / `setup` plus forced change) with a unique initial password. Operators could not sign in to a new environment with the known pair, and the one-time password was only written to a sidecar file.
+
+Decision: Newly provisioned Martial Arts and Sales environments write `NUXT_AUTH_USERNAME=admin`, `NUXT_AUTH_PASSWORD=setup`, and `NUXT_AUTH_MUST_CHANGE_PASSWORD=true`. First login opens `/account/password`. Production seed still refuses `setup` when that force-change flag is false. The Control Plane does not store the password chosen afterward. Do not re-hash every user to apply this to an existing volume; reset only the admin row.
+
+Source: Scott 2026-09-24
+
+---
+
 ## 2026-09-20 — Control Plane customer/product/environment operator lifecycle
 
 Status: accepted

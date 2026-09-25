@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { renderProvisionedEnv } from '../../server/services/provision-env'
 
 describe('S4 provisioned env and compose', () => {
-  it('writes a unique initial password, force-change, and unique volume names without renzo', () => {
+  it('writes admin/setup, force-change, and unique volume names without renzo', () => {
     const env = renderProvisionedEnv({
       composeProject: 'strategic-insights-prod',
       containerName: 'strategic-insights-prod-app',
@@ -20,7 +20,7 @@ describe('S4 provisioned env and compose', () => {
       authPassword: 'UniquePass1!',
     })
     expect(env.contents).toMatch(/NUXT_AUTH_PASSWORD="UniquePass1!"/)
-    expect(env.contents).not.toMatch(/NUXT_AUTH_PASSWORD="setup"/)
+    expect(env.contents).toMatch(/NUXT_AUTH_USERNAME="admin"/)
     expect(env.contents).toMatch(/NUXT_AUTH_MUST_CHANGE_PASSWORD="true"/)
     expect(env.contents).toMatch(/NUXT_PUBLIC_APP_NAME="Strategic Insights Consulting, LLC Acquisition"/)
     expect(env.contents).toMatch(/SQLITE_VOLUME="strategic-insights-prod-sqlite"/)
@@ -30,24 +30,7 @@ describe('S4 provisioned env and compose', () => {
     expect(env.authPassword).toBe('UniquePass1!')
   })
 
-  it('refuses the universal setup password', () => {
-    expect(() => renderProvisionedEnv({
-      composeProject: 'strategic-insights-prod',
-      containerName: 'strategic-insights-prod-app',
-      hostPort: 52210,
-      sqliteVolume: 'strategic-insights-prod-sqlite',
-      assetsVolume: 'strategic-insights-prod-assets',
-      expectedImage: 'martial-arts-acquisition:s4',
-      type: 'PROD',
-      displayName: 'Strategic Insights Consulting, LLC',
-      adminEmail: 'admin@strategic-insights.local',
-      timezone: 'America/Denver',
-      sessionPassword: 'test-session-password-32-characters',
-      authPassword: 'setup',
-    })).toThrow(/unique initial-access password/)
-  })
-
-  it('generates a unique password when none is supplied', () => {
+  it('uses admin/setup when no password is supplied', () => {
     const first = renderProvisionedEnv({
       composeProject: 'nova-bjj-prod',
       containerName: 'nova-bjj-prod-app',
@@ -74,9 +57,10 @@ describe('S4 provisioned env and compose', () => {
       timezone: 'America/Denver',
       sessionPassword: 'test-session-password-32-characters',
     })
-    expect(first.authPassword).not.toBe('setup')
-    expect(second.authPassword).not.toBe(first.authPassword)
-    expect(first.contents).toContain(`NUXT_AUTH_PASSWORD="${first.authPassword}"`)
+    expect(first.authPassword).toBe('setup')
+    expect(second.authPassword).toBe('setup')
+    expect(first.contents).toContain('NUXT_AUTH_PASSWORD="setup"')
+    expect(first.contents).toContain('NUXT_AUTH_MUST_CHANGE_PASSWORD="true"')
   })
 
   it('uses a plain app name and Sales proposal dir for the Sales product', () => {

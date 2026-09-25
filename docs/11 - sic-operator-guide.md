@@ -59,7 +59,7 @@ pnpm lab:docker lab-acme-dev up
 
 Never `compose down -v`. Missing image: `pnpm lab:docker lab-acme-prod build` then `up`.
 
-Lab CRM URLs (S3): http://127.0.0.1:52040 (PROD), http://127.0.0.1:52050 (DEV). Historical lab logins used the development pair; **new S4 environments never use `setup`.**
+Lab CRM URLs (S3): http://127.0.0.1:52040 (PROD), http://127.0.0.1:52050 (DEV). New environments start as `admin` / `setup` and must change that password on first login.
 
 ### Linux hosting node (repository-complete, not official S7)
 
@@ -103,7 +103,7 @@ Customer workspace → **Products** → pick **Martial Arts** or **Sales** → *
 - Compose cwd = product template directory (`docker-compose.provisioned.yml`).
 - Host ports **52200–52999**.
 - New names: `{customer}-{productId}-{type}` (backfilled historical `{customer}-{type}` stay).
-- Unique initial password → gitignored env file + `*.initial-access.txt` (0600). API returns username/password **once**. Never `setup`.
+- Initial login is `admin` / `setup` in the gitignored env file, with `NUXT_AUTH_MUST_CHANGE_PASSWORD=true`. First login opens `/account/password`. The Control Plane does not store the password they choose.
 - Wait until PROD and DEV are **healthy**. Image build can take minutes; you may leave the page.
 
 Retry on Failed/Provisioning **resumes the same rows and remounts the same volumes**. Failed rows keep `provision_error`. Same `(customer, product)` will not create a second instance.
@@ -271,7 +271,7 @@ Template triple on a laptop (`:5000/:5010/:5020`) is **not** the Control Plane f
 
 Returned **once** at provision. Also in gitignored env + sidecar. Unique. First login forces `/account/password`.
 
-Never store the living password in Control Plane sqlite. Never use `setup` on provisioned customers.
+Never store the living password in Control Plane sqlite. `setup` is only the initial login and must be changed before normal CRM use.
 
 ---
 

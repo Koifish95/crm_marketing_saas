@@ -4,21 +4,8 @@ import { randomBytes } from 'node:crypto'
 import type { ProductDefinition } from '../products/catalog'
 import { MARTIAL_ARTS_PRODUCT } from '../products/catalog'
 
-const FORBIDDEN_BOOTSTRAP_PASSWORDS = ['setup']
-
-export function isForbiddenBootstrapPassword(password: string) {
-  return FORBIDDEN_BOOTSTRAP_PASSWORDS.includes(password.trim().toLowerCase())
-}
-
-export function generateInitialAccessPassword() {
-  for (let attempt = 0; attempt < 8; attempt += 1) {
-    const password = `A${randomBytes(12).toString('base64url')}!`
-    if (password.length >= 8 && /[A-Z]/.test(password) && /[^A-Za-z0-9]/.test(password) && !isForbiddenBootstrapPassword(password)) {
-      return password
-    }
-  }
-  throw new Error('Unable to generate a unique initial-access password.')
-}
+export const INITIAL_ACCESS_USERNAME = 'admin'
+export const INITIAL_ACCESS_PASSWORD = 'setup'
 
 export function provisionedEnvAbsolutePath(envFileLocal: string, root = process.cwd()) {
   return isAbsolute(envFileLocal) ? envFileLocal : join(root, envFileLocal)
@@ -29,14 +16,7 @@ export function randomSessionPassword() {
 }
 
 export function resolveInitialAccessPassword(explicit?: string) {
-  const password = explicit?.trim()
-  if (!password) {
-    return generateInitialAccessPassword()
-  }
-  if (isForbiddenBootstrapPassword(password)) {
-    throw new Error('Refusing universal bootstrap password "setup". Provision a unique initial-access password.')
-  }
-  return password
+  return explicit?.trim() || INITIAL_ACCESS_PASSWORD
 }
 
 function envLine(key: string, value: string | number) {
@@ -103,7 +83,7 @@ export function renderProvisionedEnv(input: {
     envLine('EXPECTED_IMAGE', input.expectedImage),
     envLine('APP_ENV', appEnv),
     envLine('NUXT_SESSION_PASSWORD', input.sessionPassword ?? randomSessionPassword()),
-    envLine('NUXT_AUTH_USERNAME', 'admin'),
+    envLine('NUXT_AUTH_USERNAME', INITIAL_ACCESS_USERNAME),
     envLine('NUXT_AUTH_EMAIL', input.adminEmail),
     envLine('NUXT_AUTH_PASSWORD', authPassword),
     envLine('NUXT_AUTH_MUST_CHANGE_PASSWORD', 'true'),
@@ -122,7 +102,7 @@ export function renderProvisionedEnv(input: {
   return {
     contents: `${lines.join('\n')}\n`,
     authPassword,
-    username: 'admin',
+    username: INITIAL_ACCESS_USERNAME,
   }
 }
 
@@ -174,22 +154,4 @@ export function writeSecretFile(path: string, contents: string) {
 
 export function writeProvisionedEnvFile(envFileLocal: string, contents: string, root = process.cwd()) {
   return writeSecretFile(provisionedEnvAbsolutePath(envFileLocal, root), contents)
-}
-
-export function writeInitialAccessFile(envFileLocal: string, input: {
-  username: string
-  password: string
-  email: string
-}, root = process.cwd()) {
-  const envPath = provisionedEnvAbsolutePath(envFileLocal, root)
-  const path = envPath.replace(/\.env$/i, '.initial-access.txt')
-  const body = [
-    'Martial Arts CRM initial access. Deliver once, then the academy admin must change this password.',
-    `username=${input.username}`,
-    `email=${input.email}`,
-    `password=${input.password}`,
-    'mustChangePassword=true',
-    '',
-  ].join('\n')
-  return writeSecretFile(path, body)
 }

@@ -14,7 +14,7 @@ import {
   type NonProdEnvironmentType,
 } from './provision-contract'
 import { listRegisteredEnvironments } from './registry'
-import { renderProvisionedEnv, writeInitialAccessFile, writeProvisionedEnvFile, generateInitialAccessPassword } from './provision-env'
+import { INITIAL_ACCESS_PASSWORD, INITIAL_ACCESS_USERNAME, renderProvisionedEnv, writeProvisionedEnvFile } from './provision-env'
 import { requireLocalHostingNode } from './hosting-node'
 
 export class ProvisionError extends Error {
@@ -122,11 +122,6 @@ export async function insertNamedEnvironment(db: Database, input: {
     product,
   })
   writeProvisionedEnvFile(envFile, rendered.contents, input.filesRoot)
-  writeInitialAccessFile(envFile, {
-    username: rendered.username,
-    password: rendered.authPassword,
-    email: input.customer.adminEmail,
-  }, input.filesRoot)
   return {
     id,
     slug: input.names.slug,
@@ -267,7 +262,6 @@ export async function addProductInstance(db: Database, customerId: string, input
     initialUsername: string
     initialPassword: string
   }[] = []
-  const authPassword = generateInitialAccessPassword()
   for (const names of defaultEnvironmentPair(customer.slug, product.id)) {
     created.push(await insertNamedEnvironment(db, {
       customer: {
@@ -284,7 +278,6 @@ export async function addProductInstance(db: Database, customerId: string, input
       hostPort: ports[created.length] as number,
       filesRoot: input.filesRoot,
       now,
-      authPassword,
     }))
   }
 
@@ -293,8 +286,8 @@ export async function addProductInstance(db: Database, customerId: string, input
     productInstanceId: instanceId,
     productId: product.id,
     displayName,
-    initialUsername: 'admin',
-    initialPassword: authPassword,
+    initialUsername: INITIAL_ACCESS_USERNAME,
+    initialPassword: INITIAL_ACCESS_PASSWORD,
     environments: created,
   }
 }
