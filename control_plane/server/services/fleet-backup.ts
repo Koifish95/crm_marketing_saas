@@ -154,6 +154,34 @@ export async function backupRegisteredEnvironment(db: Database, id: string, file
   }
 }
 
+const OFFHOST_REMOTE_PATH = /^[A-Za-z0-9][A-Za-z0-9._-]{0,40}:[A-Za-z0-9][A-Za-z0-9._/-]*$/
+
+export function assertOffhostRemotePath(value: string) {
+  const path = value.trim()
+  if (!OFFHOST_REMOTE_PATH.test(path) || path.includes('..')) {
+    throw new FleetBackupError('Off-host remote path is not a verified rclone destination.', 400)
+  }
+  return path
+}
+
+export async function recordVerifiedOffhostRemote(
+  db: Database,
+  id: string,
+  remotePath: string,
+) {
+  const row = requireEnvironment(await getRegisteredEnvironment(db, id))
+  const latest = await latestEnvironmentBackup(db, row.id)
+  if (!latest) {
+    throw new FleetBackupError('No same-host backup exists for this environment.', 409)
+  }
+  const target = assertOffhostRemotePath(remotePath)
+  const copiedAt = new Date().toISOString()
+  await db.update(environmentBackups)
+    .set({ offhostPath: target, offhostCopiedAt: copiedAt })
+    .where(eq(environmentBackups.id, latest.id))
+  return { ...latest, offhostPath: target, offhostCopiedAt: copiedAt }
+}
+
 export async function copyEnvironmentBackupOffhost(
   db: Database,
   id: string,

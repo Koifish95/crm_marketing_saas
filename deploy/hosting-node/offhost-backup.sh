@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Nightly PROD bundle: fleet zip, PROD env files, Control Plane sqlite.
-# A destination on the same filesystem as /opt/sic is refused. That is not off-host.
+# Nightly PROD recovery set: fleet zip, PROD env files, Control Plane sqlite.
+# Production destination is an rclone remote (SIC_OFFHOST_REMOTE), not a folder on this VPS.
+# A directory destination remains for tests and refuses the same filesystem as /opt/sic.
 # Tests may set SIC_OFFHOST_ALLOW_SAME_FS=1. Production cron must not.
 
 ROOT=${SIC_ROOT:-/opt/sic/crm_marketing_saas}
@@ -12,6 +13,7 @@ STATUS_FILE="$STATUS_DIR/offhost-status.txt"
 STAGING=${SIC_OFFHOST_STAGING:-/var/lib/sic/backups/staging}
 ENV_FILE=${SIC_OFFHOST_ENV:-/etc/sic/offhost.env}
 RETENTION_DAYS=${SIC_OFFHOST_RETENTION_DAYS:-14}
+RCLONE_CONFIG=${SIC_RCLONE_CONFIG:-/root/.config/rclone/rclone.conf}
 
 if [[ -f "$ENV_FILE" ]]; then
   # shellcheck disable=SC1090
@@ -21,6 +23,7 @@ if [[ -f "$ENV_FILE" ]]; then
 fi
 
 DEST=${SIC_OFFHOST_DEST:-}
+REMOTE=${SIC_OFFHOST_REMOTE:-}
 mkdir -p "$STATUS_DIR" "$STAGING"
 
 fail() {
@@ -35,18 +38,40 @@ device_of() {
   stat -c %d "$1"
 }
 
-if [[ -z "$DEST" ]]; then
-  fail 2 "MISSING_DESTINATION Set SIC_OFFHOST_DEST in $ENV_FILE to a directory that is not on this VPS disk."
+remote_dest_for() {
+  local base=$1
+  local stamp=$2
+  if [[ "$base" == *: ]]; then
+    printf '%s%s\n' "$base" "$stamp"
+  else
+    printf '%s/%s\n' "${base%/}" "$stamp"
+  fi
+}
+
+if [[ -z "$REMOTE" && -z "$DEST" ]]; then
+  fail 2 "MISSING_DESTINATION Set SIC_OFFHOST_REMOTE (rclone) or SIC_OFFHOST_DEST in $ENV_FILE."
 fi
 
-if [[ ! -d "$DEST" ]]; then
-  fail 2 "MISSING_DESTINATION $DEST does not exist."
-fi
-
-src_dev=$(device_of "$ROOT")
-dest_dev=$(device_of "$DEST")
-if [[ "$src_dev" == "$dest_dev" && "${SIC_OFFHOST_ALLOW_SAME_FS:-}" != "1" ]]; then
-  fail 3 "SAME_DISK $DEST is on the production filesystem. Refusing to call that off-host."
+if [[ -n "$REMOTE" ]]; then
+  if [[ "$REMOTE" != *:* ]]; then
+    fail 2 "REMOTE_INVALID SIC_OFFHOST_REMOTE must be an rclone remote path."
+  fi
+  if ! command -v rclone >/dev/null 2>&1; then
+    fail 2 "MISSING_RCLONE rclone is not installed."
+  fi
+  if [[ ! -f "$RCLONE_CONFIG" ]]; then
+    fail 2 "MISSING_RCLONE_CONFIG $RCLONE_CONFIG"
+  fi
+  export RCLONE_CONFIG
+else
+  if [[ ! -d "$DEST" ]]; then
+    fail 2 "MISSING_DESTINATION $DEST does not exist."
+  fi
+  src_dev=$(device_of "$ROOT")
+  dest_dev=$(device_of "$DEST")
+  if [[ "$src_dev" == "$dest_dev" && "${SIC_OFFHOST_ALLOW_SAME_FS:-}" != "1" ]]; then
+    fail 3 "SAME_DISK $DEST is on the production filesystem. Refusing to call that off-host."
+  fi
 fi
 
 DB="$ROOT/control_plane/data/control-plane.sqlite"
@@ -69,7 +94,10 @@ fi
 
 STAMP=$(date -u +%Y%m%d_%H%M%S)
 BUNDLE="$STAGING/$STAMP"
-mkdir -p "$BUNDLE/env" "$BUNDLE/registry" "$BUNDLE/zip" "$DEST/$STAMP/env" "$DEST/$STAMP/registry"
+mkdir -p "$BUNDLE/env" "$BUNDLE/registry" "$BUNDLE/zip"
+if [[ -z "$REMOTE" ]]; then
+  mkdir -p "$DEST/$STAMP/env" "$DEST/$STAMP/registry"
+fi
 
 for id in "${PROD_IDS[@]}"; do
   code=$(curl -sS -o "$BUNDLE/backup-$id.json" -w '%{http_code}' -X POST "$CP_URL/api/environments/$id/backup" -H 'content-type: application/json' -d '{}')
@@ -100,18 +128,48 @@ else
   cp -a "$DB" "$BUNDLE/registry/control-plane.sqlite"
 fi
 
-cp -a "$BUNDLE/env/." "$DEST/$STAMP/env/"
-cp -a "$BUNDLE/registry/." "$DEST/$STAMP/registry/"
-find "$DEST" -mindepth 1 -maxdepth 1 -type d -mtime +"$RETENTION_DAYS" -exec rm -rf {} +
+publish_path=""
+if [[ -n "$REMOTE" ]]; then
+  publish_path=$(remote_dest_for "$REMOTE" "$STAMP")
+  if ! rclone copy "$BUNDLE" "$publish_path" --retries 3 --low-level-retries 10; then
+    rclone purge "$publish_path" >/dev/null 2>&1 || true
+    fail 8 "UPLOAD_FAILED $publish_path"
+  fi
+  if ! rclone check "$BUNDLE" "$publish_path" --one-way; then
+    rclone purge "$publish_path" >/dev/null 2>&1 || true
+    fail 8 "VERIFY_FAILED $publish_path"
+  fi
+  cutoff=$(date -u -d "-${RETENTION_DAYS} days" +%Y%m%d)
+  while IFS= read -r name; do
+    name=${name%/}
+    [[ "$name" == "$STAMP" ]] && continue
+    [[ "$name" =~ ^[0-9]{8}_[0-9]{6}$ ]] || continue
+    day=${name%%_*}
+    if [[ "$day" < "$cutoff" ]]; then
+      old_path=$(remote_dest_for "$REMOTE" "$name")
+      rclone purge "$old_path" || echo "RETENTION_WARN $old_path" >&2
+    fi
+  done < <(rclone lsf "$REMOTE" --dirs-only --max-depth 1)
+else
+  cp -a "$BUNDLE/env/." "$DEST/$STAMP/env/"
+  cp -a "$BUNDLE/registry/." "$DEST/$STAMP/registry/"
+  find "$DEST" -mindepth 1 -maxdepth 1 -type d -mtime +"$RETENTION_DAYS" -exec rm -rf {} +
+  publish_path="$DEST/$STAMP"
+fi
 
 for id in "${PROD_IDS[@]}"; do
+  if [[ -n "$REMOTE" ]]; then
+    payload=$(python3 -c 'import json,sys; print(json.dumps({"remotePath": sys.argv[1]}))' "$publish_path")
+  else
+    payload=$(python3 -c 'import json,sys; print(json.dumps({"destinationDir": sys.argv[1]}))' "$publish_path")
+  fi
   code=$(curl -sS -o "$BUNDLE/copy-$id.json" -w '%{http_code}' -X POST "$CP_URL/api/environments/$id/backup/copy" \
     -H 'content-type: application/json' \
-    -d "{\"destinationDir\":\"$DEST/$STAMP\"}")
+    -d "$payload")
   if [[ "$code" != "200" ]]; then
-    fail 8 "OFFHOST_RECORD_FAILED $id http $code"
+    fail 9 "OFFHOST_RECORD_FAILED $id http $code"
   fi
 done
 
-printf '%s OK %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$DEST/$STAMP" >"$STATUS_FILE"
-echo "Off-host bundle $DEST/$STAMP"
+printf '%s OK %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$publish_path" >"$STATUS_FILE"
+echo "Off-host bundle $publish_path"

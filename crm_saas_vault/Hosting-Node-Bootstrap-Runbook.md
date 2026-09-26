@@ -78,8 +78,8 @@ Browse `http://127.0.0.1:52100`. The loopback middleware sees a local connection
 
 - Customer environments: Fleet Lifecycle backup (sqlite + assets zip). Retention 14 days on the Control Plane host.
 - Control Plane registry: `/usr/local/sbin/sic-backup-control-plane` at 02:15 UTC. That file stays on this VPS.
-- Off-host bundle: `/usr/local/sbin/sic-offhost-backup` at 02:30 UTC. It backs up every live PROD environment, copies that zip plus the PROD env file and the Control Plane sqlite, and records the off-host path. Retention 14 days on the destination.
-- The destination is `SIC_OFFHOST_DEST` in `/etc/sic/offhost.env`. The script exits non-zero if that directory is missing or is on the same filesystem as `/opt/sic`. A second folder on this droplet is not off-host. Status is written to `/var/lib/sic/backups/offhost-status.txt`. The Control Plane also alerts when a PROD backup has no off-host path.
+- Off-host bundle: `/usr/local/sbin/sic-offhost-backup` at 02:30 UTC. It backs up every live PROD environment, stages that zip plus the PROD env file and a Control Plane sqlite snapshot, uploads the stamp with rclone, and records the remote path only after `rclone check` succeeds. Retention is 14 days of timestamped stamps. A failed upload does not delete an older stamp or production data.
+- The destination is `SIC_OFFHOST_REMOTE` in `/etc/sic/offhost.env` (rclone remote `nuxxion-dr:`, already rooted at the Google Drive folder). rclone config stays at `/root/.config/rclone/rclone.conf` and is not in git. A directory `SIC_OFFHOST_DEST` is still refused when it is on the same filesystem as `/opt/sic`. Status is `/var/lib/sic/backups/offhost-status.txt`. The Control Plane alerts when a ready PROD backup has no off-host path.
 
 Full node-loss recovery: restore the Control Plane sqlite, restore the PROD zip onto the same volume names, restore the env file, start compose, point DNS at the new IP, issue a new certificate. Do not treat `/var/lib/sic/backups` as the recovery copy.
 

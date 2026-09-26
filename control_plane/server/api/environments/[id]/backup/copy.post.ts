@@ -1,9 +1,10 @@
 import { z } from 'zod'
 import { useDb } from '../../../../database'
-import { copyEnvironmentBackupOffhost, FleetBackupError, summarizeBackup } from '../../../../services/fleet-backup'
+import { copyEnvironmentBackupOffhost, FleetBackupError, recordVerifiedOffhostRemote, summarizeBackup } from '../../../../services/fleet-backup'
 
 const Body = z.object({
-  destinationDir: z.string(),
+  destinationDir: z.string().optional(),
+  remotePath: z.string().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -13,10 +14,17 @@ export default defineEventHandler(async (event) => {
   }
   const parsed = Body.safeParse(await readBody(event))
   if (!parsed.success) {
-    throw createError({ statusCode: 400, statusMessage: 'destinationDir is required.' })
+    throw createError({ statusCode: 400, statusMessage: 'destinationDir or remotePath is required.' })
+  }
+  const destinationDir = parsed.data.destinationDir?.trim() || ''
+  const remotePath = parsed.data.remotePath?.trim() || ''
+  if (Boolean(destinationDir) === Boolean(remotePath)) {
+    throw createError({ statusCode: 400, statusMessage: 'Provide a local destinationDir or a verified remotePath.' })
   }
   try {
-    const backup = await copyEnvironmentBackupOffhost(useDb(), id, parsed.data.destinationDir)
+    const backup = remotePath
+      ? await recordVerifiedOffhostRemote(useDb(), id, remotePath)
+      : await copyEnvironmentBackupOffhost(useDb(), id, destinationDir)
     return { backup: summarizeBackup(backup) }
   } catch (error) {
     if (error instanceof FleetBackupError) {

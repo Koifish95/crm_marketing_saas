@@ -30,6 +30,7 @@ import {
   assertRevealableZipPath,
   assertZipPathAvailable,
   copyEnvironmentBackupOffhost,
+  recordVerifiedOffhostRemote,
   FleetBackupError,
   isPathInsideBackupRoot,
   listRestorableBackups,
@@ -385,6 +386,10 @@ describe('S6 fleet backup contract', () => {
       )
     }
     expect(readFileSync(first.offhostPath!, 'utf8')).toBe('do-not-overwrite')
+    const recorded = await recordVerifiedOffhostRemote(db, dev!.id, 'nuxxion-dr:20260926_033000')
+    expect(recorded.offhostPath).toBe('nuxxion-dr:20260926_033000')
+    expect(recorded.offhostCopiedAt).toBeTruthy()
+    await expect(recordVerifiedOffhostRemote(db, dev!.id, '/var/lib/sic/backups')).rejects.toBeInstanceOf(FleetBackupError)
     client.close()
     try {
       rmSync(root, { recursive: true, force: true })
