@@ -128,3 +128,4 @@ notes:
   sales_local_sqlite_backup_date: 2026-09-27
   sales_local_sqlite_backup_retention_days: 14
   sales_local_sqlite_backup_work_order: WO-2026-09-27-sales-local-backup
+  sales_first_outreach_playbook: crm_saas_vault/Nuxxion-First-Outreach-Playbook.md

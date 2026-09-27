@@ -2,7 +2,7 @@
 type: index
 status: current
 area: overview
-updated: 2026-09-19
+updated: 2026-09-27
 aliases:
   - Start
   - Index
@@ -88,7 +88,7 @@ Renzo notes at the vault root (`Overview`, `Implementation-State`, `Milestones`,
 
 Official S-track S0–S6 **Successful**. C1 **code-shipped** (shared foundation). C2A–B2 **Successful**. **C2 Successful** (2026-09-15). Architecture: product-owned domains + shared foundation (**accepted** 2026-09-17). Martial Arts sequential multi-file Asset upload **shipped** (2026-09-17; template work, not a platform milestone). Martial Arts Customer #1 sell-readiness **repository-complete** 2026-09-19, awaiting external blockers ([[Martial-Arts-Customer-1-Sell-Readiness]]). Hosting-node repository path **shipped** 2026-09-19 ([[Hosting-Node-Architecture]]); live VPS/DNS/TLS remain external. Official S7/S8 remain **not Successful**. C3, Beauty: **not started**. Pre-VPS product quality program **complete**: [[Product-Workflow-UX-Audit]], [[Product-UX-Overhaul-Return]], [[Product-Release-Update-Lifecycle]]. No active work order.
 
-Details: [[Current-State]]. Lockfile: [[project-state.yaml]].
+Details: [[Current-State]]. Lockfile: [[project-state.yaml]]. First outreach cockpit: [[Nuxxion-First-Outreach-Playbook]].
 
 ---
 
