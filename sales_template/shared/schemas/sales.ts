@@ -15,6 +15,7 @@ import {
   OFFER_PRICING_TYPES,
   REPORT_RANGE_PRESETS,
 } from '../utils/catalog'
+import { PROSPECT_LANES, PROSPECT_PRIORITIES, PROSPECT_STATUSES } from '../utils/prospect'
 
 export const leadStageSchema = z.enum(LEAD_STAGES)
 export const opportunityStageSchema = z.enum(OPPORTUNITY_STAGES)
@@ -40,6 +41,7 @@ export const createCompanySchema = z.object({
   state: z.string().trim().max(80).optional(),
   active: z.boolean().optional(),
   lifecycle: companyLifecycleSchema.optional(),
+  doNotContact: z.boolean().optional(),
 })
 
 export const patchCompanySchema = z.object({
@@ -51,6 +53,7 @@ export const patchCompanySchema = z.object({
   state: z.string().trim().max(80).nullable().optional(),
   active: z.boolean().optional(),
   lifecycle: companyLifecycleSchema.optional(),
+  doNotContact: z.boolean().optional(),
 })
 
 export const createContactSchema = z.object({
@@ -292,4 +295,29 @@ export const patchProposalLetterheadSchema = z.object({
   email: z.string().max(200).optional(),
   website: z.string().max(200).optional(),
   footer: z.string().max(4000).optional(),
+})
+
+export const createProspectSchema = z.object({
+  name: z.string().trim().min(1).max(200),
+  website: z.string().trim().max(300).optional(),
+  city: z.string().trim().max(120).optional(),
+  state: z.string().trim().max(80).optional(),
+  discipline: z.string().trim().max(120).optional(),
+  email: z.string().trim().max(200).optional(),
+  phone: z.string().trim().max(80).optional(),
+  priority: z.enum(PROSPECT_PRIORITIES).optional(),
+  lane: z.enum(PROSPECT_LANES).optional(),
+  notes: z.string().trim().max(4000).optional(),
+  source: z.string().trim().min(1).max(80).optional(),
+  externalId: z.string().trim().min(1).max(200).optional(),
+  query: z.string().trim().max(500).optional(),
+  sourceUrl: z.string().trim().max(500).optional(),
+})
+
+export const listProspectsQuerySchema = z.object({
+  search: z.string().trim().max(200).optional(),
+  state: z.string().trim().max(80).optional(),
+  status: z.enum(PROSPECT_STATUSES).optional(),
+  priority: z.enum(PROSPECT_PRIORITIES).optional(),
+  lane: z.enum(PROSPECT_LANES).optional(),
 })

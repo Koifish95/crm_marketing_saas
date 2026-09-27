@@ -114,6 +114,7 @@ export async function createCompany(db: Database, input: {
   state?: string
   active?: boolean
   lifecycle?: CompanyLifecycle
+  doNotContact?: boolean
 }) {
   const lifecycle = input.lifecycle ?? 'prospect'
   if (!isCompanyLifecycle(lifecycle)) {
@@ -129,6 +130,7 @@ export async function createCompany(db: Database, input: {
     state: blankToNull(input.state),
     active: input.active ?? true,
     lifecycle,
+    doNotContact: input.doNotContact ?? false,
     createdAt,
     updatedAt: createdAt,
   })
@@ -148,6 +150,7 @@ export async function updateCompany(db: Database, id: number, input: {
   state?: string | null
   active?: boolean
   lifecycle?: CompanyLifecycle
+  doNotContact?: boolean
 }) {
   await requireAccount(db, id)
   const patch: Partial<typeof salesAccounts.$inferInsert> = { updatedAt: now() }
@@ -171,6 +174,9 @@ export async function updateCompany(db: Database, id: number, input: {
   }
   if (input.active !== undefined) {
     patch.active = input.active
+  }
+  if (input.doNotContact !== undefined) {
+    patch.doNotContact = input.doNotContact
   }
   if (input.lifecycle !== undefined) {
     if (!isCompanyLifecycle(input.lifecycle)) {

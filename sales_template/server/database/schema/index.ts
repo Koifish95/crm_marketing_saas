@@ -35,6 +35,7 @@ export const salesAccounts = sqliteTable('sales_accounts', {
   state: text('state'),
   active: integer('active', { mode: 'boolean' }).notNull().default(true),
   lifecycle: text('lifecycle').notNull().default('prospect'),
+  doNotContact: integer('do_not_contact', { mode: 'boolean' }).notNull().default(false),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
 }, table => [
@@ -312,4 +313,50 @@ export const salesProposalLines = sqliteTable('sales_proposal_lines', {
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
 }, table => [
   index('sales_proposal_lines_revision_id_idx').on(table.revisionId),
+])
+
+export const salesProspects = sqliteTable('sales_prospects', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  website: text('website'),
+  domainKey: text('domain_key'),
+  city: text('city'),
+  state: text('state'),
+  discipline: text('discipline'),
+  email: text('email'),
+  phone: text('phone'),
+  phoneKey: text('phone_key'),
+  locationKey: text('location_key'),
+  status: text('status').notNull().default('review'),
+  priority: text('priority').notNull().default('normal'),
+  lane: text('lane').notNull().default('national'),
+  possibleDuplicateProspectId: integer('possible_duplicate_prospect_id'),
+  salesAccountId: integer('sales_account_id').references(() => salesAccounts.id),
+  salesContactId: integer('sales_contact_id').references(() => salesContacts.id),
+  salesOpportunityId: integer('sales_opportunity_id').references(() => salesOpportunities.id),
+  notes: text('notes'),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+}, table => [
+  uniqueIndex('sales_prospects_domain_key_unique').on(table.domainKey),
+  uniqueIndex('sales_prospects_location_key_unique').on(table.locationKey),
+  index('sales_prospects_status_idx').on(table.status),
+  index('sales_prospects_state_idx').on(table.state),
+  index('sales_prospects_phone_key_idx').on(table.phoneKey),
+  index('sales_prospects_sales_account_id_idx').on(table.salesAccountId),
+])
+
+export const salesProspectObservations = sqliteTable('sales_prospect_observations', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  prospectId: integer('prospect_id').notNull().references(() => salesProspects.id),
+  source: text('source').notNull(),
+  externalId: text('external_id').notNull(),
+  query: text('query'),
+  sourceUrl: text('source_url'),
+  rawRef: text('raw_ref'),
+  discoveredAt: integer('discovered_at', { mode: 'timestamp_ms' }).notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+}, table => [
+  uniqueIndex('sales_prospect_observations_source_external_unique').on(table.source, table.externalId),
+  index('sales_prospect_observations_prospect_id_idx').on(table.prospectId),
 ])

@@ -2,7 +2,7 @@
 type: decision
 status: current
 area: process
-updated: 2026-09-20
+updated: 2026-09-27
 tags:
   - adr
   - saas
@@ -24,6 +24,25 @@ Decision: what we chose
 ```
 
 ---
+
+---
+
+## 2026-09-27 — Sales prospect pool for Martial Arts discovery
+
+Status: accepted
+
+Context: Nuxxion needs a supply of martial-arts academies to pursue. Sales Minimum V1 already manages a chosen pursuit. Dumping every discovery into Company would fill Work today. The Control Plane must stay a hosting registry. A separate product is not justified for one internal operator and one vertical.
+
+Decision:
+
+- The prospect pool is a Sales-owned aggregate (`sales_prospects`, `sales_prospect_observations`) in the Sales database. It is not a Control Plane feature, not a Martial Arts feature, and not a new application.
+- Promotion is the boundary. It creates or links Company, Contact when a public email or phone exists, and a Working opportunity attributed to Cold Outreach. It does not use Lead convert.
+- Identity is registrable domain, otherwise normalized name + city + state. Phone may flag a possible duplicate and does not merge.
+- Do not contact on the prospect blocks promotion. A company `do_not_contact` flag survives promotion and blocks a later match.
+- Discovery is a laptop command. The first source is OpenStreetMap Overpass for Utah, cached, rerun-safe. Homepage enrichment may copy public contact details. The product does not send email.
+- Scoring, sequences, Google Places, paid data, and social scraping are not part of this decision.
+
+Source: Scott 2026-09-27 (current Cursor chat work order WO-2026-09-27-sales-prospect-pool)
 
 ---
 

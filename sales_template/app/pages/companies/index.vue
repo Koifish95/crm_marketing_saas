@@ -20,6 +20,7 @@ type Company = {
   state: string | null
   active: boolean
   lifecycle: string
+  doNotContact: boolean
 }
 
 const search = ref('')
@@ -204,6 +205,9 @@ async function create() {
         <p class="record-item-meta">
           {{ companyLifecycleLabel(company.lifecycle) }}
           · {{ company.active ? 'Active' : 'Inactive' }}
+          <span v-if="company.doNotContact">
+            · Do not contact
+          </span>
           <span v-if="company.city || company.state">
             · {{ [company.city, company.state].filter(Boolean).join(', ') }}
           </span>

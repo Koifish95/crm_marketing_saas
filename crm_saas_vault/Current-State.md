@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-24
+updated: 2026-09-27
 aliases:
   - CURRENT_STATE
   - Current state
@@ -113,7 +113,7 @@ Local: http://localhost:5030 (`pnpm dev`). Laptop Docker PRODUCTION `:5000`, STA
 
 ### Sales product (`sales_template/`) — C2A–B2 Successful; C2 Successful; Minimum V1 code-shipped
 
-Second working product consuming the shared foundation `@crm/core` (Nuxt `extends`). Package `sales-crm` (`private: true`). Local: http://localhost:5040 (`pnpm dev`). SQLite `file:./data/app.sqlite`. Provisioned sqlite is `file:/app/data/sqlite/crm.sqlite`. Drizzle journal `0000`–`0004` is **Sales-owned** (including `users` / RBAC / `app_settings` created in `0000_wide_cyclops`; V1 firmographics/outcomes in `0004_sales_v1_dogfood`). Docker image **`crm-sales:c2`**. Proposal PDFs in provisioned envs use `SALES_PROPOSALS_DIR=/app/data/uploads/proposals` on the existing assets/uploads volume (S6 zip already includes `/app/data/uploads`).
+Second working product consuming the shared foundation `@crm/core` (Nuxt `extends`). Package `sales-crm` (`private: true`). Local: http://localhost:5040 (`pnpm dev`). SQLite `file:./data/app.sqlite`. Provisioned sqlite is `file:/app/data/sqlite/crm.sqlite`. Drizzle journal `0000`–`0005` is **Sales-owned** (including `users` / RBAC / `app_settings` created in `0000_wide_cyclops`; V1 firmographics/outcomes in `0004_sales_v1_dogfood`; prospect pool in `0005_sales_prospect_pool`). Docker image **`crm-sales:c2`**. Proposal PDFs in provisioned envs use `SALES_PROPOSALS_DIR=/app/data/uploads/proposals` on the existing assets/uploads volume (S6 zip already includes `/app/data/uploads`).
 
 Sales already performed the architectural role of the second consumer: it shares foundation infrastructure and owns a **divergent** domain (not a Core Lead/Campaign). Do not describe Sales as still needing to be built to challenge Core.
 
@@ -127,7 +127,20 @@ B1 adds Sales-owned Sources, Campaigns (no primary source), Campaign+Source Trac
 
 B2 adds a Sales-owned Proposal chain on each Opportunity: draft/issue/mark-sent/accept/decline/supersede, immutable issued commercial snapshots, instance letterhead (`sales.proposal_letterhead`), staff HTML preview, PDFKit-generated PDFs under `data/proposals/`, optional signed PDF upload. Accepted does **not** auto-Won. No browser e-sign, no CRM email, no customer portal.
 
-Sales Minimum V1 is **code-shipped** for SIC to begin dogfooding. It is **not** a new C-track milestone and is **not** owner-accepted Successful. Stop further Sales feature work until real friction from dogfooding. Investigation record: [[Sales-SIC-Dogfooding-Readiness-Assessment]]. Return: [[history/WO-2026-09-19-sales-minimum-v1-return]].
+Sales Minimum V1 is **code-shipped** for SIC to begin dogfooding. It is **not** a new C-track milestone and is **not** owner-accepted Successful. Investigation record: [[Sales-SIC-Dogfooding-Readiness-Assessment]]. Return: [[history/WO-2026-09-19-sales-minimum-v1-return]].
+
+**Prospect pool (internal SIC, 2026-09-27, code-shipped).** Discovered martial-arts businesses live in `sales_prospects` plus `sales_prospect_observations`, not in Company / Work today. Review at `/prospects`. **Promote** creates or links a Company, a Front Desk contact when a public email or phone exists, and a Working opportunity with source Cold Outreach and source detail `prospect:{id}`. The same registrable domain is one prospect. Without a domain, normalized name + city + state is one prospect. A shared phone flags a possible duplicate and does not merge. Do not contact on the prospect blocks promotion. After promotion, Do not contact sets `sales_accounts.do_not_contact`, which also blocks a later promote of a matching academy. Outreach email stays manual: Sales records an email Activity; the product does not send mail. No numeric score.
+
+One-state discovery, from `sales_template/`:
+
+```text
+pnpm prospect:discover
+pnpm prospect:discover -- --refresh
+pnpm prospect:enrich
+pnpm prospect:enrich -- --limit 25
+```
+
+`prospect:discover` queries OpenStreetMap Overpass for Utah once, caches the response at `data/prospect-cache/overpass/us-ut.json` (gitignored), and skips source ids already stored. A rerun does not create duplicate academies. `prospect:enrich` fetches academy homepages slowly, honors `robots.txt`, and copies a public email or phone only when the page mentions the academy. It does not send email. Return: [[history/WO-2026-09-27-sales-prospect-pool-return]]. Decision: [[SaaS-Decisions#2026-09-27 — Sales prospect pool for Martial Arts discovery]].
 
 No additional Sales CRM features shipped in C2 (no e-sign, email, portal). Strategic Insights has **not** been migrated as a Control Plane customer. C2 proof used disposable Control Plane account **C2 QA Test**, not lab-acme or SI mutation.
 
@@ -173,7 +186,8 @@ Exact `docker inspect` + compose. Combined status: container running **and** `/a
 Do not assume any of these exist:
 
 - C3 Beauty as an independently owned product; official S7–S11 **Successful** marks; **live** VPS / DNS / TLS issuance
-- Browser e-sign, public signing portal, customer portal, CRM email send, document/theme CMS
+- Browser e-sign, public signing portal, customer portal, CRM email send (including prospect-pool sequences, open tracking, and bounce handling), document/theme CMS
+- Automated prospect scoring, Google Places, paid lead data, and social-network scraping
 - Beauty product (sister business is the intended second **pilot**, not a shipped product)
 - Generic Lead / Campaign / Event / public-capture model in the foundation (not planned)
 - Option C account-management redesign (multiple instances of the same product, SI cutover)

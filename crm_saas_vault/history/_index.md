@@ -2,7 +2,7 @@
 type: index
 status: historical
 area: process
-updated: 2026-09-20
+updated: 2026-09-27
 tags:
   - history
   - saas
@@ -37,6 +37,7 @@ Closeouts, superseded roadmaps, and dated snapshots live here so agents do not t
 - [[history/WO-2026-09-19-cp-operator-experience-return]] — Control Plane operator experience & lifecycle return (code-shipped; not an official S-track Successful)
 - [[history/WO-2026-09-19-pre-vps-product-quality-return]] — Pre-VPS product quality program return (Phases 1–3 SUCCESS; not an official milestone)
 - [[history/WO-2026-09-19-sales-minimum-v1-return]] — Sales Minimum V1 SIC dogfooding return (code-shipped; not a platform milestone; not owner-accepted Successful)
+- [[history/WO-2026-09-27-sales-prospect-pool-return]] — Sales prospect pool and Utah OpenStreetMap discovery (code-shipped; not a platform milestone; email automation not included)
 - [[history/WO-2026-09-19-production-hosting-node-return]] — hosting-node / private Control Plane return (repository-complete; live VPS/DNS/TLS external; not official S7/S8)
 - [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]] — Martial Arts Customer #1 sell-readiness return (repository-complete; not a platform milestone)
 - [[history/WO-2026-09-17-ma-multi-asset-upload-return]] — Martial Arts sequential multi-file Asset upload return (template work; not a platform milestone)

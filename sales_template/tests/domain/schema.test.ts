@@ -18,6 +18,8 @@ describe('Sales schema isolation', () => {
     expect(schema).toHaveProperty('salesCampaigns')
     expect(schema).toHaveProperty('salesTrackingLinks')
     expect(schema).toHaveProperty('salesOffers')
+    expect(schema).toHaveProperty('salesProspects')
+    expect(schema).toHaveProperty('salesProspectObservations')
     expect(schema).toHaveProperty('salesOpportunityLines')
     expect(schema).toHaveProperty('users')
   })

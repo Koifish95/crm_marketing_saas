@@ -19,6 +19,7 @@ type Company = {
   state: string | null
   active: boolean
   lifecycle: string
+  doNotContact: boolean
 }
 type Contact = { id: number, firstName: string, lastName: string }
 type Opportunity = { id: number, name: string, stage: string }
@@ -46,6 +47,7 @@ const phone = ref('')
 const city = ref('')
 const state = ref('')
 const active = ref(true)
+const doNotContact = ref(false)
 const lifecycle = ref('prospect')
 const saving = ref(false)
 const notice = ref('')
@@ -63,6 +65,7 @@ watch(company, (value) => {
   city.value = value.city || ''
   state.value = value.state || ''
   active.value = value.active
+  doNotContact.value = Boolean(value.doNotContact)
   lifecycle.value = value.lifecycle || 'prospect'
 }, { immediate: true })
 
@@ -81,6 +84,7 @@ async function save() {
         city: city.value,
         state: state.value,
         active: active.value,
+        doNotContact: doNotContact.value,
         lifecycle: lifecycle.value,
       },
     })
@@ -113,6 +117,9 @@ async function save() {
         </span>
         <span v-if="company?.phone">
           · {{ company.phone }}
+        </span>
+        <span v-if="company?.doNotContact">
+          · Do not contact
         </span>
       </p>
     </template>
@@ -200,6 +207,13 @@ async function save() {
           type="checkbox"
         >
         Active record
+      </label>
+      <label class="touch-row">
+        <input
+          v-model="doNotContact"
+          type="checkbox"
+        >
+        Do not contact
       </label>
       <AppButton
         type="submit"

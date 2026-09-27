@@ -32,6 +32,7 @@ logs
 **/*.db-shm
 data/uploads/
 data/backups/
+data/prospect-cache/
 
 # Obsidian local UI state (vault notes stay tracked)
 .obsidian/workspace.json

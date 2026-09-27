@@ -19,3 +19,4 @@ logs
 /data/*.db-wal
 /data/*.db-shm
 /data/proposals/
+/data/prospect-cache/
