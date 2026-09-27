@@ -19,6 +19,14 @@ pnpm dev
 - Health: http://localhost:5040/api/health
 - Staff: `/login` → `/dashboard`, `/prospects` (discovered academies, not yet Sales work), `/companies` (outbound first), `/leads` (inbound), `/contacts`, `/opportunities`, `/activities`, `/campaigns`, `/offers`, `/proposals`
 - Utah discovery: `pnpm prospect:discover` (cached OpenStreetMap pull). Optional homepage contact lookup: `pnpm prospect:enrich`. Neither command sends email.
+- Local dogfood backup: `pnpm backup:local`. Writes a SQLite `VACUUM INTO` snapshot to `data/backups/sales-local-YYYYMMDDTHHMMSSZ.sqlite` (gitignored), checks integrity, and deletes snapshots older than 14 days except the newest. `pnpm backup:restore -- --to <disposable-path>` copies the newest snapshot somewhere else. It refuses to replace `data/app.sqlite`. This does not back up Control Plane, Martial Arts, or a VPS volume.
+- Optional daily schedule, from an elevated or normal prompt, only if Scott wants it. This does not create the task by itself:
+
+```text
+schtasks /Create /TN "Nuxxion Sales local backup" /SC DAILY /ST 02:00 /TR "cmd /c cd /d C:\Users\Scoy9\Projects\crm_marketing_saas\sales_template && pnpm backup:local"
+```
+
+If that task cannot find `pnpm`, replace `pnpm` with the full path from `where.exe pnpm`.
 - Public (no auth): `/inquire`, `/t/{token}` — intake defaults **off**
 - ADMIN: `/users`, `/security`, `/settings` (includes Public intake and Proposal letterhead)
 

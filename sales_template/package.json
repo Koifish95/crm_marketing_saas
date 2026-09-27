@@ -15,6 +15,8 @@
     "db:setup": "pnpm db:migrate && pnpm db:seed",
     "prospect:discover": "tsx scripts/discover-prospects.ts",
     "prospect:enrich": "tsx scripts/enrich-prospects.ts",
+    "backup:local": "tsx scripts/backup-local-sqlite.ts",
+    "backup:restore": "tsx scripts/backup-local-sqlite.ts restore",
     "db:studio": "drizzle-kit studio",
     "test": "vitest run"
   },

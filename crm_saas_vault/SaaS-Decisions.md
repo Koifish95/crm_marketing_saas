@@ -27,6 +27,18 @@ Decision: what we chose
 
 ---
 
+## 2026-09-27 — Local Sales dogfood sqlite backup
+
+Status: accepted
+
+Context: `sales_template/data/app.sqlite` now holds the Utah prospect pool and promoted pursuits. Control Plane fleet backup protects registered customer volumes, not this laptop file.
+
+Decision: A Sales command snapshots that file with SQLite `VACUUM INTO`, keeps timestamped copies under gitignored `data/backups/` for 14 days, and restores only to a path that is not the live database. It does not send email and does not replace fleet backup.
+
+Source: Scott 2026-09-27 (current Cursor chat, local backup authorized; outreach automation not authorized)
+
+---
+
 ## 2026-09-27 — Sales prospect pool for Martial Arts discovery
 
 Status: accepted

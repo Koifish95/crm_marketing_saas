@@ -20,3 +20,4 @@ logs
 /data/*.db-shm
 /data/proposals/
 /data/prospect-cache/
+/data/backups/

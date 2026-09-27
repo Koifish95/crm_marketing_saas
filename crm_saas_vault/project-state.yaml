@@ -124,3 +124,7 @@ notes:
   sales_prospect_pool_work_order: WO-2026-09-27-sales-prospect-pool
   sales_prospect_discovery: utah_openstreetmap
   sales_prospect_email_automation: not_authorized
+  sales_local_sqlite_backup: code_shipped
+  sales_local_sqlite_backup_date: 2026-09-27
+  sales_local_sqlite_backup_retention_days: 14
+  sales_local_sqlite_backup_work_order: WO-2026-09-27-sales-local-backup
