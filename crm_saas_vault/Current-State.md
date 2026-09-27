@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-20
+updated: 2026-09-24
 aliases:
   - CURRENT_STATE
   - Current state
@@ -56,17 +56,20 @@ Lockfile: [[project-state.yaml]].
 
 ```text
 crm_marketing_saas/
-├── pnpm-workspace.yaml          # packages/crm-core + martial_arts_template + sales_template
+├── pnpm-workspace.yaml          # packages/crm-core + martial_arts_template + sales_template + marketing_site
 ├── package.json                 # root workspace stub; Node 22+; pnpm 10
 ├── packages/crm-core/           # @crm/core — shared application foundation (C1 shipped; name historical)
 ├── martial_arts_template/       # Martial Arts product; local :5030; Docker :5000/:5010/:5020
 ├── sales_template/              # Sales product (sales-crm); local :5040; Docker image crm-sales:c2
+├── marketing_site/              # Nuxxion public site; local :5050; not a customer image; not deployed
 ├── control_plane/               # NOT in the workspace; http://127.0.0.1:52100
 ├── docs/                        # customer/staff/operator docs (derived; not this map)
 └── crm_saas_vault/              # this vault
 ```
 
 **Runtime:** Martial Arts, Sales, and Control Plane run on a **laptop lab node** (`kind=laptop`) or a **Linux hosting node** (`kind=vps`, same local Docker). Laptop `pnpm dev` remains MA :5030 and Sales :5040. Control Plane is always `127.0.0.1:52100` (SSH tunnel from a remote operator). Never `docker compose down -v`, never prune, never attach `webhosting_renzo_*` / leftover `renzo-*` volumes. Do not copy laptop sqlite onto the Pi. Do not touch `Projects/renzo_crm` or Koi-Pi PRODUCTION.
+
+**Marketing site:** `marketing_site/` (`nuxxion-marketing`) is the public Nuxxion site for Nuxxion Martial Arts. Local `pnpm dev` is http://localhost:5050. It is not a customer product image, does not write Sales or Martial Arts databases, and is not deployed. Phase 1 demo requests are validated locally only. Sales public intake still requires separate first and last names, and its `website` field remains a honeypot.
 
 **Image tags in use:** `martial-arts-acquisition:s2` (Acme lab), `martial-arts-acquisition:s4` (provisioned MA), `crm-sales:c2` (provisioned Sales). Do not rename or retag existing MA images.
 
