@@ -335,6 +335,10 @@ export const salesProspects = sqliteTable('sales_prospects', {
   salesContactId: integer('sales_contact_id').references(() => salesContacts.id),
   salesOpportunityId: integer('sales_opportunity_id').references(() => salesOpportunities.id),
   notes: text('notes'),
+  outreachStatus: text('outreach_status').notNull().default('none'),
+  nextTouchAt: integer('next_touch_at', { mode: 'timestamp_ms' }),
+  sequenceStartedAt: integer('sequence_started_at', { mode: 'timestamp_ms' }),
+  emailSourceUrl: text('email_source_url'),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
 }, table => [
@@ -344,6 +348,7 @@ export const salesProspects = sqliteTable('sales_prospects', {
   index('sales_prospects_state_idx').on(table.state),
   index('sales_prospects_phone_key_idx').on(table.phoneKey),
   index('sales_prospects_sales_account_id_idx').on(table.salesAccountId),
+  index('sales_prospects_outreach_status_idx').on(table.outreachStatus),
 ])
 
 export const salesProspectObservations = sqliteTable('sales_prospect_observations', {
@@ -359,4 +364,41 @@ export const salesProspectObservations = sqliteTable('sales_prospect_observation
 }, table => [
   uniqueIndex('sales_prospect_observations_source_external_unique').on(table.source, table.externalId),
   index('sales_prospect_observations_prospect_id_idx').on(table.prospectId),
+])
+
+export const salesProspectMessages = sqliteTable('sales_prospect_messages', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  prospectId: integer('prospect_id').notNull().references(() => salesProspects.id),
+  step: integer('step').notNull(),
+  subject: text('subject').notNull(),
+  body: text('body').notNull(),
+  delivery: text('delivery').notNull().default('queued'),
+  providerMessageId: text('provider_message_id'),
+  openToken: text('open_token'),
+  sentAt: integer('sent_at', { mode: 'timestamp_ms' }),
+  deliveredAt: integer('delivered_at', { mode: 'timestamp_ms' }),
+  bouncedAt: integer('bounced_at', { mode: 'timestamp_ms' }),
+  openedAt: integer('opened_at', { mode: 'timestamp_ms' }),
+  replyExcerpt: text('reply_excerpt'),
+  replyAt: integer('reply_at', { mode: 'timestamp_ms' }),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+}, table => [
+  uniqueIndex('sales_prospect_messages_prospect_step_unique').on(table.prospectId, table.step),
+  uniqueIndex('sales_prospect_messages_open_token_unique').on(table.openToken),
+  index('sales_prospect_messages_provider_message_id_idx').on(table.providerMessageId),
+  index('sales_prospect_messages_sent_at_idx').on(table.sentAt),
+])
+
+export const salesProspectRuns = sqliteTable('sales_prospect_runs', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  stateCode: text('state_code').notNull(),
+  status: text('status').notNull(),
+  storedCount: integer('stored_count').notNull().default(0),
+  rejectedCount: integer('rejected_count').notNull().default(0),
+  detail: text('detail'),
+  error: text('error'),
+  startedAt: integer('started_at', { mode: 'timestamp_ms' }).notNull(),
+  finishedAt: integer('finished_at', { mode: 'timestamp_ms' }),
+}, table => [
+  index('sales_prospect_runs_status_idx').on(table.status),
 ])

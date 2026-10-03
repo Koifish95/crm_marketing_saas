@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-27
+updated: 2026-10-03
 aliases:
   - CURRENT_STATE
   - Current state
@@ -38,6 +38,7 @@ This repo is the **generic SaaS platform** plus its first industry product, the 
 | SI Sales B2 (proposal system) | **Successful** (2026-09-13). Owner-accepted after core QA, refinements, and final regression QA at http://localhost:5040. Feature `84c0cc8`; refinements `c2d611e`; revision-selection `0be7e06`. Not C2. Evidence: [[history/B2_closeout]] |
 | C2 / Beauty / S7–S11 | C2 **Successful** (2026-09-15). Beauty and S7–S11 **Not started** |
 | Sales pre-development architecture audit | **Complete** (2026-09-11, docs only). Evidence: [[wip/WO-2026-09-11-sales-predev-audit-return]]. |
+| Unified QA/ticketing + Martial Arts runner | **Operationally proven**; deep UI/UX audit completed 2026-10-03 against `lab-acme-dev` (run `b80cd8c9-1569-40ea-83be-953fc9ae4cbe`), seven persisted findings |
 
 **Authorized work:** none. Control Plane operator experience & lifecycle **code-shipped** (2026-09-20): audit [[Control-Plane-Operator-UX-Audit]], return [[history/WO-2026-09-19-cp-operator-experience-return]]. Not an official S-track Successful. Pre-VPS product quality & release readiness **complete** (2026-09-19): Phase 1 [[Product-Workflow-UX-Audit]], Phase 2 [[Product-UX-Overhaul-Return]], Phase 3 [[Product-Release-Update-Lifecycle]] (return [[history/WO-2026-09-19-pre-vps-product-quality-return]]). Sales Minimum V1 remains **code-shipped** for SIC dogfooding; not a platform milestone and not owner-accepted Successful. Hosting-node repository work shipped 2026-09-19; live VPS/DNS/TLS remain external. Official S7/S8 remain **Not started**. Architecture law is [[ADR-Product-Owned-Domains-Shared-Foundation]] (2026-09-17). Hosting-node map: [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]]. Do not start C3, Beauty, SI migration, Core-domain promotion, package rename, or `apps/` moves. See [[Working-Agreement]] and [[Work-Order-Protocol]]. Closeout: [[history/C2_closeout]]. Asset upload return: [[history/WO-2026-09-17-ma-multi-asset-upload-return]]. Architecture return: [[history/WO-2026-09-17-product-owned-domains-shared-foundation-return]]. Customer #1 sell-readiness: [[Martial-Arts-Customer-1-Sell-Readiness]], [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]]. Sales V1 return: [[history/WO-2026-09-19-sales-minimum-v1-return]]. Assessment (investigation record, V1 closed): [[Sales-SIC-Dogfooding-Readiness-Assessment]].
 
@@ -129,7 +130,7 @@ B2 adds a Sales-owned Proposal chain on each Opportunity: draft/issue/mark-sent/
 
 Sales Minimum V1 is **code-shipped** for SIC to begin dogfooding. It is **not** a new C-track milestone and is **not** owner-accepted Successful. Investigation record: [[Sales-SIC-Dogfooding-Readiness-Assessment]]. Return: [[history/WO-2026-09-19-sales-minimum-v1-return]].
 
-**Prospect pool (internal SIC, 2026-09-27, code-shipped).** Discovered martial-arts businesses live in `sales_prospects` plus `sales_prospect_observations`, not in Company / Work today. Review at `/prospects`. **Promote** creates or links a Company, a Front Desk contact when a public email or phone exists, and a Working opportunity with source Cold Outreach and source detail `prospect:{id}`. The same registrable domain is one prospect. Without a domain, normalized name + city + state is one prospect. A shared phone flags a possible duplicate and does not merge. Do not contact on the prospect blocks promotion. After promotion, Do not contact sets `sales_accounts.do_not_contact`, which also blocks a later promote of a matching academy. Outreach email stays manual: Sales records an email Activity; the product does not send mail. No numeric score.
+**Prospect pool (internal SIC, 2026-09-27, code-shipped).** Discovered martial-arts businesses live in `sales_prospects` plus `sales_prospect_observations`, not in Company / Work today. Review at `/prospects`. **Promote** creates or links a Company, a Front Desk contact when a public email or phone exists, and a Working opportunity with source Cold Outreach and source detail `prospect:{id}`. The same registrable domain is one prospect. Without a domain, normalized name + city + state is one prospect. A shared phone flags a possible duplicate and does not merge. Do not contact on the prospect blocks promotion. After promotion, Do not contact sets `sales_accounts.do_not_contact`, which also blocks a later promote of a matching academy. Outreach mail is the prospect desk sequence, not a Sales Activity and not a general inbox. No numeric score.
 
 One-state discovery, from `sales_template/`:
 
@@ -140,7 +141,9 @@ pnpm prospect:enrich
 pnpm prospect:enrich -- --limit 25
 ```
 
-`prospect:discover` queries OpenStreetMap Overpass for Utah once, caches the response at `data/prospect-cache/overpass/us-ut.json` (gitignored), and skips source ids already stored. A rerun does not create duplicate academies. `prospect:enrich` fetches academy homepages slowly, honors `robots.txt`, and copies a public email or phone only when the page mentions the academy. It does not send email. Return: [[history/WO-2026-09-27-sales-prospect-pool-return]]. Decision: [[SaaS-Decisions#2026-09-27 — Sales prospect pool for Martial Arts discovery]].
+`prospect:discover` still queries OpenStreetMap Overpass for Utah once and caches `data/prospect-cache/overpass/us-ut.json` (gitignored). The operator desk at `/prospects` runs one practice state at a time and stores a row only when it has a name, city, state, its own website, and a public email from that site. Utah and the bordering states stay out of Ready and Sending. Existing Utah rows remain, lane `local`.
+
+The desk shows Stored, Ready, Sending today against a default cap of 5, and Needs you. A three-touch sequence sends only inside a Denver weekday window, with minutes between messages. A reply, bounce, or unsubscribe stops that academy. Any reply that is not an unsubscribe, bounce, or out-of-office lands in Needs you. The product does not write an answer. Opens are recorded only when a public base URL is set, are labeled unreliable, and never schedule the next touch. Two bounces in a Denver day pause sending. Promote still creates or links Company, contact, and a Working opportunity, and it does not send mail. The desk is on for the local dogfood database and off until enabled on any other Sales database. Settings: `/settings/prospects`. Mail is SMTP submit plus IMAP read of one mailbox; tests use a fixture and do not open a socket. Return: [[history/WO-2026-10-02-sales-prospect-outreach-desk-return]]. Decision: [[SaaS-Decisions#2026-10-02 — Sales prospect outreach desk]]. Earlier pool return: [[history/WO-2026-09-27-sales-prospect-pool-return]].
 
 **Local Sales sqlite backup (2026-09-27).** `sales_template/data/app.sqlite` is the internal dogfood database. From `sales_template/`, `pnpm backup:local` runs `VACUUM INTO` after a WAL checkpoint, integrity-checks the snapshot, and writes `data/backups/sales-local-<timestamp>.sqlite`. That directory is gitignored. Retention is 14 days, and the newest snapshot is kept even if it is older. `pnpm backup:restore -- --to <disposable-path>` copies a snapshot to another file and refuses the live database path. On Scott’s PC, Task Scheduler task `Nuxxion Sales local backup` runs `scripts/backup-local-scheduled.cmd` daily at 02:00 local. This is not the Control Plane fleet backup and does not protect provisioned volumes. First-outreach cockpit: [[Nuxxion-First-Outreach-Playbook]]. Return: [[history/WO-2026-09-27-sales-local-backup-return]].
 
@@ -153,6 +156,8 @@ C2A owner-accepted 2026-09-11. Closeout: [[history/C2A_closeout]]. C2B owner-acc
 C1 units 1–3 **code-shipped** and **still in force**: pnpm workspace, thin Nuxt layer, ESLint/architecture test (foundation must not import MA / sales / beauty), brand/health/app-env, auth/users/RBAC framework, settings KV, shell + registration. The package name is historical; it is the shared **application foundation**, not a CRM domain. No Core migrator. No Core pages. Version `0.0.0` / `workspace:*`. `control_plane` is **out** of the workspace. `martial_arts_template/` was **not** moved to `apps/`. Do not split the package or rename it without a new work order.
 
 ### Control Plane (`control_plane/`)
+
+**QA and unified ticketing (code-shipped and operationally proved 2026-10-02).** The operator shell adds **Tickets** and **QA Runs**. Relational tickets include source/category/lifecycle, comments, activity, assignment labels, resolution, and evidence links. Persisted QA runs include workflows, structured findings, and file-backed evidence. Findings may be converted/linked, dismissed, or marked duplicate without deletion. The Martial Arts Playwright runner selects an exact registered slug/ID, supports explicit gitignored environment credentials or process-only QA credentials, requires ready non-PROD, and refuses PROD before credential or browser work. `lab-acme-dev` read-only and disposable-lead runs passed; the real missing-page-heading finding became `TKT-11AF0427` with evidence and a linked recurrence. Evidence bytes are gitignored on disk and copied beside Control Plane registry snapshots. Product source was not changed. Architecture/runbook: [[QA-Ticketing-Architecture]], [[QA-Ticketing-Runbook]]. Operational evidence: [[history/WO-2026-10-02-qa-ticketing-operational-proof-return]].
 
 http://127.0.0.1:52100. Multi-page shell: Dashboard, Customers, Products, Environments, Backups, Reports, Hosting Nodes, Settings. Observe + provision **product instances**. Customers default to **active**; deactivate/reactivate keeps the account. Product instances deactivate independently (customer deactivate also marks them inactive and stops their live processes; customer reactivate restores instance `active` without starting Docker). New customer = account only. Add Product Instance picks Martial Arts or Sales, creates that instance’s PROD+DEV, and provisions in the background. Extra non-PROD attaches to an instance. One-PROD per instance. Upgrade “non-PROD first” is instance-scoped. **Stop** = process halt. **Decommission** = process gone, volumes stay. **Archive & Delete** = final backup + exact registered volume remove; row stays `archived`. Retry = continue/resume the same environments. PROD may store `public_hostname`; access URL becomes `https://{hostname}`. Health URLs stay loopback. No operator login; non-loopback is 403 unless `CONTROL_PLANE_ALLOW_REMOTE` + token. Unique initial-access passwords (never `setup`). Hosting node: [[Hosting-Node-Architecture]]. Details: [[Control-Plane]]. Operator UX audit: [[Control-Plane-Operator-UX-Audit]].
 
@@ -188,7 +193,7 @@ Exact `docker inspect` + compose. Combined status: container running **and** `/a
 Do not assume any of these exist:
 
 - C3 Beauty as an independently owned product; official S7–S11 **Successful** marks; **live** VPS / DNS / TLS issuance
-- Browser e-sign, public signing portal, customer portal, CRM email send (including prospect-pool sequences, open tracking, and bounce handling), document/theme CMS
+- Browser e-sign, public signing portal, customer portal, document/theme CMS. Prospect outreach mail is the Sales desk sequence only (capped SMTP/IMAP). It is not a general CRM inbox.
 - Automated prospect scoring, Google Places, paid lead data, and social-network scraping
 - Beauty product (sister business is the intended second **pilot**, not a shipped product)
 - Generic Lead / Campaign / Event / public-capture model in the foundation (not planned)
@@ -278,6 +283,7 @@ IMM-01–04 and NEAR-01–03 are **resolved / working**. Do not present them as 
 | Pre-VPS workflow/UX audit (Phase 1) | [[Product-Workflow-UX-Audit]] |
 | Pre-VPS UX overhaul return (Phase 2) | [[Product-UX-Overhaul-Return]] |
 | Pre-VPS release/update lifecycle (Phase 3) | [[Product-Release-Update-Lifecycle]] |
+| QA and unified ticketing | [[QA-Ticketing-Architecture]], [[QA-Ticketing-Runbook]] |
 | Product / operator documentation package (derived; not this map) | `docs/1 - README.md` |
 | Customer #1 production deploy | [[Customer-1-Production-Deploy-Runbook]] |
 | Customer #1 backup/restore | [[Customer-1-Backup-Restore-Runbook]] |

@@ -1,315 +1,353 @@
 <script setup lang="ts">
-import {
-  PROSPECT_LANES,
-  PROSPECT_PRIORITIES,
-  PROSPECT_STATUSES,
-  prospectLaneLabel,
-  prospectPriorityLabel,
-  prospectStatusLabel,
-} from '#shared/utils/prospect'
-
 definePageMeta({
   layout: 'internal',
-  middleware: ['auth', 'sales'],
+  middleware: ['auth', 'sales', 'prospect-desk'],
 })
 
 useHead({
   title: 'Prospects',
 })
 
-type Prospect = {
+type DeskItem = {
   id: number
   name: string
-  website: string | null
   city: string | null
   state: string | null
-  discipline: string | null
   email: string | null
-  phone: string | null
+  website: string | null
+  outreachStatus: string
+  why: string | null
+  step: number | null
+  subject: string | null
+}
+
+type Run = {
+  id: number
+  stateCode: string
   status: string
-  priority: string
-  lane: string
-  readiness: string
-  possibleDuplicateProspectId: number | null
+  storedCount: number
+  rejectedCount: number
+  detail: string | null
+  error: string | null
 }
 
-type Counts = {
-  new: number
-  review: number
-  promoted: number
-  skipped: number
-  do_not_contact: number
-  total: number
-}
-
-const search = ref('')
-const state = ref('UT')
-const status = ref('review')
-const priority = ref('')
-const lane = ref('')
-const creating = ref(false)
-const saving = ref(false)
-const errorMessage = ref('')
-const name = ref('')
-const website = ref('')
-const city = ref('')
-const prospectState = ref('UT')
-const email = ref('')
-const phone = ref('')
-const discipline = ref('')
-
-const query = computed(() => ({
-  search: search.value || undefined,
-  state: state.value || undefined,
-  status: status.value || undefined,
-  priority: priority.value || undefined,
-  lane: lane.value || undefined,
-}))
-
-const { data, error, pending, refresh } = await useFetch<{ items: Prospect[], counts: Counts }>('/api/prospects', {
-  query,
-})
-
-async function create() {
-  errorMessage.value = ''
-  saving.value = true
-  try {
-    const created = await $fetch<{ prospect: Prospect }>('/api/prospects', {
-      method: 'POST',
-      body: {
-        name: name.value,
-        website: website.value || undefined,
-        city: city.value || undefined,
-        state: prospectState.value || undefined,
-        email: email.value || undefined,
-        phone: phone.value || undefined,
-        discipline: discipline.value || undefined,
-        lane: 'local',
-      },
-    })
-    name.value = ''
-    website.value = ''
-    city.value = ''
-    email.value = ''
-    phone.value = ''
-    discipline.value = ''
-    await refresh()
-    await navigateTo(`/prospects/${created.prospect.id}`)
-  } catch (caught: unknown) {
-    const err = caught as { data?: { message?: string } }
-    errorMessage.value = err.data?.message || 'Could not add that prospect.'
-  } finally {
-    saving.value = false
+type Desk = {
+  stored: number
+  ready: number
+  sendingToday: number
+  sendingCap: number
+  needsYou: number
+  senderPaused: boolean
+  senderPausedReason: string | null
+  mailboxReady: boolean
+  capReached: boolean
+  blockReason: string | null
+  view: string
+  items: DeskItem[]
+  run: Run | null
+  config: {
+    practiceStates: string[]
   }
 }
+
+const route = useRoute()
+const view = computed(() => {
+  const value = String(route.query.view ?? 'needs_you')
+  return value === 'ready' || value === 'sending' ? value : 'needs_you'
+})
+
+const { data, error, refresh } = await useFetch<Desk>('/api/prospects/desk', {
+  query: computed(() => ({ view: view.value })),
+})
+
+const state = ref('')
+const starting = ref(false)
+const resuming = ref(false)
+const formError = ref('')
+const run = ref<Run | null>(null)
+let pollTimer: ReturnType<typeof setInterval> | undefined
+
+watch(data, (value) => {
+  if (!state.value && value?.config.practiceStates[0]) {
+    state.value = value.config.practiceStates[0]
+  }
+  if (value?.run && !run.value) {
+    run.value = value.run
+  }
+}, { immediate: true })
+
+const emptyCopy = computed(() => {
+  if (view.value === 'needs_you' && data.value?.senderPaused) {
+    return {
+      title: 'Sending is paused',
+      description: data.value.senderPausedReason || 'Check the bounces, then resume sending.',
+    }
+  }
+  if (view.value === 'ready') {
+    return {
+      title: 'No academies are waiting',
+      description: 'Run discovery for a practice state. Ready should stay larger than what you send.',
+    }
+  }
+  if (view.value === 'sending') {
+    return {
+      title: 'Nothing is in the sequence',
+      description: 'Qualified academies move here when a send window and the daily cap allow a message.',
+    }
+  }
+  const ready = data.value?.ready ?? 0
+  return {
+    title: 'Nothing needs you',
+    description: ready > 0
+      ? `${ready} ${ready === 1 ? 'academy is' : 'academies are'} Ready. Open that list to see them. Quiet follow-ups stay in Sending.`
+      : 'Replies and the sender pause show up here. Quiet follow-ups stay in Sending.',
+  }
+})
+
+const viewLabel = computed(() => {
+  if (view.value === 'ready') {
+    return 'Ready'
+  }
+  if (view.value === 'sending') {
+    return 'Sending'
+  }
+  return 'Needs you'
+})
+
+function cardClass(name: string) {
+  return view.value === name
+    ? 'rounded-md border-2 px-4 py-3 text-left'
+    : 'rounded-md border px-4 py-3 text-left'
+}
+
+function selectView(next: string) {
+  return navigateTo({ path: '/prospects', query: next === 'needs_you' ? {} : { view: next } })
+}
+
+async function pollRun(id: number) {
+  const current = await $fetch<Run>(`/api/prospects/runs/${id}`)
+  run.value = current
+  if (current.status === 'running') {
+    return
+  }
+  if (pollTimer) {
+    clearInterval(pollTimer)
+    pollTimer = undefined
+  }
+  await refresh()
+}
+
+async function discover() {
+  formError.value = ''
+  starting.value = true
+  try {
+    const created = await $fetch<Run>('/api/prospects/discover', {
+      method: 'POST',
+      body: { state: state.value },
+    })
+    run.value = created
+    if (pollTimer) {
+      clearInterval(pollTimer)
+    }
+    pollTimer = setInterval(() => {
+      void pollRun(created.id)
+    }, 2000)
+    await pollRun(created.id)
+  } catch (caught: unknown) {
+    const err = caught as { data?: { message?: string } }
+    formError.value = err.data?.message || 'Discovery did not start.'
+  } finally {
+    starting.value = false
+  }
+}
+
+async function resume() {
+  formError.value = ''
+  resuming.value = true
+  try {
+    await $fetch('/api/prospects/resume', { method: 'POST' })
+    await refresh()
+  } catch (caught: unknown) {
+    const err = caught as { data?: { message?: string } }
+    formError.value = err.data?.message || 'Sending stayed paused.'
+  } finally {
+    resuming.value = false
+  }
+}
+
+onBeforeUnmount(() => {
+  if (pollTimer) {
+    clearInterval(pollTimer)
+  }
+})
 </script>
 
 <template>
   <section class="space-y-6">
     <AppPageHeader
-      title="Prospect pool"
-      description="Discovered academies waiting for review. Promote sends one academy into Sales. Nothing here is emailed automatically."
+      title="Prospects"
+      description="Academies are stored here before anyone is emailed. The daily cap limits what goes out."
     >
       <template #actions>
-        <AppButton
-          type="button"
-          variant="secondary"
-          @click="creating = !creating"
+        <NuxtLink
+          class="text-sm"
+          to="/settings/prospects"
         >
-          {{ creating ? 'Cancel' : 'Add prospect' }}
-        </AppButton>
+          Desk settings
+        </NuxtLink>
       </template>
     </AppPageHeader>
-    <p
-      v-if="data?.counts"
-      class="text-sm text-muted"
-    >
-      {{ data.counts.total }} total
-      · {{ data.counts.review }} review
-      · {{ data.counts.new }} new
-      · {{ data.counts.promoted }} promoted
-      · {{ data.counts.skipped }} skipped
-      · {{ data.counts.do_not_contact }} do not contact
-    </p>
-    <AppAlert v-if="error || errorMessage">
-      {{ errorMessage || 'Could not load prospects.' }}
+    <AppAlert v-if="error || formError">
+      {{ formError || 'Could not load the prospect desk.' }}
     </AppAlert>
-    <AppPanel
-      v-if="creating"
-      title="Add prospect"
+    <AppAlert
+      v-if="data?.senderPaused"
+      tone="warning"
     >
-      <form
-        class="grid gap-3 sm:grid-cols-2"
-        @submit.prevent="create"
+      Sending is paused. {{ data.senderPausedReason || 'Resume when you have checked the bounces.' }}
+      <AppButton
+        class="ml-3"
+        type="button"
+        variant="secondary"
+        :loading="resuming"
+        @click="resume"
       >
-        <AppField
-          label="Academy name"
-          required
-        >
-          <input
-            v-model="name"
-            class="control"
-            required
-          >
-        </AppField>
-        <AppField label="Website">
-          <input
-            v-model="website"
-            class="control"
-          >
-        </AppField>
-        <AppField label="City">
-          <input
-            v-model="city"
-            class="control"
-          >
-        </AppField>
-        <AppField label="State">
-          <input
-            v-model="prospectState"
-            class="control"
-          >
-        </AppField>
-        <AppField label="Email">
-          <input
-            v-model="email"
-            class="control"
-            type="email"
-          >
-        </AppField>
-        <AppField label="Phone">
-          <input
-            v-model="phone"
-            class="control"
-          >
-        </AppField>
-        <AppField label="Discipline">
-          <input
-            v-model="discipline"
-            class="control"
-          >
-        </AppField>
-        <div class="sm:col-span-2">
-          <AppButton
-            type="submit"
-            :loading="saving"
-          >
-            Save prospect
-          </AppButton>
-        </div>
-      </form>
-    </AppPanel>
-    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-      <AppField label="Search">
-        <input
-          v-model="search"
-          class="control"
-          placeholder="Name, city, site, email"
-        >
-      </AppField>
-      <AppField label="State">
-        <input
-          v-model="state"
-          class="control"
-          placeholder="UT"
-        >
-      </AppField>
-      <AppField label="Status">
-        <select
-          v-model="status"
-          class="control"
-        >
-          <option value="">
-            All
-          </option>
-          <option
-            v-for="code in PROSPECT_STATUSES"
-            :key="code"
-            :value="code"
-          >
-            {{ prospectStatusLabel(code) }}
-          </option>
-        </select>
-      </AppField>
-      <AppField label="Priority">
-        <select
-          v-model="priority"
-          class="control"
-        >
-          <option value="">
-            All
-          </option>
-          <option
-            v-for="code in PROSPECT_PRIORITIES"
-            :key="code"
-            :value="code"
-          >
-            {{ prospectPriorityLabel(code) }}
-          </option>
-        </select>
-      </AppField>
-      <AppField label="Lane">
-        <select
-          v-model="lane"
-          class="control"
-        >
-          <option value="">
-            All
-          </option>
-          <option
-            v-for="code in PROSPECT_LANES"
-            :key="code"
-            :value="code"
-          >
-            {{ prospectLaneLabel(code) }}
-          </option>
-        </select>
-      </AppField>
+        Resume sending
+      </AppButton>
+    </AppAlert>
+    <AppAlert v-else-if="data && !data.mailboxReady">
+      Connect the mailbox and add the postal address before anything sends.
+    </AppAlert>
+    <AppAlert v-else-if="data?.capReached">
+      Today's cap of {{ data.sendingCap }} is reached. Ready academies stay in the backlog.
+    </AppAlert>
+    <AppAlert v-else-if="data?.blockReason && data.blockReason !== 'Outside the weekday send window.'">
+      {{ data.blockReason }}
+    </AppAlert>
+    <div class="grid gap-3 sm:grid-cols-4">
+      <button
+        type="button"
+        :class="cardClass('needs_you')"
+        :aria-pressed="view === 'needs_you'"
+        @click="selectView('needs_you')"
+      >
+        <p class="text-sm text-muted">
+          Needs you
+        </p>
+        <p class="text-2xl">
+          {{ data?.needsYou ?? '—' }}
+        </p>
+      </button>
+      <button
+        type="button"
+        :class="cardClass('ready')"
+        :aria-pressed="view === 'ready'"
+        @click="selectView('ready')"
+      >
+        <p class="text-sm text-muted">
+          Ready
+        </p>
+        <p class="text-2xl">
+          {{ data?.ready ?? '—' }}
+        </p>
+      </button>
+      <button
+        type="button"
+        :class="cardClass('sending')"
+        :aria-pressed="view === 'sending'"
+        @click="selectView('sending')"
+      >
+        <p class="text-sm text-muted">
+          Sending today
+        </p>
+        <p class="text-2xl">
+          {{ data ? `${data.sendingToday} / ${data.sendingCap}` : '—' }}
+        </p>
+      </button>
+      <div class="rounded-md border px-4 py-3">
+        <p class="text-sm text-muted">
+          Stored
+        </p>
+        <p class="text-2xl">
+          {{ data?.stored ?? '—' }}
+        </p>
+      </div>
     </div>
-    <p
-      v-if="pending && !data"
-      class="text-sm text-muted"
-    >
-      Loading…
+    <AppPanel title="Discovery">
+      <form
+        class="flex flex-wrap items-end gap-3"
+        @submit.prevent="discover"
+      >
+        <AppField label="Practice state">
+          <select
+            v-model="state"
+            class="control"
+          >
+            <option
+              v-for="code in data?.config.practiceStates ?? []"
+              :key="code"
+              :value="code"
+            >
+              {{ code }}
+            </option>
+          </select>
+        </AppField>
+        <AppButton
+          type="submit"
+          :loading="starting"
+        >
+          Run discovery
+        </AppButton>
+      </form>
+      <p
+        v-if="run"
+        class="mt-3 text-sm text-muted"
+      >
+        {{ run.stateCode }} · {{ run.status }}
+        · stored {{ run.storedCount }}
+        · rejected {{ run.rejectedCount }}
+        <span v-if="run.detail">
+          · {{ run.detail }}
+        </span>
+        <span v-if="run.error">
+          · {{ run.error }}
+        </span>
+      </p>
+    </AppPanel>
+    <p class="text-sm text-muted">
+      Showing {{ viewLabel }}
     </p>
     <AppEmpty
-      v-else-if="!data?.items.length"
-      title="No prospects in this view"
-      description="Change the filters, add a prospect, or run one-state discovery."
+      v-if="data && !data.items.length"
+      :title="emptyCopy.title"
+      :description="emptyCopy.description"
     />
     <ul
-      v-else
+      v-else-if="data"
       class="record-list"
     >
       <li
-        v-for="prospect in data.items"
-        :key="prospect.id"
+        v-for="item in data.items"
+        :key="item.id"
         class="record-item"
       >
         <NuxtLink
-          :to="`/prospects/${prospect.id}`"
+          :to="`/prospects/${item.id}`"
           class="record-item-title"
         >
-          {{ prospect.name }}
+          {{ item.name }}
         </NuxtLink>
         <p class="record-item-meta">
-          {{ prospectStatusLabel(prospect.status) }}
-          · {{ prospect.readiness }}
-          <span v-if="prospect.priority === 'high'">
-            · High
+          {{ [item.city, item.state].filter(Boolean).join(', ') || 'No place' }}
+          <span v-if="item.step">
+            · Touch {{ item.step }}
           </span>
-          <span v-if="prospect.city || prospect.state">
-            · {{ [prospect.city, prospect.state].filter(Boolean).join(', ') }}
-          </span>
-          <span v-if="prospect.discipline">
-            · {{ prospect.discipline }}
-          </span>
-          <span v-if="prospect.possibleDuplicateProspectId">
-            · Possible duplicate
+          <span v-if="item.why">
+            · {{ item.why }}
           </span>
         </p>
         <p class="record-item-meta">
-          {{ prospect.website || prospect.email || prospect.phone || 'No public contact yet' }}
+          {{ item.email || item.website || 'No public contact yet' }}
         </p>
       </li>
     </ul>

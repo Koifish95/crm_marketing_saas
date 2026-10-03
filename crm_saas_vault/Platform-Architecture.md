@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-19
+updated: 2026-10-02
 aliases:
   - ARCHITECTURE
   - Platform architecture
@@ -106,6 +106,10 @@ It lists customers/environments, observes up/down (container running **and** `/a
 Operational chain: Customer → Product Instance → Product/Build → Docker image → Environment → Hosting Node → Port (DNS/TLS later). The Control Plane does **not** need to know a product’s internal domain, how much source products share, or a foundation package version.
 
 Not in the pnpm workspace. No operator login. Loopback only. Details: [[Control-Plane]].
+
+### QA and unified tickets
+
+The Control Plane owns cross-product operational tickets plus persisted QA runs, workflows, findings, and evidence metadata. This is not product CRM domain and is not part of `@crm/core`. A Playwright runner exercises a registered Martial Arts non-PROD environment through its UI, records deterministic and structured-review findings, and never edits source or deploys. Findings remain separate from tickets until an operator creates or links one. Evidence bytes live outside SQLite and are included alongside Control Plane registry snapshots. Details: [[QA-Ticketing-Architecture]]. Runbook: [[QA-Ticketing-Runbook]].
 
 ---
 

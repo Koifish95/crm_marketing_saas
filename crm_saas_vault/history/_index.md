@@ -2,7 +2,7 @@
 type: index
 status: historical
 area: process
-updated: 2026-09-27
+updated: 2026-10-02
 tags:
   - history
   - saas
@@ -38,6 +38,10 @@ Closeouts, superseded roadmaps, and dated snapshots live here so agents do not t
 - [[history/WO-2026-09-19-pre-vps-product-quality-return]] — Pre-VPS product quality program return (Phases 1–3 SUCCESS; not an official milestone)
 - [[history/WO-2026-09-19-sales-minimum-v1-return]] — Sales Minimum V1 SIC dogfooding return (code-shipped; not a platform milestone; not owner-accepted Successful)
 - [[history/WO-2026-09-27-sales-prospect-pool-return]] — Sales prospect pool and Utah OpenStreetMap discovery (code-shipped; not a platform milestone; email automation not included)
+- [[history/WO-2026-10-02-sales-prospect-outreach-desk-return]] — Sales prospect outreach desk (code-shipped; not a platform milestone; not owner-accepted Successful)
+- [[history/WO-2026-10-02-qa-ticketing-platform-return]] — Control Plane unified ticketing + non-PROD Martial Arts QA runner (code-shipped; not a platform milestone; not owner-accepted Successful)
+- [[history/WO-2026-10-02-qa-ticketing-operational-proof-return]] — live `lab-acme-dev` QA proof, runner tuning, and real finding-to-ticket evidence
+- [[history/WO-2026-10-03-ma-ui-ux-audit-return]] — deep Martial Arts CRM UI/UX audit, persisted findings, evidence, and limitations
 - [[history/WO-2026-09-27-sales-local-backup-return]] — Local Sales sqlite backup for the dogfood database (code-shipped; not fleet backup; email automation not included)
 - [[history/WO-2026-09-19-production-hosting-node-return]] — hosting-node / private Control Plane return (repository-complete; live VPS/DNS/TLS external; not official S7/S8)
 - [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]] — Martial Arts Customer #1 sell-readiness return (repository-complete; not a platform milestone)

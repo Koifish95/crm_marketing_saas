@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-20
+updated: 2026-10-02
 aliases:
   - Platform control
   - Control module
@@ -16,6 +16,8 @@ tags:
 S3 and S4 **Successful**. Operator app: `control_plane/` at http://127.0.0.1:52100 — multi-page shell (Dashboard, Customers, Products, Environments, Backups, Reports, Hosting Nodes, Settings). Observe: [[S3-Control-Plane-Runbook]]. Provision: [[S4-Provision-Runbook]] (`Customers → New customer` then **Add product instance**). Hosting node: [[Hosting-Node-Architecture]]. Current state: [[Current-State]]. Operator UX audit: [[Control-Plane-Operator-UX-Audit]]. Return: [[history/WO-2026-09-19-cp-operator-experience-return]]. Historical frontend status: [[wip/archive/S5_Control_Plane_Productization_Status]]. Historical audit: [[wip/archive/Control_Plane_Post_Productization_Audit]]. Handoffs: [[history/S3_closeout]], [[history/S4_closeout]].
 
 It is not another customer admin page and not the platform owner's CRM.
+
+2026-10-02 QA/ticketing is **code-shipped**. The shell adds **Tickets** and **QA Runs**. Tickets have sources/categories/lifecycle, comments, activity, assignment labels, resolution, and evidence. QA runs preserve workflows/findings/evidence; findings may be ticketed, linked, dismissed, or marked duplicate without deletion. The Martial Arts Playwright runner selects a registered ready environment, refuses PROD before browser launch, and creates findings rather than code changes. Architecture/runbook: [[QA-Ticketing-Architecture]], [[QA-Ticketing-Runbook]]. No customer support portal or autonomous remediation exists.
 
 ```text
 Platform Owner
@@ -62,6 +64,8 @@ C2 **Successful** (2026-09-15): one account may own Martial Arts and Sales insta
 - Image registry / multi-region / Kubernetes
 - Billing, self-service, ThePond replacement
 - Managing external Renzo
+- Autonomous finding remediation or deployment
+- Customer-facing support portal
 
 ## Implementation (S3 facts + S6)
 
@@ -74,6 +78,8 @@ C2 **Successful** (2026-09-15): one account may own Martial Arts and Sales insta
 - Start: eligible when not decommissioned/archived/provisioning/failed, customer and product instance are active, and status `stopped`. Missing stays on Relaunch. Stop: runtime running (or healthy/unhealthy); never sets `decommissioned`. Bulk `{ scope: selected|all }`; `all` = eligible registered fleet, not the table filter. Sequential Docker; no `Promise.all`.
 - Customer `POST .../deactivate` / `.../reactivate`. Product instance same. Deactivate stops live processes; does not delete rows or volumes.
 - Operator events: `GET /api/events`. Reports: `GET /api/reports`. Fleet backups: `GET /api/backups`.
+- Tickets: `/tickets` with paginated/filterable `GET /api/tickets`; details, lifecycle changes, comments, activity, and QA evidence links. QA history: `/qa/runs`.
+- QA evidence bytes: gitignored `data/qa-evidence/`; metadata stays in SQLite. Control Plane registry snapshots copy evidence to a sibling `.evidence` directory.
 - No operator login; loopback bind
 - Non-loopback requests are refused unless `CONTROL_PLANE_ALLOW_REMOTE=true` **and** `x-control-plane-token` matches `CONTROL_PLANE_TOKEN`
 - New Martial Arts/Sales envs start as `admin` / `setup` with `mustChangePassword`; first login opens `/account/password`. Env files are `0600` where the OS allows. The Control Plane does not store the password chosen after that.

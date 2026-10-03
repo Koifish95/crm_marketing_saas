@@ -8,6 +8,8 @@ describe('operator shell navigation', () => {
       ['/customers', 'Customers'],
       ['/products', 'Products'],
       ['/environments', 'Environments'],
+      ['/tickets', 'Tickets'],
+      ['/qa/runs', 'QA Runs'],
       ['/backups', 'Backups'],
       ['/reports', 'Reports'],
       ['/nodes', 'Hosting Nodes'],

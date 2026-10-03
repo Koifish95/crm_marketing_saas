@@ -3,11 +3,25 @@ import { prospectLaneLabel, prospectPriorityLabel, prospectStatusLabel } from '#
 
 definePageMeta({
   layout: 'internal',
-  middleware: ['auth', 'sales'],
+  middleware: ['auth', 'sales', 'prospect-desk'],
 })
 
 const route = useRoute()
 const id = computed(() => Number(route.params.id))
+
+type Message = {
+  id: number
+  step: number
+  subject: string
+  body: string
+  delivery: string
+  sentAt: string | Date | null
+  deliveredAt: string | Date | null
+  bouncedAt: string | Date | null
+  openedAt: string | Date | null
+  replyExcerpt: string | null
+  replyAt: string | Date | null
+}
 
 type Observation = {
   id: number
@@ -28,7 +42,9 @@ type Prospect = {
   state: string | null
   discipline: string | null
   email: string | null
+  emailSourceUrl: string | null
   phone: string | null
+  outreachStatus: string
   status: string
   priority: string
   lane: string
@@ -40,6 +56,7 @@ type Prospect = {
   salesContactId: number | null
   salesOpportunityId: number | null
   observations: Observation[]
+  messages: Message[]
 }
 
 const { data: prospect, error, pending, refresh } = await useFetch<Prospect>(() => `/api/prospects/${id.value}`)
@@ -133,6 +150,15 @@ function formatWhen(value: string | Date) {
         Skip
       </AppButton>
       <AppButton
+        v-if="prospect.outreachStatus === 'ready' || prospect.outreachStatus === 'active' || prospect.outreachStatus === 'queued'"
+        type="button"
+        variant="secondary"
+        :loading="saving"
+        @click="act(`/api/prospects/${prospect.id}/pause`, 'Paused. No further messages will send.')"
+      >
+        Pause
+      </AppButton>
+      <AppButton
         v-if="prospect.status !== 'do_not_contact'"
         type="button"
         variant="secondary"
@@ -190,6 +216,24 @@ function formatWhen(value: string | Date) {
         </div>
         <div>
           <dt class="text-muted">
+            Email found on
+          </dt>
+          <dd>
+            <a
+              v-if="prospect.emailSourceUrl"
+              :href="prospect.emailSourceUrl"
+              rel="noopener"
+              target="_blank"
+            >
+              {{ prospect.emailSourceUrl }}
+            </a>
+            <template v-else>
+              —
+            </template>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-muted">
             Phone
           </dt>
           <dd>{{ prospect.phone || '—' }}</dd>
@@ -223,6 +267,58 @@ function formatWhen(value: string | Date) {
       >
         {{ prospect.notes }}
       </p>
+    </AppPanel>
+    <AppPanel
+      v-if="prospect"
+      class="mt-6"
+      title="Messages"
+    >
+      <AppEmpty
+        v-if="!prospect.messages.length"
+        title="No messages yet"
+        description="This academy is not in a sequence. Opens stay unavailable until a public base URL is saved."
+      />
+      <ol
+        v-else
+        class="space-y-4 text-sm"
+      >
+        <li
+          v-for="message in prospect.messages"
+          :key="message.id"
+          class="space-y-1"
+        >
+          <p class="font-medium">
+            Touch {{ message.step }} · {{ message.subject }}
+          </p>
+          <p class="text-muted">
+            {{ message.delivery }}
+            <span v-if="message.sentAt">
+              · Sent {{ formatWhen(message.sentAt) }}
+            </span>
+            <span v-if="message.deliveredAt">
+              · Delivered {{ formatWhen(message.deliveredAt) }}
+            </span>
+            <span v-if="message.bouncedAt">
+              · Bounced {{ formatWhen(message.bouncedAt) }}
+            </span>
+            <span v-if="message.openedAt">
+              · Opened {{ formatWhen(message.openedAt) }} (unreliable)
+            </span>
+            <span v-else>
+              · Opened unavailable
+            </span>
+          </p>
+          <p class="whitespace-pre-wrap">
+            {{ message.body }}
+          </p>
+          <p
+            v-if="message.replyExcerpt"
+            class="text-muted"
+          >
+            Reply: {{ message.replyExcerpt }}
+          </p>
+        </li>
+      </ol>
     </AppPanel>
     <AppPanel
       v-if="prospect"

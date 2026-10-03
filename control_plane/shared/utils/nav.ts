@@ -9,6 +9,8 @@ export const OPERATOR_NAV: OperatorNavLink[] = [
   { to: '/customers', label: 'Customers' },
   { to: '/products', label: 'Products' },
   { to: '/environments', label: 'Environments' },
+  { to: '/tickets', label: 'Tickets' },
+  { to: '/qa/runs', label: 'QA Runs' },
   { to: '/backups', label: 'Backups' },
   { to: '/reports', label: 'Reports' },
   { to: '/nodes', label: 'Hosting Nodes' },

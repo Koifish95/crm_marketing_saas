@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm'
 import { coreHealthBody } from '@crm/core/shared/utils/health'
 import { useDb } from '../database'
 
-export const SALES_SCHEMA_VERSION = '0004_sales_v1_dogfood'
+export const SALES_SCHEMA_VERSION = '0006_sales_prospect_outreach'
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()

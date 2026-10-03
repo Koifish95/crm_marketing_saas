@@ -18,3 +18,4 @@ logs
 /data/*.db-shm
 /data/provisioned/
 /data/backups/
+/data/qa-evidence/

@@ -1,5 +1,6 @@
 import { canUseCrmRole, registerNavItems } from '@crm/core/shared/utils/nav'
 import { registerSettingsSections } from '@crm/core/shared/utils/settings-registry'
+import { prospectDeskNavEnabled } from './prospect-desk-nav'
 
 function salesVisible(ctx: { role?: string, accessRights?: string[] }) {
   return canUseCrmRole(ctx.role) && (
@@ -14,7 +15,7 @@ registerNavItems([
     label: 'Prospects',
     match: '/prospects',
     order: 11,
-    visible: salesVisible,
+    visible: ctx => salesVisible(ctx) && prospectDeskNavEnabled.value,
   },
   {
     id: 'sales-companies',
@@ -103,5 +104,12 @@ registerSettingsSections([
     title: 'Proposal letterhead',
     description: 'Instance-configurable seller identity for Proposal PDFs. Optional logo. No theme CMS.',
     order: 30,
+  },
+  {
+    id: 'sales-prospects-settings',
+    to: '/settings/prospects',
+    title: 'Prospect desk',
+    description: 'Practice states, send cap, templates, and the mailbox for academy outreach.',
+    order: 40,
   },
 ])

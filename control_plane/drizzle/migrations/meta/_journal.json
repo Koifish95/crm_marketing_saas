@@ -57,6 +57,13 @@
       "when": 1789580000000,
       "tag": "0007_operator_lifecycle",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1790992800000,
+      "tag": "0008_qa_ticketing",
+      "breakpoints": true
     }
   ]
 }

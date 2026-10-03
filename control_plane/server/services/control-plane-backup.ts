@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync } from 'node:fs'
+import { copyFileSync, cpSync, existsSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Client } from '@libsql/client'
 import { sqliteFilePath } from '../database'
@@ -16,6 +16,7 @@ export async function snapshotControlPlaneRegistry(client: Client, input: {
   databaseUrl?: string
   filesRoot?: string
   now?: Date
+  evidenceRoot?: string
 } = {}) {
   const source = sqliteFilePath(input.databaseUrl || process.env.DATABASE_URL || 'file:./data/control-plane.sqlite')
   if (!source) {
@@ -34,5 +35,10 @@ export async function snapshotControlPlaneRegistry(client: Client, input: {
     }
     copyFileSync(source, dest)
   }
-  return { path: dest, filename, source }
+  const evidenceRoot = input.evidenceRoot || join(input.filesRoot || process.cwd(), 'data', 'qa-evidence')
+  const evidencePath = `${dest}.evidence`
+  if (existsSync(evidenceRoot)) {
+    cpSync(evidenceRoot, evidencePath, { recursive: true, errorOnExist: true })
+  }
+  return { path: dest, filename, source, evidencePath: existsSync(evidencePath) ? evidencePath : null }
 }

@@ -36,6 +36,11 @@ describe('C2A registration contracts', () => {
   })
 
   it('registers Sales settings sections only', () => {
-    expect(listSettingsSections().map(section => section.to)).toEqual(['/settings/access', '/settings/intake', '/settings/proposals'])
+    expect(listSettingsSections().map(section => section.to)).toEqual([
+      '/settings/access',
+      '/settings/intake',
+      '/settings/proposals',
+      '/settings/prospects',
+    ])
   })
 })

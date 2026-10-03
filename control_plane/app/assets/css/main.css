@@ -375,7 +375,8 @@ input[type="checkbox"] {
 }
 
 input,
-select {
+select,
+textarea {
   display: block;
   width: 100%;
   box-sizing: border-box;
@@ -402,4 +403,34 @@ a.button {
   display: inline-flex;
   align-items: center;
   text-decoration: none;
+}
+
+textarea {
+  padding: 0.65rem;
+  resize: vertical;
+}
+
+.narrow { max-width: 52rem; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0 0.75rem; }
+.detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) 18rem; gap: 1rem; align-items: start; }
+.detail-main, .detail-side { margin-top: 0; }
+.pre-wrap { white-space: pre-wrap; }
+.subcard, .comment { border-top: 1px solid #e6ecf1; padding: 0.75rem 0; }
+.stacked-dl dt { color: #5b6b7c; font-size: 0.8rem; margin-top: 0.75rem; }
+.stacked-dl dd { margin: 0.15rem 0 0; overflow-wrap: anywhere; }
+.activity { padding-left: 1.25rem; }
+.activity li { margin: 0.4rem 0; }
+.pager { justify-content: flex-end; margin-top: 0.75rem; }
+.finding-card h3 { margin-bottom: 0.35rem; }
+.review-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.75rem; border-top: 1px solid #e6ecf1; margin-top: 1rem; padding-top: 0.75rem; }
+.review-actions label { margin: 0; }
+.review-actions button { margin-top: 0.35rem; }
+.status-new, .status-reviewed, .status-running { background: #cfe2ff; color: #084298; }
+.status-triaged, .status-ready, .status-linked { background: #e2d6f3; color: #3d2463; }
+.status-in_progress, .status-review, .status-testing { background: #fff3cd; color: #664d03; }
+.status-done, .status-ticketed, .status-completed { background: #d8f3dc; color: #1b4332; }
+.status-rejected, .status-dismissed, .status-duplicate, .status-cancelled, .status-completed-with-findings { background: #f8d7da; color: #842029; }
+
+@media (max-width: 48rem) {
+  .detail-grid { grid-template-columns: 1fr; }
 }

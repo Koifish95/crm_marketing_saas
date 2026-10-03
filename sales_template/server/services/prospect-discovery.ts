@@ -26,15 +26,23 @@ export type OverpassElement = {
   tags?: Record<string, string>
 }
 
-export function overpassQueryForUtah() {
+export function overpassQueryForState(stateCode: string) {
+  const code = stateCode.trim().toUpperCase()
+  if (!/^[A-Z]{2}$/.test(code)) {
+    throw new Error('Discovery needs a two-letter state code.')
+  }
   return `[out:json][timeout:180];
-area["ISO3166-2"="US-UT"]->.searchArea;
+area["ISO3166-2"="US-${code}"]->.searchArea;
 (
   nwr["sport"~"martial_arts|judo|karate|taekwondo|aikido|kendo|brazilian_jiu_jitsu|jiu_jitsu|kickboxing|muay_thai|kung_fu|wushu|hapkido|krav_maga|capoeira|boxing",i](area.searchArea);
   nwr["amenity"="dojo"](area.searchArea);
   nwr["name"~"martial arts|dojo|jiu[- ]?jitsu|karate|taekwondo|tae kwon do|brazilian jiu",i](area.searchArea);
 );
 out tags center;`
+}
+
+export function overpassQueryForUtah() {
+  return overpassQueryForState('UT')
 }
 
 export function overpassExternalId(element: OverpassElement) {

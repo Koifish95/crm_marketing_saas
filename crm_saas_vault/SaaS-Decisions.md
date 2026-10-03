@@ -2,7 +2,7 @@
 type: decision
 status: current
 area: process
-updated: 2026-09-27
+updated: 2026-10-02
 tags:
   - adr
   - saas
@@ -24,6 +24,47 @@ Decision: what we chose
 ```
 
 ---
+
+---
+
+## 2026-10-02 — Control Plane owns unified tickets and cross-product QA records
+
+Status: accepted
+
+Context: Automated Martial Arts browser QA needs durable run/finding/evidence history and an operator review path. Manual engineering, future customer support, feature request, and system issue sources need one ticket lifecycle without putting an operational domain into a product or the shared application foundation.
+
+Decision:
+
+- The Control Plane owns normalized tickets, comments, activity, attachments/relations, QA runs/workflows, structured findings, evidence metadata, and finding-ticket links.
+- Findings and tickets remain separate. Operators explicitly create/link tickets, dismiss findings, or mark duplicates; original evidence is preserved.
+- Evidence bytes live outside SQLite under a root-contained gitignored directory. Control Plane registry snapshots copy the evidence tree beside the SQLite snapshot.
+- The first Playwright runner targets only a registered ready Martial Arts non-PROD environment and refuses PROD before launch. Test-data mutation requires an explicit flag.
+- Deterministic browser/UI/accessibility checks may generate findings. Subjective review must state observation, rationale, suggestion, and confidence. Neither path edits source, deploys, or remediates autonomously.
+- Existing Control Plane loopback/remote-token access protects internal ticket detail. Customer comment visibility is modeled, but no customer support portal is implemented.
+
+Details: [[QA-Ticketing-Architecture]], [[QA-Ticketing-Runbook]]. Source: Scott 2026-10-02 (current chat authorization, WO-2026-10-02-qa-ticketing-platform).
+
+---
+
+## 2026-10-02 — Sales prospect outreach desk
+
+Status: accepted
+
+Context: The prospect pool could store academies, and Scott still sent mail by hand. He wants the table to grow faster than mail goes out, with a hard cap so the mailbox is not treated as a bulk sender. The 2026-09-27 pool decision left sending, sequences, and reply reading out of scope.
+
+Decision:
+
+- The desk stays inside Sales. It is not a Control Plane product. `/prospects` is on for the local dogfood database and off until an operator enables it on any other Sales database.
+- Discovery from the desk runs one practice state at a time. Utah and ID, WY, CO, NM, AZ, and NV are excluded from Ready and Sending. A row is stored only with a name, city, state, its own website, and a public email found on that site.
+- Sending is SMTP for one mailbox and IMAP for replies. The default cap is 5 sends per Denver weekday, inside a configured window, with minutes between messages. Three touches, then stop. A reply, bounce, or unsubscribe stops that academy. Opens, when a public base URL exists, are labeled unreliable and never schedule the next touch.
+- Unsubscribe, bounce, and out-of-office are sorted by rule. Every other reply pauses the sequence and appears in Needs you. The product does not answer it.
+- Two bounces in a Denver day pause sending until the operator resumes it.
+- Promote still creates or links Company, contact, and a Working opportunity. Promote does not send mail and discovery does not fill Work today.
+- Scoring, Google Places, paid lists, social scraping, and a nationwide pull remain out of scope.
+
+The 2026-09-27 pool decision still governs identity, promotion, and do-not-contact. Its statements that the product does not send email and that discovery is Utah-only are superseded here.
+
+Source: Scott 2026-10-02 (WO-2026-10-02-sales-prospect-outreach-desk)
 
 ---
 

@@ -5,6 +5,7 @@ import type { Database } from '../database'
 import {
   salesAccounts,
   salesOpportunities,
+  salesProspectMessages,
   salesProspectObservations,
   salesProspects,
 } from '../database/schema'
@@ -28,6 +29,7 @@ import {
   type ProspectPriority,
   type ProspectStatus,
 } from '../../shared/utils/prospect'
+import { isExcludedOutreachState, qualificationFailure } from '../../shared/utils/prospect-desk'
 import { utcNowMs } from '../../shared/utils/time'
 
 const COLD_OUTREACH_CODE = 'cold_outreach'
@@ -58,6 +60,7 @@ export type ProspectIngestInput = {
   sourceUrl?: string | null
   rawRef?: string | null
   discoveredAt?: Date
+  emailSourceUrl?: string | null
 }
 
 export type IngestOutcome = 'created' | 'deduped' | 'known'
@@ -160,8 +163,28 @@ async function fillProspect(db: Database, id: number, input: ProspectIngestInput
     email: current.email ?? normalizeEmailAddress(input.email),
     phone: current.phone ?? blankToNull(input.phone),
     phoneKey: current.phoneKey ?? normalizePhoneKey(input.phone ?? current.phone),
+    emailSourceUrl: current.emailSourceUrl ?? blankToNull(input.emailSourceUrl),
     priority,
     status,
+    updatedAt: now(),
+  }).where(eq(salesProspects.id, id))
+  await syncOutreachReadiness(db, id)
+  return requireProspect(db, id)
+}
+
+async function syncOutreachReadiness(db: Database, id: number) {
+  const current = await requireProspect(db, id)
+  if (current.status === 'promoted' || current.status === 'do_not_contact') {
+    return current
+  }
+  if (current.outreachStatus !== 'none' && current.outreachStatus !== 'ready') {
+    return current
+  }
+  const excluded = isExcludedOutreachState(current.state)
+  const failure = qualificationFailure(current)
+  await db.update(salesProspects).set({
+    lane: excluded ? 'local' : 'national',
+    outreachStatus: failure ? 'none' : 'ready',
     updatedAt: now(),
   }).where(eq(salesProspects.id, id))
   return requireProspect(db, id)
@@ -228,6 +251,7 @@ export async function ingestProspect(db: Database, input: ProspectIngestInput) {
     priority: input.priority ?? 'normal',
     lane: input.lane ?? 'national',
     notes: blankToNull(input.notes),
+    emailSourceUrl: blankToNull(input.emailSourceUrl),
     createdAt,
     updatedAt: createdAt,
   }).returning()
@@ -236,6 +260,7 @@ export async function ingestProspect(db: Database, input: ProspectIngestInput) {
   }
   await addObservation(db, created.id, { ...input, name }, discoveredAt)
   await flagPossibleDuplicate(db, created.id, identity.phoneKey)
+  await syncOutreachReadiness(db, created.id)
   return { outcome: 'created' as const, prospect: await requireProspect(db, created.id) }
 }
 
@@ -319,11 +344,15 @@ export async function getProspectDetail(db: Database, id: number) {
       .limit(1)
     duplicateName = duplicate?.name ?? null
   }
+  const messages = await db.select().from(salesProspectMessages)
+    .where(eq(salesProspectMessages.prospectId, id))
+    .orderBy(asc(salesProspectMessages.step))
   return {
     ...prospect,
     readiness: prospectReadiness(prospect),
     duplicateName,
     observations,
+    messages,
   }
 }
 
@@ -337,6 +366,8 @@ export async function skipProspect(db: Database, id: number) {
   }
   await db.update(salesProspects).set({
     status: 'skipped',
+    outreachStatus: 'stopped',
+    nextTouchAt: null,
     updatedAt: now(),
   }).where(eq(salesProspects.id, id))
   return getProspectDetail(db, id)
@@ -356,6 +387,8 @@ export async function markProspectDoNotContact(db: Database, id: number) {
   }
   await db.update(salesProspects).set({
     status: 'do_not_contact',
+    outreachStatus: 'stopped',
+    nextTouchAt: null,
     updatedAt: now(),
   }).where(eq(salesProspects.id, id))
   return getProspectDetail(db, id)
@@ -490,6 +523,8 @@ export async function promoteProspect(db: Database, id: number, actorUserId: num
 
     await writer.update(salesProspects).set({
       status: 'promoted',
+      outreachStatus: 'stopped',
+      nextTouchAt: null,
       salesAccountId: company.id,
       salesContactId: contactId,
       salesOpportunityId: opportunity.id,

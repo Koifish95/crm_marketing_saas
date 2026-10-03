@@ -2,11 +2,11 @@
 # Human map: Current-State.md. This file is an index, not a second essay.
 # Update in the same commit as the work that changes these fields.
 schema_version: 1
-updated: 2026-09-27
+updated: 2026-10-02
 repo: crm_marketing_saas
 branch: working
 remote: https://github.com/Koifish95/crm_marketing_saas.git
-head_at_write: "5e26fe8c40894059afd11aefb6b4b267aca5fdb0"
+head_at_write: "00b757e88863268d266c95e4c3d633ed7b7a4885"
 
 canonical:
   bootstrap: Home.md
@@ -113,6 +113,18 @@ notes:
   cp_operator_experience: code_shipped
   cp_operator_experience_date: 2026-09-20
   cp_operator_experience_work_order: WO-2026-09-19-cp-operator-experience
+  qa_ticketing_platform: code_shipped
+  qa_ticketing_platform_date: 2026-10-02
+  qa_ticketing_work_order: WO-2026-10-02-qa-ticketing-platform
+  qa_martial_arts_runner: operationally_proved_lab_acme_dev
+  qa_martial_arts_operational_proof_date: 2026-10-02
+  qa_martial_arts_read_only_run: 1c55eb90-ae03-4731-9f48-8222311110b3
+  qa_martial_arts_final_run: a57ee9c7-e543-4a02-aeba-5aca9024ef0f
+  qa_martial_arts_proof_ticket: TKT-11AF0427
+  qa_martial_arts_ui_ux_audit_run: b80cd8c9-1569-40ea-83be-953fc9ae4cbe
+  qa_martial_arts_ui_ux_audit_date: 2026-10-03
+  qa_martial_arts_ui_ux_audit_findings: 7
+  qa_autonomous_remediation: forbidden
   marketing_site: phase1_visual
   marketing_site_path: marketing_site
   marketing_site_package: nuxxion-marketing
@@ -122,8 +134,12 @@ notes:
   sales_prospect_pool: code_shipped
   sales_prospect_pool_date: 2026-09-27
   sales_prospect_pool_work_order: WO-2026-09-27-sales-prospect-pool
-  sales_prospect_discovery: utah_openstreetmap
-  sales_prospect_email_automation: not_authorized
+  sales_prospect_discovery: practice_states_openstreetmap
+  sales_prospect_email_automation: code_shipped
+  sales_prospect_outreach_desk: code_shipped
+  sales_prospect_outreach_desk_date: 2026-10-02
+  sales_prospect_outreach_desk_work_order: WO-2026-10-02-sales-prospect-outreach-desk
+  sales_prospect_daily_cap: 5
   sales_local_sqlite_backup: code_shipped
   sales_local_sqlite_backup_date: 2026-09-27
   sales_local_sqlite_backup_retention_days: 14

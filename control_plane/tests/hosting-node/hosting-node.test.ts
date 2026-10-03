@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, existsSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -273,6 +273,24 @@ describe('hosting node identity', () => {
       const backup = await snapshotControlPlaneRegistry(client, { databaseUrl: url, filesRoot: root })
       expect(existsSync(backup.path)).toBe(true)
       expect(backup.path).toContain('control-plane')
+    } finally {
+      client.close()
+    }
+  })
+
+  it('includes QA evidence with the Control Plane registry snapshot', async () => {
+    const root = tmpRoot()
+    const url = `file:${join(root, 'control-plane.sqlite').replaceAll('\\', '/')}`
+    const evidenceRoot = join(root, 'data', 'qa-evidence')
+    mkdirSync(join(evidenceRoot, 'run-1'), { recursive: true })
+    writeFileSync(join(evidenceRoot, 'run-1', 'screenshot.png'), 'evidence')
+    await migrateDatabase(url)
+    await seedRegistry(url)
+    const { client } = createDb(url)
+    try {
+      const backup = await snapshotControlPlaneRegistry(client, { databaseUrl: url, filesRoot: root, evidenceRoot })
+      expect(backup.evidencePath).toBeTruthy()
+      expect(existsSync(join(backup.evidencePath!, 'run-1', 'screenshot.png'))).toBe(true)
     } finally {
       client.close()
     }

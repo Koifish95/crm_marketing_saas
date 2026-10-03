@@ -2,7 +2,7 @@
 type: note
 status: current
 area: operations
-updated: 2026-09-27
+updated: 2026-10-02
 aliases:
   - Nuxxion First Outreach Playbook
 tags:
@@ -16,7 +16,7 @@ tags:
 This is the cockpit for the first real outbound experiment. Sales at http://localhost:5040 is the operational record. This note is the checklist and the learning log.
 
 > [!warning]
-> Do not email anyone until you have approved the message in [[#Outreach Message — Approval Required]] and checked that academy’s website yourself.
+> The desk can send. It will not send until the mailbox, postal address, and templates are saved, and it will not send more than the daily cap. Approve the three templates in Sales settings before you connect a mailbox.
 
 ## What we have built
 
@@ -40,18 +40,21 @@ OpenStreetMap discovery
 
 You review a discovered academy, decide to pursue it, and the Sales app creates the company, contact, and working opportunity. You send the email from your own mailbox. You record what you did in Sales.
 
+## What the desk does
+
+Open http://localhost:5040/prospects (or the port Sales actually bound). The home screen shows Stored, Ready, Sending today, and Needs you. Discovery runs one practice state at a time and keeps Utah and the bordering states out of the queue. Settings live at `/settings/prospects`.
+
+Sending uses one mailbox, a Denver weekday window, and a default cap of 5. Three touches, then stop. A human reply waits in Needs you. The product does not answer it. Promote still does not send mail and does not provision a customer.
+
 ## What it does not do
 
 It does not:
 
-- send email
-- follow up by itself
-- read replies
-- process bounces
+- send a custom reply
+- follow up because an email was opened
 - provision a customer when you mark Won
-- decide who you should contact
-
-You are proving the human sales motion before any of that is automated.
+- pull every state in one run
+- score academies or scrape social networks
 
 ## Where things live
 
@@ -119,19 +122,19 @@ Maximum five academies. All five are still status **Review**, priority **Normal*
 
 ## Utah Tora Jutsu
 
-| | |
-|---|---|
-| Prospect | 93 |
-| Place | Lehi, UT |
-| Website | https://www.utahtorajutsu.com |
-| Email | info@utahtorajutsu.com |
-| Phone | +1 801-477-7402 |
-| Status | Review |
-| Priority | Normal |
-| Lane | National |
-| Promoted | No |
-| Provenance | OpenStreetMap node/13733183351 |
-| Warning | None recorded. The email domain matches the website. Still open the site. |
+|            |                                                                           |
+| ---------- | ------------------------------------------------------------------------- |
+| Prospect   | 93                                                                        |
+| Place      | Lehi, UT                                                                  |
+| Website    | https://www.utahtorajutsu.com                                             |
+| Email      | info@utahtorajutsu.com                                                    |
+| Phone      | +1 801-477-7402                                                           |
+| Status     | Review                                                                    |
+| Priority   | Normal                                                                    |
+| Lane       | National                                                                  |
+| Promoted   | No                                                                        |
+| Provenance | OpenStreetMap node/13733183351                                            |
+| Warning    | None recorded. The email domain matches the website. Still open the site. |
 
 Open in Sales: http://localhost:5040/prospects/93
 
