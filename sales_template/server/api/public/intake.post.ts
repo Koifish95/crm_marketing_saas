@@ -1,7 +1,7 @@
 import { createError, defineEventHandler, getRequestHeader, readBody } from 'h3'
 import { getRequestIP } from 'h3'
 import { publicIntakeSubmitSchema } from '../../../shared/schemas/sales'
-import { submitPublicIntake } from '../../services/public-intake'
+import { LEAD_INTAKE_KEY_HEADER, intakeKeyMatches, submitPublicIntake } from '../../services/public-intake'
 import { useDb } from '../../database'
 import { throwDomain } from '../../utils/api'
 import { allowPublicRequest } from '../../utils/rate-limit'
@@ -10,6 +10,9 @@ import { recordSecurityEvent, requestAuditContext } from '../../services/securit
 const MAX_BYTES = 32_768
 
 export default defineEventHandler(async (event) => {
+  if (!intakeKeyMatches(getRequestHeader(event, LEAD_INTAKE_KEY_HEADER))) {
+    throw createError({ statusCode: 401, message: 'Invalid intake key.' })
+  }
   const lengthHeader = getRequestHeader(event, 'content-length')
   const length = lengthHeader ? Number(lengthHeader) : 0
   if (Number.isFinite(length) && length > MAX_BYTES) {

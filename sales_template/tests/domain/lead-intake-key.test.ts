@@ -98,3 +98,41 @@ describe('keyed public lead intake', () => {
     expect(await leadCount()).toBe(baseline)
   })
 })
+
+describe('original public intake endpoint is also key-protected', () => {
+  const form = { firstName: 'Ann', lastName: 'Lee', email: 'ann@example.com', phone: '801-555-0111', message: 'hi' }
+  let legacy: (request: Request) => Promise<Response>
+
+  beforeEach(async () => {
+    const { writePublicIntakeConfig } = await import('../../server/services/public-intake')
+    await writePublicIntakeConfig(dbHandle.db, { enabled: true }, null)
+    const { default: handler } = await import('../../server/api/public/intake.post')
+    const app = createApp()
+    app.use('/api/public/intake', handler)
+    const web = toWebHandler(app)
+    legacy = request => web(request)
+    baseline = await leadCount()
+  })
+
+  function postLegacy(key?: string) {
+    return legacy(new Request('http://localhost/api/public/intake', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...(key === undefined ? {} : { 'x-intake-key': key }) },
+      body: JSON.stringify(form),
+    }))
+  }
+
+  it('creates the lead only with the correct key', async () => {
+    expect((await postLegacy(KEY)).status).toBe(200)
+    expect(await leadCount()).toBe(baseline + 1)
+  })
+
+  it('refuses missing key, wrong key and unset server key; creates nothing', async () => {
+    expect((await postLegacy()).status).toBe(401)
+    expect((await postLegacy('wrong')).status).toBe(401)
+    delete process.env.LEAD_INTAKE_KEY
+    expect((await postLegacy(KEY)).status).toBe(401)
+    expect((await postLegacy('')).status).toBe(401)
+    expect(await leadCount()).toBe(baseline)
+  })
+})
