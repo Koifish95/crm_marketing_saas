@@ -204,7 +204,7 @@ async function submit() {
     </div>
 
     <form
-      class="space-y-6"
+      class="space-y-6 pb-24 sm:pb-0"
       @submit.prevent="submit"
     >
       <AppAlert v-if="errorMessage">
@@ -391,6 +391,19 @@ async function submit() {
       <div class="flex flex-wrap gap-3">
         <AppButton
           type="submit"
+          :loading="pending"
+        >
+          Create household
+        </AppButton>
+      </div>
+
+      <div
+        class="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 px-4 pt-3 shadow-[0_-4px_16px_rgba(15,23,42,0.08)] backdrop-blur sm:hidden"
+        style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));"
+      >
+        <AppButton
+          type="submit"
+          block
           :loading="pending"
         >
           Create household

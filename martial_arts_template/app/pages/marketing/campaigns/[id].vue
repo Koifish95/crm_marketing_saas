@@ -124,6 +124,28 @@ interface EventListRow {
   status: string
 }
 
+interface AcquisitionFunnel {
+  activatedAt: string | null
+  activatedAtDisplay: string | null
+  rangeClampedToActivation: boolean
+  from: string
+  to: string
+  note: string
+  stages: Array<{ key: string, label: string, journeys: number, rateFromPrevious: number | null }>
+  availability: { available: number, empty: number, error: number }
+  failures: { journeys: number, categories: Array<{ category: string, journeys: number }> }
+  phoneClicked: number
+  directionsClicked: number
+  outcomes: { source: string, note: string, attended: number, joined: number }
+  breakdowns: {
+    program: Array<{ key: string, journeys: number }>
+    path: Array<{ key: string, journeys: number }>
+    device: Array<{ key: string, journeys: number }>
+    trackingLink: Array<{ id: number, label: string, publicSlug: string, journeys: number }>
+    day: Array<{ date: string, pageViews: number, scheduled: number }>
+  }
+}
+
 interface CampaignPerformance {
   plannedBudgetCents: number | null
   plannedBudgetSource: string
@@ -220,16 +242,66 @@ const { data: performance, error: performanceError, refresh: refreshPerformance 
   () => `/api/marketing/campaigns/${campaignId.value}/performance`,
   { immediate: false },
 )
+const funnelFrom = ref('')
+const funnelTo = ref('')
+const { data: funnel, error: funnelError, refresh: refreshFunnel } = await useFetch<AcquisitionFunnel>(
+  () => `/api/marketing/campaigns/${campaignId.value}/funnel`,
+  {
+    query: computed(() => ({
+      from: funnelFrom.value || undefined,
+      to: funnelTo.value || undefined,
+    })),
+    immediate: false,
+  },
+)
 
 watch(
   [canViewReports, campaignId],
   ([allowed, id]) => {
     if (allowed && Number.isInteger(id) && id > 0) {
       void refreshPerformance()
+      void refreshFunnel()
     }
   },
   { immediate: true },
 )
+
+watch([funnelFrom, funnelTo], () => {
+  if (canViewReports.value && Number.isInteger(campaignId.value) && campaignId.value > 0) {
+    void refreshFunnel()
+  }
+})
+
+const funnelPathLabels: Record<string, string> = {
+  SELF: 'Me',
+  CHILD: 'My child',
+  FAMILY: 'Family',
+}
+const funnelProgramLabels: Record<string, string> = {
+  ADULT_BJJ: 'Adult Jiu-Jitsu',
+  KIDS_BJJ: 'Kids Jiu-Jitsu',
+}
+const funnelDeviceLabels: Record<string, string> = {
+  MOBILE: 'Mobile',
+  TABLET: 'Tablet',
+  DESKTOP: 'Desktop',
+  UNKNOWN: 'Unknown',
+}
+const funnelFailureLabels: Record<string, string> = {
+  VALIDATION: 'Validation',
+  SLOT_UNAVAILABLE: 'Class unavailable',
+  RATE_LIMITED: 'Rate limited',
+  SERVER: 'Server',
+  NETWORK: 'Network',
+  UNKNOWN: 'Unknown',
+}
+
+function funnelPercent(rate: number | null) {
+  if (rate == null) {
+    return ''
+  }
+  return `${Math.round(rate * 100)}%`
+}
 
 useHead({
   title: computed(() => campaign.value?.name || 'Campaign'),
@@ -1927,6 +1999,182 @@ const linkableAssets = computed(() => {
             <AppAlert v-else-if="performanceError">
               Could not load detailed campaign performance.
             </AppAlert>
+            <AppPanel
+              v-if="canViewReports"
+              title="Acquisition funnel"
+              description="Unique journeys on the public trial path. Counts start when funnel measurement was turned on."
+            >
+              <form class="mb-4 flex flex-wrap items-end gap-3">
+                <AppField label="From">
+                  <input
+                    v-model="funnelFrom"
+                    type="date"
+                    class="control"
+                  >
+                </AppField>
+                <AppField label="To">
+                  <input
+                    v-model="funnelTo"
+                    type="date"
+                    class="control"
+                  >
+                </AppField>
+              </form>
+              <AppAlert v-if="funnelError">
+                Could not load the acquisition funnel.
+              </AppAlert>
+              <template v-else-if="funnel">
+                <p class="text-sm text-muted">
+                  {{ funnel.note }}
+                </p>
+                <p
+                  v-if="funnel.rangeClampedToActivation"
+                  class="mt-2 text-sm text-muted"
+                >
+                  The start date is before measurement began, so this report starts at {{ funnel.activatedAtDisplay }}.
+                </p>
+                <p class="mt-2 text-xs text-muted">
+                  Showing {{ funnel.from }} through {{ funnel.to }}.
+                </p>
+                <ol class="mt-4 space-y-2">
+                  <li
+                    v-for="stage in funnel.stages"
+                    :key="stage.key"
+                    class="flex items-baseline justify-between gap-3 border-b border-line py-2 text-sm"
+                  >
+                    <span class="text-navy-900">{{ stage.label }}</span>
+                    <span class="shrink-0 text-right">
+                      <span class="font-medium text-navy-900">{{ stage.journeys }}</span>
+                      <span
+                        v-if="funnelPercent(stage.rateFromPrevious)"
+                        class="ml-2 text-muted"
+                      >{{ funnelPercent(stage.rateFromPrevious) }} of previous</span>
+                    </span>
+                  </li>
+                </ol>
+                <dl class="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div class="kv-row">
+                    <dt>Availability empty</dt>
+                    <dd>{{ funnel.availability.empty }}</dd>
+                  </div>
+                  <div class="kv-row">
+                    <dt>Availability error</dt>
+                    <dd>{{ funnel.availability.error }}</dd>
+                  </div>
+                  <div class="kv-row">
+                    <dt>Booking failed</dt>
+                    <dd>{{ funnel.failures.journeys }}</dd>
+                  </div>
+                  <div class="kv-row">
+                    <dt>Phone clicked</dt>
+                    <dd>{{ funnel.phoneClicked }}</dd>
+                  </div>
+                  <div class="kv-row">
+                    <dt>Directions clicked</dt>
+                    <dd>{{ funnel.directionsClicked }}</dd>
+                  </div>
+                  <div class="kv-row">
+                    <dt>Trial attended (CRM)</dt>
+                    <dd>{{ funnel.outcomes.attended }}</dd>
+                  </div>
+                  <div class="kv-row">
+                    <dt>Joined (CRM)</dt>
+                    <dd>{{ funnel.outcomes.joined }}</dd>
+                  </div>
+                </dl>
+                <p
+                  v-if="funnel.failures.categories.length"
+                  class="mt-3 text-sm text-muted"
+                >
+                  Failures:
+                  <span
+                    v-for="(failure, index) in funnel.failures.categories"
+                    :key="failure.category"
+                  >
+                    {{ index ? ', ' : '' }}{{ funnelFailureLabels[failure.category] || failure.category }} {{ failure.journeys }}
+                  </span>
+                </p>
+                <div
+                  v-if="funnel.breakdowns.program.length || funnel.breakdowns.path.length || funnel.breakdowns.device.length"
+                  class="mt-4 grid gap-4 sm:grid-cols-3"
+                >
+                  <div v-if="funnel.breakdowns.program.length">
+                    <p class="text-sm font-medium text-navy-900">
+                      Program
+                    </p>
+                    <ul class="mt-1 text-sm text-muted">
+                      <li
+                        v-for="row in funnel.breakdowns.program"
+                        :key="row.key"
+                      >
+                        {{ funnelProgramLabels[row.key] || row.key }} · {{ row.journeys }}
+                      </li>
+                    </ul>
+                  </div>
+                  <div v-if="funnel.breakdowns.path.length">
+                    <p class="text-sm font-medium text-navy-900">
+                      Who
+                    </p>
+                    <ul class="mt-1 text-sm text-muted">
+                      <li
+                        v-for="row in funnel.breakdowns.path"
+                        :key="row.key"
+                      >
+                        {{ funnelPathLabels[row.key] || row.key }} · {{ row.journeys }}
+                      </li>
+                    </ul>
+                  </div>
+                  <div v-if="funnel.breakdowns.device.length">
+                    <p class="text-sm font-medium text-navy-900">
+                      Device
+                    </p>
+                    <ul class="mt-1 text-sm text-muted">
+                      <li
+                        v-for="row in funnel.breakdowns.device"
+                        :key="row.key"
+                      >
+                        {{ funnelDeviceLabels[row.key] || row.key }} · {{ row.journeys }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div
+                  v-if="funnel.breakdowns.trackingLink.length"
+                  class="mt-4"
+                >
+                  <p class="text-sm font-medium text-navy-900">
+                    Tracking link
+                  </p>
+                  <ul class="mt-1 text-sm text-muted">
+                    <li
+                      v-for="row in funnel.breakdowns.trackingLink"
+                      :key="row.id"
+                    >
+                      {{ row.label }} · /t/{{ row.publicSlug }} · {{ row.journeys }}
+                    </li>
+                  </ul>
+                </div>
+                <div
+                  v-if="funnel.breakdowns.day.length"
+                  class="mt-4"
+                >
+                  <p class="text-sm font-medium text-navy-900">
+                    By day
+                  </p>
+                  <ul class="mt-1 text-sm text-muted">
+                    <li
+                      v-for="row in funnel.breakdowns.day"
+                      :key="row.date"
+                    >
+                      {{ row.date }} · page {{ row.pageViews }} · scheduled {{ row.scheduled }}
+                    </li>
+                  </ul>
+                </div>
+                <p class="mt-3 text-xs text-muted">
+                  {{ funnel.outcomes.note }} Direct /trial visits with no campaign are stored and omitted here.
+                </p>
+              </template>
+            </AppPanel>
             <AppPanel
               v-if="canViewReports && performance"
               title="Detailed performance"

@@ -1,11 +1,11 @@
 export const ALLOW_EARLY_TRIAL_OUTCOMES_KEY = 'allowEarlyTrialOutcomes'
 export const ALLOW_EARLY_TRIAL_OUTCOMES_DEFAULT = true
-export const ALLOW_EARLY_TRIAL_OUTCOMES_LABEL = 'Allow early Trial outcomes'
+export const ALLOW_EARLY_TRIAL_OUTCOMES_LABEL = 'Allow early intro outcomes'
 export const ALLOW_EARLY_TRIAL_OUTCOMES_DESCRIPTION
-  = 'Allow authorized staff to mark a Trial as Attended or No-show before its scheduled start time.'
+  = 'Allow authorized staff to mark an intro class as Attended or No-show before its scheduled start time.'
 export const EARLY_TRIAL_OUTCOME_BLOCKED_MESSAGE
-  = 'This Trial cannot be marked Attended or No-show until its scheduled start time.'
-export const INVALID_TRIAL_OUTCOME_MESSAGE = 'Only a scheduled Trial can be marked Attended or No-show.'
+  = 'This intro class cannot be marked Attended or No-show until its scheduled start time.'
+export const INVALID_TRIAL_OUTCOME_MESSAGE = 'Only a scheduled intro class can be marked Attended or No-show.'
 
 export function mayRecordTrialOutcome(input: {
   allowEarlyTrialOutcomes: boolean

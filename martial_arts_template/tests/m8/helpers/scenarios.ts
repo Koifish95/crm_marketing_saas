@@ -18,7 +18,7 @@ import {
 } from '../../../server/services/leads'
 import { bookPublicHousehold } from '../../../server/services/public-trial'
 import { householdDisplayStatus } from '../../../shared/utils/labels'
-import { followUpDueAt } from '../../../shared/utils/follow-up'
+import { introConfirmationDueAt } from '../../../shared/utils/follow-up'
 import type { openTestDatabase } from '../../helpers/db'
 
 export const SCENARIO_NOW = Date.parse('2026-08-31T21:00:00.000Z')
@@ -296,8 +296,8 @@ export async function bookPublicParentChild(db: AppDb, input?: {
   }, { nowMs })
 }
 
-export function expectedFollowUpDue(nowMs = SCENARIO_NOW) {
-  return followUpDueAt(nowMs)
+export function expectedConfirmationDue(scheduledAtMs: number, nowMs = SCENARIO_NOW) {
+  return introConfirmationDueAt(scheduledAtMs, nowMs)
 }
 
 export function householdClosed(lead: Household) {

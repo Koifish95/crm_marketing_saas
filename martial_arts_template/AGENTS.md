@@ -93,7 +93,7 @@ Schema changes: `pnpm db:generate`, review the SQL, then `pnpm db:migrate`. Pref
 
 Do not commit `.env`, local SQLite (`data/app.sqlite`), marketing asset bytes (`data/uploads/`), or host backups (`data/backups/`). `pnpm db:setup` is idempotent.
 
-More: `crm_saas_vault/How-to-Run.md` (historical source notes). In this folder: `pnpm env:up` starts the **local template** triple at http://localhost:5000 (PROD), :5010 (STAGE), :5020 (DEV). Image `martial-arts-acquisition:s2`. S2 lab customer: `pnpm lab:docker` (`lab-acme-*`). Load laptop `data/app.sqlite` onto local PRODUCTION with `pnpm env:prod:load-local -- --confirm-load-local-into-prod`. Host backups: `pnpm backup:prod|stage|dev`. Local `pnpm dev` is http://localhost:5030. Laptop `pnpm backup:*` does **not** protect Koi-Pi volumes. Never attach `webhosting_renzo_*` or leftover `renzo-*` laptop volumes.
+More: `crm_saas_vault/How-to-Run.md` (platform run guide; the Renzo-era version is `crm_saas_vault/history/Renzo-How-to-Run.md`). In this folder: `pnpm env:up` starts the **local template** triple at http://localhost:5000 (PROD), :5010 (STAGE), :5020 (DEV). Image `martial-arts-acquisition:s2`. S2 lab customer: `pnpm lab:docker` (`lab-acme-*`). Load laptop `data/app.sqlite` onto local PRODUCTION with `pnpm env:prod:load-local -- --confirm-load-local-into-prod`. Host backups: `pnpm backup:prod|stage|dev`. Local `pnpm dev` is http://localhost:5030. Laptop `pnpm backup:*` does **not** protect Koi-Pi volumes. Never attach `webhosting_renzo_*` or leftover `renzo-*` laptop volumes.
 
 ## Layout
 

@@ -15,7 +15,7 @@ import {
   createSingleAdultHousehold,
   expectHouseholdStatus,
   expectPendingInitialCount,
-  expectedFollowUpDue,
+  expectedConfirmationDue,
   householdClosed,
   householdStatus,
   kidsSlot,
@@ -61,7 +61,7 @@ describe('M8 scenarios A — single-person household', () => {
       expectHouseholdStatus(scheduled, 'ACTIVE', 'Active')
       expectPendingInitialCount(scheduled, 1)
       const due = new Date(pendingInitialTasks(scheduled)[0]!.dueAt).getTime()
-      expect(due).toBe(expectedFollowUpDue(SCENARIO_NOW).getTime())
+      expect(due).toBe(expectedConfirmationDue(new Date(firstTrial.scheduledAt).getTime(), SCENARIO_NOW).getTime())
       expect(trialsFor(scheduled.lines[0])).toHaveLength(1)
 
       const later = await adultNoGiSlot(testDb.db)

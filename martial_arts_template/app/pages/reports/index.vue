@@ -286,7 +286,7 @@ const activeFilterCount = computed(() => [programId.value, source.value, campaig
         </AppStat>
         <AppStat
           label="Prospective members"
-          hint="Unique people, not trial rows"
+          hint="Unique people, not intro records"
         >
           {{ data.prospectiveMembers }}
         </AppStat>
@@ -327,7 +327,7 @@ const activeFilterCount = computed(() => [programId.value, source.value, campaig
           </div>
           <div>
             <dt class="text-sm text-muted">
-              Trial scheduled
+              Intro scheduled
             </dt>
             <dd class="font-display text-xl font-semibold">
               {{ data.funnel.trialScheduled }}
@@ -338,7 +338,7 @@ const activeFilterCount = computed(() => [programId.value, source.value, campaig
           </div>
           <div>
             <dt class="text-sm text-muted">
-              Trial attended
+              Intro attended
             </dt>
             <dd class="font-display text-xl font-semibold">
               {{ data.funnel.trialAttended }}
@@ -360,7 +360,7 @@ const activeFilterCount = computed(() => [programId.value, source.value, campaig
           </div>
         </dl>
         <p class="mt-4 text-sm text-muted">
-          Trial activity (rows, not people): {{ data.trialActivity.noShowCount }} no-shows, {{ data.trialActivity.cancelledCount }} cancellations, {{ data.trialActivity.linesWithMultipleTrials }} people with more than one trial.
+          Intro activity (records, not people): {{ data.trialActivity.noShowCount }} no-shows, {{ data.trialActivity.cancelledCount }} cancellations, {{ data.trialActivity.linesWithMultipleTrials }} people with more than one intro.
         </p>
       </AppPanel>
 

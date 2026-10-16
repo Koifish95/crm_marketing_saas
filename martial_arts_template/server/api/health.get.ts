@@ -4,7 +4,7 @@ import { useDb } from '../database'
 import { readBackupStatus } from '../services/host-backup'
 import { readDiskStatus } from '../services/disk-status'
 
-export const MARTIAL_ARTS_SCHEMA_VERSION = '0020_tidy_frog_thor'
+export const MARTIAL_ARTS_SCHEMA_VERSION = '0021_cheerful_lethal_legion'
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()

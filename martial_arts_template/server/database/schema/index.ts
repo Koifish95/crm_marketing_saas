@@ -297,6 +297,32 @@ export const leads = sqliteTable('leads', {
   ),
 ])
 
+/** Pre-booking public acquisition measurements. Not an Acquisition Event and not a Trial. */
+export const acquisitionFunnelEvents = sqliteTable('acquisition_funnel_events', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  journeyId: text('journey_id').notNull(),
+  eventType: text('event_type').notNull(),
+  occurredAt: integer('occurred_at', { mode: 'timestamp_ms' }).notNull(),
+  campaignId: integer('campaign_id').references(() => campaigns.id),
+  campaignTrackingLinkId: integer('campaign_tracking_link_id').references(() => campaignTrackingLinks.id),
+  trackingCode: text('tracking_code'),
+  utmSource: text('utm_source'),
+  utmMedium: text('utm_medium'),
+  utmContent: text('utm_content'),
+  utmTerm: text('utm_term'),
+  route: text('route'),
+  deviceClass: text('device_class'),
+  metadata: text('metadata'),
+  leadId: integer('lead_id').references(() => leads.id),
+  dedupeKey: text('dedupe_key').notNull(),
+}, table => [
+  uniqueIndex('acquisition_funnel_events_dedupe_unique').on(table.dedupeKey),
+  index('acquisition_funnel_events_journey_idx').on(table.journeyId),
+  index('acquisition_funnel_events_campaign_occurred_idx').on(table.campaignId, table.occurredAt),
+  index('acquisition_funnel_events_type_occurred_idx').on(table.eventType, table.occurredAt),
+  index('acquisition_funnel_events_lead_id_idx').on(table.leadId),
+])
+
 export const leadLines = sqliteTable('lead_lines', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   leadId: integer('lead_id').notNull().references(() => leads.id),

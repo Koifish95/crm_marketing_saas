@@ -1,5 +1,9 @@
 <script setup lang="ts">
+import { ageBandForAvailability, classTimeSelection } from '#shared/utils/acquisition-funnel'
+import type { PublicAttributionFields } from '#shared/utils/public-attribution'
 import { EXPERIENCE_LABELS } from '#shared/utils/labels'
+import { denverYmd, weekdayFromYmd } from '#shared/utils/time'
+import type { IntroSlotOption } from '~/components/IntroSlotPicker.vue'
 
 export interface TrialPersonDraft {
   key: string
@@ -18,11 +22,14 @@ const props = defineProps<{
   title?: string
   showIdentity?: boolean
   identityLocked?: boolean
+  attribution?: PublicAttributionFields | null
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: TrialPersonDraft]
 }>()
+
+const { trackOnce } = useAcquisitionFunnel()
 
 let latest = props.modelValue
 watch(() => props.modelValue, (value) => {
@@ -41,9 +48,54 @@ const availabilityQuery = computed(() => ({
     : undefined,
 }))
 
-const { data: slots, pending: slotsPending } = await useFetch('/api/public/availability', {
+const { data: slots, pending: slotsPending, error: slotsError } = await useFetch<IntroSlotOption[]>('/api/public/availability', {
   query: availabilityQuery,
 })
+
+watch(() => props.modelValue.programCode, (program) => {
+  trackOnce(`program:${program}`, 'program_selected', { program }, props.attribution)
+}, { immediate: true })
+
+watch(slotsError, (error) => {
+  if (!error || !import.meta.client) {
+    return
+  }
+  const age = props.modelValue.programCode === 'KIDS_BJJ' && props.modelValue.age
+    ? Number(props.modelValue.age)
+    : undefined
+  const ageBand = ageBandForAvailability(props.modelValue.programCode, age)
+  trackOnce(`availability:ERROR:${props.modelValue.programCode}:${ageBand}`, 'availability_result', {
+    program: props.modelValue.programCode,
+    ageBand,
+    outcome: 'ERROR',
+  }, props.attribution)
+})
+
+function onSlotSelected(slotId: string) {
+  patch({ slotId })
+  if (!slotId) {
+    return
+  }
+  try {
+    const slot = (slots.value ?? []).find(item => item.id === slotId)
+    if (!slot) {
+      return
+    }
+    const selection = classTimeSelection({
+      slotId,
+      program: props.modelValue.programCode,
+      startMinute: slot.startMinute,
+      todayYmd: denverYmd(Date.now()),
+      weekday: weekdayFromYmd(slot.date),
+    })
+    if (!selection) {
+      return
+    }
+    trackOnce(`class:${selection.slotId}`, 'class_time_selected', selection, props.attribution)
+  } catch {
+    // Selecting a class must not depend on measurement.
+  }
+}
 
 const availableDates = computed(() => {
   const dates: string[] = []
@@ -188,7 +240,7 @@ const kidsHint = computed(() => {
       :pending="slotsPending"
       :hint="kidsHint"
       @update:selected-date="patch({ selectedDate: $event, slotId: '' })"
-      @update:selected-slot-id="patch({ slotId: $event })"
+      @update:selected-slot-id="onSlotSelected"
     />
   </div>
 </template>

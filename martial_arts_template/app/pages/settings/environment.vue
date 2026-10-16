@@ -6,6 +6,8 @@ definePageMeta({
   middleware: ['auth', 'admin'],
 })
 
+await navigateTo('/settings', { replace: true })
+
 useHead({
   title: 'Environment',
 })

@@ -1,13 +1,44 @@
+import type { H3Event } from 'h3'
 import { createError, defineEventHandler, getRequestIP, readBody } from 'h3'
 import { publicHouseholdTrialSchema, publicTrialSchema } from '../../../shared/schemas/intro'
 import { useDb } from '../../database'
+import {
+  idempotencyFromUnknown,
+  resolveBookingAttribution,
+  safeRecordBookingFailed,
+  safeRecordTrialScheduled,
+} from '../../services/acquisition-funnel'
+import { DomainError } from '../../services/errors'
 import { bookPublicHousehold, bookPublicTrial } from '../../services/public-trial'
 import { throwDomain } from '../../utils/api'
 import { allowPublicRequest } from '../../utils/rate-limit'
 
+async function noteBookingFailure(event: H3Event, raw: unknown, error: unknown) {
+  try {
+    const status = error instanceof DomainError
+      ? error.statusCode
+      : error && typeof error === 'object' && 'statusCode' in error && typeof error.statusCode === 'number'
+        ? error.statusCode
+        : 500
+    const message = error instanceof Error ? error.message : ''
+    await safeRecordBookingFailed(useDb(), event, {
+      status,
+      message,
+      idempotencyKey: idempotencyFromUnknown(raw),
+      attribution: await resolveBookingAttribution(useDb(), raw),
+    })
+  } catch {
+    // A failed measurement must not change the booking error.
+  }
+}
+
 export default defineEventHandler(async (event) => {
   const ip = getRequestIP(event, { xForwardedFor: true }) ?? 'unknown'
   if (!allowPublicRequest(`trial:${ip}`)) {
+    await safeRecordBookingFailed(useDb(), event, {
+      status: 429,
+      message: 'Too many scheduling attempts. Please wait and try again.',
+    })
     throw createError({ statusCode: 429, message: 'Too many scheduling attempts. Please wait and try again.' })
   }
 
@@ -25,7 +56,9 @@ export default defineEventHandler(async (event) => {
       : legacyParsed && !legacyParsed.success
         ? legacyParsed.error.issues[0]?.message
         : 'Invalid trial request.'
-    throw createError({ statusCode: 400, message: message ?? 'Invalid trial request.' })
+    const failure = createError({ statusCode: 400, message: message ?? 'Invalid trial request.' })
+    await noteBookingFailure(event, raw, failure)
+    throw failure
   }
 
   try {
@@ -72,11 +105,21 @@ export default defineEventHandler(async (event) => {
         idempotencyKey: parsed.data.idempotencyKey,
       })
 
+    try {
+      await safeRecordTrialScheduled(useDb(), event, {
+        leadId: result.lead.id,
+        attribution: await resolveBookingAttribution(useDb(), raw),
+      })
+    } catch {
+      // The household, trial, and follow-up are already committed.
+    }
+
     return {
       ok: true,
       confirmation: result.confirmation,
     }
   } catch (error) {
+    await noteBookingFailure(event, raw, error)
     throwDomain(error)
   }
 })

@@ -27,6 +27,13 @@ const followUpCounts = computed(() => [
   { label: 'Due today', value: data.value?.followUp?.dueToday ?? 0, tone: 'warning' as const, to: '/tasks?view=due_today' },
   { label: 'Upcoming', value: data.value?.followUp?.upcoming ?? 0, tone: 'default' as const, to: '/tasks?view=upcoming' },
 ])
+
+const pipelineCounts = computed(() => LEAD_STATUSES.map(status => ({
+  status,
+  label: leadStatusLabel(status),
+  value: data.value?.byStatus?.[status] ?? 0,
+  to: { path: '/leads', query: { status } },
+})))
 </script>
 
 <template>
@@ -171,7 +178,7 @@ const followUpCounts = computed(() => [
         </AppStat>
         <AppStat
           label="Attended this month"
-          hint="Unique people, not trial rows"
+          hint="Unique people, not intro records"
         >
           {{ data?.attendedThisMonth ?? 0 }}
         </AppStat>
@@ -191,7 +198,7 @@ const followUpCounts = computed(() => [
             v-if="!data?.upcomingTrials?.length"
             bare
             title="No upcoming intros"
-            description="Scheduled trials will show here with the prospect’s name."
+            description="Scheduled intro classes will show here with the prospect’s name."
           />
           <ul
             v-else
@@ -226,19 +233,29 @@ const followUpCounts = computed(() => [
         </AppPanel>
 
         <AppPanel title="Pipeline by status">
-          <dl class="panel-list grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-3 text-sm">
-            <template
-              v-for="status in LEAD_STATUSES"
-              :key="status"
+          <ul class="panel-list divide-y divide-line text-sm">
+            <li
+              v-for="item in pipelineCounts"
+              :key="item.status"
             >
-              <dt class="text-muted">
-                {{ leadStatusLabel(status) }}
-              </dt>
-              <dd class="font-medium tabular-nums text-navy-900">
-                {{ data?.byStatus?.[status] ?? 0 }}
-              </dd>
-            </template>
-          </dl>
+              <NuxtLink
+                v-if="canUseCrm"
+                :to="item.to"
+                class="flex min-h-11 items-center justify-between gap-4 py-2 text-muted hover:text-brand-700"
+                :aria-label="`Open ${item.label} leads (${item.value})`"
+              >
+                <span>{{ item.label }}</span>
+                <span class="font-medium tabular-nums text-navy-900">{{ item.value }}</span>
+              </NuxtLink>
+              <div
+                v-else
+                class="flex items-center justify-between gap-4 py-2"
+              >
+                <span class="text-muted">{{ item.label }}</span>
+                <span class="font-medium tabular-nums text-navy-900">{{ item.value }}</span>
+              </div>
+            </li>
+          </ul>
         </AppPanel>
       </div>
     </template>

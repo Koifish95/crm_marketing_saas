@@ -37,7 +37,6 @@ describe('C1 registration contracts', () => {
       '/settings/campaigns',
       '/settings/meta',
       '/settings/access',
-      '/settings/environment',
     ])
   })
 })

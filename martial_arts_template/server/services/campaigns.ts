@@ -416,29 +416,37 @@ export async function updateCampaignTrackingLink(
   return getCampaign(db, campaignId)
 }
 
-export async function resolvePublicTrackingSlug(db: Database, rawSlug: string) {
+export async function loadActivePublicTracking(db: Database, rawSlug: string) {
   const slug = rawSlug.trim().toLowerCase()
   if (!slug) {
-    throw new DomainError('Tracking link not found.', 404)
+    return null
   }
   const [link] = await db.select().from(campaignTrackingLinks)
     .where(eq(campaignTrackingLinks.publicSlug, slug))
     .limit(1)
   if (!link?.active) {
-    throw new DomainError('Tracking link not found.', 404)
+    return null
   }
   const [campaign] = await db.select().from(campaigns).where(eq(campaigns.id, link.campaignId)).limit(1)
   if (!campaign || campaign.status === 'CANCELLED') {
+    return null
+  }
+  return { link, campaign, slug }
+}
+
+export async function resolvePublicTrackingSlug(db: Database, rawSlug: string) {
+  const loaded = await loadActivePublicTracking(db, rawSlug)
+  if (!loaded) {
     throw new DomainError('Tracking link not found.', 404)
   }
   return {
-    destinationPath: link.destinationPath || '/trial',
-    trackingCode: link.code,
-    campaign: campaign.slug,
-    utmSource: link.utmSource,
-    utmMedium: link.utmMedium,
-    utmContent: link.utmContent,
-    utmTerm: link.utmTerm,
+    destinationPath: loaded.link.destinationPath || '/trial',
+    trackingCode: loaded.link.code,
+    campaign: loaded.campaign.slug,
+    utmSource: loaded.link.utmSource,
+    utmMedium: loaded.link.utmMedium,
+    utmContent: loaded.link.utmContent,
+    utmTerm: loaded.link.utmTerm,
   }
 }
 

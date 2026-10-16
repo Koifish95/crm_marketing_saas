@@ -68,10 +68,9 @@ export function dueStateRank(state: FollowUpDueState): number {
 const WEEKEND = new Set([0, 6])
 
 export function addBusinessDays(ymd: string, days: number): string {
-  let remaining = days
+  let remaining = Math.abs(days)
   let current = ymd
   const step = days < 0 ? -1 : 1
-  remaining = Math.abs(days)
   while (remaining > 0) {
     current = addCalendarDays(current, step)
     if (!WEEKEND.has(weekdayFromYmd(current))) {
@@ -91,8 +90,8 @@ export function followUpDueAt(scheduledAtMs: number): Date {
 /** Confirmation call: last business day before the intro, at 5:00 PM Denver. */
 export function introConfirmationDueAt(trialScheduledAtMs: number, nowMs: number): Date {
   const trialYmd = denverYmd(trialScheduledAtMs)
-  let dueYmd = addBusinessDays(trialYmd, -1)
-  let due = denverWallToUtc(dueYmd, FOLLOW_UP_DUE_MINUTE)
+  const dueYmd = addBusinessDays(trialYmd, -1)
+  const due = denverWallToUtc(dueYmd, FOLLOW_UP_DUE_MINUTE)
   if (due.getTime() >= nowMs && due.getTime() < trialScheduledAtMs) {
     return due
   }

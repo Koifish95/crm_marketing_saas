@@ -13,7 +13,7 @@ import {
 
 describe('display labels', () => {
   it('maps persisted enums to staff-facing copy', () => {
-    expect(leadStatusLabel('TRIAL_SCHEDULED')).toBe('Trial scheduled')
+    expect(leadStatusLabel('TRIAL_SCHEDULED')).toBe('Intro scheduled')
     expect(trialStatusLabel('NO_SHOW')).toBe('No-show')
     expect(sourceLabel('WALK_IN')).toBe('Walk-in')
     expect(dueStateLabel('DUE_TODAY')).toBe('Due today')

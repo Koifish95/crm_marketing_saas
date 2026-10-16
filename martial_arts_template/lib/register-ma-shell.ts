@@ -72,11 +72,4 @@ registerSettingsSections([
     description: 'User Types, User Roles, and Access Rights for Marketing.',
     order: 50,
   },
-  {
-    id: 'ma-environment',
-    to: '/settings/environment',
-    title: 'Environment',
-    description: 'Download and restore SQLite backups to copy data between environments.',
-    order: 60,
-  },
 ])

@@ -542,7 +542,7 @@ async function addTrial() {
     await refresh()
   } catch (caught: unknown) {
     const err = caught as { data?: { message?: string }, message?: string }
-    errorMessage.value = err.data?.message || err.message || 'Could not schedule trial.'
+    errorMessage.value = err.data?.message || err.message || 'Could not schedule intro class.'
   }
 }
 
@@ -1168,7 +1168,7 @@ function closeTaskConfirm(open: boolean) {
               <div class="mt-4 grid gap-4 sm:grid-cols-2">
                 <div class="min-w-0">
                   <p class="text-xs font-semibold uppercase tracking-wide text-muted">
-                    Latest Trial
+                    Latest intro
                   </p>
                   <template v-if="lineSummaries[line.id]!.latestTrial">
                     <p class="mt-1 break-words font-medium text-navy-900">
@@ -1308,7 +1308,7 @@ function closeTaskConfirm(open: boolean) {
                   v-else-if="linePrimaryKind(line) === 'schedule'"
                   @click="startLineAction(line.id, 'schedule')"
                 >
-                  Schedule trial
+                  Schedule intro
                 </AppButton>
                 <AppButton
                   v-else-if="linePrimaryKind(line) !== 'attended' && linePrimaryKind(line) !== 'convert'"
@@ -1376,7 +1376,7 @@ function closeTaskConfirm(open: boolean) {
                   class="btn btn-subtle min-h-11 w-full justify-start"
                   @click="startLineAction(line.id, 'schedule')"
                 >
-                  Schedule trial
+                  Schedule intro
                 </button>
                 <button
                   v-if="canWrite && line.status !== 'JOINED' && line.status !== 'LOST' && linePrimaryKind(line) !== 'convert'"
@@ -1409,7 +1409,7 @@ function closeTaskConfirm(open: boolean) {
                     class="rounded-md border border-line p-4 text-sm"
                   >
                     <p class="text-xs font-semibold uppercase tracking-wide text-muted">
-                      {{ trialHasOccurred(nextTrialForLine(line)!) ? 'Intro' : 'Upcoming intro' }}
+                      {{ trialHasOccurred(nextTrialForLine(line)!) ? 'Intro class' : 'Upcoming intro class' }}
                     </p>
                     <p class="mt-1 font-medium text-navy-900">
                       {{ toBusinessDateTime(new Date(nextTrialForLine(line)!.scheduledAt).getTime()) }}
@@ -1499,7 +1499,7 @@ function closeTaskConfirm(open: boolean) {
                       type="submit"
                       :disabled="!selectedAddSlotId"
                     >
-                      Schedule trial
+                      Schedule intro
                     </AppButton>
                   </form>
                   <AppButton
@@ -1508,7 +1508,7 @@ function closeTaskConfirm(open: boolean) {
                     type="button"
                     @click="startLineAction(line.id, 'schedule')"
                   >
-                    Schedule another trial
+                    Schedule another intro
                   </AppButton>
                   <div
                     v-if="historyTrialsForLine(line).length"
@@ -2610,7 +2610,7 @@ function closeTaskConfirm(open: boolean) {
     <AppConfirm
       :open="cancelTrialId != null"
       title="Cancel this intro?"
-      description="The visit stays in history as cancelled. A still-open confirmation call for this trial will be cancelled too."
+      description="The visit stays in history as cancelled. A still-open confirmation call for this intro will be cancelled too."
       confirm-label="Cancel intro"
       danger
       @update:open="closeTrialConfirm"

@@ -161,32 +161,32 @@ onBeforeUnmount(() => {
     <div class="record-identity-row">
       <div class="relative min-w-0 flex-1">
         <div class="flex min-w-0 flex-wrap items-center gap-2">
-          <button
-            class="record-identity-trigger"
-            type="button"
-            :aria-label="ariaLabel"
-            :aria-expanded="open"
-            aria-haspopup="listbox"
-            :aria-controls="listboxId"
-            @click="openSelector"
-            @keydown="onIdentityKeydown"
-          >
-            <span class="record-identity-name">
-              {{ displayLabel }}
-            </span>
-            <svg
-              class="record-identity-chevron"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
+          <h1 class="record-identity-name">
+            <button
+              class="record-identity-trigger"
+              type="button"
+              :aria-label="ariaLabel"
+              :aria-expanded="open"
+              aria-haspopup="listbox"
+              :aria-controls="listboxId"
+              @click="openSelector"
+              @keydown="onIdentityKeydown"
             >
-              <path
-                fill-rule="evenodd"
-                d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </button>
+              <span class="min-w-0 break-words">{{ displayLabel }}</span>
+              <svg
+                class="record-identity-chevron"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </h1>
           <AppBadge
             v-if="displayBadge"
             :tone="displayBadgeTone"

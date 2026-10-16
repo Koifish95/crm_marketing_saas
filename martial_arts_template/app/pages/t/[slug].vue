@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { writePublicAttribution } from '#shared/utils/public-attribution'
+import { trackingRedirectPath, writePublicAttribution } from '#shared/utils/public-attribution'
 
 definePageMeta({
   layout: 'default',
@@ -23,7 +23,7 @@ const route = useRoute()
 const slug = computed(() => String(route.params.slug || ''))
 const { data, error } = await useFetch<PublicTrackingLink>(() => `/api/public/tracking/${encodeURIComponent(slug.value)}`)
 
-if (import.meta.client && data.value && !error.value) {
+if (data.value && !error.value) {
   writePublicAttribution({
     trackingCode: data.value.trackingCode,
     campaign: data.value.campaign,
@@ -32,7 +32,23 @@ if (import.meta.client && data.value && !error.value) {
     utmContent: data.value.utmContent ?? undefined,
     utmTerm: data.value.utmTerm ?? undefined,
   })
-  await navigateTo(data.value.destinationPath)
+  let target = ''
+  try {
+    target = trackingRedirectPath({
+      destinationPath: data.value.destinationPath,
+      trackingCode: data.value.trackingCode,
+      campaign: data.value.campaign,
+      utmSource: data.value.utmSource,
+      utmMedium: data.value.utmMedium,
+      utmContent: data.value.utmContent,
+      utmTerm: data.value.utmTerm,
+    })
+  } catch {
+    target = ''
+  }
+  if (target) {
+    await navigateTo(target, { redirectCode: 302, replace: true })
+  }
 }
 </script>
 

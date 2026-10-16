@@ -66,7 +66,7 @@ describe('LeadLine acquisition summary', () => {
     expect(summary.kind).toBe('open')
     expect(summary.latestTrial).toEqual(scheduled)
     expect(summary.nextScheduledTrial).toEqual(scheduled)
-    expect(summary.statusLabel).toBe('Trial scheduled')
+    expect(summary.statusLabel).toBe('Intro scheduled')
   })
 
   it('summarizes a guardian-only child line without inventing SELF', () => {
@@ -231,7 +231,7 @@ describe('LeadLine acquisition summary', () => {
       program: { name: 'Kids BJJ' },
     }))
     expect(open.kind).toBe('open')
-    expect(open.statusLabel).toBe('Trial scheduled')
+    expect(open.statusLabel).toBe('Intro scheduled')
     expect(open.conversion).toBeNull()
     expect(open.lost).toBeNull()
   })

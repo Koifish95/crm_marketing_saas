@@ -27,16 +27,17 @@ const canWrite = computed(() => user.value?.role === 'ADMIN' || user.value?.role
 
 const route = useRoute()
 const search = ref('')
-const status = ref('')
+const status = ref(typeof route.query.status === 'string' ? route.query.status : '')
 const programId = ref('')
 const source = ref('')
 const campaignId = ref(typeof route.query.campaignId === 'string' ? route.query.campaignId : '')
 const view = ref<'list' | 'board'>('list')
 
 watch(
-  () => route.query.campaignId,
-  (value) => {
-    campaignId.value = typeof value === 'string' ? value : ''
+  () => [route.query.status, route.query.campaignId],
+  ([nextStatus, nextCampaignId]) => {
+    status.value = typeof nextStatus === 'string' ? nextStatus : ''
+    campaignId.value = typeof nextCampaignId === 'string' ? nextCampaignId : ''
   },
 )
 

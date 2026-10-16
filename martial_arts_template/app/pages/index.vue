@@ -19,7 +19,9 @@ useHead({
         Acquisition
       </h1>
       <p class="mt-3 max-w-xl text-sm leading-6 text-muted">
-        Book a free intro class. Staff can sign in separately.
+        {{ trialPublished
+          ? 'Book a free intro class. Staff can sign in separately.'
+          : 'Online intro booking is not available right now. Please contact the academy directly; staff can sign in separately.' }}
       </p>
     </div>
     <NuxtLink
@@ -34,6 +36,17 @@ useHead({
         Adult and kids intros. No experience required.
       </p>
     </NuxtLink>
+    <div
+      v-else
+      class="panel p-5"
+    >
+      <p class="text-sm font-semibold text-navy-900">
+        Online booking is temporarily unavailable
+      </p>
+      <p class="mt-1 text-sm text-muted">
+        Please contact the academy directly to arrange an intro class.
+      </p>
+    </div>
     <p class="text-sm text-muted">
       Work at the academy?
       <NuxtLink

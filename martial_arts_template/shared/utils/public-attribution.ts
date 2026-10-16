@@ -49,6 +49,44 @@ export function readStoredPublicAttribution(): PublicAttributionFields | null {
   }
 }
 
+export interface TrackingRedirectInput {
+  destinationPath: string
+  trackingCode?: string | null
+  campaign?: string | null
+  utmSource?: string | null
+  utmMedium?: string | null
+  utmContent?: string | null
+  utmTerm?: string | null
+}
+
+const TRACKING_REDIRECT_BASE = 'http://127.0.0.1'
+
+function setAttributionParam(url: URL, key: string, value: string | null | undefined) {
+  const trimmed = value?.trim()
+  if (trimmed) {
+    url.searchParams.set(key, trimmed)
+  }
+}
+
+/** Internal path plus the query `/trial` and event registration already read. */
+export function trackingRedirectPath(input: TrackingRedirectInput) {
+  const dest = input.destinationPath.trim()
+  if (!dest.startsWith('/') || dest.startsWith('//') || dest.includes('://') || dest.includes('\\')) {
+    throw new Error('Tracking destination must be an internal path.')
+  }
+  const url = new URL(dest, TRACKING_REDIRECT_BASE)
+  if (url.origin !== TRACKING_REDIRECT_BASE) {
+    throw new Error('Tracking destination must be an internal path.')
+  }
+  setAttributionParam(url, 'c', input.trackingCode)
+  setAttributionParam(url, 'campaign', input.campaign)
+  setAttributionParam(url, 'utm_source', input.utmSource)
+  setAttributionParam(url, 'utm_medium', input.utmMedium)
+  setAttributionParam(url, 'utm_content', input.utmContent)
+  setAttributionParam(url, 'utm_term', input.utmTerm)
+  return `${url.pathname}${url.search}`
+}
+
 export function capturePublicAttribution(query: Record<string, unknown>): PublicAttributionFields | null {
   const fromQuery = attributionFromQuery(query)
   if (fromQuery) {

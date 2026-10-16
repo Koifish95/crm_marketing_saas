@@ -180,7 +180,23 @@ function confirmCancel() {
       v-else-if="!error && !tasks?.length"
       title="No follow-up in this view"
       description="Try another filter. Confirmation calls appear when an intro is scheduled; conversion calls appear after attendance or a no-show."
-    />
+    >
+      <div class="flex flex-wrap justify-center gap-2">
+        <NuxtLink
+          to="/leads"
+          class="btn btn-secondary"
+        >
+          Find a lead
+        </NuxtLink>
+        <NuxtLink
+          v-if="canWrite"
+          to="/leads/new"
+          class="btn btn-primary"
+        >
+          Add a lead
+        </NuxtLink>
+      </div>
+    </AppEmpty>
 
     <ul
       v-else
