@@ -94,6 +94,7 @@ export const environmentBackups = sqliteTable('environment_backups', {
   offhostPath: text('offhost_path'),
   offhostCopiedAt: text('offhost_copied_at'),
   previousExpectedImage: text('previous_expected_image'),
+  previousReleaseId: text('previous_release_id'),
 }, table => [
   index('environment_backups_environment_id_idx').on(table.environmentId),
 ])

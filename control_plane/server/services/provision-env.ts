@@ -106,6 +106,11 @@ export function renderProvisionedEnv(input: {
   }
 }
 
+export function readEnvValue(contents: string, key: string) {
+  const match = contents.match(new RegExp(`^${key}=(?:"([^"]*)"|'([^']*)'|([^\\r\\n]*))`, 'm'))
+  return (match?.[1] ?? match?.[2] ?? match?.[3] ?? '').trim()
+}
+
 export function patchEnvFileContents(contents: string, updates: Record<string, string>) {
   const keys = new Set(Object.keys(updates))
   const seen = new Set<string>()

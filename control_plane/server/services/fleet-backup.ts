@@ -23,11 +23,20 @@ import { getRegisteredEnvironment, listRegisteredEnvironments } from './registry
 import { restoreSnapshotToEnvironment, snapshotRegisteredEnvironment } from './fleet-backup-snapshot'
 import { extractFleetBackupZip, extractedSqliteDir, extractedUploadsDir } from './fleet-backup-extract'
 import { readFleetBackupManifest, writeFleetBackupZip } from './fleet-backup-zip'
-import { composeArgs, composeRootForEnvironment, repoRoot, resolveComposeEnvFile } from './docker-relaunch'
+import { composeArgs, composeRootForEnvironment, dockerSpawnOptions, repoRoot, resolveComposeEnvFile } from './docker-relaunch'
 import { inspectRegisteredContainer } from './docker-runtime'
-import { currentReleaseId, imageBuildArgs, waitUntilHealthy } from './provision-runtime'
-import { patchEnvFileContents } from './provision-env'
+import { imageBuildArgs, sourceReleaseId, waitUntilHealthy } from './provision-runtime'
+import { patchEnvFileContents, readEnvValue } from './provision-env'
 import { requireProduct } from '../products/catalog'
+import { recordOperatorEvent } from './operator-events'
+import {
+  digestImageRef,
+  imageRepository,
+  immutableImageTag,
+  isDigestImageRef,
+  normalizeImageId,
+  releaseIdentity,
+} from '../../shared/utils/image-identity'
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
 
 export class FleetBackupError extends Error {
@@ -479,6 +488,124 @@ export function writeUpgradeEnv(
   writeFileSync(envFile, next)
 }
 
+function absoluteEnvPath(row: {
+  envFileLocal: string
+  envFileExample: string
+  composeFile: string
+  productInstance: { productId: string }
+}) {
+  const envFile = resolveComposeEnvFile({
+    envFileLocal: row.envFileLocal,
+    envFileExample: row.envFileExample,
+    root: composeRootForEnvironment(row),
+  })
+  return isAbsolute(row.envFileLocal) ? row.envFileLocal : envFile
+}
+
+function dockerText(args: readonly string[], cwd = repoRoot()) {
+  const result = spawnSync('docker', [...args], dockerSpawnOptions(cwd))
+  if (result.status !== 0) {
+    throw new FleetBackupError(result.stderr?.trim() || result.stdout?.trim() || `docker ${args[0]} failed.`, 500)
+  }
+  return (result.stdout || '').trim()
+}
+
+function imageConfigReleaseId(imageRef: string) {
+  const text = dockerText(['image', 'inspect', '-f', '{{range .Config.Env}}{{println .}}{{end}}', imageRef])
+  for (const line of text.split('\n')) {
+    if (!line.startsWith('RELEASE_ID=')) {
+      continue
+    }
+    const value = line.slice('RELEASE_ID='.length).trim()
+    if (value && value !== 'dev') {
+      return value
+    }
+  }
+  return ''
+}
+
+function assertSameImage(actual: string, expected: string, label: string) {
+  const left = normalizeImageId(actual)
+  const right = normalizeImageId(expected)
+  if (!left || !right || left !== right) {
+    throw new FleetBackupError(`${label} image ${actual || 'missing'} is not ${expected}.`, 500)
+  }
+  return left
+}
+
+function recreateApp(row: {
+  envFileLocal: string
+  envFileExample: string
+  composeFile: string
+  composeProject: string
+  productInstance: { productId: string }
+}, previousEnv: string, revertOnFailure = true) {
+  const envFile = resolveComposeEnvFile({
+    envFileLocal: row.envFileLocal,
+    envFileExample: row.envFileExample,
+    root: composeRootForEnvironment(row),
+  })
+  const up = upgradeComposeArgs({
+    envFile,
+    composeFile: row.composeFile,
+    composeProject: row.composeProject,
+  })
+  const result = spawnSync('docker', up, dockerSpawnOptions(composeRootForEnvironment(row)))
+  if (result.status !== 0) {
+    if (revertOnFailure && previousEnv) {
+      writeFileSync(absoluteEnvPath(row), previousEnv)
+    }
+    throw new FleetBackupError(result.stderr?.trim() || result.stdout?.trim() || 'Compose recreate failed.', 500)
+  }
+}
+
+export async function publishRunningIdentity(db: Database, id: string) {
+  const row = requireEnvironment(await getRegisteredEnvironment(db, id))
+  const runningId = dockerText(['inspect', '-f', '{{.Image}}', row.containerName])
+  const source = imageConfigReleaseId(runningId) || sourceReleaseId(repoRoot())
+  if (source === 'dev') {
+    throw new FleetBackupError('Refusing to publish release id dev. The image has no git SHA.', 409)
+  }
+  const repository = imageRepository(row.expectedImage)
+  const releaseId = releaseIdentity(source, runningId)
+  const imageRef = digestImageRef(repository, runningId)
+  dockerText(['tag', runningId, immutableImageTag(repository, releaseId)])
+  const envPath = absoluteEnvPath(row)
+  const previousEnv = existsSync(envPath) ? readFileSync(envPath, 'utf8') : ''
+  writeUpgradeEnv(envPath, imageRef, releaseId)
+  try {
+    recreateApp(row, previousEnv)
+    assertSameImage(dockerText(['inspect', '-f', '{{.Image}}', row.containerName]), runningId, 'Pinned')
+  } catch (error) {
+    if (previousEnv && existsSync(envPath) && readFileSync(envPath, 'utf8') !== previousEnv) {
+      writeFileSync(envPath, previousEnv)
+      try {
+        recreateApp(row, previousEnv)
+      } catch {
+        // The first failure is the one to report.
+      }
+    }
+    throw error
+  }
+  await db.update(environments).set({ expectedImage: imageRef }).where(eq(environments.id, row.id))
+  const health = await waitUntilHealthy(row.healthUrl)
+  await recordOperatorEvent(db, {
+    action: 'release-pin',
+    summary: `${row.slug} release ${releaseId}`,
+    customerId: row.customer.id,
+    productInstanceId: row.productInstance.id,
+    environmentId: row.id,
+    detail: { releaseId, imageId: normalizeImageId(runningId), expectedImage: imageRef },
+  })
+  return {
+    environmentId: row.id,
+    releaseId: health.releaseId || releaseId,
+    imageId: normalizeImageId(runningId),
+    expectedImage: imageRef,
+    schemaVersion: health.schemaVersion || null,
+  }
+}
+
 export async function upgradeRegisteredEnvironment(
   db: Database,
   id: string,
@@ -489,59 +616,176 @@ export async function upgradeRegisteredEnvironment(
   if (!latest) {
     throw new FleetBackupError('Refuse upgrade without an S6 backup of this environment.', 409)
   }
-  const target = (expectedImage || row.expectedImage).trim()
-  if (!target) {
+  const requested = (expectedImage || row.expectedImage).trim()
+  if (!requested) {
     throw new FleetBackupError('expectedImage is required.', 400)
   }
   const fleet = await listRegisteredEnvironments(db)
   const siblings = fleet.filter(item => item.productInstance.id === row.productInstance.id)
-  if (row.type === 'PROD' && prodUpgradeBlocked(siblings, target, isAcmeLab(row.composeFile))) {
+  if (row.type === 'PROD' && prodUpgradeBlocked(siblings, requested, isAcmeLab(row.composeFile))) {
     throw new FleetBackupError('Upgrade a non-PROD environment to this image first.', 409)
   }
-  const previousImage = row.expectedImage
+  const envPath = absoluteEnvPath(row)
+  const previousEnv = existsSync(envPath) ? readFileSync(envPath, 'utf8') : ''
+  const previousReleaseId = readEnvValue(previousEnv, 'RELEASE_ID')
+  if (!previousReleaseId || previousReleaseId === 'dev') {
+    throw new FleetBackupError('Publish the running release identity before upgrading.', 409)
+  }
+  const previousImageId = dockerText(['inspect', '-f', '{{.Image}}', row.containerName])
+  const repository = imageRepository(row.expectedImage)
+  const previousRef = digestImageRef(repository, previousImageId)
+  dockerText(['tag', previousImageId, immutableImageTag(repository, previousReleaseId)])
+  await db.update(environmentBackups).set({
+    previousExpectedImage: previousRef,
+    previousReleaseId,
+  }).where(eq(environmentBackups.id, latest.id))
+
   const product = requireProduct(row.productInstance.productId)
-  const releaseId = currentReleaseId()
-  const built = spawnSync('docker', imageBuildArgs(target, product.dockerfile), {
-    cwd: repoRoot(),
-    encoding: 'utf8',
-    windowsHide: true,
-  })
-  if (built.status !== 0) {
-    throw new FleetBackupError(built.stderr?.trim() || built.stdout?.trim() || 'Local image build failed.', 500)
-  }
-  const envFile = resolveComposeEnvFile({
-    envFileLocal: row.envFileLocal,
-    envFileExample: row.envFileExample,
-    root: composeRootForEnvironment(row),
-  })
-  const absoluteEnvFile = isAbsolute(row.envFileLocal) ? row.envFileLocal : envFile
-  const previousEnv = existsSync(absoluteEnvFile) ? readFileSync(absoluteEnvFile, 'utf8') : ''
-  writeUpgradeEnv(absoluteEnvFile, target, releaseId)
-  const up = upgradeComposeArgs({
-    envFile,
-    composeFile: row.composeFile,
-    composeProject: row.composeProject,
-  })
-  const result = spawnSync('docker', up, {
-    cwd: composeRootForEnvironment(row),
-    encoding: 'utf8',
-    windowsHide: true,
-  })
-  if (result.status !== 0) {
-    if (previousEnv) {
-      writeFileSync(absoluteEnvFile, previousEnv)
+  let targetRef = requested
+  let releaseId = ''
+  let built = false
+  if (isDigestImageRef(requested) && requested !== previousRef) {
+    dockerText(['image', 'inspect', requested])
+    const sibling = siblings.find(item => item.id !== row.id && item.expectedImage === requested)
+    releaseId = sibling ? readEnvValue(readFileSync(absoluteEnvPath(sibling), 'utf8'), 'RELEASE_ID') : ''
+    if (!releaseId || releaseId === 'dev') {
+      throw new FleetBackupError('The target image has no recorded release id.', 409)
     }
-    throw new FleetBackupError(result.stderr?.trim() || result.stdout?.trim() || 'Upgrade compose up failed.', 500)
+  } else {
+    const source = sourceReleaseId(repoRoot())
+    if (source === 'dev') {
+      throw new FleetBackupError('Refusing to build with release id dev.', 409)
+    }
+    const builtResult = spawnSync(
+      'docker',
+      imageBuildArgs(product.image, product.dockerfile, source),
+      dockerSpawnOptions(repoRoot()),
+    )
+    if (builtResult.status !== 0) {
+      throw new FleetBackupError(builtResult.stderr?.trim() || builtResult.stdout?.trim() || 'Local image build failed.', 500)
+    }
+    built = true
+    const newId = dockerText(['image', 'inspect', '-f', '{{.Id}}', product.image])
+    if (normalizeImageId(newId) === normalizeImageId(previousImageId)) {
+      throw new FleetBackupError('Build did not produce a new image id. The previous image is unchanged.', 409)
+    }
+    targetRef = digestImageRef(imageRepository(product.image), newId)
+    releaseId = releaseIdentity(source, newId)
+    dockerText(['tag', newId, immutableImageTag(imageRepository(product.image), releaseId)])
   }
-  await db.update(environments).set({ expectedImage: target }).where(eq(environments.id, row.id))
+
+  writeUpgradeEnv(envPath, targetRef, releaseId)
+  recreateApp(row, previousEnv)
+  const runningId = assertSameImage(
+    dockerText(['inspect', '-f', '{{.Image}}', row.containerName]),
+    targetRef.split('@')[1] || '',
+    'Upgraded',
+  )
+  await db.update(environments).set({ expectedImage: targetRef }).where(eq(environments.id, row.id))
   const health = await waitUntilHealthy(row.healthUrl)
+  await recordOperatorEvent(db, {
+    action: 'upgrade',
+    summary: `${row.slug} ${previousReleaseId} → ${releaseId}`,
+    customerId: row.customer.id,
+    productInstanceId: row.productInstance.id,
+    environmentId: row.id,
+    detail: {
+      previousReleaseId,
+      previousImage: previousRef,
+      releaseId,
+      expectedImage: targetRef,
+      imageId: runningId,
+      backupId: latest.id,
+      built,
+    },
+  })
   return {
     environmentId: row.id,
-    previousImage,
-    expectedImage: target,
+    previousImage: previousRef,
+    previousReleaseId,
+    expectedImage: targetRef,
+    imageId: runningId,
     backupId: latest.id,
+    built,
     releaseId: health.releaseId || releaseId,
     schemaVersion: health.schemaVersion || null,
+  }
+}
+
+export async function rollbackRegisteredEnvironment(
+  db: Database,
+  id: string,
+  confirm: boolean,
+  backupId: string,
+  filesRoot = process.cwd(),
+) {
+  if (!confirm) {
+    throw new FleetBackupError('Type confirm to roll this environment back.', 400)
+  }
+  const resolved = await resolveRestoreRequest(db, id, backupId, filesRoot)
+  if (resolved.kind !== 'rollback') {
+    throw new FleetBackupError('Rollback only restores this environment’s own backup.', 409)
+  }
+  const imageRef = (resolved.backup.previousExpectedImage || '').trim()
+  const releaseId = (resolved.backup.previousReleaseId || '').trim()
+  if (!isDigestImageRef(imageRef)) {
+    throw new FleetBackupError('This backup has no immutable previous image.', 409)
+  }
+  if (!releaseId || releaseId === 'dev') {
+    throw new FleetBackupError('This backup has no previous release id.', 409)
+  }
+  dockerText(['image', 'inspect', imageRef])
+  const stopped = spawnSync('docker', ['stop', resolved.target.containerName], dockerSpawnOptions(repoRoot()))
+  if (stopped.status !== 0) {
+    throw new FleetBackupError(stopped.stderr?.trim() || stopped.stdout?.trim() || 'Stop failed.', 500)
+  }
+  const extractDir = join(tmpdir(), `fleet-rollback-${randomUUID()}`)
+  mkdirSync(extractDir, { recursive: true })
+  const registered = (await listRegisteredEnvironments(db)).map(item => item.containerName)
+  const envPath = absoluteEnvPath(resolved.target)
+  const previousEnv = existsSync(envPath) ? readFileSync(envPath, 'utf8') : ''
+  try {
+    await extractFleetBackupZip(resolved.zipPath, extractDir)
+    const manifest = readFleetBackupManifest(extractDir)
+    assertBackupMatchesSource(manifest, resolved.source)
+    const sqliteDir = extractedSqliteDir(extractDir)
+    findSqliteFilename(readdirSync(sqliteDir))
+    restoreSnapshotToEnvironment({
+      containerName: resolved.target.containerName,
+      sqliteVolume: resolved.target.sqliteVolume,
+      assetsVolume: resolved.target.assetsVolume,
+      sqliteDir,
+      uploadsDir: extractedUploadsDir(extractDir),
+      registeredNames: registered,
+    })
+    writeUpgradeEnv(envPath, imageRef, releaseId)
+    recreateApp(resolved.target, previousEnv, false)
+    const runningId = assertSameImage(
+      dockerText(['inspect', '-f', '{{.Image}}', resolved.target.containerName]),
+      imageRef.split('@')[1] || '',
+      'Rolled-back',
+    )
+    await db.update(environments).set({ expectedImage: imageRef }).where(eq(environments.id, resolved.target.id))
+    const health = await waitUntilHealthy(resolved.target.healthUrl)
+    await recordOperatorEvent(db, {
+      action: 'rollback',
+      summary: `${resolved.target.slug} restored ${releaseId}`,
+      customerId: resolved.target.customer.id,
+      productInstanceId: resolved.target.productInstance.id,
+      environmentId: resolved.target.id,
+      detail: { backupId: resolved.backup.id, releaseId, expectedImage: imageRef, imageId: runningId },
+    })
+    return {
+      environmentId: resolved.target.id,
+      backupId: resolved.backup.id,
+      expectedImage: imageRef,
+      imageId: runningId,
+      releaseId: health.releaseId || releaseId,
+      schemaVersion: health.schemaVersion || null,
+      kind: 'rollback' as const,
+    }
+  } finally {
+    rmSync(extractDir, { recursive: true, force: true })
   }
 }
 

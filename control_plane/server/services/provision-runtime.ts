@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process'
 import { eq } from 'drizzle-orm'
 import type { Database } from '../database'
 import { environments } from '../database/schema'
@@ -31,8 +32,29 @@ export function currentReleaseId(env: NodeJS.Dict<string | undefined> = process.
   return (env.RELEASE_ID || env.GIT_SHA || 'dev').trim() || 'dev'
 }
 
-export function imageBuildArgs(image = MARTIAL_ARTS_PRODUCT.image, dockerfile = MARTIAL_ARTS_PRODUCT.dockerfile) {
-  return ['build', '-t', image, '-f', dockerfile, '--build-arg', `RELEASE_ID=${currentReleaseId()}`, '.']
+export function sourceReleaseId(root = repoRoot(), env: NodeJS.Dict<string | undefined> = process.env) {
+  const fromEnv = (env.RELEASE_ID || env.GIT_SHA || '').trim()
+  if (fromEnv && fromEnv !== 'dev') {
+    return fromEnv
+  }
+  const git = spawnSync('git', ['rev-parse', '--short=12', 'HEAD'], {
+    cwd: root,
+    encoding: 'utf8',
+    windowsHide: true,
+  })
+  const sha = (git.stdout || '').trim()
+  if (git.status === 0 && /^[0-9a-f]{7,40}$/.test(sha)) {
+    return sha
+  }
+  return 'dev'
+}
+
+export function imageBuildArgs(
+  image = MARTIAL_ARTS_PRODUCT.image,
+  dockerfile = MARTIAL_ARTS_PRODUCT.dockerfile,
+  releaseId = currentReleaseId(),
+) {
+  return ['build', '-t', image, '-f', dockerfile, '--build-arg', `RELEASE_ID=${releaseId}`, '.']
 }
 
 export function ensureLocalImage(
