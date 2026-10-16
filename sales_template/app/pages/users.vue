@@ -59,7 +59,7 @@ async function create() {
     </AppAlert>
     <AppPanel title="Create user">
       <form
-        class="grid gap-3 sm:grid-cols-3"
+        class="grid gap-4 sm:grid-cols-3"
         @submit.prevent="create"
       >
         <AppField
@@ -109,31 +109,33 @@ async function create() {
         </div>
       </form>
     </AppPanel>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-if="pending && !users">
-          <td colspan="4">
-            Loading…
-          </td>
-        </tr>
-        <tr
-          v-for="user in users"
-          :key="user.id"
-        >
-          <td>{{ user.displayName }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.role }}</td>
-          <td>{{ user.active ? 'Active' : 'Inactive' }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="pending && !users">
+            <td colspan="4">
+              Loading…
+            </td>
+          </tr>
+          <tr
+            v-for="user in users"
+            :key="user.id"
+          >
+            <td>{{ user.displayName }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.role }}</td>
+            <td>{{ user.active ? 'Active' : 'Inactive' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 </template>

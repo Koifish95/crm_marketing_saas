@@ -206,10 +206,10 @@ const presetLabel: Record<string, string> = {
           </div>
         </div>
       </AppPanel>
-      <div class="grid gap-3 sm:grid-cols-3">
+      <div class="stat-grid">
         <NuxtLink
           to="/opportunities"
-          class="panel p-4 hover:border-navy-600/30"
+          class="stat-cell stat-link"
         >
           <p class="text-sm text-muted">
             Open pipeline (one-time)
@@ -220,7 +220,7 @@ const presetLabel: Record<string, string> = {
         </NuxtLink>
         <NuxtLink
           to="/opportunities"
-          class="panel p-4 hover:border-navy-600/30"
+          class="stat-cell stat-link"
         >
           <p class="text-sm text-muted">
             Open pipeline MRR
@@ -231,7 +231,7 @@ const presetLabel: Record<string, string> = {
         </NuxtLink>
         <NuxtLink
           to="/activities?queue=overdue"
-          class="panel p-4 hover:border-navy-600/30"
+          class="stat-cell stat-link"
         >
           <p class="text-sm text-muted">
             Overdue activities
@@ -242,7 +242,7 @@ const presetLabel: Record<string, string> = {
         </NuxtLink>
         <NuxtLink
           to="/leads"
-          class="panel p-4 hover:border-navy-600/30"
+          class="stat-cell stat-link"
         >
           <p class="text-sm text-muted">
             Leads (current)
@@ -253,7 +253,7 @@ const presetLabel: Record<string, string> = {
             · Qualified {{ data.current.leadsByStage.qualified }}
           </p>
         </NuxtLink>
-        <div class="panel p-4">
+        <div class="stat-cell">
           <p class="text-sm text-muted">
             Activity queue
           </p>
@@ -262,7 +262,7 @@ const presetLabel: Record<string, string> = {
             · Upcoming {{ data.current.activities.upcoming }}
           </p>
         </div>
-        <div class="panel p-4">
+        <div class="stat-cell">
           <p class="text-sm text-muted">
             Period outcomes
           </p>
@@ -284,7 +284,7 @@ const presetLabel: Record<string, string> = {
         </div>
         <NuxtLink
           to="/proposals"
-          class="panel p-4 hover:border-navy-600/30"
+          class="stat-cell stat-link sm:col-span-3"
         >
           <p class="text-sm text-muted">
             Proposals (current)
@@ -351,6 +351,12 @@ const presetLabel: Record<string, string> = {
             · Click → Lead {{ pct(link.clickToLead) }}
           </li>
         </ul>
+        <p
+          v-if="!data.trackingLinks.length"
+          class="text-sm text-muted"
+        >
+          No tracking links yet.
+        </p>
       </AppPanel>
     </template>
     <p class="text-xs text-muted">

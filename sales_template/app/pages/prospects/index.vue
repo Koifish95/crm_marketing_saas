@@ -116,8 +116,8 @@ const viewLabel = computed(() => {
 
 function cardClass(name: string) {
   return view.value === name
-    ? 'rounded-md border-2 px-4 py-3 text-left'
-    : 'rounded-md border px-4 py-3 text-left'
+    ? 'stat-cell stat-link text-left ring-2 ring-inset ring-navy-900'
+    : 'stat-cell stat-link text-left'
 }
 
 function selectView(next: string) {
@@ -224,7 +224,7 @@ onBeforeUnmount(() => {
     <AppAlert v-else-if="data?.blockReason && data.blockReason !== 'Outside the weekday send window.'">
       {{ data.blockReason }}
     </AppAlert>
-    <div class="grid gap-3 sm:grid-cols-4">
+    <div class="stat-grid sm:!grid-cols-4">
       <button
         type="button"
         :class="cardClass('needs_you')"
@@ -264,7 +264,7 @@ onBeforeUnmount(() => {
           {{ data ? `${data.sendingToday} / ${data.sendingCap}` : '—' }}
         </p>
       </button>
-      <div class="rounded-md border px-4 py-3">
+      <div class="stat-cell">
         <p class="text-sm text-muted">
           Stored
         </p>

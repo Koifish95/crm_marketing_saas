@@ -66,7 +66,7 @@ async function submit() {
 
 <template>
   <form
-    class="mt-3 space-y-3 rounded-md border border-navy-600/15 p-3"
+    class="mt-3 space-y-3 border-t border-line pt-3"
     @submit.prevent="submit"
   >
     <AppField

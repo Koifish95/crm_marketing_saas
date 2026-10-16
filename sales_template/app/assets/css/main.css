@@ -133,6 +133,18 @@ html[data-app-env="stage"] {
     @apply rounded-lg border border-line bg-paper;
   }
 
+  .stat-grid {
+    @apply grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-3;
+  }
+
+  .stat-cell {
+    @apply block bg-paper p-4 sm:p-6;
+  }
+
+  .stat-link {
+    @apply hover:bg-canvas;
+  }
+
   .page-width {
     @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
   }
@@ -149,8 +161,24 @@ html[data-app-env="stage"] {
     @apply px-4;
   }
 
+  .table-wrap {
+    @apply overflow-x-auto rounded-lg border border-line bg-paper;
+  }
+
   .data-table {
-    @apply w-full min-w-full text-left text-sm;
+    @apply w-full min-w-[40rem] text-left text-sm;
+  }
+
+  .data-table thead tr {
+    @apply bg-canvas;
+  }
+
+  .data-table tbody tr {
+    @apply border-t border-line;
+  }
+
+  .data-table td {
+    @apply [overflow-wrap:anywhere];
   }
 
   .data-table th,
@@ -164,7 +192,7 @@ html[data-app-env="stage"] {
   }
 
   .data-table th {
-    @apply font-medium text-muted;
+    @apply font-semibold text-muted;
   }
 
   .data-table td.num,
