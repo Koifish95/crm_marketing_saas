@@ -32,7 +32,7 @@ This note does not authorize provisioning, website integration, or a production 
 | Production status | Sales PROD and DEV provisioned on `nuxxion-vps-1` by Scott through the Control Plane (2026-10-16 UTC). Rebuilt from commit `cbee291`, release `cbee2918bda0@6010e5b97402`. Loopback only: PROD `52202`, DEV `52203` (reach with `pnpm vps tunnel`) |
 | DEV status | Not created for this customer |
 | Public hostname | PROD `https://top-tier-hauling.nuxxion.com` (2026-10-16 04:32 UTC, Let's Encrypt to 2027-01-14, via the GoDaddy wildcard). DEV `https://dev-top-tier-hauling.nuxxion.com` (2026-10-16 22:40 UTC, Let's Encrypt to 2027-01-14); DEV keeps its initial password until first sign-in forces the change |
-| Releases (2026-10-16 22:40 UTC) | DEV `df1a5d3c2214@e1fdd8cbf362` (Upgraded by Scott, GHCR image, Designer UI cleanup 1–4). PROD still `cbee2918bda0@6010e5b97402` until Upgraded |
+| Releases (2026-10-16 22:40 UTC) | DEV and PROD both `df1a5d3c2214@e1fdd8cbf362` (GHCR image, Designer UI cleanup 1–4). Upgraded by Scott in the Control Plane: DEV 22:37, PROD 22:40 (from `cbee2918bda0@6010e5b97402`). PROD backup `3ad5015b` taken 22:48 on the new release |
 | Website integration | Not built |
 
 No slug, URL, credential, or environment name is recorded here because none has been created for Top Tier. Do not invent them.
