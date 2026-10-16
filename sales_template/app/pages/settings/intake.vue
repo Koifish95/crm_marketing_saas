@@ -149,7 +149,7 @@ async function save() {
       <div
         v-for="field in fields"
         :key="field.id"
-        class="rounded-md border border-line p-3 space-y-2"
+        class="space-y-2 border-t border-line pt-3"
       >
         <p class="text-sm font-medium">
           {{ field.id }}

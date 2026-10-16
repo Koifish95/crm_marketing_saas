@@ -854,7 +854,7 @@ function companyName() {
       </AppButton>
       <div
         v-if="confirmClose"
-        class="rounded-md border border-navy-600/15 p-3 space-y-3"
+        class="space-y-3 border-t border-line pt-3"
       >
         <p class="text-sm">
           {{ openActivities.length }} open {{ openActivities.length === 1 ? 'activity remains' : 'activities remain' }}.
@@ -902,7 +902,7 @@ function companyName() {
       </AppButton>
       <div
         v-if="opportunity.stage === 'won' && handoff"
-        class="rounded-md border border-navy-600/15 p-3 space-y-2"
+        class="space-y-2 border-t border-line pt-3"
       >
         <p class="text-sm font-semibold">
           The sale is complete. Now serve the customer.
@@ -1247,7 +1247,7 @@ function companyName() {
             <li
               v-for="line in lines"
               :key="line.id"
-              class="space-y-2 rounded-md border border-line p-3"
+              class="space-y-2 border-t border-line pt-3"
             >
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <span>

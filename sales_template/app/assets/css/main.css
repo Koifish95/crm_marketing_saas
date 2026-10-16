@@ -133,6 +133,18 @@ html[data-app-env="stage"] {
     @apply rounded-lg border border-line bg-paper;
   }
 
+  .stat-grid {
+    @apply grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-3;
+  }
+
+  .stat-cell {
+    @apply block bg-paper p-4 sm:p-6;
+  }
+
+  .stat-link {
+    @apply hover:bg-canvas;
+  }
+
   .page-width {
     @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
   }

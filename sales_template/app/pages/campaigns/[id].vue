@@ -283,7 +283,7 @@ async function copyLink(token: string) {
             <li
               v-for="link in links"
               :key="link.id"
-              class="rounded-md border border-line p-3"
+              class="border-t border-line pt-3"
             >
               <p class="font-medium">
                 {{ link.label }}
