@@ -25,7 +25,7 @@ import { extractFleetBackupZip, extractedSqliteDir, extractedUploadsDir } from '
 import { readFleetBackupManifest, writeFleetBackupZip } from './fleet-backup-zip'
 import { composeArgs, composeRootForEnvironment, dockerSpawnOptions, repoRoot, resolveComposeEnvFile } from './docker-relaunch'
 import { inspectRegisteredContainer } from './docker-runtime'
-import { imageBuildArgs, sourceReleaseId, waitUntilHealthy } from './provision-runtime'
+import { currentReleaseId, imageBuildArgs, sourceReleaseId, waitUntilHealthy } from './provision-runtime'
 import { patchEnvFileContents, readEnvValue } from './provision-env'
 import { requireProduct } from '../products/catalog'
 import { recordOperatorEvent } from './operator-events'
@@ -562,9 +562,10 @@ function recreateApp(row: {
 export async function publishRunningIdentity(db: Database, id: string) {
   const row = requireEnvironment(await getRegisteredEnvironment(db, id))
   const runningId = dockerText(['inspect', '-f', '{{.Image}}', row.containerName])
-  const source = imageConfigReleaseId(runningId) || sourceReleaseId(repoRoot())
-  if (source === 'dev') {
-    throw new FleetBackupError('Refusing to publish release id dev. The image has no git SHA.', 409)
+  // Only the image itself can say which commit it came from. The checkout may have moved since it was built.
+  const source = imageConfigReleaseId(runningId)
+  if (!source) {
+    throw new FleetBackupError('Refusing to publish release id dev. The image has no git SHA. Stop the environment and retry provision to rebuild it from the current commit.', 409)
   }
   const repository = imageRepository(row.expectedImage)
   const releaseId = releaseIdentity(source, runningId)
@@ -642,7 +643,7 @@ export async function upgradeRegisteredEnvironment(
 
   const product = requireProduct(row.productInstance.productId)
   let targetRef = requested
-  let releaseId = ''
+  let releaseId: string
   let built = false
   if (isDigestImageRef(requested) && requested !== previousRef) {
     dockerText(['image', 'inspect', requested])

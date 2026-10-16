@@ -2,7 +2,7 @@
 type: runbook
 status: current
 area: operations
-updated: 2026-10-14
+updated: 2026-10-15
 aliases:
   - How to run
   - Run
@@ -35,13 +35,17 @@ The example already holds the Nuxxion VPS host, `root`, and key `~/.ssh/id_ed255
 pnpm vps            # menu
 pnpm vps test       # can I SSH to the VPS?
 pnpm vps status     # is sic-control-plane active, and does :52100 answer?
-pnpm vps tunnel     # open the tunnel; browse http://localhost:52100; Ctrl+C closes it
+pnpm vps tunnel     # tunnel :52100 plus every customer environment port; Ctrl+C closes it
 pnpm vps start      # start the Control Plane
 pnpm vps restart    # restart it (asks first; --yes skips)
 pnpm vps stop       # stop it (asks first; --yes skips)
+pnpm vps deploy     # deploy origin/working to the VPS Control Plane (asks first)
+pnpm vps deploy <sha>   # deploy a specific pushed commit (also how you go back)
 ```
 
-`node tools/vps.mjs <command>` works too. The helper only runs `systemctl … sic-control-plane` and a status probe. It never runs Docker or touches customer environments.
+`node tools/vps.mjs <command>` works too. The helper runs `systemctl … sic-control-plane`, a status probe, a loopback port listing, and the deploy script. It never runs Docker or touches customer environments.
+
+**Environment links:** the Control Plane links a non-public environment as `http://localhost:<port>` (for example Top Tier DEV `52203`). That port exists only on the VPS loopback. `pnpm vps tunnel` forwards every listening port in `52200–52299`, so those links open from this PC while the tunnel is up. Reopen the tunnel after provisioning a new environment.
 
 **Control Plane is down:**
 
@@ -83,25 +87,29 @@ Full detail: [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]], [[
 | Cron (`/etc/cron.d/sic-hosting-node`, UTC) | 02:15 registry backup · 02:30 off-host bundle · 03:20 certificate renew |
 | Containers | `acme-martial-arts-prod-app`, `acme-martial-arts-dev-app`, `sic-production-edge` (nginx, host network) |
 
-**Checkout drift:** on 2026-10-15 the VPS checkout was commit `47159a0` plus uncommitted Control Plane files (release pin, rollback, `0009_previous_release`, `image-identity.ts`) and a generated `deploy/edge/nginx.conf`. Those Control Plane files match uncommitted work on Scott’s PC. Until they are committed and pushed, a `git pull` on the VPS will conflict with them. Do not discard them on the VPS: the running build and registry migration `0009` depend on them.
+**The checkout is deploy-only.** GitHub `origin/working` is the only source. Never edit, copy, or `scp` code into `/opt/sic/crm_marketing_saas`. The only expected local changes there are the generated `deploy/edge/nginx.conf` and untracked `deploy/edge/letsencrypt/`.
 
-### Update the Control Plane code on the VPS
+### Workstation → VPS: deploy a commit
 
-Derived from `deploy/hosting-node/bootstrap.sh`. Not yet run as a standalone procedure. It updates only the Control Plane, not customer images.
+Develop and test on this PC. Commit, push to `origin/working`, then:
 
-```bash
-/usr/local/sbin/sic-backup-control-plane         # registry snapshot first
-cd /opt/sic/crm_marketing_saas
-git status --short                               # must be clean except deploy/edge/nginx.conf and letsencrypt/
-git pull --ff-only
-cd control_plane
-pnpm install --frozen-lockfile
-pnpm build
-pnpm db:migrate
-systemctl restart sic-control-plane
+```powershell
+pnpm vps deploy          # deploys the tip of origin/working
+pnpm vps deploy 0e74575  # or any commit already on origin/working (this is also rollback)
 ```
 
-Then `pnpm vps status` from this PC. Customer product upgrades are a separate action: Control Plane environment → Release tab ([[S6-Fleet-Runbook]]).
+The helper refuses a commit that is not on `origin/working`, shows the commits between the VPS and the target, and asks first. It streams `deploy/hosting-node/deploy-control-plane.sh` from this PC to the VPS, which:
+
+1. Refuses tracked edits on the VPS (other than `nginx.conf`) and a commit that changes the generated `nginx.conf`.
+2. Snapshots the registry (`sic-backup-control-plane`).
+3. `git checkout -B working <sha>`, then `pnpm install --frozen-lockfile`, `pnpm build`, `pnpm db:migrate` in `control_plane/`.
+4. Reinstalls the cron scripts in `/usr/local/sbin` and the systemd unit if it changed.
+5. Restarts `sic-control-plane` and waits up to 60 s for `200`. On failure it prints the `pnpm vps deploy <previous sha>` that goes back.
+
+Deploying updates the **Control Plane** only. Running customer containers keep their image. Product code reaches customers through images built from the deployed commit:
+
+- **New environment:** provisioning builds `<product-repo>:<commit>` from the deployed checkout (or reuses that tag) and pins the environment to `<repo>@sha256:…` with `RELEASE_ID=<commit>@<12hex>`. On the VPS it refuses product source with uncommitted changes.
+- **Existing environment:** Release tab → upgrade, DEV first, then PROD with the same digest ([[S6-Fleet-Runbook]]).
 
 ---
 

@@ -1,7 +1,27 @@
 import assert from 'node:assert/strict'
 import { homedir } from 'node:os'
 import { test } from 'node:test'
-import { normalizeConfig, parseStatus, sshArgs, systemctlCommand } from './vps.mjs'
+import { forwardArgs, normalizeConfig, parseListenPorts, parseStatus, sshArgs, systemctlCommand } from './vps.mjs'
+
+test('parseListenPorts keeps loopback customer ports only', () => {
+  const text = [
+    'LISTEN 0 4096 127.0.0.1:52203 0.0.0.0:*',
+    'LISTEN 0 4096 127.0.0.1:52200 0.0.0.0:*',
+    'LISTEN 0 4096 127.0.0.1:52200 0.0.0.0:*',
+    'LISTEN 0 511 127.0.0.1:52100 0.0.0.0:*',
+    'LISTEN 0 4096 0.0.0.0:52201 0.0.0.0:*',
+  ].join('\n')
+  assert.deepEqual(parseListenPorts(text), [52200, 52203])
+})
+
+test('forwardArgs forwards the Control Plane plus each environment port', () => {
+  const cfg = normalizeConfig({ host: 'h', localPort: 52999 })
+  assert.deepEqual(forwardArgs(cfg, [52200, 52203]), [
+    '-L', '52999:127.0.0.1:52100',
+    '-L', '52200:127.0.0.1:52200',
+    '-L', '52203:127.0.0.1:52203',
+  ])
+})
 
 test('normalizeConfig fills defaults and expands ~', () => {
   const cfg = normalizeConfig({ host: 'h', identityFile: '~/.ssh/k' })

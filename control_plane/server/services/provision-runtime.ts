@@ -1,8 +1,16 @@
 import { spawnSync } from 'node:child_process'
+import { existsSync } from 'node:fs'
 import { eq } from 'drizzle-orm'
 import type { Database } from '../database'
 import { environments } from '../database/schema'
 import { MARTIAL_ARTS_PRODUCT, requireProduct } from '../products/catalog'
+import {
+  digestImageRef,
+  imageRepository,
+  immutableImageTag,
+  normalizeImageId,
+  releaseIdentity,
+} from '../../shared/utils/image-identity'
 import {
   composeArgs,
   composeRootForEnvironment,
@@ -12,6 +20,8 @@ import {
   spawnDocker,
 } from './docker-relaunch'
 import { probeRegisteredHealth } from './health'
+import { localHostingNodeSpec } from './hosting-node'
+import { patchProvisionedEnvFile, provisionedEnvAbsolutePath } from './provision-env'
 import { listRegisteredEnvironments } from './registry'
 
 const provisionLocks = new Set<string>()
@@ -57,20 +67,89 @@ export function imageBuildArgs(
   return ['build', '-t', image, '-f', dockerfile, '--build-arg', `RELEASE_ID=${releaseId}`, '.']
 }
 
-export function ensureLocalImage(
-  root = repoRoot(),
-  image = MARTIAL_ARTS_PRODUCT.image,
-  dockerfile = MARTIAL_ARTS_PRODUCT.dockerfile,
-) {
-  const inspect = spawnDocker(imageInspectArgs(image), root)
-  if (inspect.status === 0) {
-    return { image, built: false }
+export type CommandResult = { status: number | null, stdout: string, stderr: string, error?: Error }
+export type CommandRunner = (command: 'git' | 'docker', args: readonly string[], cwd: string) => CommandResult
+
+export const defaultCommandRunner: CommandRunner = (command, args, cwd) => {
+  const result = command === 'docker'
+    ? spawnDocker(args, cwd)
+    : spawnSync('git', [...args], { cwd, encoding: 'utf8', windowsHide: true })
+  return {
+    status: result.status,
+    stdout: result.stdout || '',
+    stderr: result.stderr || '',
+    error: result.error,
   }
-  const build = spawnDocker(imageBuildArgs(image, dockerfile), root)
-  if (build.status !== 0 || build.error) {
-    throw new Error(dockerFailureMessage(build, 'Local image build failed.'))
+}
+
+/** Workspace files every product image also builds from. */
+export const SHARED_SOURCE_PATHS = ['packages', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml'] as const
+
+export function gitHeadSha(root: string, run: CommandRunner = defaultCommandRunner) {
+  const head = run('git', ['rev-parse', '--short=12', 'HEAD'], root)
+  const sha = head.stdout.trim()
+  return head.status === 0 && /^[0-9a-f]{7,40}$/.test(sha) ? sha : ''
+}
+
+export function productSourceDirty(root: string, templateDir: string, run: CommandRunner = defaultCommandRunner) {
+  const status = run('git', ['status', '--porcelain', '--', templateDir, ...SHARED_SOURCE_PATHS], root)
+  return status.status !== 0 || status.stdout.trim().length > 0
+}
+
+export type ProvisionImage = {
+  expectedImage: string
+  releaseId: string
+  imageId: string
+  built: boolean
+}
+
+/**
+ * Build (or reuse) the product image for the checked-out commit and return its digest identity.
+ * The commit tag is reused only for a clean tree, so one tag always means one source.
+ * A VPS refuses uncommitted product source: deploy a commit first.
+ */
+export function resolveProvisionImage(
+  spec: { image: string, dockerfile: string, templateDir: string },
+  options: { root?: string, nodeKind?: string, run?: CommandRunner } = {},
+): ProvisionImage {
+  const root = options.root ?? repoRoot()
+  const run = options.run ?? defaultCommandRunner
+  const sha = gitHeadSha(root, run)
+  if (!sha) {
+    throw new Error('Cannot read the git commit of the checkout. Refusing to build an image with no release id.')
   }
-  return { image, built: true }
+  const dirty = productSourceDirty(root, spec.templateDir, run)
+  if (dirty && options.nodeKind === 'vps') {
+    throw new Error(`${spec.templateDir} has uncommitted changes on this host. Deploy a clean commit first (pnpm vps deploy).`)
+  }
+  const source = dirty ? `${sha}-dirty` : sha
+  const repository = imageRepository(spec.image)
+  const commitTag = `${repository}:${source}`
+  let built = false
+  if (dirty || run('docker', imageInspectArgs(commitTag), root).status !== 0) {
+    const build = run('docker', imageBuildArgs(commitTag, spec.dockerfile, source), root)
+    if (build.status !== 0 || build.error) {
+      throw new Error((build.error?.message || `${build.stderr}\n${build.stdout}`.trim() || 'Local image build failed.').slice(-4000))
+    }
+    built = true
+  }
+  const imageId = normalizeImageId(run('docker', ['image', 'inspect', '-f', '{{.Id}}', commitTag], root).stdout)
+  if (!imageId) {
+    throw new Error(`Image ${commitTag} has no sha256 id.`)
+  }
+  const releaseId = releaseIdentity(source, imageId)
+  run('docker', ['tag', imageId, immutableImageTag(repository, releaseId)], root)
+  return { expectedImage: digestImageRef(repository, imageId), releaseId, imageId, built }
+}
+
+/** Point a provisioned env file at the pinned image before compose up. Lab rows without a provisioned file are left alone. */
+export function pinProvisionedEnvFile(envFileLocal: string, image: ProvisionImage, filesRoot?: string) {
+  const path = provisionedEnvAbsolutePath(envFileLocal, filesRoot)
+  if (!existsSync(path)) {
+    return false
+  }
+  patchProvisionedEnvFile(envFileLocal, { EXPECTED_IMAGE: image.expectedImage, RELEASE_ID: image.releaseId }, filesRoot)
+  return true
 }
 
 export function provisionUpCommand(input: {
@@ -155,10 +234,10 @@ export function selectEnvironmentsToProvision<T extends {
 }
 
 export function imageSpecsForRows(rows: readonly { productInstance: { productId: string } }[]) {
-  const images = new Map<string, { image: string, dockerfile: string }>()
+  const images = new Map<string, { image: string, dockerfile: string, templateDir: string }>()
   for (const row of rows) {
     const product = requireProduct(row.productInstance.productId)
-    images.set(product.image, { image: product.image, dockerfile: product.dockerfile })
+    images.set(product.image, { image: product.image, dockerfile: product.dockerfile, templateDir: product.templateDir })
   }
   return images
 }
@@ -212,9 +291,11 @@ export async function provisionCustomerEnvironments(
     throw new Error('No environments to provision.')
   }
   const imageErrors = new Map<string, string>()
+  const images = new Map<string, ProvisionImage>()
+  const nodeKind = localHostingNodeSpec().kind
   for (const spec of imageSpecsForRows(rows).values()) {
     try {
-      ensureLocalImage(repoRoot(), spec.image, spec.dockerfile)
+      images.set(spec.image, resolveProvisionImage(spec, { root: repoRoot(), nodeKind }))
     } catch (error) {
       imageErrors.set(spec.image, error instanceof Error ? error.message : 'Local image build failed.')
     }
@@ -236,6 +317,10 @@ export async function provisionCustomerEnvironments(
           results.push({ id: row.id, slug: row.slug, status: 'ready' as const })
           continue
         }
+      }
+      const image = images.get(product.image)
+      if (image && pinProvisionedEnvFile(row.envFileLocal, image, filesRoot)) {
+        await db.update(environments).set({ expectedImage: image.expectedImage }).where(eq(environments.id, row.id))
       }
       runProvisionUp({
         envFileLocal: row.envFileLocal,

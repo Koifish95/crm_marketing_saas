@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-// Nuxxion VPS helper: test SSH, check, start, stop, restart, and tunnel the
-// Control Plane (systemd `sic-control-plane`). No dependencies; uses the
-// system `ssh`. It never runs Docker and never touches customer environments.
+// Nuxxion VPS helper: test SSH, check, start, stop, restart, tunnel, and deploy
+// the Control Plane (systemd `sic-control-plane`). No dependencies; uses the
+// system `ssh` and `git`. It never runs Docker and never touches customer environments.
 //
-//   pnpm vps              menu
-//   pnpm vps <command>    test | status | start | stop | restart | tunnel
-//   --yes                 skip the confirmation on stop / restart
+//   pnpm vps                 menu
+//   pnpm vps <command>       test | status | start | stop | restart | tunnel | deploy
+//   pnpm vps deploy [ref]    deploy a pushed commit (default origin/working)
+//   --yes                    skip the confirmation on stop / restart / deploy
 
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
@@ -17,9 +18,16 @@ import { fileURLToPath } from 'node:url'
 
 export const SERVICE = 'sic-control-plane'
 export const REMOTE_PORT = 52100
-export const COMMANDS = ['test', 'status', 'start', 'stop', 'restart', 'tunnel']
+export const COMMANDS = ['test', 'status', 'start', 'stop', 'restart', 'tunnel', 'deploy']
+export const BRANCH = 'working'
+export const REMOTE_ROOT = '/opt/sic/crm_marketing_saas'
+// Customer environments publish on loopback in this range (the Control Plane allocates from 52200).
+export const ENV_PORT_MIN = 52200
+export const ENV_PORT_MAX = 52299
 
 const here = dirname(fileURLToPath(import.meta.url))
+const REPO = join(here, '..')
+const DEPLOY_SCRIPT = join(REPO, 'deploy', 'hosting-node', 'deploy-control-plane.sh')
 const CONFIG_PATH = join(here, 'vps.config.json')
 const EXAMPLE_PATH = join(here, 'vps.config.example.json')
 
@@ -79,6 +87,29 @@ export function parseStatus(text) {
     http,
     healthy: active === 'active' && http === '200',
   }
+}
+
+// `ss -Hltn` lines -> sorted loopback ports in the customer environment range.
+export function parseListenPorts(text) {
+  const ports = new Set()
+  for (const line of text.split(/\r?\n/)) {
+    const m = line.match(/127\.0\.0\.1:(\d+)\s/)
+    const port = m ? Number(m[1]) : 0
+    if (port >= ENV_PORT_MIN && port <= ENV_PORT_MAX) ports.add(port)
+  }
+  return [...ports].sort((a, b) => a - b)
+}
+
+export function forwardArgs(cfg, envPorts) {
+  return [
+    '-L', `${cfg.localPort}:127.0.0.1:${REMOTE_PORT}`,
+    ...envPorts.flatMap(port => ['-L', `${port}:127.0.0.1:${port}`]),
+  ]
+}
+
+function git(args) {
+  const r = spawnSync('git', args, { cwd: REPO, encoding: 'utf8' })
+  return { ok: r.status === 0, out: (r.stdout || '').trim(), err: (r.stderr || '').trim() }
 }
 
 function loadConfig() {
@@ -141,7 +172,7 @@ function portFree(port) {
   })
 }
 
-async function run(command, cfg, { yes }) {
+async function run(command, cfg, { yes, refArg }) {
   switch (command) {
     case 'test': {
       const r = remote(cfg, 'echo ok; hostname; uptime -p')
@@ -183,13 +214,21 @@ async function run(command, cfg, { yes }) {
         console.log(`localhost:${cfg.localPort} is already in use. A tunnel may already be open; try http://localhost:${cfg.localPort}`)
         return 1
       }
+      // Forward every customer environment too, so the Control Plane's http://localhost:<port> links open.
+      const listening = remote(cfg, `ss -Hltn 'sport >= :${ENV_PORT_MIN} and sport <= :${ENV_PORT_MAX}'`)
+      const envPorts = []
+      for (const port of listening.ok ? parseListenPorts(listening.stdout) : []) {
+        if (await portFree(port)) envPorts.push(port)
+        else console.log(`Skipping environment port ${port}: already in use on this PC.`)
+      }
       console.log(`Tunnel open: http://localhost:${cfg.localPort} -> ${cfg.host} 127.0.0.1:${REMOTE_PORT}`)
+      if (envPorts.length) console.log(`Environments: ${envPorts.map(p => `http://localhost:${p}`).join('  ')}`)
       console.log('Press Ctrl+C to close it. The Control Plane keeps running on the VPS.')
       const child = spawn('ssh', [
         '-N',
         '-o', 'ExitOnForwardFailure=yes',
         '-o', 'ServerAliveInterval=30',
-        '-L', `${cfg.localPort}:127.0.0.1:${REMOTE_PORT}`,
+        ...forwardArgs(cfg, envPorts),
         ...sshArgs(cfg),
       ], { stdio: 'inherit' })
       process.on('SIGINT', () => child.kill())
@@ -197,6 +236,45 @@ async function run(command, cfg, { yes }) {
         console.log('Tunnel closed.')
         resolve(code ?? 0)
       }))
+    }
+    case 'deploy': {
+      const ref = refArg || `origin/${BRANCH}`
+      const fetched = git(['fetch', '--quiet', 'origin', BRANCH])
+      if (!fetched.ok) {
+        console.log(`git fetch failed: ${fetched.err}`)
+        return 1
+      }
+      const target = git(['rev-parse', '--verify', `${ref}^{commit}`])
+      if (!target.ok) {
+        console.log(`Unknown ref ${ref}.`)
+        return 1
+      }
+      if (!git(['merge-base', '--is-ancestor', target.out, `origin/${BRANCH}`]).ok) {
+        console.log(`${target.out.slice(0, 12)} is not on origin/${BRANCH}. Push it first; the VPS only deploys from GitHub.`)
+        return 1
+      }
+      const current = remote(cfg, `git -C ${REMOTE_ROOT} rev-parse HEAD`)
+      if (current.code === 255 || current.code === -1) {
+        console.log(`SSH failed: ${current.stderr}`)
+        return 1
+      }
+      const from = current.stdout.trim()
+      if (from === target.out) {
+        console.log(`The VPS is already on ${from.slice(0, 12)}. Deploying again rebuilds and restarts the Control Plane.`)
+      } else {
+        console.log(`VPS: ${from.slice(0, 12) || 'unknown'} -> ${target.out.slice(0, 12)}`)
+        const log = git(['log', '--oneline', '--no-decorate', '-20', `${from}..${target.out}`])
+        if (log.ok && log.out) console.log(log.out)
+      }
+      if (!yes && !(await confirm(`Deploy ${target.out.slice(0, 12)} to ${cfg.host}? The Control Plane restarts (about a minute down). Customer apps keep running.`))) {
+        console.log('Cancelled.')
+        return 0
+      }
+      // Stream the workstation's copy of the script, so a commit that adds or changes it deploys with it.
+      const sudo = cfg.user === 'root' ? '' : 'sudo -n '
+      const child = spawn('ssh', [...sshArgs(cfg), `${sudo}bash -s -- ${target.out}`], { stdio: ['pipe', 'inherit', 'inherit'] })
+      child.stdin.end(readFileSync(DEPLOY_SCRIPT, 'utf8').replace(/\r\n/g, '\n'))
+      return await new Promise(resolve => child.on('exit', code => resolve(code ?? 1)))
     }
     default:
       console.log(`Unknown command "${command}". Use: ${COMMANDS.join(' | ')}`)
@@ -211,7 +289,8 @@ async function menu(cfg) {
     ['start', 'Start Control Plane'],
     ['stop', 'Stop Control Plane'],
     ['restart', 'Restart Control Plane'],
-    ['tunnel', `Open tunnel (browse http://localhost:${cfg.localPort})`],
+    ['tunnel', `Open tunnel (browse http://localhost:${cfg.localPort} and environments)`],
+    ['deploy', `Deploy origin/${BRANCH} to the VPS`],
   ]
   for (;;) {
     console.log(`\nNuxxion VPS ${cfg.user}@${cfg.host}`)
@@ -235,13 +314,13 @@ async function menu(cfg) {
 async function main() {
   const args = process.argv.slice(2)
   const yes = args.includes('--yes') || args.includes('-y')
-  const command = args.find(a => !a.startsWith('-'))
+  const [command, refArg] = args.filter(a => !a.startsWith('-'))
   if (args.includes('--help') || args.includes('-h')) {
-    console.log(`Usage: pnpm vps [${COMMANDS.join('|')}] [--yes]   (no command = menu)`)
+    console.log(`Usage: pnpm vps [${COMMANDS.join('|')}] [ref] [--yes]   (no command = menu)`)
     return 0
   }
   const cfg = loadConfig()
-  return command ? run(command, cfg, { yes }) : menu(cfg)
+  return command ? run(command, cfg, { yes, refArg }) : menu(cfg)
 }
 
 const isEntry = process.argv[1]

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { DOCKER_SPAWN_MAX_BUFFER, dockerSpawnOptions } from '../../server/services/docker-relaunch'
 import { PROVISIONED_IMAGE } from '../../server/services/provision-contract'
-import { environmentProvisionGuard, imageBuildArgs, imageInspectArgs, imageSpecsForRows, provisionUpCommand, selectEnvironmentsToProvision, startBackgroundProvision } from '../../server/services/provision-runtime'
+import { type CommandRunner, environmentProvisionGuard, imageBuildArgs, imageInspectArgs, imageSpecsForRows, pinProvisionedEnvFile, provisionUpCommand, resolveProvisionImage, selectEnvironmentsToProvision, startBackgroundProvision } from '../../server/services/provision-runtime'
 
 describe('S4 provision runtime commands', () => {
   it('builds the local s4 image and ups without -v', () => {
@@ -87,5 +90,84 @@ describe('S4 provision runtime commands', () => {
     const third = startBackgroundProvision({} as never, 'cust-lock', undefined, undefined, undefined, async () => [])
     expect(third.started).toBe(true)
     await new Promise(resolve => setTimeout(resolve, 20))
+  })
+})
+
+describe('provision image release identity', () => {
+  const SHA = '0123456789ab'
+  const ID = `sha256:${'d'.repeat(64)}`
+  const spec = { image: 'crm-sales:c2', dockerfile: 'sales_template/Dockerfile', templateDir: 'sales_template' }
+
+  function fakeRunner(options: { dirty?: boolean, tagExists?: boolean, head?: string }) {
+    const calls: string[] = []
+    const run: CommandRunner = (command, args) => {
+      calls.push(`${command} ${args.join(' ')}`)
+      if (command === 'git' && args[0] === 'rev-parse') {
+        return { status: 0, stdout: `${options.head ?? SHA}\n`, stderr: '' }
+      }
+      if (command === 'git') {
+        return { status: 0, stdout: options.dirty ? ' M sales_template/app.vue\n' : '', stderr: '' }
+      }
+      if (args[0] === 'image' && args[1] === 'inspect' && args[2] !== '-f') {
+        return { status: options.tagExists ? 0 : 1, stdout: '', stderr: '' }
+      }
+      if (args[0] === 'image' && args[2] === '-f') {
+        return { status: 0, stdout: `${ID}\n`, stderr: '' }
+      }
+      return { status: 0, stdout: '', stderr: '' }
+    }
+    return { run, calls }
+  }
+
+  it('builds a commit-tagged image and returns a digest pin with a real release id', () => {
+    const { run, calls } = fakeRunner({})
+    const image = resolveProvisionImage(spec, { root: '/repo', nodeKind: 'vps', run })
+    expect(image).toEqual({
+      expectedImage: `crm-sales@${ID}`,
+      releaseId: `${SHA}@dddddddddddd`,
+      imageId: ID,
+      built: true,
+    })
+    expect(calls).toContain(`docker build -t crm-sales:${SHA} -f sales_template/Dockerfile --build-arg RELEASE_ID=${SHA} .`)
+    expect(calls).toContain(`docker tag ${ID} crm-sales:${SHA}-dddddddddddd`)
+    expect(calls.some(call => call.includes('status --porcelain -- sales_template packages'))).toBe(true)
+  })
+
+  it('reuses the commit tag on a clean tree', () => {
+    const { run, calls } = fakeRunner({ tagExists: true })
+    expect(resolveProvisionImage(spec, { root: '/repo', nodeKind: 'vps', run }).built).toBe(false)
+    expect(calls.some(call => call.startsWith('docker build'))).toBe(false)
+  })
+
+  it('refuses uncommitted product source on a VPS and marks it dirty on a laptop', () => {
+    expect(() => resolveProvisionImage(spec, { root: '/repo', nodeKind: 'vps', run: fakeRunner({ dirty: true }).run }))
+      .toThrow(/uncommitted changes/)
+    const laptop = fakeRunner({ dirty: true, tagExists: true })
+    const image = resolveProvisionImage(spec, { root: '/repo', nodeKind: 'laptop', run: laptop.run })
+    expect(image.releaseId).toBe(`${SHA}-dirty@dddddddddddd`)
+    expect(image.built).toBe(true)
+  })
+
+  it('refuses a checkout with no readable commit', () => {
+    expect(() => resolveProvisionImage(spec, { root: '/repo', run: fakeRunner({ head: 'not-a-sha' }).run }))
+      .toThrow(/no release id/)
+  })
+
+  it('pins an existing provisioned env file and skips a missing one', () => {
+    const root = mkdtempSync(join(tmpdir(), 'pin-env-'))
+    try {
+      const envFile = 'data/provisioned/x.env'
+      mkdirSync(join(root, 'data/provisioned'), { recursive: true })
+      writeFileSync(join(root, envFile), 'EXPECTED_IMAGE="crm-sales:c2"\nRELEASE_ID="dev"\nHOST_PORT="52203"\n')
+      const image = { expectedImage: `crm-sales@${ID}`, releaseId: `${SHA}@dddddddddddd`, imageId: ID, built: true }
+      expect(pinProvisionedEnvFile(envFile, image, root)).toBe(true)
+      const text = readFileSync(join(root, envFile), 'utf8')
+      expect(text).toContain(`EXPECTED_IMAGE="crm-sales@${ID}"`)
+      expect(text).toContain(`RELEASE_ID="${SHA}@dddddddddddd"`)
+      expect(text).toContain('HOST_PORT="52203"')
+      expect(pinProvisionedEnvFile('data/provisioned/missing.env', image, root)).toBe(false)
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
   })
 })
