@@ -31,7 +31,7 @@ This note does not authorize provisioning, website integration, or a production 
 | Revenue | Not collected |
 | Production status | Sales PROD and DEV provisioned on `nuxxion-vps-1` by Scott through the Control Plane (2026-10-16 UTC). Rebuilt from commit `cbee291`, release `cbee2918bda0@6010e5b97402`. Loopback only: PROD `52202`, DEV `52203` (reach with `pnpm vps tunnel`) |
 | DEV status | Not created for this customer |
-| Public hostname | Not assigned |
+| Public hostname | PROD `https://top-tier-hauling.nuxxion.com` (2026-10-16 04:32 UTC, Let's Encrypt to 2027-01-14, via the GoDaddy wildcard). DEV stays loopback (`pnpm vps tunnel`, 52203) |
 | Website integration | Not built |
 
 No slug, URL, credential, or environment name is recorded here because none has been created for Top Tier. Do not invent them.
@@ -130,7 +130,7 @@ Obtaining a VPS is not an open blocker.
 
 Acme on this host has live-proven backup, restore, off-host recovery, upgrade, rollback, and reboot. What Top Tier still needs before it is a live customer: its own hostname and certificate, the website-intake decision, and an authorization to create the environment. Laptop S6 does not count as that.
 
-S7 and S8 stay **Not started**. Live acceptance on 2026-10-07 UTC: [[Nuxxion-Production-Acceptance]]. Gate: **READY FOR TOP TIER** as a hosting decision on 2026-10-08. Top Tier Sales PROD and DEV were provisioned on 2026-10-16 UTC (no hostname yet). Website intake is still open. S7 and S8 stay Not started.
+S7 and S8 stay **Not started**. Live acceptance on 2026-10-07 UTC: [[Nuxxion-Production-Acceptance]]. Gate: **READY FOR TOP TIER** as a hosting decision on 2026-10-08. Top Tier Sales PROD and DEV were provisioned on 2026-10-16 UTC; PROD went public at `top-tier-hauling.nuxxion.com` the same day (Scott: first login forces the password change, done immediately). Website intake is still open. S7 and S8 stay Not started.
 
 ---
 

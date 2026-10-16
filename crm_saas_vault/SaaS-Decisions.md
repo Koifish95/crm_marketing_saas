@@ -40,6 +40,7 @@ Decision:
 - **Provisioning:** a new PROD with no hostname gets its default hostname before `compose up` (env file carries the HTTPS origin, so no relaunch). Recorded as operator event `public-hostname`. A failure never fails provisioning.
 - **Certificate:** with `EDGE_AUTO_CERT=true`, every hostname assignment (automatic or Save hostname) runs `deploy/edge/issue-cert.sh` when no cert is installed, then regenerates nginx so 443 is live. Renewal stays the 03:20 cron. A failed issue leaves the name serving 503 on :80 and is reported; Save hostname again retries.
 - **Not changed:** the Control Plane stays loopback-only. Initial `admin` password must be changed before a client is told the URL.
+- **Live 2026-10-16:** deployed `1cd643a`; Save hostname on Top Tier PROD issued its certificate and relaunched it in one call. `https://top-tier-hauling.nuxxion.com/api/health` 200 from off-host, `http://` → 301, issuer Let's Encrypt, expires 2027-01-14. Acme unchanged (200).
 - **Later:** Cloudflare (or another DNS API) only for a second node or client-owned domains. NEAR-07 is answered for `nuxxion.com`; client vanity domains stay open.
 
 ---
