@@ -101,15 +101,42 @@ export type ProvisionImage = {
   releaseId: string
   imageId: string
   built: boolean
+  /** True when the image came from the CI registry instead of a build on this host. */
+  pulled: boolean
+}
+
+export type ProvisionImageSpec = { image: string, dockerfile: string, templateDir: string, registryImage?: string }
+
+function imageConfigEnv(ref: string, root: string, run: CommandRunner, key: string) {
+  const text = run('docker', ['image', 'inspect', '-f', '{{range .Config.Env}}{{println .}}{{end}}', ref], root).stdout
+  const line = text.split('\n').find(item => item.startsWith(`${key}=`))
+  return line ? line.slice(key.length + 1).trim() : ''
 }
 
 /**
- * Build (or reuse) the product image for the checked-out commit and return its digest identity.
+ * Use the CI image for a clean commit: already pulled, or pulled now.
+ * Returns null when the registry has no image for this commit (not pushed, CI not green yet, or no access).
+ */
+function pullRegistryImage(registryImage: string, sha: string, root: string, run: CommandRunner) {
+  const ref = `${registryImage}:${sha}`
+  if (run('docker', imageInspectArgs(ref), root).status !== 0 && run('docker', ['pull', ref], root).status !== 0) {
+    return null
+  }
+  const baked = imageConfigEnv(ref, root, run, 'RELEASE_ID')
+  if (baked !== sha) {
+    throw new Error(`Registry image ${ref} carries RELEASE_ID ${baked || 'none'}, not ${sha}. Refusing it.`)
+  }
+  return ref
+}
+
+/**
+ * Resolve the product image for the checked-out commit and return its digest identity.
+ * A clean commit uses the CI image from the registry when there is one; otherwise this host builds it.
  * The commit tag is reused only for a clean tree, so one tag always means one source.
  * A VPS refuses uncommitted product source: deploy a commit first.
  */
 export function resolveProvisionImage(
-  spec: { image: string, dockerfile: string, templateDir: string },
+  spec: ProvisionImageSpec,
   options: { root?: string, nodeKind?: string, run?: CommandRunner } = {},
 ): ProvisionImage {
   const root = options.root ?? repoRoot()
@@ -123,6 +150,16 @@ export function resolveProvisionImage(
     throw new Error(`${spec.templateDir} has uncommitted changes on this host. Deploy a clean commit first (pnpm vps deploy).`)
   }
   const source = dirty ? `${sha}-dirty` : sha
+  const pulledRef = !dirty && spec.registryImage ? pullRegistryImage(spec.registryImage, sha, root, run) : null
+  if (pulledRef && spec.registryImage) {
+    const imageId = normalizeImageId(run('docker', ['image', 'inspect', '-f', '{{.Id}}', pulledRef], root).stdout)
+    if (!imageId) {
+      throw new Error(`Image ${pulledRef} has no sha256 id.`)
+    }
+    const releaseId = releaseIdentity(sha, imageId)
+    run('docker', ['tag', imageId, immutableImageTag(spec.registryImage, releaseId)], root)
+    return { expectedImage: digestImageRef(spec.registryImage, imageId), releaseId, imageId, built: false, pulled: true }
+  }
   const repository = imageRepository(spec.image)
   const commitTag = `${repository}:${source}`
   let built = false
@@ -139,7 +176,7 @@ export function resolveProvisionImage(
   }
   const releaseId = releaseIdentity(source, imageId)
   run('docker', ['tag', imageId, immutableImageTag(repository, releaseId)], root)
-  return { expectedImage: digestImageRef(repository, imageId), releaseId, imageId, built }
+  return { expectedImage: digestImageRef(repository, imageId), releaseId, imageId, built, pulled: false }
 }
 
 /** Point a provisioned env file at the pinned image before compose up. Lab rows without a provisioned file are left alone. */
@@ -233,11 +270,15 @@ export function selectEnvironmentsToProvision<T extends {
     .filter(row => !productInstanceId || row.productInstance?.id === productInstanceId)
 }
 
+export function productImageSpec(product: ProvisionImageSpec): ProvisionImageSpec {
+  return { image: product.image, dockerfile: product.dockerfile, templateDir: product.templateDir, registryImage: product.registryImage }
+}
+
 export function imageSpecsForRows(rows: readonly { productInstance: { productId: string } }[]) {
-  const images = new Map<string, { image: string, dockerfile: string, templateDir: string }>()
+  const images = new Map<string, ProvisionImageSpec>()
   for (const row of rows) {
     const product = requireProduct(row.productInstance.productId)
-    images.set(product.image, { image: product.image, dockerfile: product.dockerfile, templateDir: product.templateDir })
+    images.set(product.image, productImageSpec(product))
   }
   return images
 }

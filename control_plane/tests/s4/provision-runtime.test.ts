@@ -98,10 +98,21 @@ describe('provision image release identity', () => {
   const ID = `sha256:${'d'.repeat(64)}`
   const spec = { image: 'crm-sales:c2', dockerfile: 'sales_template/Dockerfile', templateDir: 'sales_template' }
 
-  function fakeRunner(options: { dirty?: boolean, tagExists?: boolean, head?: string }) {
+  function fakeRunner(options: { dirty?: boolean, tagExists?: boolean, head?: string, registry?: { local?: boolean, pull?: boolean, baked?: string } }) {
     const calls: string[] = []
     const run: CommandRunner = (command, args) => {
       calls.push(`${command} ${args.join(' ')}`)
+      if (args[0] === 'pull') {
+        return { status: options.registry?.pull ? 0 : 1, stdout: '', stderr: 'denied' }
+      }
+      if (args[0] === 'image' && args[1] === 'inspect' && args[2]?.startsWith('ghcr.io/')) {
+        return { status: options.registry?.local ? 0 : 1, stdout: '', stderr: '' }
+      }
+      if (args[0] === 'image' && args[2] === '-f' && args[3]?.includes('.Config.Env')) {
+        return { status: 0, stdout: `PATH=/usr/bin
+RELEASE_ID=${options.registry?.baked ?? SHA}
+`, stderr: '' }
+      }
       if (command === 'git' && args[0] === 'rev-parse') {
         return { status: 0, stdout: `${options.head ?? SHA}\n`, stderr: '' }
       }
@@ -127,6 +138,7 @@ describe('provision image release identity', () => {
       releaseId: `${SHA}@dddddddddddd`,
       imageId: ID,
       built: true,
+      pulled: false,
     })
     expect(calls).toContain(`docker build -t crm-sales:${SHA} -f sales_template/Dockerfile --build-arg RELEASE_ID=${SHA} .`)
     expect(calls).toContain(`docker tag ${ID} crm-sales:${SHA}-dddddddddddd`)
@@ -148,6 +160,43 @@ describe('provision image release identity', () => {
     expect(image.built).toBe(true)
   })
 
+  const registrySpec = { ...spec, registryImage: 'ghcr.io/koifish95/crm-sales' }
+
+  it('pulls the CI image for a clean commit and pins its registry digest', () => {
+    const { run, calls } = fakeRunner({ registry: { pull: true } })
+    expect(resolveProvisionImage(registrySpec, { root: '/repo', nodeKind: 'vps', run })).toEqual({
+      expectedImage: `ghcr.io/koifish95/crm-sales@${ID}`,
+      releaseId: `${SHA}@dddddddddddd`,
+      imageId: ID,
+      built: false,
+      pulled: true,
+    })
+    expect(calls).toContain(`docker pull ghcr.io/koifish95/crm-sales:${SHA}`)
+    expect(calls).toContain(`docker tag ${ID} ghcr.io/koifish95/crm-sales:${SHA}-dddddddddddd`)
+    expect(calls.some(call => call.startsWith('docker build'))).toBe(false)
+  })
+
+  it('reuses an already pulled CI image without pulling again', () => {
+    const { run, calls } = fakeRunner({ registry: { local: true } })
+    expect(resolveProvisionImage(registrySpec, { root: '/repo', nodeKind: 'vps', run }).pulled).toBe(true)
+    expect(calls.some(call => call.startsWith('docker pull'))).toBe(false)
+  })
+
+  it('builds on this host when the registry has no image for the commit', () => {
+    const { run, calls } = fakeRunner({ registry: { pull: false } })
+    const image = resolveProvisionImage(registrySpec, { root: '/repo', nodeKind: 'vps', run })
+    expect(image).toMatchObject({ expectedImage: `crm-sales@${ID}`, built: true, pulled: false })
+    expect(calls).toContain(`docker build -t crm-sales:${SHA} -f sales_template/Dockerfile --build-arg RELEASE_ID=${SHA} .`)
+  })
+
+  it('never pulls for dirty laptop source and refuses a registry image built from another commit', () => {
+    const laptop = fakeRunner({ dirty: true, registry: { pull: true } })
+    expect(resolveProvisionImage(registrySpec, { root: '/repo', nodeKind: 'laptop', run: laptop.run }).pulled).toBe(false)
+    expect(laptop.calls.some(call => call.startsWith('docker pull'))).toBe(false)
+    expect(() => resolveProvisionImage(registrySpec, { root: '/repo', nodeKind: 'vps', run: fakeRunner({ registry: { pull: true, baked: 'ffffffffffff' } }).run }))
+      .toThrow(/RELEASE_ID ffffffffffff/)
+  })
+
   it('refuses a checkout with no readable commit', () => {
     expect(() => resolveProvisionImage(spec, { root: '/repo', run: fakeRunner({ head: 'not-a-sha' }).run }))
       .toThrow(/no release id/)
@@ -159,7 +208,7 @@ describe('provision image release identity', () => {
       const envFile = 'data/provisioned/x.env'
       mkdirSync(join(root, 'data/provisioned'), { recursive: true })
       writeFileSync(join(root, envFile), 'EXPECTED_IMAGE="crm-sales:c2"\nRELEASE_ID="dev"\nHOST_PORT="52203"\n')
-      const image = { expectedImage: `crm-sales@${ID}`, releaseId: `${SHA}@dddddddddddd`, imageId: ID, built: true }
+      const image = { expectedImage: `crm-sales@${ID}`, releaseId: `${SHA}@dddddddddddd`, imageId: ID, built: true, pulled: false }
       expect(pinProvisionedEnvFile(envFile, image, root)).toBe(true)
       const text = readFileSync(join(root, envFile), 'utf8')
       expect(text).toContain(`EXPECTED_IMAGE="crm-sales@${ID}"`)

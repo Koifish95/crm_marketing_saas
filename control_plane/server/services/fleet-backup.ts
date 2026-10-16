@@ -25,7 +25,8 @@ import { extractFleetBackupZip, extractedSqliteDir, extractedUploadsDir } from '
 import { readFleetBackupManifest, writeFleetBackupZip } from './fleet-backup-zip'
 import { composeArgs, composeRootForEnvironment, dockerSpawnOptions, repoRoot, resolveComposeEnvFile } from './docker-relaunch'
 import { inspectRegisteredContainer } from './docker-runtime'
-import { currentReleaseId, imageBuildArgs, sourceReleaseId, waitUntilHealthy } from './provision-runtime'
+import { currentReleaseId, productImageSpec, type ProvisionImage, resolveProvisionImage, waitUntilHealthy } from './provision-runtime'
+import { localHostingNodeSpec } from './hosting-node'
 import { patchEnvFileContents, readEnvValue } from './provision-env'
 import { requireProduct } from '../products/catalog'
 import { recordOperatorEvent } from './operator-events'
@@ -645,6 +646,7 @@ export async function upgradeRegisteredEnvironment(
   let targetRef = requested
   let releaseId: string
   let built = false
+  let pulled = false
   if (isDigestImageRef(requested) && requested !== previousRef) {
     dockerText(['image', 'inspect', requested])
     const sibling = siblings.find(item => item.id !== row.id && item.expectedImage === requested)
@@ -653,26 +655,20 @@ export async function upgradeRegisteredEnvironment(
       throw new FleetBackupError('The target image has no recorded release id.', 409)
     }
   } else {
-    const source = sourceReleaseId(repoRoot())
-    if (source === 'dev') {
-      throw new FleetBackupError('Refusing to build with release id dev.', 409)
+    // Same path as provisioning: the CI image for the deployed commit, or a build of it on this host.
+    let image: ProvisionImage
+    try {
+      image = resolveProvisionImage(productImageSpec(product), { root: repoRoot(), nodeKind: localHostingNodeSpec().kind })
+    } catch (error) {
+      throw new FleetBackupError(error instanceof Error ? error.message : 'Image build failed.', 409)
     }
-    const builtResult = spawnSync(
-      'docker',
-      imageBuildArgs(product.image, product.dockerfile, source),
-      dockerSpawnOptions(repoRoot()),
-    )
-    if (builtResult.status !== 0) {
-      throw new FleetBackupError(builtResult.stderr?.trim() || builtResult.stdout?.trim() || 'Local image build failed.', 500)
+    if (image.imageId === normalizeImageId(previousImageId)) {
+      throw new FleetBackupError('This environment already runs the image for the deployed commit. Nothing to upgrade.', 409)
     }
-    built = true
-    const newId = dockerText(['image', 'inspect', '-f', '{{.Id}}', product.image])
-    if (normalizeImageId(newId) === normalizeImageId(previousImageId)) {
-      throw new FleetBackupError('Build did not produce a new image id. The previous image is unchanged.', 409)
-    }
-    targetRef = digestImageRef(imageRepository(product.image), newId)
-    releaseId = releaseIdentity(source, newId)
-    dockerText(['tag', newId, immutableImageTag(imageRepository(product.image), releaseId)])
+    built = image.built
+    pulled = image.pulled
+    targetRef = image.expectedImage
+    releaseId = image.releaseId
   }
 
   writeUpgradeEnv(envPath, targetRef, releaseId)
@@ -698,6 +694,7 @@ export async function upgradeRegisteredEnvironment(
       imageId: runningId,
       backupId: latest.id,
       built,
+      pulled,
     },
   })
   return {
@@ -708,6 +705,7 @@ export async function upgradeRegisteredEnvironment(
     imageId: runningId,
     backupId: latest.id,
     built,
+    pulled,
     releaseId: health.releaseId || releaseId,
     schemaVersion: health.schemaVersion || null,
   }

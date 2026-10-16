@@ -27,6 +27,21 @@ Decision: what we chose
 
 ---
 
+## 2026-10-16 — CI builds product images and pushes them to GHCR; the VPS pulls them
+
+Status: accepted (Scott asked in chat 2026-10-16: "go ahead with building images in CI and pushing to GHCR")
+
+Context: The VPS built each product image itself from the deployed checkout. That image was never the one CI tested, a build on the 2 vCPU droplet takes minutes, and two hosts building the same commit get different digests.
+
+Decision:
+
+- **Build once, in CI:** after every app job is green on a push to `working` / `main`, the `images` job in `.github/workflows/ci.yml` builds Martial Arts and Sales and pushes `ghcr.io/koifish95/martial-arts-acquisition:<commit>` and `ghcr.io/koifish95/crm-sales:<commit>` (12-char commit, `RELEASE_ID=<commit>` baked in, one plain manifest: no provenance or SBOM). Pull requests build no images.
+- **Pull, don't build:** for a clean checkout, provisioning and Release-tab upgrade take `<registryImage>:<commit>` (catalog field `registryImage`) when it is already local or `docker pull` succeeds, and pin `<registryImage>@sha256:<id>`. On the containerd image store the VPS uses, the image id is the registry digest. An image whose baked `RELEASE_ID` is not the commit is refused.
+- **Fallback:** if the registry has no image for the commit (CI not finished, failed, or no pull access), the host builds it as before (`<local repo>:<commit>`). Results carry `pulled: true|false` so the operator can tell. Dirty laptop source never pulls.
+- **Still manual:** `pnpm vps deploy` and PROD promotion. Existing environments keep their image until upgraded.
+
+---
+
 ## 2026-10-15 — GitHub is the only source for the VPS; releases are commits pinned by digest
 
 Status: accepted (Scott asked in chat 2026-10-15: foundation steps 1–3 before CI/CD, and rebuild Top Tier from current code)
@@ -41,7 +56,7 @@ Decision:
 - **Migrations:** `migrateDatabase` also applies any older journal entry with no row (matched by `created_at`), so an out-of-order registry heals on the next deploy.
 - **Environment access:** `pnpm vps tunnel` forwards every loopback port in `52200–52299` as well as `52100`. No public DEV hostnames.
 - **CI (built 2026-10-16):** `.github/workflows/ci.yml` runs lint, typecheck, test, and build for Martial Arts, Sales, the marketing site, and the Control Plane, plus the helper tests, on every push to `working` / `main` and every pull request. It deploys nothing. The first run exposed that `pnpm install` inside `control_plane/` installs the root workspace instead; CI, `bootstrap.sh`, and `deploy-control-plane.sh` now use `--ignore-workspace`.
-- **Next (not built):** images built in CI and pushed to GHCR, pulled by digest. PROD promotion stays a manual Control Plane action.
+- **Next:** images built in CI and pulled from GHCR — built 2026-10-16, see the entry above. PROD promotion stays a manual Control Plane action.
 
 ---
 

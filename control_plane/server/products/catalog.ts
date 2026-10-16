@@ -10,6 +10,8 @@ export type ProductDefinition = {
   templateDir: string
   composeFile: string
   image: string
+  /** CI pushes `<registryImage>:<12-char commit>` on every green push (.github/workflows/ci.yml). */
+  registryImage: string
   containerPort: number
   healthPath: string
   sqliteInContainer: string
@@ -26,6 +28,7 @@ export const PRODUCTS: Record<ProductId, ProductDefinition> = {
     templateDir: 'martial_arts_template',
     composeFile: 'docker-compose.provisioned.yml',
     image: 'martial-arts-acquisition:s4',
+    registryImage: 'ghcr.io/koifish95/martial-arts-acquisition',
     containerPort: 5000,
     healthPath: '/api/health',
     sqliteInContainer: '/app/data/sqlite/crm.sqlite',
@@ -40,6 +43,7 @@ export const PRODUCTS: Record<ProductId, ProductDefinition> = {
     templateDir: 'sales_template',
     composeFile: 'docker-compose.provisioned.yml',
     image: 'crm-sales:c2',
+    registryImage: 'ghcr.io/koifish95/crm-sales',
     containerPort: 5000,
     healthPath: '/api/health',
     sqliteInContainer: '/app/data/sqlite/crm.sqlite',

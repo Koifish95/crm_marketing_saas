@@ -934,7 +934,7 @@ async function refreshWorkspace() {
           @submit.prevent="upgradeEnvironment"
         >
           <p class="muted">
-            Upgrade rebuilds the local image, recreates the app container, and remounts the same volumes. Requires an S6 backup of this environment. Non-PROD first when the customer has one. Rollback is Restore plus the previous image — do not downgrade SQLite.
+            Upgrade moves to the image for the deployed commit (the CI image from GHCR, or a build on this host if CI has none), recreates the app container, and remounts the same volumes. Requires an S6 backup of this environment. Non-PROD first when the customer has one. Rollback is Restore plus the previous image — do not downgrade SQLite.
           </p>
           <label>
             Target image

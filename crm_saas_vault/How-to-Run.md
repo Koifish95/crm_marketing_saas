@@ -106,12 +106,12 @@ The helper refuses a commit that is not on `origin/working`, shows the commits b
 4. Reinstalls the cron scripts in `/usr/local/sbin` and the systemd unit if it changed.
 5. Restarts `sic-control-plane` and waits up to 60 s for `200`. On failure it prints the `pnpm vps deploy <previous sha>` that goes back.
 
-**CI:** every push to `working` or `main`, and every pull request, runs `.github/workflows/ci.yml` on GitHub Actions: lint, typecheck, test, and build for Martial Arts, Sales, the marketing site, and the Control Plane, plus the helper tests. Results: the repo's Actions tab. CI deploys nothing. Wait for a green run before `pnpm vps deploy`.
+**CI:** every push to `working` or `main`, and every pull request, runs `.github/workflows/ci.yml` on GitHub Actions: lint, typecheck, test, and build for Martial Arts, Sales, the marketing site, and the Control Plane, plus the helper tests. On a push, once those are green, it builds the product images and pushes `ghcr.io/koifish95/martial-arts-acquisition:<commit>` and `ghcr.io/koifish95/crm-sales:<commit>`. Results: the repo's Actions tab. CI deploys nothing. Wait for a green run (including the image jobs) before `pnpm vps deploy`.
 
 Deploying updates the **Control Plane** only. Running customer containers keep their image. Product code reaches customers through images built from the deployed commit:
 
-- **New environment:** provisioning builds `<product-repo>:<commit>` from the deployed checkout (or reuses that tag) and pins the environment to `<repo>@sha256:…` with `RELEASE_ID=<commit>@<12hex>`. On the VPS it refuses product source with uncommitted changes.
-- **Existing environment:** Release tab → upgrade, DEV first, then PROD with the same digest ([[S6-Fleet-Runbook]]).
+- **New environment:** provisioning pulls the CI image `ghcr.io/koifish95/<product>:<commit>` for the deployed commit and pins the environment to `ghcr.io/…@sha256:…` with `RELEASE_ID=<commit>@<12hex>`. If GHCR has no image for that commit (CI not green yet), the VPS builds `<product-repo>:<commit>` itself instead. On the VPS it refuses product source with uncommitted changes.
+- **Existing environment:** Release tab → upgrade (same pull-or-build), DEV first, then PROD with the same digest ([[S6-Fleet-Runbook]]).
 
 ---
 
