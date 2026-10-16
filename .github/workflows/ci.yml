@@ -31,15 +31,17 @@ jobs:
             install_dir: .
           - app: marketing_site
             install_dir: .
-          # The Control Plane is outside the workspace and has its own lockfile.
+          # The Control Plane is outside the workspace and has its own lockfile. Without
+          # --ignore-workspace, pnpm walks up to pnpm-workspace.yaml and installs the root instead.
           - app: control_plane
             install_dir: control_plane
+            install_flags: --ignore-workspace
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: pnpm/action-setup@v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: pnpm
@@ -49,7 +51,7 @@ jobs:
 
       - name: Install
         working-directory: ${{ matrix.install_dir }}
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile ${{ matrix.install_flags }}
 
       - name: Local env from the committed example
         working-directory: ${{ matrix.app }}
@@ -76,8 +78,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
       - name: VPS helper tests

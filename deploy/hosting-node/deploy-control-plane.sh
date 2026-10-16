@@ -73,7 +73,8 @@ trap restore_hint ERR
 
 step "Install, build, migrate"
 cd "$SIC_ROOT/control_plane"
-pnpm install --frozen-lockfile
+# control_plane is not a workspace member; without --ignore-workspace pnpm installs the root workspace instead.
+pnpm install --frozen-lockfile --ignore-workspace
 pnpm build
 pnpm db:migrate
 

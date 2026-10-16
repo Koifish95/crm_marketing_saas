@@ -188,7 +188,7 @@ notes:
   vps_deploy_first_run: "2026-10-16 47159a0 -> cbee291 OK"
   provision_release_identity: "<repo>:<commit> pinned by digest, RELEASE_ID=<commit>@<12hex>"
   top_tier_sales_envs: "PROD 52202 / DEV 52203 on crm-sales@sha256:6010e5b97402, RELEASE_ID cbee2918bda0@6010e5b97402, schema 0006, no hostname"
-  ci_cd: not_started
+  ci_cd: "ci_checks_live (.github/workflows/ci.yml); cd not_started"
   vps_control_plane_service: sic-control-plane_systemd_enabled
   vps_ssh: "root@157.245.136.47 key ~/.ssh/id_ed25519_sic_prod"
   vps_tls_live_check: "2026-10-15 acme.nuxxion.com 200, Let's Encrypt until 2026-12-24"

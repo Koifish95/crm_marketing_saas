@@ -40,7 +40,8 @@ Decision:
 - **Release identity at provision:** provisioning builds `<repo>:<commit>` from the checkout (reusing the tag only for a clean tree), pins each new environment to `<repo>@sha256:…`, and writes `RELEASE_ID=<commit>@<12hex>`. On a VPS it refuses product source with uncommitted changes. `release-pin` no longer falls back to the checkout HEAD; only the image's own `RELEASE_ID` counts.
 - **Migrations:** `migrateDatabase` also applies any older journal entry with no row (matched by `created_at`), so an out-of-order registry heals on the next deploy.
 - **Environment access:** `pnpm vps tunnel` forwards every loopback port in `52200–52299` as well as `52100`. No public DEV hostnames.
-- **Next (not built):** GitHub Actions checks on push, then images built in CI and pushed to GHCR, pulled by digest. PROD promotion stays a manual Control Plane action.
+- **CI (built 2026-10-16):** `.github/workflows/ci.yml` runs lint, typecheck, test, and build for Martial Arts, Sales, the marketing site, and the Control Plane, plus the helper tests, on every push to `working` / `main` and every pull request. It deploys nothing. The first run exposed that `pnpm install` inside `control_plane/` installs the root workspace instead; CI, `bootstrap.sh`, and `deploy-control-plane.sh` now use `--ignore-workspace`.
+- **Next (not built):** images built in CI and pushed to GHCR, pulled by digest. PROD promotion stays a manual Control Plane action.
 
 ---
 

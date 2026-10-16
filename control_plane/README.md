@@ -3,7 +3,7 @@
 Laptop operator app. Observe (S3) and sales-led provision (S4). Not a customer CRM.
 
 ```text
-pnpm install
+pnpm install --ignore-workspace
 pnpm dev
 ```
 

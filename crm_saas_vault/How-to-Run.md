@@ -102,9 +102,11 @@ The helper refuses a commit that is not on `origin/working`, shows the commits b
 
 1. Refuses tracked edits on the VPS (other than `nginx.conf`) and a commit that changes the generated `nginx.conf`.
 2. Snapshots the registry (`sic-backup-control-plane`).
-3. `git checkout -B working <sha>`, then `pnpm install --frozen-lockfile`, `pnpm build`, `pnpm db:migrate` in `control_plane/`.
+3. `git checkout -B working <sha>`, then `pnpm install --frozen-lockfile --ignore-workspace`, `pnpm build`, `pnpm db:migrate` in `control_plane/`.
 4. Reinstalls the cron scripts in `/usr/local/sbin` and the systemd unit if it changed.
 5. Restarts `sic-control-plane` and waits up to 60 s for `200`. On failure it prints the `pnpm vps deploy <previous sha>` that goes back.
+
+**CI:** every push to `working` or `main`, and every pull request, runs `.github/workflows/ci.yml` on GitHub Actions: lint, typecheck, test, and build for Martial Arts, Sales, the marketing site, and the Control Plane, plus the helper tests. Results: the repo's Actions tab. CI deploys nothing. Wait for a green run before `pnpm vps deploy`.
 
 Deploying updates the **Control Plane** only. Running customer containers keep their image. Product code reaches customers through images built from the deployed commit:
 
@@ -121,14 +123,14 @@ Node 22+, pnpm 10. Install the workspace once from the repo root (`packages/crm-
 pnpm install
 ```
 
-`control_plane/` is **not** in the workspace. Install it separately.
+`control_plane/` is **not** in the workspace. Install it separately with `pnpm install --ignore-workspace` inside `control_plane/`. Plain `pnpm install` there walks up to the root workspace and leaves the Control Plane without its own dependencies.
 
 | App | Folder | First run | Daily | URL |
 |---|---|---|---|---|
 | Martial Arts | `martial_arts_template/` | `copy .env.example .env` · `pnpm db:setup` | `pnpm dev` | http://localhost:5030 |
 | Sales | `sales_template/` | `copy .env.example .env` · `pnpm db:setup` | `pnpm dev` | http://localhost:5040 |
 | Marketing site | `marketing_site/` | `copy .env.example .env` | `pnpm dev` | http://localhost:5050 |
-| Control Plane (laptop lab) | `control_plane/` | `copy .env.example .env` · `pnpm install` · `pnpm db:setup` | `pnpm dev` | http://127.0.0.1:52100 |
+| Control Plane (laptop lab) | `control_plane/` | `copy .env.example .env` · `pnpm install --ignore-workspace` · `pnpm db:setup` | `pnpm dev` | http://127.0.0.1:52100 |
 
 - Local sqlite is `data/app.sqlite` in each product folder (gitignored). `pnpm db:setup` = migrate then seed, safe to repeat.
 - Development sign-in for both products: `admin` or `admin@local` with the `NUXT_AUTH_PASSWORD` in `.env`.

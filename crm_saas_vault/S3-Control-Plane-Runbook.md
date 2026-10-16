@@ -26,7 +26,7 @@ pnpm lab:docker lab-acme-prod up
 pnpm lab:docker lab-acme-dev up
 
 cd ..\control_plane
-pnpm install
+pnpm install --ignore-workspace
 pnpm dev
 ```
 

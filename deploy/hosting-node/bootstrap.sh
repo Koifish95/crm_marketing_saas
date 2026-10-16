@@ -74,7 +74,7 @@ chmod 0600 /etc/sic/control-plane.env
 install -m 0644 "$SIC_ROOT/deploy/hosting-node/sic-control-plane.service" /etc/systemd/system/sic-control-plane.service
 
 cd "$SIC_ROOT/control_plane"
-pnpm install --frozen-lockfile
+pnpm install --frozen-lockfile --ignore-workspace
 pnpm build
 pnpm db:migrate
 SKIP_LAB_SEED=true HOSTING_NODE_NAME="$NODE_NAME" HOSTING_NODE_KIND=vps pnpm db:seed
