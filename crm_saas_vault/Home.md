@@ -89,7 +89,7 @@ Renzo notes at the vault root (`Overview`, `Implementation-State`, `Milestones`,
 
 Official S-track S0–S6 **Successful**. C1 **code-shipped** (shared foundation). C2A–B2 **Successful**. **C2 Successful** (2026-09-15). Architecture: product-owned domains + shared foundation (**accepted** 2026-09-17). Martial Arts sequential multi-file Asset upload **shipped** (2026-09-17; template work, not a platform milestone). Martial Arts Customer #1 sell-readiness **repository-complete** 2026-09-19, awaiting external blockers ([[Martial-Arts-Customer-1-Sell-Readiness]]). A Nuxxion DigitalOcean VPS is in use for the Control Plane; that is not S7 or S8 Successful. Immediate commercial priority is Top Tier Hauling, Sales CRM, revenue not collected ([[customers/Top-Tier-Hauling]]). A 2026-10-08 UTC live acceptance cleared that host for Top Tier hosting ([[Nuxxion-Production-Acceptance]]). Top Tier is not provisioned. Official S7/S8 remain **not Successful**. C3, Beauty: **not started**. Pre-VPS product quality program **complete**: [[Product-Workflow-UX-Audit]], [[Product-UX-Overhaul-Return]], [[Product-Release-Update-Lifecycle]]. No active work order.
 
-Reach the live Control Plane from Scott’s PC with `pnpm vps` ([[How-to-Run]]). A large part of the current code is **uncommitted** (Control Plane release pin/rollback, Martial Arts funnel and QA remediation); see [[Current-State#Working tree vs Git (2026-10-14)]].
+Reach the live Control Plane from Scott’s PC with `pnpm vps` ([[How-to-Run]]). Code reaches the VPS only from GitHub: push, then `pnpm vps deploy`; see [[Current-State#Git and the VPS (2026-10-15)]].
 
 Details: [[Current-State]]. Lockfile: [[project-state.yaml]]. First outreach cockpit: [[Nuxxion-First-Outreach-Playbook]].
 

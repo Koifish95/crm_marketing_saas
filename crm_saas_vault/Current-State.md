@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-10-14
+updated: 2026-10-15
 aliases:
   - CURRENT_STATE
   - Current state
@@ -58,22 +58,13 @@ The Nuxxion DigitalOcean VPS is already the hosting node. Do not treat “obtain
 
 ---
 
-## Working tree vs Git (2026-10-14)
+## Git and the VPS (2026-10-15)
 
-Much of what this note describes is **in the working tree on Scott’s PC and not committed**. HEAD is `0c686e9`. Uncommitted, and described here as current because it is the code that runs:
+Everything described here is committed and pushed to `origin/working` (release identity, Martial Arts funnel `0021`, QA remediation, vault overhaul; then the deploy foundation in `dd35777` and `6e08a1d`). Control Plane checks at `6e08a1d`: test 139/139, lint and typecheck clean, build passes.
 
-| Area | Uncommitted pieces |
-|---|---|
-| Control Plane release identity | `release-pin` / `rollback` APIs, `shared/utils/image-identity.ts`, `fleet-backup.ts` digest upgrade, migration `0009_previous_release`, tests `tests/s6/image-identity.test.ts` |
-| Martial Arts acquisition funnel | migration `0021_cheerful_lethal_legion`, funnel services/APIs/middleware/composable, `tests/m9/acquisition-funnel.test.ts` |
-| Martial Arts QA remediation | page/component edits from the 2026-10-03 remediation, `tests/qa/ui-remediation.test.ts`, `shared/utils/follow-up.ts` (`introConfirmationDueAt`) |
-| Vault / docs | Top Tier record, production acceptance, funnel spec, QA remediation return, this reconciliation |
+**Workstation → VPS** ([[SaaS-Decisions#2026-10-15 — GitHub is the only source for the VPS; releases are commits pinned by digest]]): develop here, push, then `pnpm vps deploy`. Provisioning pins new environments to a commit-built digest. Procedure: [[How-to-Run#Workstation → VPS: deploy a commit]].
 
-Commit `0c686e9` (automated “The Board” agent, 2026-10-14) adds `tests/m5/intro-confirmation-due.test.ts`, which imports the uncommitted `introConfirmationDueAt`. HEAD alone does not pass that test.
-
-With the working tree as it stands on 2026-10-14, `pnpm test` passes in all three apps: Control Plane 133/133, Martial Arts 376/376, Sales 73/73. Lint, typecheck, and build were not re-run in this reconciliation.
-
-The VPS checkout at `/opt/sic/crm_marketing_saas` is commit `47159a0` plus the same uncommitted Control Plane files, so its running Control Plane and registry migration `0009` are not reproducible from GitHub until they are committed and pushed. Do not `git checkout .` or `git pull` over them on either machine. Details: [[How-to-Run#VPS layout (live, checked 2026-10-15 UTC)]].
+**VPS state on 2026-10-15 (before the first `pnpm vps deploy`):** checkout `47159a0` plus hand-copied Control Plane files (CRLF copies of what is now committed, plus an older `_journal.json` / `schema.ts` without `0008`). The registry has `0009` applied and `0008_qa_ticketing` missing. The first deploy needs those copies removed (they are archived first), and the migrator then applies `0008`. Top Tier Hauling Sales PROD (`52202`) and DEV (`52203`) run `crm-sales:c2`, schema `0004`, `RELEASE_ID=dev`. They are to be rebuilt from the deployed commit (stop, then retry provision, DEV first). Their volumes hold no customer data yet.
 
 ---
 
@@ -211,7 +202,7 @@ Start All / Stop All = eligible **registered fleet**, not the table filter. Elig
 
 ### Provisioning
 
-Sales-led. `Customers → New customer` creates the **account only**. From the customer workspace Products tab, **Add product instance** and select Martial Arts or Sales. The Control Plane stores the instance immediately as **Provisioning**. Image build (`martial-arts-acquisition:s4` or `crm-sales:c2`) and compose run in the background from the product Dockerfile with **repo-root** context. Compose cwd is that product’s template directory. You can leave the page; Failed rows keep `provision_error` and Retry remounts the same volumes. Initial access is `admin` / `setup` with `NUXT_AUTH_MUST_CHANGE_PASSWORD=true`, written to the env file (chmod 0600). First login opens `/account/password`. Decision: [[SaaS-Decisions#2026-09-24 — Provisioned environments unwrap with admin / setup]]. Runbook: [[S4-Provision-Runbook]].
+Sales-led. `Customers → New customer` creates the **account only**. From the customer workspace Products tab, **Add product instance** and select Martial Arts or Sales. The Control Plane stores the instance immediately as **Provisioning**. Image build and compose run in the background from the product Dockerfile with **repo-root** context. The image is `<repo>:<commit>` built from the checked-out commit (reused only for a clean tree; refused on a VPS when product source has uncommitted changes), and each new environment is pinned to `<repo>@sha256:…` with `RELEASE_ID=<commit>@<12hex>`. `martial-arts-acquisition:s4` / `crm-sales:c2` remain only as catalog repository names and compose defaults. Compose cwd is that product’s template directory. You can leave the page; Failed rows keep `provision_error` and Retry remounts the same volumes. Initial access is `admin` / `setup` with `NUXT_AUTH_MUST_CHANGE_PASSWORD=true`, written to the env file (chmod 0600). First login opens `/account/password`. Decision: [[SaaS-Decisions#2026-09-24 — Provisioned environments unwrap with admin / setup]]. Runbook: [[S4-Provision-Runbook]].
 
 ### Backup / restore (official S6 Successful; C2 copy-down included)
 

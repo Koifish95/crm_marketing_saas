@@ -27,6 +27,23 @@ Decision: what we chose
 
 ---
 
+## 2026-10-15 — GitHub is the only source for the VPS; releases are commits pinned by digest
+
+Status: accepted (Scott asked in chat 2026-10-15: foundation steps 1–3 before CI/CD, and rebuild Top Tier from current code)
+
+Context: Top Tier Sales was provisioned on the VPS from a checkout that was `47159a0` plus hand-copied Control Plane files. It ran schema `0004` (current Sales is `0006`) under a reused tag `crm-sales:c2` with `RELEASE_ID=dev`, so nobody could say which code it was. The hand copies had also left the registry with `0009` applied and `0008_qa_ticketing` missing. Separately, the Control Plane links non-public environments as `http://localhost:<port>`, which only exists on the VPS loopback.
+
+Decision:
+
+- **Source of truth:** `origin/working` on GitHub. The VPS checkout is deploy-only: no hand edits, copies, or `scp`. Its only allowed local changes are the generated `deploy/edge/nginx.conf` and `deploy/edge/letsencrypt/`.
+- **Deploy:** `pnpm vps deploy [sha]` streams `deploy/hosting-node/deploy-control-plane.sh` to the VPS. The script refuses a commit that is not on `origin/working`, refuses tracked hand edits, backs up the registry, checks out the commit, installs, builds, migrates, and restarts `sic-control-plane`. Deploying an older sha is the Control Plane rollback.
+- **Release identity at provision:** provisioning builds `<repo>:<commit>` from the checkout (reusing the tag only for a clean tree), pins each new environment to `<repo>@sha256:…`, and writes `RELEASE_ID=<commit>@<12hex>`. On a VPS it refuses product source with uncommitted changes. `release-pin` no longer falls back to the checkout HEAD; only the image's own `RELEASE_ID` counts.
+- **Migrations:** `migrateDatabase` also applies any older journal entry with no row (matched by `created_at`), so an out-of-order registry heals on the next deploy.
+- **Environment access:** `pnpm vps tunnel` forwards every loopback port in `52200–52299` as well as `52100`. No public DEV hostnames.
+- **Next (not built):** GitHub Actions checks on push, then images built in CI and pushed to GHCR, pulled by digest. PROD promotion stays a manual Control Plane action.
+
+---
+
 ## 2026-10-14 — Operator VPS helper and platform How-to-Run
 
 Status: accepted (Scott asked in chat 2026-10-14)

@@ -2,11 +2,11 @@
 # Human map: Current-State.md. This file is an index, not a second essay.
 # Update in the same commit as the work that changes these fields.
 schema_version: 1
-updated: 2026-10-14
+updated: 2026-10-15
 repo: crm_marketing_saas
 branch: working
 remote: https://github.com/Koifish95/crm_marketing_saas.git
-head_at_write: "0c686e94869b09c3852b01f0d7f7be66454a98e7"  # HEAD; large working-tree changes uncommitted (see working_tree_* below)
+head_at_write: "6e08a1d"  # all work committed and pushed to origin/working
 
 canonical:
   bootstrap: Home.md
@@ -175,22 +175,28 @@ notes:
   ma_acquisition_funnel_schema: 0021_cheerful_lethal_legion
   ma_acquisition_funnel_note: Acquisition-Funnel-Analytics.md
   ma_acquisition_funnel_scope: instance_sqlite_not_control_plane
-  ma_acquisition_funnel_committed: false
-  cp_release_pin_rollback: code_present_uncommitted
+  ma_acquisition_funnel_committed: true
+  cp_release_pin_rollback: code_shipped
   cp_release_pin_rollback_live_proof: "2026-10-07 Acme A to B to A on nuxxion-vps-1"
   cp_release_pin_rollback_ui: api_only
   cp_schema: 0009_previous_release
-  working_tree_uncommitted: true
-  working_tree_note: "Current-State.md#Working tree vs Git (2026-10-14)"
-  head_test_depends_on_uncommitted: "0c686e9 tests/m5/intro-confirmation-due.test.ts imports uncommitted introConfirmationDueAt"
-  vps_checkout: "47159a0 plus uncommitted Control Plane files (checked 2026-10-15 UTC)"
+  working_tree_uncommitted: false
+  git_vps_note: "Current-State.md#Git and the VPS (2026-10-15)"
+  vps_checkout: "47159a0 plus hand-copied Control Plane files until the first pnpm vps deploy (checked 2026-10-15 UTC)"
+  vps_registry_missing_migration: "0008_qa_ticketing (0009 applied first); healed by migrateDatabase on deploy"
+  vps_deploy: "pnpm vps deploy [sha] -> deploy/hosting-node/deploy-control-plane.sh; origin/working only"
+  vps_deploy_first_run: pending_owner
+  provision_release_identity: "<repo>:<commit> pinned by digest, RELEASE_ID=<commit>@<12hex>"
+  top_tier_sales_envs: "PROD 52202 / DEV 52203 on crm-sales:c2 schema 0004 RELEASE_ID=dev; rebuild pending after deploy"
+  ci_cd: not_started
   vps_control_plane_service: sic-control-plane_systemd_enabled
   vps_ssh: "root@157.245.136.47 key ~/.ssh/id_ed25519_sic_prod"
   vps_tls_live_check: "2026-10-15 acme.nuxxion.com 200, Let's Encrypt until 2026-12-24"
   vps_offhost_last_ok: "2026-10-15T02:30:12Z nuxxion-dr:20261015_023001"
-  ops_vps_helper: code_shipped_uncommitted
+  ops_vps_helper: code_shipped
   ops_vps_helper_path: tools/vps.mjs
   ops_vps_helper_command: "pnpm vps"
+  ops_vps_tunnel_env_ports: "52200-52299 forwarded with 52100"
   ops_vps_helper_live_exercised: 2026-10-15
   how_to_run: platform_note_2026-10-14
   how_to_run_renzo_history: history/Renzo-How-to-Run.md
