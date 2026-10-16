@@ -82,6 +82,8 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
+          # v5 caches the packageManager from package.json by default; this job needs no pnpm.
+          package-manager-cache: false
       - name: VPS helper tests
         run: node --test tools/vps.test.mjs
       - name: Deploy script syntax
