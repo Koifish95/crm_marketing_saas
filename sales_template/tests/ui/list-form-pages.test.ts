@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 const read = (p: string) => readFileSync(join(process.cwd(), p), 'utf8')
-const forms = ['activities/index', 'companies/index', 'contacts/index', 'leads/index', 'offers/index', 'opportunities/index', 'campaigns/index']
+const forms = ['activities/index', 'companies/index', 'contacts/index', 'leads/index', 'offers/index', 'opportunities/index', 'campaigns/index', 'prospects/index']
 
 describe('Sales UI cleanup 4/4: new-record forms', () => {
   it.each([...forms, 'users'])('%s uses a two-column grid, never three', (page) => {
@@ -16,6 +16,12 @@ describe('Sales UI cleanup 4/4: new-record forms', () => {
     const src = read(`app/pages/${page}.vue`)
     expect(src).toContain('sm:grid-cols-2')
     expect(src).toMatch(/sm:col-span-2 form-actions/)
+  })
+
+  it('prospects discovery keeps the submit button out of the field row', () => {
+    const src = read('app/pages/prospects/index.vue')
+    expect(src).not.toContain('items-end')
+    expect(src).toMatch(/<form\s+class="grid gap-4 sm:grid-cols-2"\s+@submit\.prevent="discover"/)
   })
 
   it('form-actions adds 8px on top of the 16px grid gap (24px total)', () => {

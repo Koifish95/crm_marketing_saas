@@ -316,18 +316,20 @@ async function copyLink(token: string) {
             Controlled list. Deactivating keeps historical attribution.
           </p>
           <form
-            class="mb-3 flex gap-2"
+            class="mb-3 space-y-4"
             @submit.prevent="addSource"
           >
             <input
               v-model="sourceName"
-              class="control flex-1"
+              class="control"
               placeholder="New source name"
               required
             >
-            <AppButton type="submit">
-              Add
-            </AppButton>
+            <div class="form-actions">
+              <AppButton type="submit">
+                Add
+              </AppButton>
+            </div>
           </form>
           <ul class="space-y-2 text-sm">
             <li

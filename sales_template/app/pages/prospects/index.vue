@@ -277,7 +277,7 @@ onBeforeUnmount(() => {
     </div>
     <AppPanel title="Discovery">
       <form
-        class="flex flex-wrap items-end gap-3"
+        class="grid gap-4 sm:grid-cols-2"
         @submit.prevent="discover"
       >
         <AppField label="Practice state">
@@ -294,12 +294,14 @@ onBeforeUnmount(() => {
             </option>
           </select>
         </AppField>
-        <AppButton
-          type="submit"
-          :loading="starting"
-        >
-          Run discovery
-        </AppButton>
+        <div class="sm:col-span-2 form-actions">
+          <AppButton
+            type="submit"
+            :loading="starting"
+          >
+            Run discovery
+          </AppButton>
+        </div>
       </form>
       <p
         v-if="run"
