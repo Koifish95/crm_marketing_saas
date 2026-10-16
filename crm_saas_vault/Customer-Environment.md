@@ -104,7 +104,7 @@ Customer Environment
 | Assets | Per environment. Same isolation as the database. |
 | Deployed version | Per environment. DEV may run newer software than PROD. A Customer does not have one version. |
 | Secrets / runtime config | Environment-owned. See [[#Integration credentials]]. |
-| Public hostname | Optional. **PROD only.** Deployment configuration, not product identity. Derives `https://{hostname}` origin for nginx, cookies, and CSRF. See [[Hosting-Node-Architecture]]. |
+| Public hostname | Optional. **PROD and DEV** (2026-10-16). Deployment configuration, not product identity. Derives `https://{hostname}` origin for nginx, cookies, and CSRF. See [[Hosting-Node-Architecture]]. |
 
 ## Default entitlement vs capability
 

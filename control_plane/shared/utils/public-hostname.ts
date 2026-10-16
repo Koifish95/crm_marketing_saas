@@ -1,3 +1,10 @@
+/** PROD and DEV can be published; other non-PROD types (STAGE, TEST, …) stay loopback. */
+export const PUBLIC_HOSTNAME_TYPES: readonly string[] = ['PROD', 'DEV']
+
+export function canHavePublicHostname(type: string | null | undefined) {
+  return Boolean(type && PUBLIC_HOSTNAME_TYPES.includes(type))
+}
+
 export function normalizePublicHostname(raw: string) {
   return raw.trim().toLowerCase().replace(/\.$/, '')
 }

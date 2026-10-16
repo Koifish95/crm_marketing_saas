@@ -111,8 +111,21 @@ describe('production edge generator', () => {
       { type: 'PROD', hostPort: 52200, publicHostname: 'keep.example.com', lifecycleStatus: 'ready' },
       { type: 'PROD', hostPort: 52210, publicHostname: 'gone.example.com', lifecycleStatus: 'decommissioned' },
       { type: 'DEV', hostPort: 52201, publicHostname: 'dev.example.com', lifecycleStatus: 'ready' },
+      { type: 'STAGE', hostPort: 52202, publicHostname: 'stage.example.com', lifecycleStatus: 'ready' },
     ])
-    expect(routes.map(route => route.hostname)).toEqual(['keep.example.com'])
+    expect(routes.map(route => route.hostname)).toEqual(['dev.example.com', 'keep.example.com'])
+  })
+
+  it('rejects the TLS handshake for names with no server block', () => {
+    const conf = renderNginxConf({
+      routes: [{ hostname: 'acme.example.com', hostPort: 52200 }],
+      proxyMode: 'host-network',
+      hasCertificate: () => true,
+    })
+    const catchAll = conf.indexOf('listen 443 ssl default_server')
+    expect(catchAll).toBeGreaterThan(-1)
+    expect(conf).toContain('ssl_reject_handshake on')
+    expect(catchAll).toBeLessThan(conf.indexOf('server_name acme.example.com'))
   })
 
   it('writes linux and desktop compose files without publishing 52100', () => {

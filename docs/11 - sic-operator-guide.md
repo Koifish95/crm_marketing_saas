@@ -165,7 +165,7 @@ Dashboard, Products, Backups, and Reports are first-class nav. Reports are platf
 
 ## Assigning public hostnames
 
-PROD only. Environment Overview → hostname field → save.
+PROD and DEV. Environment Overview → hostname field → save. On the VPS, provisioning does this automatically (`{slug}.nuxxion.com`, `dev-{slug}.nuxxion.com`) and issues the certificate.
 
 Control Plane writes `public_hostname`, sets `NUXT_PUBLIC_ORIGIN=https://{hostname}`, regenerates `deploy/edge/nginx.conf`, patches env, relaunches app (**same volumes**).
 

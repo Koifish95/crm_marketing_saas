@@ -27,7 +27,7 @@ Short, precise meanings as used in **this** platform. Related: [Overview](2 - pr
 | **Copy-down** | Restore a PROD backup into same-account, same-product DEV. |
 | **Upgrade** | Backup-gated image rebuild + container recreate, no `-v`. |
 | **Production edge** | Generated nginx :80/:443 → `127.0.0.1:{hostPort}`. |
-| **Public hostname** | PROD-only DNS name; source of HTTPS origin, cookies, CSRF. |
+| **Public hostname** | PROD or DEV DNS name; source of HTTPS origin, cookies, CSRF. |
 | **Martial Arts Lead** | A **household**, not a single person. |
 | **Member / line** | A person in a household, usually with a program. |
 | **Trial / intro** | Scheduled introduction class for a member. |

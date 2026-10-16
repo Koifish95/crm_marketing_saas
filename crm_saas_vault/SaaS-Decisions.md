@@ -27,6 +27,20 @@ Decision: what we chose
 
 ---
 
+## 2026-10-16 — DEV gets a public hostname too; unknown names are refused on 443
+
+Status: accepted (Scott in chat 2026-10-16: the client must reach Top Tier DEV as well; "go ahead and build both"; DEV keeping `admin`/`setup` is acceptable because first sign-in forces a password change). Supersedes "Still PROD only; DEV stays loopback" in the entry below.
+
+Context: `dev-top-tier-hauling.nuxxion.com` resolved through the wildcard, but nginx had no server for it. With no default server on 443, nginx answered with the first HTTPS block, Acme: Acme's certificate (browser warning) and, if clicked through, Acme's app.
+
+Decision:
+
+- **DEV hostnames:** PROD and DEV can carry a public hostname (`PUBLIC_HOSTNAME_TYPES`). Provisioning gives a new DEV `dev-{customer-slug}.nuxxion.com` (or `dev-{customer-slug}-{product}`) with its certificate. Save hostname works on DEV. Other non-PROD types stay loopback.
+- **Catch-all:** the generated nginx has `listen 443 ssl default_server` with `ssl_reject_handshake on`. A name with no server block fails the TLS handshake instead of reaching a customer. Checked with nginx 1.27: unknown SNI gets `unrecognized name`; known names keep their own certificate.
+- **Unchanged:** the Control Plane stays loopback-only. Release order (DEV before PROD) is unchanged.
+
+---
+
 ## 2026-10-16 — Provisioning gives PROD `{customer-slug}.nuxxion.com` and issues its certificate
 
 Status: accepted (Scott in chat 2026-10-16: Top Tier PROD must be reachable by the client; "I want provisioning to set up the hostname"; wildcard record added in GoDaddy, "go ahead and build it"). Starts S8 for `nuxxion.com`.

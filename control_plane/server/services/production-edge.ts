@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { repoRoot } from './docker-relaunch'
 import { edgeProxyMode, type HostingNodeKind } from './hosting-node'
-import { assertPublicHostname } from '../../shared/utils/public-hostname'
+import { assertPublicHostname, canHavePublicHostname } from '../../shared/utils/public-hostname'
 
 export const CONTROL_PLANE_PORT = 52100
 export const EDGE_NGINX_CONTAINER = 'sic-production-edge'
@@ -141,6 +141,14 @@ http {
     location / {
       return 444;
     }
+  }
+
+  # Unknown names on 443 (the *.nuxxion.com wildcard sends every name here) must not
+  # fall through to the first customer's server block and certificate.
+  server {
+    listen 443 ssl default_server;
+    server_name _;
+    ssl_reject_handshake on;
   }`,
   ]
 
@@ -204,7 +212,7 @@ export function routesFromEnvironments(rows: readonly {
   productInstance?: { productId?: string }
 }[]): EdgeRoute[] {
   return rows
-    .filter(row => row.type === 'PROD'
+    .filter(row => canHavePublicHostname(row.type)
       && row.lifecycleStatus !== 'decommissioned'
       && row.lifecycleStatus !== 'archived'
       && Boolean(row.publicHostname)

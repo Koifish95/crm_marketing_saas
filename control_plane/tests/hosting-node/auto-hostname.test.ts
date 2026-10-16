@@ -67,6 +67,10 @@ describe('default public hostname', () => {
     expect(defaultPublicHostname({ customerSlug: 'acme', productId: 'sales', baseDomain: 'nuxxion.com', taken: new Set(['acme.nuxxion.com', 'acme-sales.nuxxion.com']) }))
       .toBeNull()
     expect(defaultPublicHostname({ customerSlug: 'acme', productId: 'sales', baseDomain: '', taken: new Set() })).toBeNull()
+    expect(defaultPublicHostname({ customerSlug: 'top-tier-hauling', productId: 'sales', type: 'DEV', baseDomain: 'nuxxion.com', taken: new Set() }))
+      .toBe('dev-top-tier-hauling.nuxxion.com')
+    expect(defaultPublicHostname({ customerSlug: 'acme', productId: 'sales', type: 'DEV', baseDomain: 'nuxxion.com', taken: new Set(['dev-acme.nuxxion.com']) }))
+      .toBe('dev-acme-sales.nuxxion.com')
   })
 
   it('reads EDGE_AUTO_CERT as an explicit opt-in', () => {
@@ -106,15 +110,17 @@ describe('edge certificate', () => {
 })
 
 describe('provisioning hostname', () => {
-  it('gives each new PROD its default hostname and leaves DEV on loopback', async () => {
+  it('gives each new PROD and DEV its default hostname', async () => {
     const { root, edgeDir, client, db, customerId } = await vpsRegistry()
     try {
       await addProductInstance(db, customerId, { productId: 'martial-arts', filesRoot: root })
       await addProductInstance(db, customerId, { productId: 'sales', filesRoot: root })
       const rows = (await listRegisteredEnvironments(db)).filter(row => row.customer.slug === 'nova-bjj')
       const options = { filesRoot: root, edgeDir, baseDomain: 'nuxxion.com', certificate: true, issuer: fakeIssuer }
-      const dev = rows.find(row => row.type === 'DEV')!
-      expect(await autoAssignPublicHostname(db, dev, options)).toBeNull()
+      const dev = rows.find(row => row.type === 'DEV' && row.productInstance.productId === 'martial-arts')!
+      const devHost = await autoAssignPublicHostname(db, dev, options)
+      expect(devHost?.hostname).toBe('dev-nova-bjj.nuxxion.com')
+      expect(readFileSync(join(edgeDir, 'nginx.conf'), 'utf8')).toContain('server_name dev-nova-bjj.nuxxion.com')
       const maProd = rows.find(row => row.type === 'PROD' && row.productInstance.productId === 'martial-arts')!
       const salesProd = rows.find(row => row.type === 'PROD' && row.productInstance.productId === 'sales')!
       const first = await autoAssignPublicHostname(db, maProd, options)

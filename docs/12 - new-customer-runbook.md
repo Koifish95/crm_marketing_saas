@@ -67,14 +67,11 @@ The Nuxxion DigitalOcean VPS already exists and passed the 2026-10-08 hosting ga
 - [ ] Offers/prices
 - [ ] Public intake left **off** unless they asked for `/inquire`
 
-### 6. Hostname (PROD only)
+### 6. Hostname (PROD and DEV)
 
-Proven shape: `{slug}.nuxxion.com`. Acme is `https://acme.nuxxion.com`.
+Shape: PROD `{slug}.nuxxion.com`, DEV `dev-{slug}.nuxxion.com`. On the VPS, provisioning assigns both and issues their certificates (`PUBLIC_BASE_DOMAIN`, `EDGE_AUTO_CERT`); the `*.nuxxion.com` wildcard covers DNS. Manual path (other domains): Save hostname, DNS A record to the VPS, Save again if the certificate failed.
 
-- [ ] Save public hostname in Control Plane
-- [ ] DNS A record to the VPS public IP. No AAAA unless the node listens on IPv6.
-- [ ] `EDGE_ROOT=/opt/sic/crm_marketing_saas/deploy/edge bash deploy/edge/issue-cert.sh {hostname} scottc@nuxxion.com`
-- [ ] Save hostname again so nginx enables 443
+- [ ] Hostnames shown on each environment's Overview
 - [ ] `https://{hostname}/api/health` from outside the VPS
 - [ ] Login over HTTPS; cookie is `Secure`; a foreign `Origin` is rejected
 

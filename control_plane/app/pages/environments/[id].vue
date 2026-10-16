@@ -11,6 +11,7 @@ import {
 } from '~~/shared/utils/fleet-backup'
 import { ENVIRONMENT_TABS } from '~~/shared/utils/nav'
 import { isRetryableLifecycle } from '~~/shared/utils/provision'
+import { canHavePublicHostname } from '~~/shared/utils/public-hostname'
 
 const route = useRoute()
 const { error, pending, refreshing, environments, checkedAt, refreshStatus, applyStatus } = await useFleetStatus()
@@ -206,7 +207,7 @@ async function startEnvironment() {
 }
 
 async function assignHostname() {
-  if (!env.value || assigningHostname.value || env.value.type !== 'PROD') {
+  if (!env.value || assigningHostname.value || !canHavePublicHostname(env.value.type)) {
     return
   }
   assigningHostname.value = true
@@ -633,7 +634,7 @@ async function refreshWorkspace() {
           <dd><AppAccessLink :href="env?.accessUrl" /></dd>
           <dt>Public hostname</dt>
           <dd>
-            <template v-if="env?.type === 'PROD' && !decommissioned">
+            <template v-if="canHavePublicHostname(env?.type) && !decommissioned">
               <form
                 class="hostname-form"
                 @submit.prevent="assignHostname"
@@ -656,7 +657,7 @@ async function refreshWorkspace() {
               </form>
               <p class="muted">
                 One source of truth. nginx, HTTPS origin, Secure cookies, and CSRF all use
-                <code>https://{{ hostnameDraft || env.publicHostname || 'hostname' }}</code>.
+                <code>https://{{ hostnameDraft || env?.publicHostname || 'hostname' }}</code>.
                 Temporary SIC names such as ma-test.strategicinsightsconsulting.net are configuration, not architecture.
               </p>
             </template>

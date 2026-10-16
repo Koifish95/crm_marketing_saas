@@ -1,7 +1,7 @@
 import { and, eq, ne } from 'drizzle-orm'
 import type { Database } from '../database'
 import { environments } from '../database/schema'
-import { accessUrlForEnvironment, assertPublicHostname, publicOriginForHostname } from '../../shared/utils/public-hostname'
+import { accessUrlForEnvironment, assertPublicHostname, canHavePublicHostname, publicOriginForHostname } from '../../shared/utils/public-hostname'
 import { relaunchRegisteredEnvironment } from './docker-relaunch'
 import { publicEnvSettings, patchProvisionedEnvFile } from './provision-env'
 import { generateProductionEdgeFilesFromRegistry } from './production-edge-sync'
@@ -39,8 +39,8 @@ export async function assignPublicHostname(db: Database, id: string, rawHostname
   if (row.lifecycleStatus === 'decommissioned') {
     throw new HostnameError('Decommissioned environments cannot receive a public hostname.', 409)
   }
-  if (row.type !== 'PROD') {
-    throw new HostnameError('Public hostnames are assigned to PROD environments only.', 409)
+  if (!canHavePublicHostname(row.type)) {
+    throw new HostnameError('Public hostnames are assigned to PROD and DEV environments only.', 409)
   }
   const [taken] = await db.select({ id: environments.id }).from(environments)
     .where(and(eq(environments.publicHostname, hostname), ne(environments.id, id)))
@@ -117,13 +117,14 @@ export async function assignPublicHostname(db: Database, id: string, rawHostname
 }
 
 /**
- * Default PROD hostname under the node's base domain: `{customer-slug}.{domain}`, as with acme.nuxxion.com.
- * A customer's second PROD (another product) gets `{customer-slug}-{product}.{domain}`.
+ * Default hostname under the node's base domain: PROD `{customer-slug}.{domain}`, as with acme.nuxxion.com;
+ * DEV `dev-{customer-slug}.{domain}`. A customer's second product gets `…{customer-slug}-{product}.{domain}`.
  * Returns null when no base domain is configured or every candidate is taken or invalid.
  */
 export function defaultPublicHostname(input: {
   customerSlug: string
   productId: string
+  type?: string
   baseDomain?: string | null
   taken: ReadonlySet<string>
 }) {
@@ -131,7 +132,8 @@ export function defaultPublicHostname(input: {
   if (!domain) {
     return null
   }
-  for (const label of [input.customerSlug, `${input.customerSlug}-${input.productId}`]) {
+  const prefix = input.type === 'DEV' ? 'dev-' : ''
+  for (const label of [`${prefix}${input.customerSlug}`, `${prefix}${input.customerSlug}-${input.productId}`]) {
     try {
       const hostname = assertPublicHostname(`${label}.${domain}`)
       if (!input.taken.has(hostname)) {
@@ -148,7 +150,7 @@ export function publicBaseDomain(env: NodeJS.Dict<string | undefined> = process.
   return (env.PUBLIC_BASE_DOMAIN || '').trim() || null
 }
 
-/** Provisioning: give a new PROD its default hostname. Never throws; a failure leaves the environment on loopback. */
+/** Provisioning: give a new PROD or DEV its default hostname. Never throws; a failure leaves the environment on loopback. */
 export async function autoAssignPublicHostname(db: Database, row: {
   id: string
   type: string
@@ -156,7 +158,7 @@ export async function autoAssignPublicHostname(db: Database, row: {
   customer: { slug: string }
   productInstance: { productId: string }
 }, input: { filesRoot?: string, baseDomain?: string | null, edgeDir?: string, certificate?: boolean, issuer?: CertificateIssuer } = {}) {
-  if (row.type !== 'PROD' || row.publicHostname) {
+  if (!canHavePublicHostname(row.type) || row.publicHostname) {
     return null
   }
   const taken = new Set((await listRegisteredEnvironments(db))
@@ -165,6 +167,7 @@ export async function autoAssignPublicHostname(db: Database, row: {
   const hostname = defaultPublicHostname({
     customerSlug: row.customer.slug,
     productId: row.productInstance.productId,
+    type: row.type,
     baseDomain: input.baseDomain === undefined ? publicBaseDomain() : input.baseDomain,
     taken,
   })
