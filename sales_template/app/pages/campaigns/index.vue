@@ -85,7 +85,7 @@ async function toggleIntake() {
     </AppPanel>
     <AppPanel title="New campaign">
       <form
-        class="flex flex-wrap gap-3"
+        class="grid gap-4 sm:grid-cols-2"
         @submit.prevent="create"
       >
         <AppField
@@ -98,7 +98,7 @@ async function toggleIntake() {
             required
           >
         </AppField>
-        <div class="self-end">
+        <div class="sm:col-span-2 form-actions">
           <AppButton
             type="submit"
             :loading="saving"
@@ -121,15 +121,17 @@ async function toggleIntake() {
         :key="campaign.id"
         class="record-item"
       >
-        <NuxtLink
-          :to="`/campaigns/${campaign.id}`"
-          class="record-item-title"
-        >
-          {{ campaign.name }}
-        </NuxtLink>
-        <p class="record-item-meta">
-          {{ campaignStatusLabel(campaign.status) }}
-        </p>
+        <div class="record-row">
+          <NuxtLink
+            :to="`/campaigns/${campaign.id}`"
+            class="record-item-title"
+          >
+            {{ campaign.name }}
+          </NuxtLink>
+          <AppBadge tone="brand">
+            {{ campaignStatusLabel(campaign.status) }}
+          </AppBadge>
+        </div>
       </li>
     </ul>
     <p class="text-xs text-muted">

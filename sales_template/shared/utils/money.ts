@@ -19,6 +19,17 @@ export function centsToDollarString(cents: number): string {
   return `${sign}${whole}.${fraction}`
 }
 
+/** Display-only: thousands separators for lists. Documents and PDFs keep formatUsdFromCents. */
+export function formatUsdGrouped(cents: number | null | undefined) {
+  if (cents == null) {
+    return '—'
+  }
+  const sign = cents < 0 ? '-' : ''
+  const abs = Math.abs(cents)
+  const whole = Math.floor(abs / 100).toLocaleString('en-US')
+  return `${sign}$${whole}.${String(abs % 100).padStart(2, '0')}`
+}
+
 export function formatUsdFromCents(cents: number | null | undefined) {
   if (cents == null) {
     return '—'

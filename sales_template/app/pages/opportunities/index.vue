@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatUsdFromCents } from '#shared/utils/money'
+import { formatUsdGrouped } from '#shared/utils/money'
 import {
   ACTIVE_OPPORTUNITY_STAGES,
   OPPORTUNITY_STAGES,
@@ -103,7 +103,7 @@ async function create() {
     </AppAlert>
     <AppPanel title="New opportunity">
       <form
-        class="grid gap-3 sm:grid-cols-2"
+        class="grid gap-4 sm:grid-cols-2"
         @submit.prevent="create"
       >
         <AppField
@@ -147,7 +147,7 @@ async function create() {
             inputmode="decimal"
           >
         </AppField>
-        <div class="sm:col-span-2">
+        <div class="sm:col-span-2 form-actions">
           <AppButton
             type="submit"
             :loading="saving"
@@ -195,18 +195,24 @@ async function create() {
         :key="opportunity.id"
         class="record-item"
       >
-        <NuxtLink
-          :to="`/opportunities/${opportunity.id}`"
-          class="record-item-title"
-        >
-          {{ opportunity.name }}
-        </NuxtLink>
-        <p class="record-item-meta">
-          {{ companyName(opportunity) }}
-          · {{ opportunityStageLabel(opportunity.stage) }}
-          · {{ formatUsdFromCents(opportunity.amountCents ?? 0) }} one-time
-          · {{ formatUsdFromCents(opportunity.mrrCents ?? 0) }} MRR
-        </p>
+        <div class="record-row">
+          <div>
+            <NuxtLink
+              :to="`/opportunities/${opportunity.id}`"
+              class="record-item-title"
+            >
+              {{ opportunity.name }}
+            </NuxtLink>
+            <p class="record-item-meta">
+              {{ companyName(opportunity) }}
+              · {{ formatUsdGrouped(opportunity.amountCents ?? 0) }} one-time
+              · {{ formatUsdGrouped(opportunity.mrrCents ?? 0) }} MRR
+            </p>
+          </div>
+          <AppBadge tone="brand">
+            {{ opportunityStageLabel(opportunity.stage) }}
+          </AppBadge>
+        </div>
         <p class="record-item-meta">
           {{ nextLabel(opportunity.nextActivity ?? null) }}
         </p>

@@ -130,7 +130,7 @@ async function complete(activity: Activity, payload: {
     </AppAlert>
     <AppPanel title="New activity">
       <form
-        class="grid gap-3 sm:grid-cols-2"
+        class="grid gap-4 sm:grid-cols-2"
         @submit.prevent="create"
       >
         <AppField
@@ -202,7 +202,7 @@ async function complete(activity: Activity, payload: {
             </option>
           </select>
         </AppField>
-        <div class="sm:col-span-2">
+        <div class="sm:col-span-2 form-actions">
           <AppButton
             type="submit"
             :loading="saving"

@@ -116,7 +116,7 @@ const viewLabel = computed(() => {
 
 function cardClass(name: string) {
   return view.value === name
-    ? 'stat-cell stat-link text-left ring-2 ring-inset ring-navy-900'
+    ? 'stat-cell stat-link bg-brand-50 text-left ring-1 ring-inset ring-brand-500'
     : 'stat-cell stat-link text-left'
 }
 
@@ -184,46 +184,48 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="space-y-6">
-    <AppPageHeader
-      title="Prospects"
-      description="Academies are stored here before anyone is emailed. The daily cap limits what goes out."
-    >
-      <template #actions>
-        <NuxtLink
-          class="text-sm"
-          to="/settings/prospects"
-        >
-          Desk settings
-        </NuxtLink>
-      </template>
-    </AppPageHeader>
-    <AppAlert v-if="error || formError">
-      {{ formError || 'Could not load the prospect desk.' }}
-    </AppAlert>
-    <AppAlert
-      v-if="data?.senderPaused"
-      tone="warning"
-    >
-      Sending is paused. {{ data.senderPausedReason || 'Resume when you have checked the bounces.' }}
-      <AppButton
-        class="ml-3"
-        type="button"
-        variant="secondary"
-        :loading="resuming"
-        @click="resume"
+    <div class="space-y-3">
+      <AppPageHeader
+        title="Prospects"
+        description="Academies are stored here before anyone is emailed. The daily cap limits what goes out."
       >
-        Resume sending
-      </AppButton>
-    </AppAlert>
-    <AppAlert v-else-if="data && !data.mailboxReady">
-      Connect the mailbox and add the postal address before anything sends.
-    </AppAlert>
-    <AppAlert v-else-if="data?.capReached">
-      Today's cap of {{ data.sendingCap }} is reached. Ready academies stay in the backlog.
-    </AppAlert>
-    <AppAlert v-else-if="data?.blockReason && data.blockReason !== 'Outside the weekday send window.'">
-      {{ data.blockReason }}
-    </AppAlert>
+        <template #actions>
+          <NuxtLink
+            class="btn btn-secondary"
+            to="/settings/prospects"
+          >
+            Desk settings
+          </NuxtLink>
+        </template>
+      </AppPageHeader>
+      <AppAlert v-if="error || formError">
+        {{ formError || 'Could not load the prospect desk.' }}
+      </AppAlert>
+      <AppAlert
+        v-if="data?.senderPaused"
+        tone="warning"
+      >
+        Sending is paused. {{ data.senderPausedReason || 'Resume when you have checked the bounces.' }}
+        <AppButton
+          class="ml-3"
+          type="button"
+          variant="secondary"
+          :loading="resuming"
+          @click="resume"
+        >
+          Resume sending
+        </AppButton>
+      </AppAlert>
+      <AppAlert v-else-if="data && !data.mailboxReady">
+        Connect the mailbox and add the postal address before anything sends.
+      </AppAlert>
+      <AppAlert v-else-if="data?.capReached">
+        Today's cap of {{ data.sendingCap }} is reached. Ready academies stay in the backlog.
+      </AppAlert>
+      <AppAlert v-else-if="data?.blockReason && data.blockReason !== 'Outside the weekday send window.'">
+        {{ data.blockReason }}
+      </AppAlert>
+    </div>
     <div class="stat-grid sm:!grid-cols-4">
       <button
         type="button"

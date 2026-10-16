@@ -72,7 +72,7 @@ async function create() {
     </AppAlert>
     <AppPanel title="New lead">
       <form
-        class="grid gap-3 sm:grid-cols-2"
+        class="grid gap-4 sm:grid-cols-2"
         @submit.prevent="create"
       >
         <AppField
@@ -107,7 +107,7 @@ async function create() {
             class="control"
           >
         </AppField>
-        <div class="sm:col-span-2">
+        <div class="sm:col-span-2 form-actions">
           <AppButton
             type="submit"
             :loading="saving"
@@ -145,16 +145,22 @@ async function create() {
         :key="lead.id"
         class="record-item"
       >
-        <NuxtLink
-          :to="`/leads/${lead.id}`"
-          class="record-item-title"
-        >
-          {{ lead.displayName }}
-        </NuxtLink>
-        <p class="record-item-meta">
-          {{ leadStageLabel(lead.stage) }}
-          · {{ lead.email || lead.phone || 'Reachability on file' }}
-        </p>
+        <div class="record-row">
+          <div>
+            <NuxtLink
+              :to="`/leads/${lead.id}`"
+              class="record-item-title"
+            >
+              {{ lead.displayName }}
+            </NuxtLink>
+            <p class="record-item-meta">
+              {{ lead.email || lead.phone || 'Reachability on file' }}
+            </p>
+          </div>
+          <AppBadge tone="brand">
+            {{ leadStageLabel(lead.stage) }}
+          </AppBadge>
+        </div>
       </li>
     </ul>
     <p class="text-xs text-muted">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { OFFER_PRICING_TYPES, offerPricingTypeLabel } from '#shared/utils/catalog'
-import { formatUsdFromCents } from '#shared/utils/money'
+import { formatUsdGrouped } from '#shared/utils/money'
 
 definePageMeta({
   layout: 'internal',
@@ -63,7 +63,7 @@ async function create() {
     </AppAlert>
     <AppPanel title="New offer">
       <form
-        class="grid gap-3 sm:grid-cols-3"
+        class="grid gap-4 sm:grid-cols-2"
         @submit.prevent="create"
       >
         <AppField
@@ -101,7 +101,7 @@ async function create() {
             required
           >
         </AppField>
-        <div class="sm:col-span-3">
+        <div class="sm:col-span-2 form-actions">
           <AppButton
             type="submit"
             :loading="saving"
@@ -124,17 +124,23 @@ async function create() {
         :key="offer.id"
         class="record-item"
       >
-        <NuxtLink
-          :to="`/offers/${offer.id}`"
-          class="record-item-title"
-        >
-          {{ offer.name }}
-        </NuxtLink>
-        <p class="record-item-meta">
-          {{ offerPricingTypeLabel(offer.pricingType) }}
-          · {{ formatUsdFromCents(offer.defaultUnitPriceCents) }}
-          · {{ offer.active ? 'Active' : 'Inactive' }}
-        </p>
+        <div class="record-row">
+          <div>
+            <NuxtLink
+              :to="`/offers/${offer.id}`"
+              class="record-item-title"
+            >
+              {{ offer.name }}
+            </NuxtLink>
+            <p class="record-item-meta">
+              {{ offerPricingTypeLabel(offer.pricingType) }}
+              · {{ formatUsdGrouped(offer.defaultUnitPriceCents) }}
+            </p>
+          </div>
+          <AppBadge :tone="offer.active ? 'success' : 'muted'">
+            {{ offer.active ? 'Active' : 'Inactive' }}
+          </AppBadge>
+        </div>
       </li>
     </ul>
   </section>
