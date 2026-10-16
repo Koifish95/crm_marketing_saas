@@ -45,6 +45,14 @@ describe('Sales UI cleanup 2/4: panels, fields, buttons and tables', () => {
     }
   })
 
+  it('the public intake pages (/inquire and /t/{token}) render through AppField with the hint slot', () => {
+    expect(read('app/pages/t/[token].vue')).toContain('<PublicIntakeForm')
+    expect(read('app/pages/inquire.vue')).toContain('PublicIntakeForm')
+    const form = read('app/components/PublicIntakeForm.vue')
+    expect(form).toContain('<AppField')
+    expect(form).toContain(':hint="field.helpText')
+  })
+
   it('does not draw bordered boxes inside panels', () => {
     const boxed = /rounded-(md|lg)[^"']*border|border[^"']*rounded-(md|lg)/
     for (const page of [
