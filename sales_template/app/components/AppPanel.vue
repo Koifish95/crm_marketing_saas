@@ -1,16 +1,18 @@
 <script setup lang="ts">
-defineProps<{
+withDefaults(defineProps<{
   title?: string
   description?: string
   padded?: boolean
-}>()
+}>(), {
+  padded: true,
+})
 </script>
 
 <template>
   <section class="panel">
     <header
       v-if="title || $slots.actions"
-      class="mx-4 flex flex-wrap items-start justify-between gap-3 border-b border-line py-4 sm:mx-6 sm:py-5 lg:mx-8"
+      class="mx-4 flex flex-wrap items-start justify-between gap-3 border-b border-line py-4 sm:mx-6"
     >
       <div class="min-w-0">
         <h2
@@ -34,8 +36,7 @@ defineProps<{
       </div>
     </header>
     <div
-      class="p-4 sm:p-6 lg:p-8"
-      :class="{ '!p-0': padded === false }"
+      :class="padded ? 'p-4 sm:p-6' : ''"
     >
       <slot />
     </div>

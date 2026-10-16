@@ -35,29 +35,31 @@ const { data: events, error, pending } = await useFetch<SecurityEventRow[]>('/ap
     >
       Loading…
     </p>
-    <table
+    <div
       v-else
-      class="data-table"
+      class="table-wrap"
     >
-      <thead>
-        <tr>
-          <th>When</th>
-          <th>Action</th>
-          <th>Result</th>
-          <th>Actor</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="event in events"
-          :key="event.id"
-        >
-          <td>{{ new Date(event.createdAt).toLocaleString() }}</td>
-          <td>{{ event.action }}</td>
-          <td>{{ event.result }}</td>
-          <td>{{ event.actorName || event.actorEmail || '—' }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>When</th>
+            <th>Action</th>
+            <th>Result</th>
+            <th>Actor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="event in events"
+            :key="event.id"
+          >
+            <td>{{ new Date(event.createdAt).toLocaleString() }}</td>
+            <td>{{ event.action }}</td>
+            <td>{{ event.result }}</td>
+            <td>{{ event.actorName || event.actorEmail || '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 </template>

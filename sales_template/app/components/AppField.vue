@@ -9,25 +9,23 @@ defineProps<{
 
 <template>
   <label class="block text-sm font-medium text-navy-800">
-    <span class="flex items-baseline justify-between gap-2">
-      <span>
-        {{ label }}
-        <span
-          v-if="required"
-          class="text-danger-700"
-        >*</span>
-      </span>
+    <span>
+      {{ label }}
       <span
-        v-if="hint"
-        class="font-normal text-muted"
-      >{{ hint }}</span>
+        v-if="required"
+        class="text-danger-700"
+      >*</span>
     </span>
-    <span class="mt-1.5 block">
+    <span class="mt-2 block">
       <slot />
     </span>
     <span
+      v-if="hint"
+      class="mt-1 block text-xs font-normal leading-5 text-muted"
+    >{{ hint }}</span>
+    <span
       v-if="error"
-      class="mt-1 block text-xs font-normal text-danger-700"
+      class="mt-1 block text-xs font-normal leading-5 text-danger-700"
     >
       {{ error }}
     </span>
