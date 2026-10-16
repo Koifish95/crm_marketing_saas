@@ -45,3 +45,6 @@ crm_saas_vault/.obsidian/types.json
 crm_saas_vault/.obsidian/plugins/
 crm_saas_vault/.obsidian/graph.json
 martial_arts_template/vault/.obsidian/
+
+# Local VPS helper config (host, user, key path)
+tools/vps.config.json

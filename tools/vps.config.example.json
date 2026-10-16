@@ -1,0 +1,7 @@
+{
+  "host": "157.245.136.47",
+  "user": "root",
+  "port": 22,
+  "identityFile": "~/.ssh/id_ed25519_sic_prod",
+  "localPort": 52100
+}
