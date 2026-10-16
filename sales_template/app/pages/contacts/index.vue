@@ -83,7 +83,7 @@ async function create() {
     </AppAlert>
     <AppPanel title="New contact">
       <form
-        class="grid gap-3 sm:grid-cols-2"
+        class="grid gap-4 sm:grid-cols-2"
         @submit.prevent="create"
       >
         <AppField
@@ -146,7 +146,7 @@ async function create() {
             class="control"
           >
         </AppField>
-        <div class="sm:col-span-2">
+        <div class="sm:col-span-2 form-actions">
           <AppButton
             type="submit"
             :loading="saving"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatUsdFromCents } from '#shared/utils/money'
+import { formatUsdGrouped } from '#shared/utils/money'
 import { proposalStatusLabel } from '#shared/utils/proposals'
 
 definePageMeta({
@@ -46,7 +46,7 @@ const { data: rows, error, pending } = await useFetch<Row[]>('/api/proposals')
       Loading…
     </p>
     <ul
-      v-else
+      v-else-if="rows?.length"
       class="record-list"
     >
       <li
@@ -54,31 +54,35 @@ const { data: rows, error, pending } = await useFetch<Row[]>('/api/proposals')
         :key="row.id"
         class="record-item"
       >
-        <NuxtLink
-          :to="`/opportunities/${row.opportunityId}`"
-          class="record-item-title"
-        >
-          {{ row.label }}
-        </NuxtLink>
-        <p class="record-item-meta">
-          {{ row.opportunityName }}
-          · {{ row.companyName }}
-          · {{ proposalStatusLabel(row.status) }}
-          <span v-if="row.sentAt">· Sent</span>
-          · {{ formatUsdFromCents(row.amountCents) }}
-          · {{ formatUsdFromCents(row.mrrCents) }} MRR
-          <span
-            v-if="row.pastValidThrough"
-            class="text-red-800"
-          >· Past valid-through</span>
-        </p>
+        <div class="record-row">
+          <div>
+            <NuxtLink
+              :to="`/opportunities/${row.opportunityId}`"
+              class="record-item-title"
+            >
+              {{ row.label }}
+            </NuxtLink>
+            <p class="record-item-meta">
+              {{ row.opportunityName }}
+              · {{ row.companyName }}
+              <span v-if="row.sentAt">· Sent</span>
+              · {{ formatUsdGrouped(row.amountCents) }}
+              · {{ formatUsdGrouped(row.mrrCents) }} MRR
+              <span
+                v-if="row.pastValidThrough"
+                class="text-danger-700"
+              >· Past valid-through</span>
+            </p>
+          </div>
+          <AppBadge tone="brand">
+            {{ proposalStatusLabel(row.status) }}
+          </AppBadge>
+        </div>
       </li>
     </ul>
-    <p
+    <AppEmpty
       v-if="rows && !rows.length"
-      class="text-sm text-muted"
-    >
-      No Proposals yet. Open an Opportunity to create a Draft.
-    </p>
+      title="No Proposals yet. Open an Opportunity to create a Draft."
+    />
   </section>
 </template>

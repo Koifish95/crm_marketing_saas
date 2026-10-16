@@ -99,7 +99,7 @@ async function create() {
             </option>
           </select>
         </AppField>
-        <div class="sm:col-span-3">
+        <div class="sm:col-span-3 form-actions">
           <AppButton
             type="submit"
             :loading="saving"
@@ -132,7 +132,11 @@ async function create() {
             <td>{{ user.displayName }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.role }}</td>
-            <td>{{ user.active ? 'Active' : 'Inactive' }}</td>
+            <td>
+              <AppBadge :tone="user.active ? 'success' : 'muted'">
+                {{ user.active ? 'Active' : 'Inactive' }}
+              </AppBadge>
+            </td>
           </tr>
         </tbody>
       </table>

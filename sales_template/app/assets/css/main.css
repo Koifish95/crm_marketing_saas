@@ -330,7 +330,7 @@ html[data-app-env="stage"] {
   }
 
   .field-group-fields {
-    @apply grid gap-3 sm:grid-cols-2;
+    @apply grid gap-4 sm:grid-cols-2;
   }
 
   .form-measure {
@@ -346,7 +346,23 @@ html[data-app-env="stage"] {
   }
 
   .record-item {
-    @apply px-4 py-4 sm:px-5;
+    @apply px-4 py-4 sm:px-6;
+  }
+
+  .record-row {
+    @apply flex items-start justify-between gap-3;
+  }
+
+  .record-row > :first-child {
+    @apply min-w-0;
+  }
+
+  .record-row > :last-child {
+    @apply shrink-0;
+  }
+
+  .form-actions {
+    @apply pt-2;
   }
 
   .record-item-title {

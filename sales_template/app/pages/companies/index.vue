@@ -97,7 +97,7 @@ async function create() {
       title="New company"
     >
       <form
-        class="grid gap-3 sm:grid-cols-2"
+        class="grid gap-4 sm:grid-cols-2"
         @submit.prevent="create"
       >
         <AppField
@@ -140,7 +140,7 @@ async function create() {
             class="control"
           >
         </AppField>
-        <div class="sm:col-span-2">
+        <div class="sm:col-span-2 form-actions">
           <AppButton
             type="submit"
             :loading="saving"
@@ -196,22 +196,28 @@ async function create() {
         :key="company.id"
         class="record-item"
       >
-        <NuxtLink
-          :to="`/companies/${company.id}`"
-          class="record-item-title"
-        >
-          {{ company.name }}
-        </NuxtLink>
-        <p class="record-item-meta">
-          {{ companyLifecycleLabel(company.lifecycle) }}
-          · {{ company.active ? 'Active' : 'Inactive' }}
-          <span v-if="company.doNotContact">
-            · Do not contact
-          </span>
-          <span v-if="company.city || company.state">
-            · {{ [company.city, company.state].filter(Boolean).join(', ') }}
-          </span>
-        </p>
+        <div class="record-row">
+          <div>
+            <NuxtLink
+              :to="`/companies/${company.id}`"
+              class="record-item-title"
+            >
+              {{ company.name }}
+            </NuxtLink>
+            <p class="record-item-meta">
+              {{ companyLifecycleLabel(company.lifecycle) }}
+              <span v-if="company.doNotContact">
+                · Do not contact
+              </span>
+              <span v-if="company.city || company.state">
+                · {{ [company.city, company.state].filter(Boolean).join(', ') }}
+              </span>
+            </p>
+          </div>
+          <AppBadge :tone="company.active ? 'success' : 'muted'">
+            {{ company.active ? 'Active' : 'Inactive' }}
+          </AppBadge>
+        </div>
       </li>
     </ul>
   </section>
