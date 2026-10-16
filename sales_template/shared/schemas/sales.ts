@@ -256,6 +256,14 @@ export const publicIntakeSubmitSchema = z.object({
   message: z.string().trim().max(4000).optional(),
 })
 
+export const publicLeadIntakeSchema = z.object({
+  name: z.string().trim().max(200).optional(),
+  email: z.string().trim().max(200).optional(),
+  phone: z.string().trim().max(80).optional(),
+  message: z.string().trim().max(4000).optional(),
+  source: z.string().trim().max(120).optional(),
+})
+
 export const patchPublicIntakeConfigSchema = z.object({
   enabled: z.boolean().optional(),
   introText: z.string().max(2000).optional(),

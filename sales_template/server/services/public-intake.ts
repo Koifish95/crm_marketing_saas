@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+import { createHash, randomUUID, timingSafeEqual } from 'node:crypto'
 import { eq } from 'drizzle-orm'
 import { DomainError } from '@crm/core/server/services/errors'
 import { ensureAppSettings, readAppSetting, upsertAppSetting } from '@crm/core/server/services/app-settings'
@@ -346,4 +346,43 @@ export async function publicTrackingPayload(db: Database, token: string) {
     token: link.token,
     intake: publicIntakePresentation(config),
   }
+}
+
+export const LEAD_INTAKE_KEY_HEADER = 'x-intake-key'
+
+/** Fail closed: an unset/blank server key or a missing/wrong presented key never matches. */
+export function intakeKeyMatches(presented: string | null | undefined, expected = process.env.LEAD_INTAKE_KEY) {
+  const want = expected?.trim()
+  if (!want || !presented) {
+    return false
+  }
+  const a = createHash('sha256').update(presented).digest()
+  const b = createHash('sha256').update(want).digest()
+  return timingSafeEqual(a, b)
+}
+
+export async function submitKeyedLead(db: Database, input: {
+  name?: string | null
+  email?: string | null
+  phone?: string | null
+  message?: string | null
+  source?: string | null
+}) {
+  const organic = await websiteOrganicSource(db)
+  const lead = await createLead(db, {
+    displayName: input.name ?? '',
+    email: input.email ?? undefined,
+    phone: input.phone ?? undefined,
+    sourceId: organic.id,
+    sourceDetail: blankToNull(input.source) ?? 'website',
+  })
+  const message = blankToNull(input.message)
+  await db.insert(salesNotes).values({
+    recordKind: 'lead',
+    recordId: lead.id,
+    body: message ? `Website inquiry: ${message}` : 'Submitted via keyed website lead intake.',
+    authorUserId: null,
+    createdAt: now(),
+  })
+  return { ok: true as const, id: lead.id }
 }
