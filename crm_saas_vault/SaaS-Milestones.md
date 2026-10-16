@@ -213,6 +213,8 @@ Reachable customer access: hostname shape `{slug}.{product-domain}`, TLS, real (
 
 **Not in this milestone:** Apex/www for Renzo. Cloudflare/Caddy locks from the Renzo hosting contract.
 
+2026-10-16: Top Tier PROD live at `top-tier-hauling.nuxxion.com`, password changed, Scott signed in. Remaining for Successful: Top Tier staff sign in and use the CRM.
+
 - [ ] **S8 Successful:** Customer staff can hit `{slug}.{product-domain}`, sign in with a real password, and run the CRM, without touching `app.renzogracieutah.com`.
 
 Repo-side hostname/TLS workflow exists (PROD `public_hostname`, generated nginx, ACME scripts). Live DNS/TLS and the unset product domain remain this milestone. Temporary `*.strategicinsightsconsulting.net` names are not the product domain.

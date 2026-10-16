@@ -186,7 +186,7 @@ Not started. Each phase needs its own authorization. `authorization.active_work_
 **Not built for Top Tier:** hostname, website-to-CRM integration, staff notification, customer acceptance.
 
 1. **P0 — Production platform confidence. Done as a hosting gate 2026-10-08 (READY FOR TOP TIER, [[Nuxxion-Production-Acceptance]]).** On the existing VPS, validate persistence, registry backup, restart, reboot recovery, customer isolation, edge, DNS/TLS, release identity, backup, verified restore, PROD → DEV copy-down, DEV-first upgrade, rollback, disk and backup visibility, and ticket visibility. Do not call a laptop rehearsal live-proven.
-2. **P0 — Provision** Top Tier Sales PROD and DEV through the Control Plane. **Done 2026-10-16 UTC** (rebuilt from `cbee291`; initial password change still to confirm). Change the initial password before any public hostname. Leave the prospect desk off.
+2. **P0 — Provision** Top Tier Sales PROD and DEV through the Control Plane. **Done 2026-10-16 UTC** (rebuilt from `cbee291`). PROD initial password changed by Scott on first public login, 2026-10-16; sign-in at `https://top-tier-hauling.nuxxion.com` confirmed working. DEV still has its initial password (loopback only). Leave the prospect desk off.
 3. **P0 — Intake design before code.** Write the payload, endpoint, validation, abuse protection, record mapping, duplicate behavior, failure behavior, and observability. Then implement only what that note authorizes.
 4. **P0 — End to end.** Top Tier website → form submission → Nuxxion Sales PROD → the intended record(s) → staff can find the inquiry → follow-up → a normal sales outcome.
 5. **P0 — Customer acceptance.** Top Tier uses the workflow. Record what they say. Tests passing do not finish onboarding.
