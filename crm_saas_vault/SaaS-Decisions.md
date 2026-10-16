@@ -39,7 +39,7 @@ Decision:
 - **Pull, don't build:** for a clean checkout, provisioning and Release-tab upgrade take `<registryImage>:<commit>` (catalog field `registryImage`) when it is already local or `docker pull` succeeds, and pin `<registryImage>@sha256:<id>`. On the containerd image store the VPS uses, the image id is the registry digest. An image whose baked `RELEASE_ID` is not the commit is refused.
 - **Fallback:** if the registry has no image for the commit (CI not finished, failed, or no pull access), the host builds it as before (`<local repo>:<commit>`). Results carry `pulled: true|false` so the operator can tell. Dirty laptop source never pulls.
 - **Still manual:** `pnpm vps deploy` and PROD promotion. Existing environments keep their image until upgraded.
-- **Verified 2026-10-16:** first run [38844976829](https://github.com/Koifish95/crm_marketing_saas/actions/runs/38844976829) at `b3e5080` pushed both images (Sales 107 s, Martial Arts 129 s). Both GHCR packages are public: an anonymous manifest fetch returns 200, so the VPS needs no registry login. The VPS has not yet deployed `b3e5080`, so no environment has pulled one yet.
+- **Verified 2026-10-16:** first run [38844976829](https://github.com/Koifish95/crm_marketing_saas/actions/runs/38844976829) at `b3e5080` pushed both images (Sales 107 s, Martial Arts 129 s). Both GHCR packages are public: an anonymous manifest fetch returns 200, so the VPS needs no registry login. `pnpm vps deploy` then moved the VPS `cbee291` → `c78e89a` (Control Plane UP, all four environments healthy, `docker manifest inspect` on GHCR works from the VPS without login). No environment has pulled a CI image yet; existing ones keep their digests until upgraded.
 
 ---
 
