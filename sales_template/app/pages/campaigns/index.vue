@@ -85,7 +85,7 @@ async function toggleIntake() {
     </AppPanel>
     <AppPanel title="New campaign">
       <form
-        class="flex flex-wrap items-end gap-4"
+        class="grid gap-4 sm:grid-cols-2"
         @submit.prevent="create"
       >
         <AppField
@@ -98,7 +98,7 @@ async function toggleIntake() {
             required
           >
         </AppField>
-        <div>
+        <div class="sm:col-span-2 form-actions">
           <AppButton
             type="submit"
             :loading="saving"

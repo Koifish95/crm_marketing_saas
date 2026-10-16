@@ -59,7 +59,7 @@ async function create() {
     </AppAlert>
     <AppPanel title="Create user">
       <form
-        class="grid gap-4 sm:grid-cols-3"
+        class="grid gap-4 sm:grid-cols-2"
         @submit.prevent="create"
       >
         <AppField
@@ -99,7 +99,7 @@ async function create() {
             </option>
           </select>
         </AppField>
-        <div class="sm:col-span-3 form-actions">
+        <div class="sm:col-span-2 form-actions">
           <AppButton
             type="submit"
             :loading="saving"
