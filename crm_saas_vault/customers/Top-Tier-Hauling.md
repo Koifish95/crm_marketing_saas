@@ -31,7 +31,7 @@ This note does not authorize provisioning, website integration, or a production 
 | Revenue | Not collected |
 | Production status | Sales PROD and DEV provisioned on `nuxxion-vps-1` by Scott through the Control Plane (2026-10-16 UTC). Rebuilt from commit `cbee291`, release `cbee2918bda0@6010e5b97402`. Loopback only: PROD `52202`, DEV `52203` (reach with `pnpm vps tunnel`) |
 | DEV status | Not created for this customer |
-| Public hostname | PROD `https://top-tier-hauling.nuxxion.com` (2026-10-16 04:32 UTC, Let's Encrypt to 2027-01-14, via the GoDaddy wildcard). DEV `https://dev-top-tier-hauling.nuxxion.com` (2026-10-16 22:40 UTC, Let's Encrypt to 2027-01-14); DEV keeps its initial password until first sign-in forces the change |
+| Public hostname | PROD `https://top-tier-hauling.nuxxion.com` (2026-10-16 04:32 UTC, Let's Encrypt to 2027-01-14, via the GoDaddy wildcard). DEV `https://dev-top-tier-hauling.nuxxion.com` (2026-10-16 22:40 UTC, Let's Encrypt to 2027-01-14). DEV initial password changed by Scott on first sign-in; sign-in confirmed working |
 | Releases (2026-10-16 22:40 UTC) | DEV and PROD both `df1a5d3c2214@e1fdd8cbf362` (GHCR image, Designer UI cleanup 1–4). Upgraded by Scott in the Control Plane: DEV 22:37, PROD 22:40 (from `cbee2918bda0@6010e5b97402`). PROD backup `3ad5015b` taken 22:48 on the new release |
 | Website integration | Not built |
 
@@ -187,7 +187,7 @@ Not started. Each phase needs its own authorization. `authorization.active_work_
 **Not built for Top Tier:** hostname, website-to-CRM integration, staff notification, customer acceptance.
 
 1. **P0 — Production platform confidence. Done as a hosting gate 2026-10-08 (READY FOR TOP TIER, [[Nuxxion-Production-Acceptance]]).** On the existing VPS, validate persistence, registry backup, restart, reboot recovery, customer isolation, edge, DNS/TLS, release identity, backup, verified restore, PROD → DEV copy-down, DEV-first upgrade, rollback, disk and backup visibility, and ticket visibility. Do not call a laptop rehearsal live-proven.
-2. **P0 — Provision** Top Tier Sales PROD and DEV through the Control Plane. **Done 2026-10-16 UTC** (rebuilt from `cbee291`). PROD initial password changed by Scott on first public login, 2026-10-16; sign-in at `https://top-tier-hauling.nuxxion.com` confirmed working. DEV still has its initial password (loopback only). Leave the prospect desk off.
+2. **P0 — Provision** Top Tier Sales PROD and DEV through the Control Plane. **Done 2026-10-16 UTC** (rebuilt from `cbee291`). PROD initial password changed by Scott on first public login, 2026-10-16; sign-in at `https://top-tier-hauling.nuxxion.com` confirmed working. DEV went public at `https://dev-top-tier-hauling.nuxxion.com` the same day; its initial password was changed by Scott on first sign-in and sign-in works. Leave the prospect desk off.
 3. **P0 — Intake design before code.** Write the payload, endpoint, validation, abuse protection, record mapping, duplicate behavior, failure behavior, and observability. Then implement only what that note authorizes.
 4. **P0 — End to end.** Top Tier website → form submission → Nuxxion Sales PROD → the intended record(s) → staff can find the inquiry → follow-up → a normal sales outcome.
 5. **P0 — Customer acceptance.** Top Tier uses the workflow. Record what they say. Tests passing do not finish onboarding.
