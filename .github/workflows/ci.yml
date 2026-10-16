@@ -1,0 +1,86 @@
+# Checks every push and pull request. It deploys nothing: the VPS still only moves on `pnpm vps deploy`.
+# Each app runs lint, typecheck, test, and build, the same commands as How-to-Run → Checks.
+name: CI
+
+on:
+  push:
+    branches: [working, main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  app:
+    name: ${{ matrix.app }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # pnpm workspace members install from the root lockfile.
+          - app: martial_arts_template
+            install_dir: .
+          - app: sales_template
+            install_dir: .
+          - app: marketing_site
+            install_dir: .
+          # The Control Plane is outside the workspace and has its own lockfile.
+          - app: control_plane
+            install_dir: control_plane
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            control_plane/pnpm-lock.yaml
+
+      - name: Install
+        working-directory: ${{ matrix.install_dir }}
+        run: pnpm install --frozen-lockfile
+
+      - name: Local env from the committed example
+        working-directory: ${{ matrix.app }}
+        run: if [ -f .env.example ] && [ ! -f .env ]; then cp .env.example .env; fi
+
+      - name: Lint
+        working-directory: ${{ matrix.app }}
+        run: pnpm lint
+
+      - name: Typecheck
+        working-directory: ${{ matrix.app }}
+        run: pnpm typecheck
+
+      - name: Test
+        working-directory: ${{ matrix.app }}
+        run: pnpm test
+
+      - name: Build
+        working-directory: ${{ matrix.app }}
+        run: pnpm build
+
+  tools:
+    name: tools
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: VPS helper tests
+        run: node --test tools/vps.test.mjs
+      - name: Deploy script syntax
+        run: bash -n deploy/hosting-node/deploy-control-plane.sh
