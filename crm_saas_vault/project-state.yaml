@@ -182,7 +182,7 @@ notes:
   cp_schema: 0009_previous_release
   working_tree_uncommitted: false
   git_vps_note: "Current-State.md#Git and the VPS (2026-10-15)"
-  vps_checkout: "03ef751 via pnpm vps deploy 2026-10-16 22:12 UTC (Sales UI cleanup; from 1cd643a). Top Tier DEV upgraded to 03ef751b6db9@ab634be31071 (pulled from GHCR); PROD unchanged"
+  vps_checkout: "df1a5d3 via pnpm vps deploy 2026-10-16 ~22:33 UTC (from 03ef751; includes the Sales snapshot fix 990164d and DEV public hostnames). Top Tier DEV runs df1a5d3c2214@e1fdd8cbf362 (pulled from GHCR); live backup d158957e verified. PROD unchanged (old image, no S6 backups yet)"
   vps_registry_migrations: "0000-0009 applied; 0008 backfilled by migrateDatabase on the first deploy"
   vps_deploy: "pnpm vps deploy [sha] -> deploy/hosting-node/deploy-control-plane.sh; origin/working only"
   vps_deploy_first_run: "2026-10-16 47159a0 -> cbee291 OK"
