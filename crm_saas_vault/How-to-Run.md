@@ -111,6 +111,7 @@ The helper refuses a commit that is not on `origin/working`, shows the commits b
 Deploying updates the **Control Plane** only. Running customer containers keep their image. Product code reaches customers through images built from the deployed commit:
 
 - **New environment:** provisioning pulls the CI image `ghcr.io/koifish95/<product>:<commit>` for the deployed commit and pins the environment to `ghcr.io/…@sha256:…` with `RELEASE_ID=<commit>@<12hex>`. If GHCR has no image for that commit (CI not green yet), the VPS builds `<product-repo>:<commit>` itself instead. On the VPS it refuses product source with uncommitted changes.
+- **Public URL:** a new PROD gets `https://{customer-slug}.nuxxion.com` with its certificate during provisioning. DEV stays on the tunnel. Change the initial `admin` password before sharing the URL. Details: [[Production-Edge-Runbook#Assign a hostname]].
 - **Existing environment:** Release tab → upgrade (same pull-or-build), DEV first, then PROD with the same digest ([[S6-Fleet-Runbook]]).
 
 ---

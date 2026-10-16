@@ -59,7 +59,7 @@ Today: no CP audit trail.
 
 Hostname hierarchy, DNS provider/API, and TLS termination (and whether the CP has a public hostname).
 
-Today: unset. `accessUrl` is `http://localhost:{port}`. Renzo Cloudflare/Caddy locks do not apply here.
+Partly answered 2026-10-16: PROD hostnames are `{customer-slug}.nuxxion.com` via a GoDaddy wildcard, TLS is Let's Encrypt HTTP-01 at the VPS edge, the Control Plane has no public hostname. Still open: client-owned (vanity) domains, and a DNS API once there is more than one node. Non-public environments keep `accessUrl` `http://localhost:{port}`. Renzo Cloudflare/Caddy locks do not apply here.
 
 ### NEAR-08
 

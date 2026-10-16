@@ -5,6 +5,8 @@ import { accessUrlForEnvironment, assertPublicHostname, publicOriginForHostname 
 import { relaunchRegisteredEnvironment } from './docker-relaunch'
 import { publicEnvSettings, patchProvisionedEnvFile } from './provision-env'
 import { generateProductionEdgeFilesFromRegistry } from './production-edge-sync'
+import { edgeRoot } from './production-edge'
+import { autoCertificateEnabled, type CertificateIssuer, type CertificateResult, ensureHostnameCertificate } from './edge-certificate'
 import { getRegisteredEnvironment, listRegisteredEnvironments } from './registry'
 
 export class HostnameError extends Error {
@@ -20,6 +22,9 @@ export async function assignPublicHostname(db: Database, id: string, rawHostname
   filesRoot?: string
   edgeDir?: string
   relaunch?: boolean
+  /** Issue a Let's Encrypt certificate when none is installed. Default: on when EDGE_AUTO_CERT is set. */
+  certificate?: boolean
+  issuer?: CertificateIssuer
 } = {}) {
   let hostname: string
   try {
@@ -62,11 +67,24 @@ export async function assignPublicHostname(db: Database, id: string, rawHostname
     HOST_BIND: settings.hostBind,
   }, input.filesRoot)
 
-  const registered = await listRegisteredEnvironments(db)
-  const edge = generateProductionEdgeFilesFromRegistry(registered, {
+  const edgeKind = row.node.kind === 'vps' ? 'vps' : 'laptop'
+  let edge = generateProductionEdgeFilesFromRegistry(await listRegisteredEnvironments(db), {
     edgeDir: input.edgeDir,
-    kind: row.node.kind === 'vps' ? 'vps' : 'laptop',
+    kind: edgeKind,
   })
+
+  // The HTTP vhost written above already serves /.well-known/acme-challenge/ for this name.
+  // Once the certificate exists, regenerate so nginx adds the 443 server and the redirect.
+  let certificate: CertificateResult = { status: 'skipped' }
+  if (input.certificate ?? autoCertificateEnabled()) {
+    certificate = ensureHostnameCertificate(hostname, input.edgeDir || edgeRoot(), input.issuer)
+    if (certificate.status === 'issued') {
+      edge = generateProductionEdgeFilesFromRegistry(await listRegisteredEnvironments(db), {
+        edgeDir: input.edgeDir,
+        kind: edgeKind,
+      })
+    }
+  }
 
   let relaunch: { slug: string } | null = null
   let relaunchError: string | null = null
@@ -92,7 +110,76 @@ export async function assignPublicHostname(db: Database, id: string, rawHostname
     publicOrigin: origin,
     accessUrl,
     edge: { written: true, reloaded: edge.reloaded, reason: edge.reason },
+    certificate,
     relaunch,
     relaunchError,
+  }
+}
+
+/**
+ * Default PROD hostname under the node's base domain: `{customer-slug}.{domain}`, as with acme.nuxxion.com.
+ * A customer's second PROD (another product) gets `{customer-slug}-{product}.{domain}`.
+ * Returns null when no base domain is configured or every candidate is taken or invalid.
+ */
+export function defaultPublicHostname(input: {
+  customerSlug: string
+  productId: string
+  baseDomain?: string | null
+  taken: ReadonlySet<string>
+}) {
+  const domain = (input.baseDomain || '').trim().toLowerCase().replace(/^\.+|\.+$/g, '')
+  if (!domain) {
+    return null
+  }
+  for (const label of [input.customerSlug, `${input.customerSlug}-${input.productId}`]) {
+    try {
+      const hostname = assertPublicHostname(`${label}.${domain}`)
+      if (!input.taken.has(hostname)) {
+        return hostname
+      }
+    } catch {
+      // Not a valid DNS label; try the next candidate.
+    }
+  }
+  return null
+}
+
+export function publicBaseDomain(env: NodeJS.Dict<string | undefined> = process.env) {
+  return (env.PUBLIC_BASE_DOMAIN || '').trim() || null
+}
+
+/** Provisioning: give a new PROD its default hostname. Never throws; a failure leaves the environment on loopback. */
+export async function autoAssignPublicHostname(db: Database, row: {
+  id: string
+  type: string
+  publicHostname?: string | null
+  customer: { slug: string }
+  productInstance: { productId: string }
+}, input: { filesRoot?: string, baseDomain?: string | null, edgeDir?: string, certificate?: boolean, issuer?: CertificateIssuer } = {}) {
+  if (row.type !== 'PROD' || row.publicHostname) {
+    return null
+  }
+  const taken = new Set((await listRegisteredEnvironments(db))
+    .map(item => item.publicHostname)
+    .filter((value): value is string => Boolean(value)))
+  const hostname = defaultPublicHostname({
+    customerSlug: row.customer.slug,
+    productId: row.productInstance.productId,
+    baseDomain: input.baseDomain === undefined ? publicBaseDomain() : input.baseDomain,
+    taken,
+  })
+  if (!hostname) {
+    return null
+  }
+  try {
+    return await assignPublicHostname(db, row.id, hostname, {
+      filesRoot: input.filesRoot,
+      edgeDir: input.edgeDir,
+      relaunch: false,
+      certificate: input.certificate,
+      issuer: input.issuer,
+    })
+  } catch (error) {
+    return { id: row.id, hostname, error: error instanceof Error ? error.message : 'Hostname assignment failed.' }
   }
 }

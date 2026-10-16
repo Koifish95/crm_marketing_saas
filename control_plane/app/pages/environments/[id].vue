@@ -211,10 +211,10 @@ async function assignHostname() {
   }
   assigningHostname.value = true
   actionError.value = ''
-  actionNotice.value = 'Saving public hostname and regenerating the production edge…'
+  actionNotice.value = 'Saving public hostname, regenerating the production edge, and requesting its certificate (up to a minute)…'
   try {
     const result = await $fetch<{
-      hostname: { hostname: string, publicOrigin: string, relaunchError?: string | null }
+      hostname: { hostname: string, publicOrigin: string, relaunchError?: string | null, certificate?: { status: string, message?: string } }
       checkedAt: string
       environments: FleetStatusResponse['environments']
     }>(`/api/environments/${env.value.id}/hostname`, {
@@ -225,11 +225,18 @@ async function assignHostname() {
       applyStatus({ checkedAt: result.checkedAt, environments: result.environments })
     }
     hostnameDraft.value = result.hostname.hostname
+    const certificate = result.hostname.certificate
+    if (certificate?.status === 'failed') {
+      actionError.value = `Hostname saved, but the certificate was not issued: ${certificate.message || 'unknown error'}. Check that DNS points at this node, then Save hostname again.`
+    }
     if (result.hostname.relaunchError) {
       actionNotice.value = `Hostname saved as ${result.hostname.publicOrigin}. Relaunch needed: ${result.hostname.relaunchError}`
       return
     }
-    actionNotice.value = `Public origin is ${result.hostname.publicOrigin}. Edge config was rewritten from this hostname.`
+    const tls = certificate?.status === 'issued'
+      ? ' Certificate issued; HTTPS is live.'
+      : certificate?.status === 'present' ? ' Certificate already installed.' : ''
+    actionNotice.value = `Public origin is ${result.hostname.publicOrigin}. Edge config was rewritten from this hostname.${tls}`
   } catch (error) {
     actionNotice.value = ''
     actionError.value = fetchMessage(error, 'Could not save the public hostname.')
@@ -962,7 +969,7 @@ async function refreshWorkspace() {
         aria-labelledby="tab-network"
       >
         <p class="muted">
-          Live TLS issuance is official S8 / external. This page shows hostname configuration the Control Plane actually stores. It does not probe certificate expiry.
+          On the VPS, provisioning gives PROD <code>{customer-slug}.{base domain}</code> and Save hostname issues its Let's Encrypt certificate (EDGE_AUTO_CERT). DNS must already point here; the wildcard does that for the base domain. This page does not probe certificate expiry.
         </p>
         <dl class="dl">
           <dt>Access URL</dt>
@@ -974,7 +981,7 @@ async function refreshWorkspace() {
           <dt>Public origin</dt>
           <dd>{{ env?.publicOrigin || '—' }}</dd>
           <dt>Edge / TLS</dt>
-          <dd>{{ env?.publicHostname ? 'Hostname saved; nginx templates regenerate. Live certificate status is unknown until DNS/TLS exist.' : 'No public hostname.' }}</dd>
+          <dd>{{ env?.publicHostname ? 'Hostname saved; nginx regenerated. Save hostname reports the certificate result.' : 'No public hostname.' }}</dd>
         </dl>
       </section>
       <section

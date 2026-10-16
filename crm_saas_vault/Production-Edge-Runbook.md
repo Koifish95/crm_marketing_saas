@@ -51,6 +51,12 @@ The Control Plane port `52100` is never a `proxy_pass` target.
 
 ## Assign a hostname
 
+**Automatic (VPS, 2026-10-16):** with `PUBLIC_BASE_DOMAIN=nuxxion.com` and `EDGE_AUTO_CERT=true` in `/etc/sic/control-plane.env`, provisioning a new PROD assigns `{customer-slug}.nuxxion.com` (or `{customer-slug}-{product}` if taken) and issues its certificate. The GoDaddy wildcard `*.nuxxion.com` already points at the VPS, so there is no DNS step. Result: operator event `public-hostname`.
+
+**Manual / existing PROD:** PROD environment → Overview → Save hostname. With `EDGE_AUTO_CERT` it also issues the certificate and enables 443 in the same call; the notice says "Certificate issued" or shows the certbot error. A name outside `nuxxion.com` still needs its own DNS record first.
+
+Without `EDGE_AUTO_CERT` (laptop, or by hand):
+
 1. SSH tunnel to the Control Plane.
 2. Open the PROD environment → Overview → Save hostname.
 3. Control Plane writes `deploy/edge/nginx.conf`, patches the env file, and relaunches the app (same volumes).

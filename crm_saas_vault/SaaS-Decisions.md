@@ -27,6 +27,23 @@ Decision: what we chose
 
 ---
 
+## 2026-10-16 — Provisioning gives PROD `{customer-slug}.nuxxion.com` and issues its certificate
+
+Status: accepted (Scott in chat 2026-10-16: Top Tier PROD must be reachable by the client; "I want provisioning to set up the hostname"; wildcard record added in GoDaddy, "go ahead and build it"). Starts S8 for `nuxxion.com`.
+
+Context: Public hostnames were a manual three-step job (Save hostname, GoDaddy A record, `issue-cert.sh` over SSH, Save again). `nuxxion.com` DNS is GoDaddy, no Cloudflare; TLS is Let's Encrypt HTTP-01 through `sic-production-edge`.
+
+Decision:
+
+- **DNS:** one GoDaddy wildcard `*.nuxxion.com → 157.245.136.47`. No DNS API and no Cloudflare while there is one VPS. A specific record (`acme`) still wins over the wildcard.
+- **Product domain:** `nuxxion.com` (VPS env `PUBLIC_BASE_DOMAIN`). Hostname = `{customer-slug}.nuxxion.com`, as Acme already was; a customer's second PROD gets `{customer-slug}-{product}.nuxxion.com`. Still PROD only; DEV stays loopback (tunnel).
+- **Provisioning:** a new PROD with no hostname gets its default hostname before `compose up` (env file carries the HTTPS origin, so no relaunch). Recorded as operator event `public-hostname`. A failure never fails provisioning.
+- **Certificate:** with `EDGE_AUTO_CERT=true`, every hostname assignment (automatic or Save hostname) runs `deploy/edge/issue-cert.sh` when no cert is installed, then regenerates nginx so 443 is live. Renewal stays the 03:20 cron. A failed issue leaves the name serving 503 on :80 and is reported; Save hostname again retries.
+- **Not changed:** the Control Plane stays loopback-only. Initial `admin` password must be changed before a client is told the URL.
+- **Later:** Cloudflare (or another DNS API) only for a second node or client-owned domains. NEAR-07 is answered for `nuxxion.com`; client vanity domains stay open.
+
+---
+
 ## 2026-10-16 — CI builds product images and pushes them to GHCR; the VPS pulls them
 
 Status: accepted (Scott asked in chat 2026-10-16: "go ahead with building images in CI and pushing to GHCR")

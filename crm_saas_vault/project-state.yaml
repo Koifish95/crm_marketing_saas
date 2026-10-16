@@ -188,6 +188,7 @@ notes:
   vps_deploy_first_run: "2026-10-16 47159a0 -> cbee291 OK"
   provision_release_identity: "ghcr.io/koifish95/<product>:<commit> (or host-built <repo>:<commit>) pinned by digest, RELEASE_ID=<commit>@<12hex>"
   top_tier_sales_envs: "PROD 52202 / DEV 52203 on crm-sales@sha256:6010e5b97402, RELEASE_ID cbee2918bda0@6010e5b97402, schema 0006, no hostname"
+  public_hostnames: "S8 in progress: PUBLIC_BASE_DOMAIN=nuxxion.com wildcard; provisioning assigns {customer-slug}.nuxxion.com to PROD + EDGE_AUTO_CERT Let's Encrypt"
   ci_cd: "ci_checks_live + images pushed to ghcr.io/koifish95/<product>:<commit> on green pushes; provision/upgrade pull them, else build on host; deploy and PROD promotion manual"
   vps_control_plane_service: sic-control-plane_systemd_enabled
   vps_ssh: "root@157.245.136.47 key ~/.ssh/id_ed25519_sic_prod"

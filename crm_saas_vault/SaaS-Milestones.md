@@ -48,7 +48,7 @@ Laptop Strategic Insights data remains disposable test data. Do not build fleet 
 | S5 | Control Plane Productization / Operations Foundation | **Successful** (2026-09-10) |
 | S6 | Fleet Reliability / Lifecycle | **Successful** (2026-09-11) |
 | S7 | Hosting / Security / Remote Nodes | Not started |
-| S8 | Public Exposure | Not started |
+| S8 | Public Exposure | In progress (2026-10-16) |
 | S9 | Dogfood / Pilot Readiness | Not started |
 | S10 | Second Pilot / Template Expansion | Not started |
 | S11 | External Paying Customer Readiness | Not started — this is commercial launch |
@@ -209,7 +209,7 @@ Pre-S7 repository path (2026-09-19, **not** this Successful checkbox): one Linux
 
 ## S8 — Public Exposure
 
-Reachable customer access: hostname shape `{slug}.{product-domain}`, TLS, real (changed) password. Product domain is still unset. Do not invent a domain. Do not implement DNS/TLS yet.
+Reachable customer access: hostname shape `{slug}.{product-domain}`, TLS, real (changed) password. Product domain is `nuxxion.com` (Scott, 2026-10-16): wildcard DNS in GoDaddy, provisioning assigns `{customer-slug}.nuxxion.com` to PROD and issues its Let's Encrypt certificate ([[SaaS-Decisions#2026-10-16 — Provisioning gives PROD `{customer-slug}.nuxxion.com` and issues its certificate]]).
 
 **Not in this milestone:** Apex/www for Renzo. Cloudflare/Caddy locks from the Renzo hosting contract.
 

@@ -23,6 +23,8 @@ import { probeRegisteredHealth } from './health'
 import { localHostingNodeSpec } from './hosting-node'
 import { patchProvisionedEnvFile, provisionedEnvAbsolutePath } from './provision-env'
 import { listRegisteredEnvironments } from './registry'
+import { autoAssignPublicHostname } from './public-hostname'
+import { recordOperatorEvent } from './operator-events'
 
 const provisionLocks = new Set<string>()
 
@@ -358,6 +360,22 @@ export async function provisionCustomerEnvironments(
           results.push({ id: row.id, slug: row.slug, status: 'ready' as const })
           continue
         }
+      }
+      // Before compose up, so the container starts with its public origin and no relaunch is needed.
+      const hostname = await autoAssignPublicHostname(db, row, { filesRoot })
+      if (hostname) {
+        await recordOperatorEvent(db, {
+          action: 'public-hostname',
+          summary: 'error' in hostname
+            ? `${row.slug} hostname ${hostname.hostname} not assigned: ${hostname.error}`
+            : `${row.slug} → https://${hostname.hostname} (certificate ${hostname.certificate.status})`,
+          customerId: row.customer.id,
+          productInstanceId: row.productInstance.id,
+          environmentId: row.id,
+          detail: 'error' in hostname
+            ? { hostname: hostname.hostname, error: hostname.error }
+            : { hostname: hostname.hostname, certificate: hostname.certificate },
+        })
       }
       const image = images.get(product.image)
       if (image && pinProvisionedEnvFile(row.envFileLocal, image, filesRoot)) {
