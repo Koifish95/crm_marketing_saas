@@ -114,6 +114,18 @@ Deploying updates the **Control Plane** only. Running customer containers keep t
 - **Public URL:** a new PROD gets `https://{customer-slug}.nuxxion.com` with its certificate during provisioning. DEV stays on the tunnel. Change the initial `admin` password before sharing the URL. Details: [[Production-Edge-Runbook#Assign a hostname]].
 - **Existing environment:** Release tab → upgrade (same pull-or-build), DEV first, then PROD with the same digest ([[S6-Fleet-Runbook]]).
 
+### Ship a product change (UI/UX) to a live customer
+
+Deploying alone does **not** change a customer's app. Start, Stop, Relaunch, and Retry provision reuse the pinned image. Only **Upgrade** swaps it. Example: Top Tier Hauling (Sales).
+
+1. Change `sales_template/` (or `packages/crm-core/`, which also changes Martial Arts). Run that package's checks. Commit and push to `working`.
+2. Wait for green CI, including `image crm-sales`. That job publishes `ghcr.io/koifish95/crm-sales:<commit>`.
+3. `pnpm vps deploy`. Needed even with no Control Plane change: Upgrade uses the image for the commit the VPS is checked out on.
+4. `pnpm vps tunnel` → Control Plane → **Top Tier DEV** → Backup tab → back up → Release tab → **Upgrade**. Upgrade refuses without a fresh backup of that environment. Check the result shows the new release id (`pulled: true` means it came from GHCR), then check the app at `http://localhost:52203` through the tunnel.
+5. **Top Tier PROD** → back up → Upgrade. PROD is blocked until a non-PROD on the same instance runs that digest, and then takes the same digest. The client sees it at `https://top-tier-hauling.nuxxion.com`.
+
+Volumes and data are kept. Migrations in the new image run on container start, so test them on DEV. There is no downgrade: roll back by restoring the pre-upgrade backup plus the previous image (Release tab, [[S6-Fleet-Runbook]]).
+
 ---
 
 ## Local development (this PC)
