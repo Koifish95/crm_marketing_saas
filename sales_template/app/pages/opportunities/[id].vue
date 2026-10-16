@@ -1182,7 +1182,7 @@ function companyName() {
         </AppPanel>
         <AppPanel title="Commercial lines">
           <form
-            class="mb-4 grid gap-2 sm:grid-cols-2"
+            class="mb-4 grid gap-4 sm:grid-cols-2"
             @submit.prevent="addLine"
           >
             <AppField label="Offer">
@@ -1237,7 +1237,7 @@ function companyName() {
                 inputmode="decimal"
               >
             </AppField>
-            <div class="self-end">
+            <div class="sm:col-span-2 form-actions">
               <AppButton type="submit">
                 Add line
               </AppButton>
@@ -1273,7 +1273,7 @@ function companyName() {
               </div>
               <form
                 v-if="editingLineId === line.id"
-                class="grid gap-2 sm:grid-cols-2"
+                class="grid gap-4 sm:grid-cols-2"
                 @submit.prevent="saveEditLine"
               >
                 <AppField label="Offer">
@@ -1332,7 +1332,7 @@ function companyName() {
                     required
                   >
                 </AppField>
-                <div class="flex flex-wrap items-end gap-2">
+                <div class="sm:col-span-2 form-actions flex flex-wrap gap-2">
                   <AppButton type="submit">
                     Save line
                   </AppButton>
