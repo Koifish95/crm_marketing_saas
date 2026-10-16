@@ -29,7 +29,7 @@ This note does not authorize provisioning, website integration, or a production 
 | Product | Sales CRM |
 | Customer type | External. First committed paying customer. |
 | Revenue | Not collected |
-| Production status | Not created for this customer |
+| Production status | Sales PROD and DEV provisioned on `nuxxion-vps-1` by Scott through the Control Plane (2026-10-16 UTC). Rebuilt from commit `cbee291`, release `cbee2918bda0@6010e5b97402`. Loopback only: PROD `52202`, DEV `52203` (reach with `pnpm vps tunnel`) |
 | DEV status | Not created for this customer |
 | Public hostname | Not assigned |
 | Website integration | Not built |
@@ -93,8 +93,8 @@ Proof words: [[customers/_index#Proof labels]]. Every Top Tier gate below is **n
 
 | # | Criterion | Platform evidence | Top Tier gate |
 |---|---|---|---|
-| 1 | Sales PROD is healthy (container and `/api/health`) | Lab-proven for provisioned Sales environments | Not created |
-| 2 | Sales DEV is healthy | Lab-proven | Not created |
+| 1 | Sales PROD is healthy (container and `/api/health`) | Lab-proven for provisioned Sales environments | Healthy on the VPS 2026-10-16, schema `0006` |
+| 2 | Sales DEV is healthy | Lab-proven | Healthy on the VPS 2026-10-16, schema `0006` |
 | 3 | PROD and DEV are isolated | Lab-proven (separate volumes and databases) | Not created |
 | 4 | Customer administrator can sign in and change the initial password | Implemented. New environments unwrap `admin` / `setup` and must change it ([[SaaS-Decisions#2026-09-24 — Provisioned environments unwrap with admin / setup]]) | Not exercised |
 | 5 | Public production hostname works over valid HTTPS | Not owner-accepted. See hosting evidence below | Not assigned |
@@ -130,7 +130,7 @@ Obtaining a VPS is not an open blocker.
 
 Acme on this host has live-proven backup, restore, off-host recovery, upgrade, rollback, and reboot. What Top Tier still needs before it is a live customer: its own hostname and certificate, the website-intake decision, and an authorization to create the environment. Laptop S6 does not count as that.
 
-S7 and S8 stay **Not started**. Live acceptance on 2026-10-07 UTC: [[Nuxxion-Production-Acceptance]]. Gate: **READY FOR TOP TIER** as a hosting decision on 2026-10-08. Top Tier is still not provisioned. Website intake is still open. S7 and S8 stay Not started.
+S7 and S8 stay **Not started**. Live acceptance on 2026-10-07 UTC: [[Nuxxion-Production-Acceptance]]. Gate: **READY FOR TOP TIER** as a hosting decision on 2026-10-08. Top Tier Sales PROD and DEV were provisioned on 2026-10-16 UTC (no hostname yet). Website intake is still open. S7 and S8 stay Not started.
 
 ---
 
@@ -183,10 +183,10 @@ Not started. Each phase needs its own authorization. `authorization.active_work_
 
 **Live-proven on Acme on the VPS (2026-10-07/08, [[Nuxxion-Production-Acceptance]]):** generated nginx edge with Let’s Encrypt, off-host rclone backup and retrieved restore, digest upgrade and rollback, SSH-managed reboot. Not yet run for Top Tier, and not S7/S8.
 
-**Not built for Top Tier:** their PROD and DEV, hostname, website-to-CRM integration, staff notification, customer acceptance.
+**Not built for Top Tier:** hostname, website-to-CRM integration, staff notification, customer acceptance.
 
 1. **P0 — Production platform confidence. Done as a hosting gate 2026-10-08 (READY FOR TOP TIER, [[Nuxxion-Production-Acceptance]]).** On the existing VPS, validate persistence, registry backup, restart, reboot recovery, customer isolation, edge, DNS/TLS, release identity, backup, verified restore, PROD → DEV copy-down, DEV-first upgrade, rollback, disk and backup visibility, and ticket visibility. Do not call a laptop rehearsal live-proven.
-2. **P0 — Provision** Top Tier Sales PROD and DEV through the Control Plane. Change the initial password before any public hostname. Leave the prospect desk off.
+2. **P0 — Provision** Top Tier Sales PROD and DEV through the Control Plane. **Done 2026-10-16 UTC** (rebuilt from `cbee291`; initial password change still to confirm). Change the initial password before any public hostname. Leave the prospect desk off.
 3. **P0 — Intake design before code.** Write the payload, endpoint, validation, abuse protection, record mapping, duplicate behavior, failure behavior, and observability. Then implement only what that note authorizes.
 4. **P0 — End to end.** Top Tier website → form submission → Nuxxion Sales PROD → the intended record(s) → staff can find the inquiry → follow-up → a normal sales outcome.
 5. **P0 — Customer acceptance.** Top Tier uses the workflow. Record what they say. Tests passing do not finish onboarding.

@@ -182,12 +182,12 @@ notes:
   cp_schema: 0009_previous_release
   working_tree_uncommitted: false
   git_vps_note: "Current-State.md#Git and the VPS (2026-10-15)"
-  vps_checkout: "47159a0 plus hand-copied Control Plane files until the first pnpm vps deploy (checked 2026-10-15 UTC)"
-  vps_registry_missing_migration: "0008_qa_ticketing (0009 applied first); healed by migrateDatabase on deploy"
+  vps_checkout: "cbee291 via pnpm vps deploy 2026-10-16 ~01:00 UTC; only generated edge files differ"
+  vps_registry_migrations: "0000-0009 applied; 0008 backfilled by migrateDatabase on the first deploy"
   vps_deploy: "pnpm vps deploy [sha] -> deploy/hosting-node/deploy-control-plane.sh; origin/working only"
-  vps_deploy_first_run: pending_owner
+  vps_deploy_first_run: "2026-10-16 47159a0 -> cbee291 OK"
   provision_release_identity: "<repo>:<commit> pinned by digest, RELEASE_ID=<commit>@<12hex>"
-  top_tier_sales_envs: "PROD 52202 / DEV 52203 on crm-sales:c2 schema 0004 RELEASE_ID=dev; rebuild pending after deploy"
+  top_tier_sales_envs: "PROD 52202 / DEV 52203 on crm-sales@sha256:6010e5b97402, RELEASE_ID cbee2918bda0@6010e5b97402, schema 0006, no hostname"
   ci_cd: not_started
   vps_control_plane_service: sic-control-plane_systemd_enabled
   vps_ssh: "root@157.245.136.47 key ~/.ssh/id_ed25519_sic_prod"

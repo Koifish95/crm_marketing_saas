@@ -85,7 +85,7 @@ Full detail: [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]], [[
 | Service env | `/etc/sic/control-plane.env` (0600). `NITRO_HOST=127.0.0.1`, `NITRO_PORT=52100`, `SKIP_LAB_SEED=true` |
 | Registry | `control_plane/data/control-plane.sqlite` |
 | Cron (`/etc/cron.d/sic-hosting-node`, UTC) | 02:15 registry backup · 02:30 off-host bundle · 03:20 certificate renew |
-| Containers | `acme-martial-arts-prod-app`, `acme-martial-arts-dev-app`, `sic-production-edge` (nginx, host network) |
+| Containers | `acme-martial-arts-prod-app` (52200), `acme-martial-arts-dev-app` (52201), `top-tier-hauling-sales-prod-app` (52202), `top-tier-hauling-sales-dev-app` (52203), `sic-production-edge` (nginx, host network) |
 
 **The checkout is deploy-only.** GitHub `origin/working` is the only source. Never edit, copy, or `scp` code into `/opt/sic/crm_marketing_saas`. The only expected local changes there are the generated `deploy/edge/nginx.conf` and untracked `deploy/edge/letsencrypt/`.
 
