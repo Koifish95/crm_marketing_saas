@@ -9,6 +9,9 @@ describe('C2 Sales docker contract', () => {
     expect(dockerfile).toMatch(/COPY packages\/crm-core/)
     expect(dockerfile).toMatch(/pnpm exec esbuild docker\/runtime-init.ts/)
     expect(dockerfile).not.toMatch(/node node_modules\/esbuild\/bin\/esbuild/)
+    // The Control Plane backs up a running environment with `node docker/sqlite-snapshot.cjs`.
+    expect(dockerfile).toMatch(/esbuild docker\/runtime-init.ts docker\/sqlite-snapshot.ts/)
+    expect(dockerfile).toMatch(/COPY --from=build \/src\/sales_template\/docker\/sqlite-snapshot.cjs \.\/docker\/sqlite-snapshot.cjs/)
     expect(dockerfile).toMatch(/COPY --from=build \/src\/node_modules\/@libsql/)
     expect(dockerfile).toMatch(/ARG RELEASE_ID=dev/)
     expect(dockerfile).toMatch(/ENV RELEASE_ID=\$\{RELEASE_ID\}/)

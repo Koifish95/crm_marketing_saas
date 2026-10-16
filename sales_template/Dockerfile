@@ -17,11 +17,13 @@ COPY pnpm-workspace.yaml package.json .npmrc ./
 WORKDIR /src/sales_template
 RUN node docker/stub-missing-libsql-natives.mjs
 RUN pnpm build
-RUN pnpm exec esbuild docker/runtime-init.ts \
+# sqlite-snapshot: the Control Plane runs it inside a running container for a SQLite-safe backup.
+RUN pnpm exec esbuild docker/runtime-init.ts docker/sqlite-snapshot.ts \
   --bundle \
   --platform=node \
   --format=cjs \
-  --outfile=docker/runtime-init.cjs \
+  --outdir=docker \
+  --out-extension:.js=.cjs \
   --external:@libsql/linux-x64-gnu \
   --external:@libsql/linux-arm64-gnu \
   --external:@libsql/win32-x64-msvc \
@@ -42,6 +44,7 @@ ENV DRIZZLE_MIGRATIONS_DIR=/app/drizzle/migrations
 COPY --from=build /src/sales_template/.output ./.output
 COPY --from=build /src/sales_template/drizzle/migrations ./drizzle/migrations
 COPY --from=build /src/sales_template/docker/runtime-init.cjs ./docker/runtime-init.cjs
+COPY --from=build /src/sales_template/docker/sqlite-snapshot.cjs ./docker/sqlite-snapshot.cjs
 COPY sales_template/docker/entrypoint.sh ./docker/entrypoint.sh
 COPY --from=build /src/node_modules/@libsql ./node_modules/@libsql
 # Empty data dirs only. Never COPY a sqlite file into the image.
