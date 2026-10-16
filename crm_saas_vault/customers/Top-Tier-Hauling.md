@@ -29,8 +29,8 @@ This note does not authorize provisioning, website integration, or a production 
 | Product | Sales CRM |
 | Customer type | External. First committed paying customer. |
 | Revenue | Not collected |
-| Production status | Sales PROD and DEV provisioned on `nuxxion-vps-1` by Scott through the Control Plane (2026-10-16 UTC). Rebuilt from commit `cbee291`, release `cbee2918bda0@6010e5b97402`. Loopback only: PROD `52202`, DEV `52203` (reach with `pnpm vps tunnel`) |
-| DEV status | Not created for this customer |
+| Production status | Sales PROD and DEV provisioned on `nuxxion-vps-1` by Scott through the Control Plane (2026-10-16 UTC). Both public over HTTPS (see Public hostname). Host ports PROD `52202`, DEV `52203` (loopback; `pnpm vps tunnel` also reaches them) |
+| DEV status | Live at `https://dev-top-tier-hauling.nuxxion.com` (2026-10-16) |
 | Public hostname | PROD `https://top-tier-hauling.nuxxion.com` (2026-10-16 04:32 UTC, Let's Encrypt to 2027-01-14, via the GoDaddy wildcard). DEV `https://dev-top-tier-hauling.nuxxion.com` (2026-10-16 22:40 UTC, Let's Encrypt to 2027-01-14). DEV initial password changed by Scott on first sign-in; sign-in confirmed working |
 | Releases (2026-10-16 22:40 UTC) | DEV and PROD both `df1a5d3c2214@e1fdd8cbf362` (GHCR image, Designer UI cleanup 1–4). Upgraded by Scott in the Control Plane: DEV 22:37, PROD 22:40 (from `cbee2918bda0@6010e5b97402`). PROD backup `3ad5015b` taken 22:48 on the new release |
 | Website integration | Not built |
@@ -129,9 +129,9 @@ Obtaining a VPS is not an open blocker.
 | Off-host copy is rclone remote `nuxxion-dr:` | Nightly job `2026-10-08T02:30:11Z OK nuxxion-dr:20261008_023001`. An earlier Acme DEV zip was retrieved and restored | A Top Tier backup |
 | Reboot recovery | 2026-10-08 SSH reboot, boot `7b41db47`. Acme came back on image A | The DigitalOcean droplet console, which has not been opened |
 
-Acme on this host has live-proven backup, restore, off-host recovery, upgrade, rollback, and reboot. What Top Tier still needs before it is a live customer: its own hostname and certificate, the website-intake decision, and an authorization to create the environment. Laptop S6 does not count as that.
+Acme on this host has live-proven backup, restore, off-host recovery, upgrade, rollback, and reboot. Top Tier now has its environments, hostnames, and certificates (2026-10-16). What it still needs: the website-intake decision. Laptop S6 does not count as live evidence.
 
-S7 and S8 stay **Not started**. Live acceptance on 2026-10-07 UTC: [[Nuxxion-Production-Acceptance]]. Gate: **READY FOR TOP TIER** as a hosting decision on 2026-10-08. Top Tier Sales PROD and DEV were provisioned on 2026-10-16 UTC; PROD went public at `top-tier-hauling.nuxxion.com` the same day (Scott: first login forces the password change, done immediately). Website intake is still open. S7 and S8 stay Not started.
+S7 is **Not started**; S8 is **In progress** (Successful once Top Tier staff sign in and use the app). Live acceptance on 2026-10-07 UTC: [[Nuxxion-Production-Acceptance]]. Gate: **READY FOR TOP TIER** as a hosting decision on 2026-10-08. Top Tier Sales PROD and DEV were provisioned on 2026-10-16 UTC; PROD went public at `top-tier-hauling.nuxxion.com` and DEV at `dev-top-tier-hauling.nuxxion.com` the same day. Scott changed both initial passwords on first sign-in. Website intake is still open.
 
 ---
 
