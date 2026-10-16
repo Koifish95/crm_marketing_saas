@@ -145,7 +145,7 @@ ThePond gets its own commit only if probes, presets, `sync-excludes.txt`, or the
 
 ## Related
 
-- [[How-to-Run]]
+- [[history/Renzo-How-to-Run|How-to-Run (Renzo)]]
 - [[Operations-PRODUCTION-SQLite]]
 - [[Architecture]]
 - [[Decisions#2026-09-07 — Develop in sibling renzo_crm; drop-in is not the product]]

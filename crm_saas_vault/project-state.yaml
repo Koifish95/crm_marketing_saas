@@ -2,11 +2,11 @@
 # Human map: Current-State.md. This file is an index, not a second essay.
 # Update in the same commit as the work that changes these fields.
 schema_version: 1
-updated: 2026-10-02
+updated: 2026-10-14
 repo: crm_marketing_saas
 branch: working
 remote: https://github.com/Koifish95/crm_marketing_saas.git
-head_at_write: "00b757e88863268d266c95e4c3d633ed7b7a4885"
+head_at_write: "0c686e94869b09c3852b01f0d7f7be66454a98e7"  # HEAD; large working-tree changes uncommitted (see working_tree_* below)
 
 canonical:
   bootstrap: Home.md
@@ -99,9 +99,28 @@ notes:
   core_migrator: not_planned
   ma_customer1_sell_readiness: repository_complete_awaiting_external
   ma_customer1_sell_readiness_date: 2026-09-19
-  hosting_node: repository_complete_awaiting_external
+  hosting_node: vps_in_use_not_s7_s8_successful
   hosting_node_date: 2026-09-19
   hosting_node_work_order: WO-2026-09-19-production-hosting-node
+  nuxxion_vps: digitalocean_exercised
+  nuxxion_vps_evidence: "Operator 2026-10-06: VPS exists, Control Plane used via SSH tunnel, environment provisioning exercised. Bootstrap runbook records acme.nuxxion.com. DNS/TLS/edge/reboot/backup/off-host/full lifecycle not owner-accepted."
+  commercial_priority: top_tier_onboarding
+  commercialization_freeze: unrelated_feature_development
+  top_tier_hauling: committed_external_customer
+  top_tier_hauling_product: sales
+  top_tier_hauling_revenue: not_collected
+  top_tier_hauling_status: pre_production_onboarding
+  top_tier_customer_record: crm_saas_vault/customers/Top-Tier-Hauling.md
+  production_acceptance: ready_for_top_tier
+  production_acceptance_date: 2026-10-08
+  vps_reboot: live_proven
+  vps_reboot_note: "2026-10-08 03:48 UTC boot 7b41db47. SSH returned. Acme stayed on image A. DigitalOcean console not tested."
+  production_acceptance_note: crm_saas_vault/Nuxxion-Production-Acceptance.md
+  upgrade_rollback: live_proven
+  upgrade_rollback_note: "2026-10-07 04:35 UTC Acme A to B to A. Image A sha256:64897047fdf3. Image B sha256:f99503bba495. PROD left on A."
+  offhost_backup: live_proven
+  offhost_diagnosis: "Reconnected 2026-10-07. DEV backup 72f0069c retrieved from nuxxion-dr and restored. Nightly job OK nuxxion-dr:20261007_035256."
+  offhost_last_success: "2026-10-07T03:53:05Z nuxxion-dr:20261007_035256"
   sales_minimum_v1: code_shipped
   sales_minimum_v1_date: 2026-09-19
   sales_minimum_v1_work_order: WO-2026-09-19-sales-minimum-v1
@@ -124,6 +143,12 @@ notes:
   qa_martial_arts_ui_ux_audit_run: b80cd8c9-1569-40ea-83be-953fc9ae4cbe
   qa_martial_arts_ui_ux_audit_date: 2026-10-03
   qa_martial_arts_ui_ux_audit_findings: 7
+  qa_martial_arts_remediation: complete
+  qa_martial_arts_remediation_date: 2026-10-03
+  qa_martial_arts_remediation_baseline_run: 5a840850-ce7d-4856-93cc-5c77e5310c8f
+  qa_martial_arts_remediation_targeted_run: ba7db15b-9fae-4a3f-8c5e-760a60f36a87
+  qa_martial_arts_remediation_corrective_run: 89c446c6-a52d-4aa8-ae2a-bb161319c04d
+  qa_martial_arts_remediation_tickets_done: 7
   qa_autonomous_remediation: forbidden
   marketing_site: phase1_visual
   marketing_site_path: marketing_site
@@ -145,3 +170,27 @@ notes:
   sales_local_sqlite_backup_retention_days: 14
   sales_local_sqlite_backup_work_order: WO-2026-09-27-sales-local-backup
   sales_first_outreach_playbook: crm_saas_vault/Nuxxion-First-Outreach-Playbook.md
+  ma_acquisition_funnel: code_shipped
+  ma_acquisition_funnel_date: 2026-10-06
+  ma_acquisition_funnel_schema: 0021_cheerful_lethal_legion
+  ma_acquisition_funnel_note: Acquisition-Funnel-Analytics.md
+  ma_acquisition_funnel_scope: instance_sqlite_not_control_plane
+  ma_acquisition_funnel_committed: false
+  cp_release_pin_rollback: code_present_uncommitted
+  cp_release_pin_rollback_live_proof: "2026-10-07 Acme A to B to A on nuxxion-vps-1"
+  cp_release_pin_rollback_ui: api_only
+  cp_schema: 0009_previous_release
+  working_tree_uncommitted: true
+  working_tree_note: "Current-State.md#Working tree vs Git (2026-10-14)"
+  head_test_depends_on_uncommitted: "0c686e9 tests/m5/intro-confirmation-due.test.ts imports uncommitted introConfirmationDueAt"
+  vps_checkout: "47159a0 plus uncommitted Control Plane files (checked 2026-10-15 UTC)"
+  vps_control_plane_service: sic-control-plane_systemd_enabled
+  vps_ssh: "root@157.245.136.47 key ~/.ssh/id_ed25519_sic_prod"
+  vps_tls_live_check: "2026-10-15 acme.nuxxion.com 200, Let's Encrypt until 2026-12-24"
+  vps_offhost_last_ok: "2026-10-15T02:30:12Z nuxxion-dr:20261015_023001"
+  ops_vps_helper: code_shipped_uncommitted
+  ops_vps_helper_path: tools/vps.mjs
+  ops_vps_helper_command: "pnpm vps"
+  ops_vps_helper_live_exercised: 2026-10-15
+  how_to_run: platform_note_2026-10-14
+  how_to_run_renzo_history: history/Renzo-How-to-Run.md

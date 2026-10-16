@@ -39,7 +39,7 @@ Before you touch anything, on the environment workspace write down:
 | `schemaVersion` | `/api/health` |
 | Latest backup id | Backup tab |
 
-Martial Arts schema on health is the Drizzle journal tag (currently `0020_tidy_frog_thor`). Sales currently `0004_sales_v1_dogfood`. If you ship a new migration, health constants in code must move with the journal.
+Martial Arts schema on health is the Drizzle journal tag (currently `0021_cheerful_lethal_legion`). Sales currently `0006_sales_prospect_outreach`. If you ship a new migration, health constants in code must move with the journal. `0021` adds acquisition funnel events inside the Martial Arts database. Upgrade applies it on container start. It does not backfill old clicks.
 
 ---
 
@@ -65,10 +65,12 @@ Do not tag `latest`.
 Control Plane Upgrade already runs:
 
 ```text
-docker build -t {expectedImage} -f {product Dockerfile} --build-arg RELEASE_ID={currentReleaseId} .
+docker build -t {product image tag} -f {product Dockerfile} --build-arg RELEASE_ID={source release} .
 ```
 
-`currentReleaseId` = `RELEASE_ID` or `GIT_SHA` or `dev`. Set one of those to `git rev-parse HEAD` in the operator environment before Upgrade.
+Source release = `RELEASE_ID` or `GIT_SHA` from the Control Plane process environment, else `git rev-parse --short=12 HEAD` of the repo on the hosting node. Upgrade refuses to build with `dev`. After the build it runs the new image by digest, stamps `RELEASE_ID={source}@{12 hex of digest}`, and also tags the image `{repository}:{that release id}` so later builds do not orphan it.
+
+Because the source release comes from the node’s checkout, uncommitted changes on the node are built in but not named. Commit and pull before an upgrade you may need to reproduce.
 
 Manual example (Martial Arts):
 
@@ -84,7 +86,7 @@ Sales Dockerfile also accepts `ARG RELEASE_ID`.
 
 Control Plane → environment → **Backup**. Confirm the zip. Upgrade is **refused** without a backup of **this** env.
 
-Optional: Copy off-host to an existing folder.
+Optional: Copy off-host to an existing folder. On the VPS, PROD also gets the nightly `rclone` off-host copy; check `/var/lib/sic/backups/offhost-status.txt` says `OK` before a PROD upgrade.
 
 ---
 
@@ -92,7 +94,8 @@ Optional: Copy off-host to an existing folder.
 
 If the instance has a non-PROD, upgrade **that first** (instance-scoped). Acme lab `:s2` compose is exempt from the “non-PROD first” gate.
 
-1. Release tab → target image (often the same mutable tag you just rebuilt) → **Upgrade**
+0. Once per environment, pin the release it already runs: `POST /api/environments/{id}/release-pin` (API only; through the tunnel, e.g. `curl -X POST http://127.0.0.1:52100/api/environments/{id}/release-pin`). Upgrade refuses until this is done.
+1. Release tab → target image (leave the product tag to build from the current checkout) → **Upgrade**
 2. Wait for health
 3. Confirm `releaseId` matches the SHA you intended
 4. Confirm `schemaVersion`
@@ -106,7 +109,7 @@ Migrations: Drizzle at container start. Additive/idempotent journals are the sup
 
 ## PROD upgrade then validate
 
-Same as DEV after DEV is good. Record downtime window for the academy.
+Same as DEV after DEV is good, except the target image is the digest DEV now runs (`{repository}@sha256:…` from DEV’s Release tab). PROD then starts that exact image without a second build, and is refused any image no non-PROD on the instance runs. Pin PROD first if it was never pinned. Record downtime window for the academy.
 
 Validate health + login + one workflow. Check assets (a marketing file or a proposal PDF) still open — volumes were remounted, not replaced, unless you restored.
 
@@ -114,13 +117,14 @@ Validate health + login + one workflow. Check assets (a marketing file or a prop
 
 ## What Upgrade actually does
 
-1. Requires latest S6 backup of this env  
-2. Builds image  
-3. Writes `EXPECTED_IMAGE` **and** `RELEASE_ID` into the compose env  
-4. `docker compose up -d --force-recreate --no-deps app` (no `-v`)  
-5. Updates Control Plane `expectedImage`  
-6. Waits until health is OK  
-7. Returns previous image, new image, backup id, releaseId, schemaVersion  
+1. Requires latest S6 backup of this env. The running release must already be pinned (health is not `dev`).
+2. Records that backup’s previous image as `repository@sha256:…` and its release id. Tags that image so the next build does not orphan it.
+3. Builds only when the requested image is not an existing digest. PROD upgrade to the digest DEV already runs does not build again.
+4. Writes that digest into `EXPECTED_IMAGE` and the release id into `RELEASE_ID`.
+5. `docker compose up -d --force-recreate --no-deps app` (no `-v`)
+6. Updates Control Plane `expectedImage` to the digest.
+7. Waits until health is OK.
+8. Returns previous digest, new digest, backup id, releaseId, schemaVersion.
 
 If **compose up** fails, Control Plane **restores the previous env file**.
 
@@ -133,15 +137,13 @@ If the **new container starts but health/migrate fails**, env/DB may already be 
 **Do not** start the old image on a database that already migrated forward.
 
 ```text
-Stop the bad process (Stop / not -v)
-    → Restore the pre-update backup into THIS environment
-    → Run the previous image (previous expectedImage / RELEASE_ID)
-    → Health + login + representative workflow
+POST /api/environments/{id}/rollback
+    { "confirm": true, "backupId": "<pre-upgrade backup>" }
 ```
 
-That pair (known backup + known image) **is** rollback.
+That stops the container, restores that backup into the same volumes, and starts the digest and release id stored on the backup. It does not rebuild, and it does not follow the mutable tag.
 
-Control Plane does **not** auto-rollback after a health timeout. You get the error and use Restore.
+Control Plane does **not** auto-rollback after a health timeout. You get the error and call rollback with the pre-upgrade backup id.
 
 ---
 

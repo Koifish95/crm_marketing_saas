@@ -108,4 +108,4 @@ Failed logins are throttled in-memory by IP+email after five failures, including
 
 Do not commit `.env`. Seed does not log passwords.
 
-Related: [[Architecture]], [[How-to-Run]], [[Decisions]], [[Implementation-State]].
+Related: [[Architecture]], [[history/Renzo-How-to-Run|How-to-Run (Renzo)]], [[Decisions]], [[Implementation-State]].

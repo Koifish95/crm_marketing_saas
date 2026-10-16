@@ -21,7 +21,7 @@ Cursor may change Sales (or any other product) code only after a separate active
 
 Do not promote answers from this file into [[SaaS-Decisions]] or ADRs until Scott has completed the checkboxes **and** a follow-up says to promote.
 
-Prior process twin: [[wip/Pre_Development_Product_Architecture_Decision_Worksheet]].
+Prior process twin: [[wip/archive/Pre_Development_Product_Architecture_Decision_Worksheet]].
 
 ---
 

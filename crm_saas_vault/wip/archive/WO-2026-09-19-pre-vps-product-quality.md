@@ -10,7 +10,7 @@ decision_refs:
 base_sha: "4bd015b20a9f5f188580a50cc171680af6328239"
 authorized: yes
 authorized_scope: |
-  Follow crm_saas_vault/wip/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program.md.
+  Follow crm_saas_vault/wip/archive/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program.md.
   Phase 1: investigation-only exhaustive UX audit of Martial Arts and Sales; write
   Product-Workflow-UX-Audit.md. Phase 2 authorized only after Phase 1 audit is complete.
   Phase 3 after Phase 2. Product-quality and release-lifecycle work in martial_arts_template,
@@ -32,7 +32,7 @@ durable_docs:
 
 # Pre-VPS product quality & release readiness
 
-Authorized by Scott’s current chat: follow [[wip/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program]].
+Authorized by Scott’s current chat: follow [[wip/archive/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program]].
 
 **Successful criteria:** each phase SUCCESS or legitimate BLOCKED. Owner acceptance of official milestones is separate. Phase 1 is investigation only.
 

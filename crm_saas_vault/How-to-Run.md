@@ -1,184 +1,153 @@
 ---
-type: note
+type: runbook
 status: current
 area: operations
-updated: 2026-09-07
+updated: 2026-10-14
+aliases:
+  - How to run
+  - Run
 tags:
+  - saas
   - runbook
 ---
 
 # How to run
 
-Source / Martial Arts template commands. Platform live map: [[Current-State]]. Control plane: [[S3-Control-Plane-Runbook]], [[S4-Provision-Runbook]], [[S6-Fleet-Runbook]].
+How to reach the live Control Plane on the Nuxxion VPS, and how to run each app on this PC. Live map: [[Current-State]]. Renzo-era version of this note: [[history/Renzo-How-to-Run]].
 
-Requires Node 22+ and pnpm. Workspace map: [[Workspace]]. Develop / copy / deploy (external Renzo): [[Deploy-Workflow]]. Pi hardware (external Renzo): [[Koi-Pi-Infrastructure]].
+---
 
-```bash
-pnpm install
-copy .env.example .env
-pnpm db:setup
-pnpm dev
+## TL;DR — Control Plane on the VPS
+
+The Control Plane runs on the VPS all the time as systemd service `sic-control-plane`, bound to `127.0.0.1:52100` there. You do not launch it when you connect. You open an SSH tunnel (port 22) and browse it from this PC as `localhost:52100`. Customer apps and the public edge keep running whether the Control Plane is up or not.
+
+**One-time setup** (from the repo root):
+
+```powershell
+copy tools\vps.config.example.json tools\vps.config.json
 ```
 
-On macOS/Linux: `cp .env.example .env`.
+The example already holds the Nuxxion VPS host, `root`, and key `~/.ssh/id_ed25519_sic_prod`. `tools/vps.config.json` is gitignored. Edit it only if the host, user, or key changes.
 
-- App: http://localhost:5030
-- Health: http://localhost:5030/api/health
+**Helper** (from the repo root, no install needed beyond Node 22):
 
-Local `pnpm dev` listens on **5030**. `pnpm dev` and `pnpm preview` run `scripts/run-nuxt.mjs`, which stops whatever is already bound to 5030 and then starts there. Ports **3000, 5000, 5010, and 5020 are never used** by `pnpm dev` (3000 is other apps; 5000/5010/5020 are Docker PRODUCTION / STAGE / DEV). If 5030 still cannot bind, the wrapper tries **5031–5035** in order and then exits. `.env` should include `NUXT_PORT=5030` and `PORT=5030`.
+```powershell
+pnpm vps            # menu
+pnpm vps test       # can I SSH to the VPS?
+pnpm vps status     # is sic-control-plane active, and does :52100 answer?
+pnpm vps tunnel     # open the tunnel; browse http://localhost:52100; Ctrl+C closes it
+pnpm vps start      # start the Control Plane
+pnpm vps restart    # restart it (asks first; --yes skips)
+pnpm vps stop       # stop it (asks first; --yes skips)
+```
 
-If startup cannot bind 5030–5035, fix the occupant on 5030 and run `pnpm dev` again. Do not treat 3000 or Docker ports as the `pnpm dev` URL.
+`node tools/vps.mjs <command>` works too. The helper only runs `systemctl … sic-control-plane` and a status probe. It never runs Docker or touches customer environments.
 
-`pnpm db:setup` runs migrations then seed (programs, intro availability, development admin password hash). Safe to re-run; seed is idempotent. After changing `NUXT_AUTH_PASSWORD` for an existing admin, set `NUXT_AUTH_RESET_PASSWORD=true` once.
+**Control Plane is down:**
 
-Staff UI: http://localhost:5030/login (`admin` or `admin@local` / `setup` in development) then `/dashboard`, `/leads`, `/leads/:id` (household workspace), `/tasks`, `/reports`, `/marketing` (ADMIN, or STAFF with Access Right `VIEW_MARKETING`), `/marketing/campaigns/:id`, `/marketing/content/:id`, `/marketing/tasks`, `/marketing/tasks/:id`, `/marketing/events/:id`, and `/account`. Public intro: http://localhost:5030/trial. Public events: http://localhost:5030/events/:slug. ADMIN Settings: `/settings` (intro schedule, catalog, Access Rights, Meta, Environment backup/restore, Trial outcome setting, process controls). Campaign planning is `/marketing/campaigns` (`/settings/campaigns` redirects). ADMIN users: `/users`. ADMIN security activity: `/security`. Forced first login lands on `/account/password`. After pulling schema changes, run `pnpm db:migrate` (or `pnpm db:setup`) before signing in. The login form does not require an `@`. Record URLs and tabs: [[Design-System#Primary Record Workspace]].
+1. `pnpm vps status`. If SSH fails, see the SSH bullet below.
+2. `pnpm vps start` (or `restart`). It waits up to 30 s and prints UP or DOWN.
+3. Still down: read the service log by hand, `ssh … "journalctl -u sic-control-plane -n 80 --no-pager"`.
+4. `pnpm vps tunnel`, then open http://localhost:52100.
+
+**By hand, without the helper:**
 
 ```bash
+ssh -i ~/.ssh/id_ed25519_sic_prod root@157.245.136.47                              # shell
+ssh -i ~/.ssh/id_ed25519_sic_prod -N -L 52100:127.0.0.1:52100 root@157.245.136.47  # tunnel only
+systemctl status sic-control-plane        # on the VPS
+systemctl restart sic-control-plane       # on the VPS
+journalctl -u sic-control-plane -n 80     # on the VPS
+```
+
+**If something else is wrong:**
+
+- `localhost:52100 is already in use`: a tunnel (or a local `control_plane` dev server) is already open. Browse it, or close that window.
+- SSH fails: check the key path in `tools/vps.config.json`. If the droplet itself is down, follow [[Hosting-Node-Bootstrap-Runbook#Restart]] (DigitalOcean console, power on once).
+- A customer site is down but the Control Plane is up: that is a customer environment, not this service. Use the Control Plane Environments page. Never `docker compose down -v`.
+
+Full detail: [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]], [[S6-Fleet-Runbook]], `docs/11 - sic-operator-guide.md`.
+
+---
+
+## VPS layout (live, checked 2026-10-15 UTC)
+
+| Item | Value |
+|---|---|
+| Host | DigitalOcean droplet `ubuntu-s-2vcpu-4gb-nyc1`, `157.245.136.47`. Hosting node name `nuxxion-vps-1` |
+| SSH | `root`, key `~/.ssh/id_ed25519_sic_prod` on Scott’s PC. Public ports 22, 80, 443 |
+| Repo | `/opt/sic/crm_marketing_saas`, branch `working` |
+| Service | `/etc/systemd/system/sic-control-plane.service` runs `node control_plane/.output/server/index.mjs` as root. `Restart=on-failure`. Enabled at boot |
+| Service env | `/etc/sic/control-plane.env` (0600). `NITRO_HOST=127.0.0.1`, `NITRO_PORT=52100`, `SKIP_LAB_SEED=true` |
+| Registry | `control_plane/data/control-plane.sqlite` |
+| Cron (`/etc/cron.d/sic-hosting-node`, UTC) | 02:15 registry backup · 02:30 off-host bundle · 03:20 certificate renew |
+| Containers | `acme-martial-arts-prod-app`, `acme-martial-arts-dev-app`, `sic-production-edge` (nginx, host network) |
+
+**Checkout drift:** on 2026-10-15 the VPS checkout was commit `47159a0` plus uncommitted Control Plane files (release pin, rollback, `0009_previous_release`, `image-identity.ts`) and a generated `deploy/edge/nginx.conf`. Those Control Plane files match uncommitted work on Scott’s PC. Until they are committed and pushed, a `git pull` on the VPS will conflict with them. Do not discard them on the VPS: the running build and registry migration `0009` depend on them.
+
+### Update the Control Plane code on the VPS
+
+Derived from `deploy/hosting-node/bootstrap.sh`. Not yet run as a standalone procedure. It updates only the Control Plane, not customer images.
+
+```bash
+/usr/local/sbin/sic-backup-control-plane         # registry snapshot first
+cd /opt/sic/crm_marketing_saas
+git status --short                               # must be clean except deploy/edge/nginx.conf and letsencrypt/
+git pull --ff-only
+cd control_plane
+pnpm install --frozen-lockfile
+pnpm build
+pnpm db:migrate
+systemctl restart sic-control-plane
+```
+
+Then `pnpm vps status` from this PC. Customer product upgrades are a separate action: Control Plane environment → Release tab ([[S6-Fleet-Runbook]]).
+
+---
+
+## Local development (this PC)
+
+Node 22+, pnpm 10. Install the workspace once from the repo root (`packages/crm-core`, `martial_arts_template`, `sales_template`, `marketing_site`):
+
+```powershell
+pnpm install
+```
+
+`control_plane/` is **not** in the workspace. Install it separately.
+
+| App | Folder | First run | Daily | URL |
+|---|---|---|---|---|
+| Martial Arts | `martial_arts_template/` | `copy .env.example .env` · `pnpm db:setup` | `pnpm dev` | http://localhost:5030 |
+| Sales | `sales_template/` | `copy .env.example .env` · `pnpm db:setup` | `pnpm dev` | http://localhost:5040 |
+| Marketing site | `marketing_site/` | `copy .env.example .env` | `pnpm dev` | http://localhost:5050 |
+| Control Plane (laptop lab) | `control_plane/` | `copy .env.example .env` · `pnpm install` · `pnpm db:setup` | `pnpm dev` | http://127.0.0.1:52100 |
+
+- Local sqlite is `data/app.sqlite` in each product folder (gitignored). `pnpm db:setup` = migrate then seed, safe to repeat.
+- Development sign-in for both products: `admin` or `admin@local` with the `NUXT_AUTH_PASSWORD` in `.env`.
+- Martial Arts and Sales `pnpm dev` go through `scripts/run-nuxt.mjs`, which frees the product port and falls back to the next few ports if needed.
+- The laptop Control Plane and the VPS tunnel both use `localhost:52100`. Run one at a time.
+- `sales_template/data/app.sqlite` is the internal SIC dogfood database. Back it up with `pnpm backup:local` from `sales_template/` (details in [[Current-State]]).
+
+Checks, run inside the folder you changed:
+
+```powershell
 pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
-pnpm preview
 ```
 
-Other database commands: `pnpm db:migrate`, `pnpm db:seed`, `pnpm db:generate`, `pnpm db:studio`. Prefer generate + review over `db:push`. See [[Database]].
+Root helper tests: `pnpm test:tools`.
 
-## Environment
+Laptop Docker labs and provisioned laptop environments: [[S3-Control-Plane-Runbook]], [[S4-Provision-Runbook]]. Martial Arts laptop Docker (`pnpm env:*` on :5000/:5010/:5020, `pnpm lab:docker` for `lab-acme-*`) is described in `martial_arts_template/AGENTS.md`.
 
-From `.env.example`:
+---
 
-- `APP_ENV` — `dev` | `stage` | `production`. Invalid values fail startup. Missing value defaults to `dev` unless `NODE_ENV=production`.
-- `NUXT_SESSION_PASSWORD` — 32+ characters; seals the session cookie
-- `SESSION_COOKIE_SECURE` — optional `true`/`false`. Defaults to true only when `APP_ENV=production`.
-- `DATABASE_URL` — default `file:./data/renzo.sqlite`
-- `NUXT_PORT` / `PORT` — `5030` (local `pnpm dev` listen port)
-- `NUXT_AUTH_USERNAME` — bootstrap admin username; default `admin`. Also a valid sign-in identifier.
-- `NUXT_AUTH_EMAIL` — bootstrap admin email; default `admin@local`. Also a valid sign-in identifier.
-- `NUXT_AUTH_PASSWORD` — seed/bootstrap admin password (hashed at rest). Default `setup` in DEV, STAGE, and PRODUCTION when unset.
-- `NUXT_AUTH_RESET_PASSWORD` — optional `true` to re-hash the admin password
-- `NUXT_PUBLIC_TIMEZONE` — `America/Denver`
-- `META_ACCESS_TOKEN` — required for live Meta pull (leave empty to skip)
-- `META_AD_ACCOUNT_ID` — gym ad account (`act_…` or the numeric id)
-- `META_GRAPH_API_VERSION` — default `v25.0`
-- `ASSET_UPLOAD_DIR` — optional override for marketing asset bytes (default `data/uploads/`)
+## Safety
 
-- `APP_RESTART_ENABLED` — optional `true` only when a supervisor will start the process after ADMIN Restart
-- `APP_RESTART_EXIT_CODE` — optional integer passed to `process.exit` on Restart (default `0`)
+- Never `docker compose down -v`. Never prune volumes.
+- Never expose port 52100 publicly or set `CONTROL_PLANE_ALLOW_REMOTE` on the VPS. Use the tunnel.
+- Stopping the Control Plane does not stop customer apps. The 02:30 UTC off-host job (`/usr/local/sbin/sic-offhost-backup`) calls the Control Plane API on `127.0.0.1:52100` to back up each PROD, so a stopped Control Plane means no off-host backup that night. Do not leave it stopped.
+- Do not touch `C:\Users\Scoy9\Projects\renzo_crm` or Koi-Pi from this repo.
 
-Do not commit `.env`. After changing Meta values, restart `pnpm dev`, then ADMIN `/settings/meta` → Sync Meta data. Token permission is `ads_read`. `META_APP_ID` / `META_APP_SECRET` are not used.
-
-ADMIN Settings hub: `/settings` (Intro schedule, Catalog, Access Rights, Meta, Allow early Trial outcomes, and process controls). Campaigns live under Marketing. Shutdown exits the Node process. Restart is disabled unless `APP_RESTART_ENABLED=true`. Docker Compose enables Restart and uses `restart: unless-stopped`; use `pnpm env:<env>:down` to stop an environment.
-
-## Docker
-
-Copy the matching example once per environment, then start all three with one Compose project:
-
-```bash
-copy .env.dev.example .env.dev
-copy .env.stage.example .env.stage
-copy .env.production.example .env.production
-pnpm env:up
-```
-
-On macOS/Linux use `cp`. `pnpm env:up` uses `docker-compose.all.yml` (PRODUCTION :5000, STAGE :5010, DEV :5020). Local `pnpm dev` stays on :5030 and is not in that file. Per-environment overlays (`pnpm env:dev:up` / `env:stage:up` / `env:prod:up`) still work; do not run them at the same time as `env:up` (same host ports and container names).
-
-```bash
-pnpm env:ps
-pnpm env:logs
-pnpm env:restart
-pnpm env:down
-pnpm env:pull -- --confirm-pull-from-prod
-pnpm env:prod:load-local -- --confirm-load-local-into-prod
-```
-
-| Environment | APP_ENV | Local URL | Volumes | Chrome |
-|---|---|---|---|---|
-| DEV | `dev` | http://localhost:5020 | `renzo-dev-sqlite`, `renzo-dev-assets` | red + banner |
-| STAGE | `stage` | http://localhost:5010 | `renzo-stage-sqlite`, `renzo-stage-assets` | green + banner |
-| PRODUCTION | `production` | http://localhost:5000 | `renzo-prod-sqlite`, `renzo-prod-assets` | academy navy |
-
-Health: `http://localhost:<port>/api/health`.
-
-Other commands for a single environment replace `dev` with `stage` or `prod`:
-
-```bash
-pnpm env:dev:ps
-pnpm env:dev:logs
-pnpm env:dev:restart
-pnpm env:dev:down
-pnpm env:dev:build
-```
-
-`down` does **not** delete volumes. The only destructive helper is DEV-only:
-
-```bash
-pnpm env:dev:reset -- --confirm-dev-reset
-```
-
-There is no STAGE or PRODUCTION reset command.
-
-`pnpm env:prod:load-local -- --confirm-load-local-into-prod` overwrites Docker PRODUCTION with local `pnpm dev` data (`data/renzo.sqlite` and `data/uploads/`). Stop `pnpm dev` first. STAGE and DEV are left alone. Sign in at http://localhost:5000 with those local users and passwords. Then `pnpm env:pull` if STAGE/DEV should match.
-
-`pnpm env:pull -- --confirm-pull-from-prod` stops PRODUCTION, STAGE, and DEV, copies PRODUCTION SQLite and marketing uploads onto STAGE and DEV, starts the apps again, and restamps STAGE/DEV isolation markers. It overwrites STAGE and DEV data. Sign in there with PRODUCTION users and passwords (session cookies do not carry across environments).
-
-ADMIN Settings → Environment (`/settings/environment`) is the in-app copy path: download a zip of this process’s SQLite plus marketing uploads (browser Save As), then restore that file on the destination environment. Containers still have no Docker socket, so the app cannot copy named volumes directly. After restore, Docker starts the process again; local `pnpm dev` stays down until you start it. Sign in with users from the backup.
-
-## Host backups (same machine only)
-
-M10B stores SQLite + marketing uploads as validated zips under `data/backups/{production,stage,dev}/<Denver-stamp>/`. That directory is gitignored and is **not** inside the live Docker volumes. Backups stay on this host. They protect against a bad deploy, a corrupted live SQLite, or an operator mistake **if the zip is still on disk**. They do **not** survive disk failure, laptop theft, fire, ransomware on the host, or losing the machine.
-
-PRODUCTION backs up automatically every day at **02:00 America/Denver** (`renzo-backup-1`, `restart: unless-stopped`). It keeps **14 days**. STAGE and DEV have no scheduler — backup those by hand.
-
-```bash
-pnpm backup:prod
-pnpm backup:stage
-pnpm backup:dev
-pnpm backup:status
-pnpm backup:prune
-pnpm backup:schedule -- --once
-pnpm backup:restore -- --env stage --from data/backups/production/<stamp>/renzo-production-<stamp>.zip --confirm-env stage
-```
-
-`--confirm-env` must match the destination (`dev`, `stage`, or `production`). Restore restamps that environment’s isolation marker so STAGE stays STAGE. It replaces only that environment’s SQLite and asset volumes. A failed backup does not prune older PRODUCTION zips. Scheduler logs: `docker logs renzo-backup-1`. Off-host / cloud copies remain later M10.
-
-Staff chrome (rail, mobile header, login) links PRODUCTION / STAGE / DEV. On the laptop it swaps ports on the current hostname (`:5000` / `:5010` / `:5020`; `:5030` is none of the three). On the public Pi hosts it swaps the three hostnames (`app.renzogracieutah.com` / `stage.app.renzogracieutah.com` / `dev.app.renzogracieutah.com`) and never uses those laptop ports or `www` variants. Public `/trial` and `/events` stay without a PRODUCTION banner.
-
-Container startup runs migrations, then catalog/bootstrap seed, then Nitro. The init bundle is CommonJS (`docker/runtime-init.cjs`) with `DRIZZLE_MIGRATIONS_DIR=/app/drizzle/migrations`. `APP_SKIP_SEED=true` skips seed. DEV, STAGE, and PRODUCTION create `admin` / `admin@local` / `setup` when `NUXT_AUTH_PASSWORD` is unset. Set `NUXT_AUTH_RESET_PASSWORD=true` once to re-hash existing users to that password. Isolation/persistence check: `pnpm env:isolation:check` (starts the three overlay stacks; do not run it at the same time as `pnpm env:up`). On Windows it must spawn `docker exec` without a host shell so `>` stays inside the container.
-
-Compose restart policy is `unless-stopped`. Image rebuild and `docker compose down` keep named volumes. `docker compose down -v` is destructive — do not use it on PRODUCTION.
-
-## Public Pi URLs (HTTPS)
-
-Daily work stays on this laptop (`localhost:5000` / `:5010` / `:5020`, or `pnpm dev` on `:5030`). Public Pi URLs are HTTPS: `https://app.renzogracieutah.com`, `https://stage.app.renzogracieutah.com`, `https://dev.app.renzogracieutah.com`. No `www` variants. DNS stays at GoDaddy. The Pi does not publish 5000 / 5010 / 5020. Staff chrome uses hostname mode and keeps the current protocol. `SESSION_COOKIE_SECURE=true` on the Pi after M10D.
-
-## Develop → copy → deploy
-
-**Full write-up:** [[Deploy-Workflow]].
-
-Open Cursor at `Projects/renzo_crm` for app work. That repo is the product. `WebHosting/renzo_crm` is only the Pi drop-in. Do not develop there. Do not delete the sibling.
-
-```text
-git push renzo-crm working
-→ Refresh-FromSibling.ps1
-→ sync to Pi (no data/, no .env*)
-→ rebuild named Renzo services (no -v)
-→ git push WebHosting only if nginx/compose changed
-```
-
-“Push the app” is the **renzo_crm** remote. Copying is not a Git push. Deploying to the Pi is not a Git push. Never push the entire dirty WebHosting tree.
-
-## Preserve PRODUCTION SQLite on the Pi
-
-**Read this before every Pi update:** [[Operations-PRODUCTION-SQLite]].
-
-Live PRODUCTION data is Docker volume `webhosting_renzo_sqlite`, file `/app/data/sqlite/renzo.sqlite`. It is not in Git and not in the image. Rebuild/recreate is safe. These are not:
-
-```text
-docker compose -p webhosting down -v
-docker volume prune
-copying laptop data/renzo.sqlite onto the Pi
-```
-
-Laptop `pnpm backup:prod` backs up the laptop overlay volume, not Koi-Pi. After a Pi deploy, check `https://app.renzogracieutah.com/api/health` still says `database: reachable`.
-
-More context: [[Implementation-State]], [[Architecture]].
+Related: [[Hosting-Node-Architecture]], [[Control-Plane]], [[Current-State]].

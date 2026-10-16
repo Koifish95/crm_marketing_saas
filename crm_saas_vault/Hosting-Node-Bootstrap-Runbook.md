@@ -2,7 +2,7 @@
 type: runbook
 status: current
 area: operations
-updated: 2026-09-19
+updated: 2026-10-14
 aliases:
   - VPS bootstrap
 tags:
@@ -29,7 +29,7 @@ Do not `docker compose down -v`. Do not prune. Do not touch `renzo_crm` or Koi-P
 | Public ports | 22, 80, 443 |
 | Private | Control Plane `127.0.0.1:52100` — firewall **deny** 52100 |
 | Layout | `/opt/sic/crm_marketing_saas` |
-| Node identity | `HOSTING_NODE_NAME=vps-1` `HOSTING_NODE_KIND=vps` `driver=local-docker` |
+| Node identity | `HOSTING_NODE_NAME=vps-1` (example) `HOSTING_NODE_KIND=vps` `driver=local-docker`. The live Nuxxion node is named `nuxxion-vps-1`; its registry also carries a `laptop` node row with no environments |
 
 Any Linux VPS with public IPv4 (DigitalOcean, AWS Lightsail, etc.) is fine. Do not embed a cloud-provider API.
 
@@ -54,13 +54,13 @@ Environment file: `/etc/sic/control-plane.env` (mode 0600). Example: `deploy/hos
 
 ## Private operator access
 
-From the laptop:
+From the laptop, at the repo root: `pnpm vps tunnel` (also `test`, `status`, `start`, `stop`, `restart`; see [[How-to-Run]]). By hand:
 
 ```bash
 ssh -N -L 52100:127.0.0.1:52100 USER@VPS_IP
 ```
 
-Browse `http://127.0.0.1:52100`. The loopback middleware sees a local connection on the VPS. Do not set `CONTROL_PLANE_ALLOW_REMOTE`. Do not put the Control Plane in nginx.
+The live Nuxxion node uses `root` and key `~/.ssh/id_ed25519_sic_prod`. Browse `http://127.0.0.1:52100`. The loopback middleware sees a local connection on the VPS. Do not set `CONTROL_PLANE_ALLOW_REMOTE`. Do not put the Control Plane in nginx.
 
 ---
 
@@ -89,7 +89,9 @@ Full node-loss recovery: restore the Control Plane sqlite, restore the PROD zip 
 
 `systemd` starts Docker and `sic-control-plane` on boot (`enabled`). App containers and `sic-production-edge` use `restart: unless-stopped`. UFW is persistent. nginx.conf, certificates under `deploy/edge/certs/`, and the renewal cron survive reboot because they are files on the root disk.
 
-Do not reboot the production VPS until Scott is present. After reboot, check SSH, `systemctl is-active docker sic-control-plane`, `docker ps` for the edge and Acme containers, `https://acme.nuxxion.com/api/health`, loopback-only `52100`, and that `52200` and `52201` are not on `0.0.0.0`.
+A reboot does not require the owner to be present. Before one, confirm a fresh on-host PROD backup and that `/var/lib/sic/backups/offhost-status.txt` shows `OK`. Arm it with `systemd-run` so the reboot is not tied to the SSH session. After SSH returns, check `systemctl is-active docker sic-control-plane`, `docker ps` for the edge and Acme containers, `https://acme.nuxxion.com/api/health`, loopback-only `52100`, and that `52200` and `52201` are not on `0.0.0.0`.
+
+If SSH does not return within a few minutes, stop. Open https://cloud.digitalocean.com/droplets, select the droplet at `157.245.136.47`, and use Access → Launch Droplet Console. Power on once if the droplet is off. Do not repeat power cycles, and do not boot a recovery ISO unless the disk will not mount. That console path has not been tested. The 2026-10-08 proof is in [[Nuxxion-Production-Acceptance]].
 
 ---
 

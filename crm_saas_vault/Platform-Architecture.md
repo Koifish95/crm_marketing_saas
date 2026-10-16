@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-10-02
+updated: 2026-10-14
 aliases:
   - ARCHITECTURE
   - Platform architecture
@@ -101,7 +101,7 @@ The original Core+vertical extraction narrative is historical and not a license:
 
 Separate operator app: `control_plane/` at http://127.0.0.1:52100. Not another customer admin page and not the platform owner’s CRM.
 
-It lists customers/environments, observes up/down (container running **and** `/api/health` including `releaseId` / `schemaVersion`), relaunches without destroying volumes, provisions a Martial Arts or Sales PROD+DEV pair, and runs fleet lifecycle (backup, selectable restore including same-product PROD→DEV copy-down, off-host copy, target-image upgrade with `--force-recreate` and no `-v`, start/stop). Map: [[Product-Release-Update-Lifecycle]].
+It lists customers/environments, observes up/down (container running **and** `/api/health` including `releaseId` / `schemaVersion`), relaunches without destroying volumes, provisions a Martial Arts or Sales PROD+DEV pair, and runs fleet lifecycle (backup, selectable restore including same-product PROD→DEV copy-down, off-host copy, release pin by image digest, digest upgrade with `--force-recreate` and no `-v`, one-call rollback to the backup’s previous digest, start/stop). Map: [[Product-Release-Update-Lifecycle]].
 
 Operational chain: Customer → Product Instance → Product/Build → Docker image → Environment → Hosting Node → Port (DNS/TLS later). The Control Plane does **not** need to know a product’s internal domain, how much source products share, or a foundation package version.
 
@@ -115,6 +115,6 @@ The Control Plane owns cross-product operational tickets plus persisted QA runs,
 
 ## Hosting contract (current)
 
-Laptop Docker is the only runtime. Production VPS, image registry, operator auth, DNS/TLS, and remote nodes are **not** implemented. Official S-track still names those S7/S8; product family locally first remains C-track *priority*, not a rewrite of S7. State both.
+Two runtimes, both local Docker co-located with a Control Plane: the operator laptop (lab) and the Nuxxion DigitalOcean VPS (`nuxxion-vps-1`, live; Acme PROD at `https://acme.nuxxion.com` behind the generated nginx edge with Let’s Encrypt). The VPS Control Plane is systemd `sic-control-plane` on loopback, reached by SSH tunnel (`pnpm vps`, [[How-to-Run]]). Not implemented: image registry, operator auth, remote Docker / multi-node orchestration. Official S7/S8 are not Successful; using the VPS is not S7. State both.
 
 Safety: never `docker compose down -v`, never prune, never attach `webhosting_renzo_*` / leftover `renzo-*` volumes.

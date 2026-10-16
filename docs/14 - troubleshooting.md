@@ -8,6 +8,20 @@ For each item: **symptoms → likely causes → checks → safe remediation → 
 
 ---
 
+## Control Plane is unreachable
+
+**Symptoms:** http://localhost:52100 does not load; `pnpm vps tunnel` exits; tunnel opens but the page is blank or refused.
+
+**Likely causes:** No tunnel open; another tunnel or a local `control_plane` dev server already holds port 52100; `sic-control-plane` stopped or crashed on the VPS; SSH key or droplet problem.
+
+**Checks:** From the repo root, `pnpm vps test` (SSH), then `pnpm vps status` (service + HTTP on the VPS). Service log on the VPS: `journalctl -u sic-control-plane -n 80 --no-pager`.
+
+**Safe remediation:** `pnpm vps start` or `pnpm vps restart`, then `pnpm vps tunnel`. Customer apps keep running while the Control Plane is down. Details: [How to run](../crm_saas_vault/How-to-Run.md).
+
+**Stop:** Opening 52100 on the firewall, setting `CONTROL_PLANE_ALLOW_REMOTE`, or restarting Docker to “fix” the Control Plane. If SSH itself fails and the droplet is off, use the DigitalOcean console once ([Bootstrap runbook](../crm_saas_vault/Hosting-Node-Bootstrap-Runbook.md)).
+
+---
+
 ## Application is unreachable
 
 **Symptoms:** Browser timeout, connection refused, staff say “the site is down.”
@@ -192,13 +206,15 @@ Read JSON: `ok`, `database`, `warnings`, `releaseId`, `schemaVersion`.
 
 ## Off-host backup copy fails
 
-**Symptoms:** Copy errors; 409 filename exists; folder missing.
+**Symptoms:** Copy errors; 409 filename exists; folder missing. On the VPS: `/var/lib/sic/backups/offhost-status.txt` is not `OK`, or the Control Plane alerts that a ready PROD backup has no off-host path.
 
-**Likely causes:** Path does not exist; destination zip already there; permissions.
+**Likely causes:** Path does not exist; destination zip already there; permissions. On the VPS: the Google Drive rclone token expired (`invalid_grant`), or the Control Plane was stopped at 02:30 UTC (the nightly job calls its API).
 
-**Safe remediation:** Create the folder first. Choose a new destination or accept that the filename is unique on purpose.
+**Checks (VPS):** `pnpm vps status`; on the VPS `cat /var/lib/sic/backups/offhost-status.txt` and `rclone about nuxxion-dr:`.
 
-**Stop:** Inventing a cloud bucket in the Control Plane — it only copies to a filesystem path.
+**Safe remediation:** Create the folder first. Choose a new destination or accept that the filename is unique on purpose. VPS: `rclone config reconnect nuxxion-dr:` as root (owner action), then run `/usr/local/sbin/sic-offhost-backup` once.
+
+**Stop:** Inventing a cloud bucket in the Control Plane. It copies to a filesystem path, or records a `remote:path` that the node script already verified with `rclone check`.
 
 ---
 

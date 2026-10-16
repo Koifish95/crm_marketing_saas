@@ -61,7 +61,7 @@ This Work Order authorizes implementation of **C2** from base SHA:
 
 Canonical repository state and the finalized C2 worksheet remain authoritative. Before editing, read at minimum:
 
-- `crm_saas_vault/wip/C2_Pre_Development_Audit_and_Decision_Worksheet.md`
+- `crm_saas_vault/wip/archive/C2_Pre_Development_Audit_and_Decision_Worksheet.md`
 - `crm_saas_vault/project-state.yaml`
 - `crm_saas_vault/Current-State.md`
 - `crm_saas_vault/SaaS-Milestones.md`

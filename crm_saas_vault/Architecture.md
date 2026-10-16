@@ -87,4 +87,4 @@ Sibling repos: `C:\Users\Scoy9\Projects\WebHosting` and `C:\Users\Scoy9\Projects
 
 Vitest covers M1 domain, M2 auth helpers, M3 CRM services, M4 intro availability/booking, M5 follow-up tasks, M6 display labels, M7 user admin / throttle / RBAC HTTP, and HTTP authorization on intro-availability and follow-up handlers. No Playwright yet. Combined M6/M7 audit: [[wip/archive/M6_M7_Implementation_Audit_Handoff]].
 
-See [[Implementation-State]], [[How-to-Run]], [[Database]], [[Authentication]], [[CRM]], [[Intro-Scheduling]], [[Design-System]].
+See [[Implementation-State]], [[history/Renzo-How-to-Run|How-to-Run (Renzo)]], [[Database]], [[Authentication]], [[CRM]], [[Intro-Scheduling]], [[Design-System]].

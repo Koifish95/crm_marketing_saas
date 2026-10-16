@@ -2,7 +2,7 @@
 type: note
 status: current
 area: saas
-updated: 2026-09-18
+updated: 2026-10-06
 aliases:
   - Customer 1 production deploy
 tags:
@@ -19,7 +19,7 @@ Repository-side production host model for one Martial Arts academy. **Current ho
 
 Laptop Control Plane remains operator-only at http://127.0.0.1:52100 (SSH tunnel on a VPS).
 
-**Not included here:** buying a VPS, changing DNS at the registrar, or issuing a real certificate. Those are external.
+The Nuxxion DigitalOcean VPS already exists. This runbook does not cover registrar DNS changes or issuing a certificate. Those are still not S8 Successful. Top Tier Hauling is a Sales customer, not this Martial Arts track: [[customers/Top-Tier-Hauling]].
 
 ## Intended production shape
 

@@ -13,9 +13,11 @@ Canonical runbooks (keep using them; this page is the assembled manual):
 
 **Before risky work:** [Safety](10 - safety.md).
 
-**Live VPS/DNS/TLS:** repository path exists; official S7/S8 are **not Successful**. Label those steps **not live-proven**.
+**Hosting:** the Nuxxion DigitalOcean VPS runs the live Control Plane (systemd `sic-control-plane`) and Acme PROD/DEV. On Acme it has live-proven backup/restore, off-host recovery, digest upgrade/rollback, reboot recovery, and public HTTPS ([Production acceptance](../crm_saas_vault/Nuxxion-Production-Acceptance.md), 2026-10-07/08). Official S7/S8 are still **not Successful**.
 
 Control Plane has **no operator login**. It binds **loopback only**.
+
+**Quick start:** from the repo root, `pnpm vps status`, `pnpm vps start`, `pnpm vps tunnel` → http://localhost:52100. Full TL;DR: [How to run](../crm_saas_vault/How-to-Run.md).
 
 ---
 
@@ -61,7 +63,7 @@ Never `compose down -v`. Missing image: `pnpm lab:docker lab-acme-prod build` th
 
 Lab CRM URLs (S3): http://127.0.0.1:52040 (PROD), http://127.0.0.1:52050 (DEV). New environments start as `admin` / `setup` and must change that password on first login.
 
-### Linux hosting node (repository-complete, not official S7)
+### Linux hosting node (live Nuxxion VPS; not official S7)
 
 Bootstrap (on the VPS as root, after clone/copy):
 
@@ -74,15 +76,22 @@ sudo ./deploy/hosting-node/bootstrap.sh
 
 Layout: `/opt/sic/crm_marketing_saas`. Env: `/etc/sic/control-plane.env` (0600). Systemd: `sic-control-plane`. UFW 22/80/443. Deny **52100** on the public firewall.
 
-From the laptop:
+From the laptop (repo root), with `tools/vps.config.json` copied from the example:
 
 ```bash
-ssh -N -L 52100:127.0.0.1:52100 USER@VPS_IP
+pnpm vps            # menu: test SSH, status, start, stop, restart, tunnel
+pnpm vps tunnel     # same as the ssh command below
 ```
 
-Then browse `http://127.0.0.1:52100`. Do not set `CONTROL_PLANE_ALLOW_REMOTE` for normal work. Do not put Control Plane in nginx.
+By hand:
 
-Pages: Dashboard, Customers, Environments, Hosting Nodes, Settings (Settings currently says operator login/DNS/node credentials are **not in this slice**).
+```bash
+ssh -i ~/.ssh/id_ed25519_sic_prod -N -L 52100:127.0.0.1:52100 root@157.245.136.47
+```
+
+Then browse `http://127.0.0.1:52100`. Do not set `CONTROL_PLANE_ALLOW_REMOTE` for normal work. Do not put Control Plane in nginx. The helper only manages the `sic-control-plane` service; it never touches Docker or customer environments.
+
+Pages: Dashboard, Customers, Products, Environments, Tickets, QA Runs, Backups, Reports, Hosting Nodes, Settings (Settings says operator login/DNS/node credentials are **not in this slice**).
 
 ---
 
@@ -190,12 +199,12 @@ Do not hand-edit `server_name` apart from the registry. Changing hostname is a r
 
 On the environment workspace record:
 
-- Expected image (e.g. `martial-arts-acquisition:s4`, `crm-sales:c2`)
-- Running image name/id
-- Health `releaseId` (`RELEASE_ID` else `GIT_SHA` else `dev`)
-- Health `schemaVersion` (MA `0020_tidy_frog_thor`; Sales `0004_sales_v1_dogfood` at time of writing)
+- Expected image. Fresh provision: the build tag (`martial-arts-acquisition:s4`, `crm-sales:c2`). After a release pin or upgrade: `{repository}@sha256:…`
+- Running image id
+- Health `releaseId`. Pinned: `{git sha}@{12 hex of the image digest}`. Unpinned: `RELEASE_ID` else `GIT_SHA` else `dev`
+- Health `schemaVersion` (MA `0021_cheerful_lethal_legion`; Sales `0006_sales_prospect_outreach`)
 
-Set `RELEASE_ID` to `git rev-parse HEAD` before upgrade so health is not `dev`. Do not use tag `latest`.
+Before the first upgrade of an environment, pin it: `POST /api/environments/{id}/release-pin` (API only). Upgrade refuses an unpinned or `dev` release. Do not use tag `latest`.
 
 ---
 
@@ -248,12 +257,12 @@ Target identity, port, compose, secrets **stay**. Data (sqlite + uploads) is rep
 
 See [Update runbook](13 - update-runbook.md). Short form:
 
-1. Backup **this** environment (required).
-2. Upgrade non-PROD first when the instance has one (Acme `:s2` compose exempt).
-3. Enter target image (defaults to current).
-4. Control Plane builds with `--build-arg RELEASE_ID=…`, stamps `EXPECTED_IMAGE` and `RELEASE_ID`, `up -d --force-recreate --no-deps app`.
+1. Pin the running release once (`POST …/release-pin`).
+2. Backup **this** environment (required).
+3. Upgrade non-PROD first when the instance has one (Acme `:s2` compose exempt). That builds a new image and runs it by digest.
+4. Upgrade PROD to the digest DEV runs. No second build.
 5. Wait for health. Confirm `releaseId` and `schemaVersion`.
-6. Compose-up failure **reverts the env file**. Health/migration failure: **do not downgrade SQLite**. Restore backup + previous image.
+6. Compose-up failure **reverts the env file**. Health/migration failure: **do not downgrade SQLite**. `POST …/rollback` `{ "confirm": true, "backupId": "<pre-upgrade backup>" }` restores that backup and starts the previous digest.
 
 Drizzle migrate runs at container start (`runtime-init`). Failure → container unhealthy.
 
@@ -319,7 +328,7 @@ Use [Troubleshooting](14 - troubleshooting.md). First moves: Control Plane Dashb
 
 Compose `restart: unless-stopped`. After host reboot:
 
-1. Control Plane (systemd on VPS, or `pnpm dev` on laptop).
+1. Control Plane (systemd on VPS — `pnpm vps status` from the laptop; or `pnpm dev` on laptop).
 2. `docker compose ps` for edge + each environment (or CP Refresh).
 3. Probe loopback health, then public HTTPS if a hostname exists.
 4. Named volumes survive. **Do not** `down -v`.
@@ -335,6 +344,6 @@ Open Control Plane at least daily while any academy is in production, and after 
 | Martial Arts | `cd martial_arts_template` → `pnpm dev` | http://localhost:5030 |
 | Sales | `cd sales_template` → `pnpm dev` | http://localhost:5040 |
 
-SQLite defaults to `file:./data/app.sqlite` in product `.env.example` (the vault How-to-Run note may still mention an older filename — **code wins**: `app.sqlite`).
+SQLite defaults to `file:./data/app.sqlite` in product `.env.example`. Full local setup: [How to run](../crm_saas_vault/How-to-Run.md).
 
 Windows Nuxt sometimes exits `3221225477` on `nuxt.config` HMR; restart `pnpm dev`.

@@ -1,6 +1,6 @@
 # Martial Arts user guide
 
-Audience: academy staff who work households, trials, and follow-up every day.
+Audience: academy staff who work households, intro classes, and follow-up every day.
 
 Admin catalog, users, and intro schedule: [Martial Arts administrator guide](7 - martial-arts-administrator-guide.md).  
 Passwords and roles: [Customer administrator guide](9 - customer-administrator-guide.md).  
@@ -52,7 +52,7 @@ On a phone, open **Menu** to show the rail. On a desktop the rail stays on the l
 
 **When:** First thing, and whenever you wonder “what is on fire?”
 
-**Steps:** Open Dashboard. Use the overdue / due today / upcoming numbers; they link into Follow-up with the matching view.
+**Steps:** Open Dashboard. Use the overdue / due today / upcoming numbers to open the matching Follow-up view. Use a pipeline status count to open Leads with that status already filtered.
 
 **Afterward:** Work the Follow-up queue, then the household.
 
@@ -88,9 +88,10 @@ In this product a **Lead is a household**.
 1. **Leads →** create (new household page).
 2. Enter the **guardian / household contact** (name, phone, email as you have them).
 3. Choose a **source** (Instagram, Facebook, Walk-in, Referral, Website, Phone, Other).
-4. Save, then add **members** on the household (see next).
+4. Add each prospective member and select their program.
+5. Use **Create household**. On a phone, this action remains available at the bottom of the viewport while you move through the form.
 
-**Afterward:** The household appears in Leads. Schedule a trial or create a follow-up if they did not book a class yet.
+**Afterward:** The household appears in Leads. Schedule an intro or create a follow-up if they did not book a class yet.
 
 **Notes:** Source matters for reports. “Other” without a campaign is fine; guessing Instagram later is not.
 
@@ -104,9 +105,9 @@ In this product a **Lead is a household**.
 
 1. Open the household → **Members**.
 2. Add a person: relationship (including Self), name, program (Adult / Kids, or whatever your catalog has), age when the program requires it.
-3. Each member is a **line** with its own status (new, trial scheduled, attended, joined, lost, …).
+3. Each member is a **line** with its own status (new, intro scheduled, attended, joined, lost, …).
 
-**Afterward:** Trials, convert, and mark lost happen **on the person**, not as a single button for the whole household.
+**Afterward:** Intro scheduling, convert, and mark lost happen **on the person**, not as a single button for the whole household.
 
 **Notes:** Convert and Mark lost on the person. A joined parent does not automatically join the child.
 
@@ -123,39 +124,40 @@ In this product a **Lead is a household**.
 3. Enter household / member information required by the form.
 4. Submit.
 
-**Afterward:** A household exists; a trial is scheduled; a **confirmation follow-up** is due the last business day **before** the class (not after).
+**Afterward:** A household exists; an intro is scheduled; a **confirmation follow-up** is due the last business day **before** the class (not after).
 
 **Notes:**
 
 - Staff should still confirm by phone using Follow-up.
 - If the intro catalog has no offerings, **convert later will be blocked** until an Admin adds offerings — booking can still succeed.
+- When no intro times are published, `/trial` explains that online booking is unavailable and directs the visitor to contact the academy; it does not lead to a 404.
 - This page is the public-facing high-water mark; staff screens are denser.
 
 ---
 
-## Scheduling a trial from staff
+## Scheduling an intro from staff
 
 **When:** They did not use `/trial`, or you are booking a later intro.
 
 **Steps:**
 
 1. Open the household → the member.
-2. Schedule trial: pick an intro slot (weekly template + exceptions from Admin Intro schedule).
+2. **Schedule intro**: pick an intro slot (weekly template + exceptions from Admin Intro schedule).
 3. Save.
 
-**Afterward:** Member status moves toward trial scheduled. A confirmation follow-up task is created/updated for the household when appropriate.
+**Afterward:** Member status moves to intro scheduled. A confirmation follow-up task is created/updated for the household when appropriate.
 
-**Notes:** Do not stack overlapping scheduled trials without cancelling the old one. Repeated trials are supported; the current scheduled one is what staff should act on.
+**Notes:** Do not stack overlapping scheduled intros without cancelling the old one. Repeated intro classes are supported; the current scheduled one is what staff should act on.
 
 ---
 
 ## Attendance and no-shows
 
-**When:** After the class time (or earlier if Admin enabled “allow early trial outcomes”).
+**When:** After the class time (or earlier if Admin enabled “allow early intro outcomes”).
 
 **Steps:**
 
-1. Open the household → the member whose trial is due for an outcome.
+1. Open the household → the member whose intro is due for an outcome.
 2. Record **Attended** or **No-show** (primary action when an outcome can be recorded).
 3. Save.
 
@@ -248,6 +250,27 @@ In this product a **Lead is a household**.
 **Afterward:** Reports can group households, conversions, and MRR by source/campaign.
 
 **Notes:** Unattributed is a real bucket. Do not assign a campaign you are unsure of.
+
+---
+
+## Campaign acquisition funnel
+
+**When:** You want to see what happened after someone used this campaign’s tracking link. You need the Marketing reports right.
+
+**Steps:**
+
+1. Open the campaign.
+2. Open **Performance**.
+3. Read **Acquisition funnel**.
+
+**Afterward:** Each stage is the number of **different visits** (journeys) that reached it after measurement was turned on for this academy environment. The line under the title says when that started. A percent is “of the stage above,” not of all-time ad clicks.
+
+**Notes:**
+
+- Counts start at activation. Older Meta clicks and older households are not filled in afterward.
+- Someone who opens `/trial` directly is measured, and they are left off this campaign’s funnel unless a real campaign is known.
+- **Trial attended** and **Joined** still come from the household and trial records, not from a separate click log.
+- Phone and directions stay at zero on the current public booking page, which does not show those buttons.
 
 ---
 

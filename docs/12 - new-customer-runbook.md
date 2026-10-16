@@ -4,7 +4,7 @@ Audience: SIC operator taking a **signed** customer from nothing to handoff.
 
 Architecture: [Platform](4 - platform.md). Commands: [Operator guide](11 - sic-operator-guide.md). Stop list: [Safety](10 - safety.md).
 
-**Not live-proven as official S7/S8:** buying a VPS, registrar DNS, and Let’s Encrypt on a real academy hostname. Those steps are included and labeled.
+The Nuxxion DigitalOcean VPS already exists and passed the 2026-10-08 hosting gate on the Acme test customer (READY FOR TOP TIER). Official S7/S8 are **not Successful**. Named customer history lives in the vault, not in this runbook: [customers](../crm_saas_vault/customers/_index.md). Top Tier Hauling: [Top Tier Hauling](../crm_saas_vault/customers/Top-Tier-Hauling.md).
 
 ---
 
@@ -18,13 +18,15 @@ Architecture: [Platform](4 - platform.md). Commands: [Operator guide](11 - sic-o
 
 ### 1. Hosting node
 
-**Laptop lab (current default):** Control Plane already running at http://127.0.0.1:52100.
+**Linux VPS (default for real customers; not official S7):**
 
-**Linux VPS (repository-complete, not official S7):**
+- [ ] Use the existing Nuxxion node. Do not treat “buy a VPS” as the next step
+- [ ] `pnpm vps status` (repo root) says the Control Plane is UP; if not, `pnpm vps start`
+- [ ] `pnpm vps tunnel` and http://localhost:52100 opens
 
-- [ ] Ubuntu 24.04 node exists (**external**: vendor)
-- [ ] `deploy/hosting-node/bootstrap.sh` completed
-- [ ] SSH tunnel to 52100 works
+**Laptop lab (testing only):** `cd control_plane && pnpm dev`, http://127.0.0.1:52100. Close any VPS tunnel first; both use port 52100.
+
+- [ ] Hosting node: Nuxxion VPS was bootstrapped with `deploy/hosting-node/bootstrap.sh` (done once)
 - [ ] UFW: 22/80/443 open; 52100 closed to the world
 
 ### 2. Customer Account

@@ -72,7 +72,7 @@ Do not start an unstarted milestone unless asked. Do not invent answers to [[Ope
 | Product rules | repo-root `AGENTS.md` |
 | Develop / copy / deploy | [[Deploy-Workflow]] |
 | Pi hardware and full update steps | [[Koi-Pi-Infrastructure]] |
-| How to run | [[How-to-Run]] |
+| How to run | [[history/Renzo-How-to-Run|How-to-Run (Renzo)]] |
 | Auth | [[Authentication]] |
 | Domain | [[Domain-Model]] |
 | Staff UI | [[Design-System]] |

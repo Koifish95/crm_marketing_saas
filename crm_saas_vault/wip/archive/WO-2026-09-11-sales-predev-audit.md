@@ -4,7 +4,7 @@ status: done
 id: WO-2026-09-11-sales-predev-audit
 milestone: none
 decision_refs:
-  - "wip/Pre_Development_Product_Architecture_Decision_Worksheet"
+  - "wip/archive/Pre_Development_Product_Architecture_Decision_Worksheet"
   - "ADR-CRM-Core-Vertical-Architecture"
   - "SaaS-Decisions#2026-09-11 — D1–D4: account vs product instance; wait on Core domain"
 base_sha: "6c3b66990a9475f8a0b940c9aef16088dd698ae9"
@@ -38,7 +38,7 @@ Repo: `C:\Users\Scoy9\Projects\crm_marketing_saas`
 Branch: `working`  
 Remote: `https://github.com/Koifish95/crm_marketing_saas.git`
 
-Scott’s current chat authorizes this investigation. Primary input: [[wip/Pre_Development_Product_Architecture_Decision_Worksheet]].
+Scott’s current chat authorizes this investigation. Primary input: [[wip/archive/Pre_Development_Product_Architecture_Decision_Worksheet]].
 
 ## Successful criteria
 

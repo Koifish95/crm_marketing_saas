@@ -36,6 +36,7 @@ Do not start C3, Beauty, S7, VPS, or DNS/TLS because they are “next” on the 
 | Need | Note |
 |---|---|
 | Bootstrap | `crm_saas_vault/Home.md` |
+| Run / reach the VPS Control Plane (`pnpm vps`) | `crm_saas_vault/How-to-Run.md` |
 | How we work | `crm_saas_vault/Working-Agreement.md` |
 | What exists now | `crm_saas_vault/Current-State.md` |
 | Roadmap (S-track and C-track) | `crm_saas_vault/SaaS-Milestones.md` |

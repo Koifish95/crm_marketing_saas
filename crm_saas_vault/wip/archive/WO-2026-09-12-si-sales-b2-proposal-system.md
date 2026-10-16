@@ -100,7 +100,7 @@ Before changing code:
    `99bb058540a706d52aca8ac30e1e1035800f00e6`
 4. Read the canonical project-state packet.
 5. Read the finalized:
-   `crm_saas_vault/wip/SI_Sales_B2_Pre_Development_Decision_Worksheet.md`
+   `crm_saas_vault/wip/archive/SI_Sales_B2_Pre_Development_Decision_Worksheet.md`
 6. Inspect the current B1 implementation before designing schema or UI.
 7. If Git/code materially conflicts with this Work Order, STOP rather than guessing.
 

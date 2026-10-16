@@ -2,7 +2,7 @@
 type: reference
 status: current
 area: process
-updated: 2026-09-11
+updated: 2026-10-06
 tags:
   - docs
 ---
@@ -24,6 +24,7 @@ The source code is the implementation. Durable notes are the map: read them firs
 | Notes directly under `crm_saas_vault/` | Permanent knowledge |
 | **Canonical live set** | [[Home]], [[Working-Agreement]], [[Current-State]], [[SaaS-Milestones]], [[SaaS-Decisions]], [[Platform-Architecture]], [[project-state.yaml]], [[Work-Order-Protocol]], [[SaaS-Open-Questions]] |
 | Other live SaaS notes | [[Customer-Environment]], [[Control-Plane]], runbooks, [[SaaS-ToDo]] |
+| [[customers/_index\|customers/]] | Human operational and commercial history of real deployments. Not the Control Plane registry. Not [[Current-State]] |
 | Renzo evidence notes | [[Overview]], [[Implementation-State]], [[Milestones]], [[Architecture]], [[Decisions]], and the rest of the original gym map |
 | [[history/_index\|history/]] | Historical maps, closeouts, dated snapshots. Evidence, not the map |
 | [[Workspace]] | Cursor workspace map (three remotes). Twin of `C:\Users\Scoy9\Projects\AGENTS.md`. Historical for *this* repo’s identity. |

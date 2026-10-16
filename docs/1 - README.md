@@ -85,7 +85,8 @@ Beauty is **not started**. It is not a product you can provision.
 |---|---|
 | **Implemented** | In the current code and used in laptop / Control Plane operation |
 | **Laptop-proven** | Exercised on the operator laptop, not a live public host |
-| **Repository-complete, not live** | Scripts and Control Plane path exist; real VPS / DNS / TLS have not been accepted as official S7/S8 |
+| **Live-proven, not S7/S8** | Exercised on the Nuxxion VPS with the Acme test customer (edge, TLS, backup/restore, off-host, upgrade/rollback, reboot). Not owner-accepted as official S7/S8 |
+| **Repository-complete, not live** | Scripts and Control Plane path exist but have not been run on the VPS |
 | **Not implemented** | Do not tell customers it exists |
 | **External** | Requires a registrar, VPS vendor, or human process outside this repo |
 

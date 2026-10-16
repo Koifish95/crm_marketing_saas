@@ -2,7 +2,7 @@
 type: index
 status: current
 area: overview
-updated: 2026-09-27
+updated: 2026-10-14
 aliases:
   - Start
   - Index
@@ -66,8 +66,9 @@ Git: this folder is its own repo; `origin` is https://github.com/Koifish95/crm_m
 | [[Work-Order-Protocol]] | Only thing that authorizes Cursor implementation |
 | [[SaaS-Open-Questions]] | Unresolved NEAR/DEF |
 | [[Conventions]] | How notes are written and promoted |
+| [[How-to-Run]] | TL;DR for the VPS Control Plane (`pnpm vps`), plus local dev commands |
 
-Supporting live notes (not a second current-state): [[Customer-Environment]], [[Control-Plane]], [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]], [[S2-Hand-Boot-Checklist]], [[S3-Control-Plane-Runbook]], [[S4-Provision-Runbook]], [[S6-Fleet-Runbook]], [[SaaS-ToDo]], [[Martial-Arts-Customer-1-Sell-Readiness]], [[Customer-1-Production-Deploy-Runbook]], [[Martial-Arts-Product-Boundary]], [[Sales-SIC-Dogfooding-Readiness-Assessment]], [[Product-Workflow-UX-Audit]], [[Product-UX-Overhaul-Return]], [[Product-Release-Update-Lifecycle]].
+Supporting live notes (not a second current-state): [[Customer-Environment]], [[Control-Plane]], [[Hosting-Node-Architecture]], [[Hosting-Node-Bootstrap-Runbook]], [[Production-Edge-Runbook]], [[S2-Hand-Boot-Checklist]], [[S3-Control-Plane-Runbook]], [[S4-Provision-Runbook]], [[S6-Fleet-Runbook]], [[SaaS-ToDo]], [[customers/_index|customers/]], [[customers/Top-Tier-Hauling]], [[Martial-Arts-Customer-1-Sell-Readiness]], [[Customer-1-Production-Deploy-Runbook]], [[Martial-Arts-Product-Boundary]], [[Sales-SIC-Dogfooding-Readiness-Assessment]], [[Product-Workflow-UX-Audit]], [[Product-UX-Overhaul-Return]], [[Product-Release-Update-Lifecycle]].
 
 Customer/staff/operator documentation (derived from this vault + code; **not** a second current-state): `docs/1 - README.md` at the repository root. Owner/operator reading order is the numbered filenames in `docs/`.
 
@@ -86,7 +87,9 @@ Renzo notes at the vault root (`Overview`, `Implementation-State`, `Milestones`,
 
 ## Where development stands
 
-Official S-track S0–S6 **Successful**. C1 **code-shipped** (shared foundation). C2A–B2 **Successful**. **C2 Successful** (2026-09-15). Architecture: product-owned domains + shared foundation (**accepted** 2026-09-17). Martial Arts sequential multi-file Asset upload **shipped** (2026-09-17; template work, not a platform milestone). Martial Arts Customer #1 sell-readiness **repository-complete** 2026-09-19, awaiting external blockers ([[Martial-Arts-Customer-1-Sell-Readiness]]). Hosting-node repository path **shipped** 2026-09-19 ([[Hosting-Node-Architecture]]); live VPS/DNS/TLS remain external. Official S7/S8 remain **not Successful**. C3, Beauty: **not started**. Pre-VPS product quality program **complete**: [[Product-Workflow-UX-Audit]], [[Product-UX-Overhaul-Return]], [[Product-Release-Update-Lifecycle]]. No active work order.
+Official S-track S0–S6 **Successful**. C1 **code-shipped** (shared foundation). C2A–B2 **Successful**. **C2 Successful** (2026-09-15). Architecture: product-owned domains + shared foundation (**accepted** 2026-09-17). Martial Arts sequential multi-file Asset upload **shipped** (2026-09-17; template work, not a platform milestone). Martial Arts Customer #1 sell-readiness **repository-complete** 2026-09-19, awaiting external blockers ([[Martial-Arts-Customer-1-Sell-Readiness]]). A Nuxxion DigitalOcean VPS is in use for the Control Plane; that is not S7 or S8 Successful. Immediate commercial priority is Top Tier Hauling, Sales CRM, revenue not collected ([[customers/Top-Tier-Hauling]]). A 2026-10-08 UTC live acceptance cleared that host for Top Tier hosting ([[Nuxxion-Production-Acceptance]]). Top Tier is not provisioned. Official S7/S8 remain **not Successful**. C3, Beauty: **not started**. Pre-VPS product quality program **complete**: [[Product-Workflow-UX-Audit]], [[Product-UX-Overhaul-Return]], [[Product-Release-Update-Lifecycle]]. No active work order.
+
+Reach the live Control Plane from Scott’s PC with `pnpm vps` ([[How-to-Run]]). A large part of the current code is **uncommitted** (Control Plane release pin/rollback, Martial Arts funnel and QA remediation); see [[Current-State#Working tree vs Git (2026-10-14)]].
 
 Details: [[Current-State]]. Lockfile: [[project-state.yaml]]. First outreach cockpit: [[Nuxxion-First-Outreach-Playbook]].
 

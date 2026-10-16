@@ -21,7 +21,7 @@ durable_docs_updated:
 
 # SI Sales B2 return — proposal system
 
-**Not the live map.** Live map: [[Current-State]]. Successful closeout: [[history/B2_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system]]. Decisions: [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] B2-01–B2-06 plus Slice B 22–31 / 50–51.
+**Not the live map.** Live map: [[Current-State]]. Successful closeout: [[history/B2_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system]]. Decisions: [[wip/archive/SI_Sales_B2_Pre_Development_Decision_Worksheet]] B2-01–B2-06 plus Slice B 22–31 / 50–51.
 
 **C2 is not this slice.** Closing B2 does **not** authorize C2, Core promotion, e-sign, email, or SI migration.
 

@@ -2,7 +2,7 @@
 type: runbook
 status: current
 area: operations
-updated: 2026-09-19
+updated: 2026-10-14
 aliases:
   - Production edge
   - ACME
@@ -15,7 +15,7 @@ tags:
 
 Generated nginx on the hosting node routes public hostnames to Control Plane–provisioned PROD environments. Architecture: [[Hosting-Node-Architecture]]. Bootstrap: [[Hosting-Node-Bootstrap-Runbook]].
 
-`deploy/customer-1/` remains a single-customer example. Live nodes use `deploy/edge/` generated from the registry.
+`deploy/customer-1/` remains a single-customer example. Live nodes use `deploy/edge/` generated from the registry. Live today: `acme.nuxxion.com` on the Nuxxion VPS (Let’s Encrypt, checked 2026-10-15 UTC, expires 2026-12-24). On the VPS the generated `deploy/edge/nginx.conf` and `deploy/edge/letsencrypt/` show as local changes in Git; that is expected.
 
 ---
 

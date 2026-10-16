@@ -38,7 +38,7 @@ B1 is **Successful**. This file remains implementation evidence. Closing B1 does
 
 That was the result when this return was first written. Owner acceptance landed afterward; see [[history/B1_closeout]].
 
-Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]]. Decisions: [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] (1–64).
+Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]]. Decisions: [[wip/archive/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] (1–64).
 
 ---
 

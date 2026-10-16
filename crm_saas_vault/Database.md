@@ -110,7 +110,7 @@ Lead `phone` and `email` are **not unique**. Duplicate rows are allowed.
 
 Folder: `drizzle/migrations/`. Journal: `drizzle/migrations/meta/_journal.json`.
 
-Current migrations: `0000` through `0020_tidy_frog_thor.sql`.
+Current migrations: `0000` through `0021_cheerful_lethal_legion.sql`.
 
 `0001` rebuilds `leads` with CHECK `leads_phone_or_email_check` and sets `STRIKING` / `WRESTLING` to `active = 0`. Do not rewrite `0000`.
 
@@ -122,7 +122,7 @@ Current migrations: `0000` through `0020_tidy_frog_thor.sql`.
 
 `0006` household `lead_lines` + trial `lead_line_id` (SQL reordered so `lead_lines` exists before FKs). `0007` catalog/offerings/pricing. `0008` conversions + lost outcomes. `0009` campaign kind/budget + tracking links + header UTM. `0010` Meta tables + maps (SQL reordered: accounts → campaigns → ad sets → ads → maps). `0011` public booking idempotency keys + structured possible-duplicate warnings. `0012` `app_settings` plus default `allowEarlyTrialOutcomes = true` (`INSERT OR IGNORE` so an ADMIN-saved value is not overwritten).
 
-`0013` User Types / Roles / Access Rights + `users.user_type_id`. `0014` campaign lifecycle/planning + collaborators/programs + tracking `destination_path`. `0015` `marketing_tasks`. `0016` content items/channels/publications. `0017` assets + usages. `0018` acquisition events stack + `follow_up_tasks.source_event_id`. `0019` compensation attribution/history/earned. SQL for 0013–0019 was reordered so parents exist before foreign keys. `0020` unique `campaign_tracking_links.public_slug` (friendly `/t/:slug`); existing rows backfilled from campaign slug or `slug-id`.
+`0013` User Types / Roles / Access Rights + `users.user_type_id`. `0014` campaign lifecycle/planning + collaborators/programs + tracking `destination_path`. `0015` `marketing_tasks`. `0016` content items/channels/publications. `0017` assets + usages. `0018` acquisition events stack + `follow_up_tasks.source_event_id`. `0019` compensation attribution/history/earned. SQL for 0013–0019 was reordered so parents exist before foreign keys. `0020` unique `campaign_tracking_links.public_slug` (friendly `/t/:slug`); existing rows backfilled from campaign slug or `slug-id`. `0021` `acquisition_funnel_events` plus `app_settings.acquisition_funnel_activated_at` (`INSERT OR IGNORE`, so a repeat migrate does not move the timestamp). Spec: [[Acquisition-Funnel-Analytics]].
 
 drizzle-kit originally emitted tables in alphabetical order, which would create child tables before parents. The SQL was **reordered** so `users`, `programs`, `campaigns`, and `leads` exist before foreign keys. When generating a later migration, check create order before applying.
 
@@ -134,7 +134,7 @@ Uses `server/database/migrate.ts` (`PRAGMA foreign_keys = ON`).
 
 `pnpm db:generate` writes a new SQL file from schema diffs. Prefer generate + review over `db:push` for anything that should survive a fresh clone.
 
-Current chain: `0000`–`0005` as before, then `0006` household lines, `0007` catalog, `0008` conversion/lost, `0009` campaigns/tracking/UTM, `0010` Meta V1, `0011` public-booking identity, `0012` application settings, `0013`–`0019` M9 marketing operations, `0020` tracking-link public slugs.
+Current chain: `0000`–`0005` as before, then `0006` household lines, `0007` catalog, `0008` conversion/lost, `0009` campaigns/tracking/UTM, `0010` Meta V1, `0011` public-booking identity, `0012` application settings, `0013`–`0019` M9 marketing operations, `0020` tracking-link public slugs, `0021` acquisition funnel events.
 
 ## Seed
 

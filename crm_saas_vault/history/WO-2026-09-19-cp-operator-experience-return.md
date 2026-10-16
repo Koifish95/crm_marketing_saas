@@ -20,7 +20,7 @@ durable_docs_updated:
 
 # Control Plane operator experience & lifecycle — return
 
-Governing prompt: `crm_saas_vault/wip/Control_Plane_Operator_Experience_and_Lifecycle_Milestone_Prompt.md`. Work order: [[wip/archive/WO-2026-09-19-cp-operator-experience]]. Audit: [[Control-Plane-Operator-UX-Audit]].
+Governing prompt: `crm_saas_vault/wip/archive/Control_Plane_Operator_Experience_and_Lifecycle_Milestone_Prompt.md`. Work order: [[wip/archive/WO-2026-09-19-cp-operator-experience]]. Audit: [[Control-Plane-Operator-UX-Audit]].
 
 This is **not** an official S-track Successful. Do not mark S7. Live VPS/DNS/TLS were not started.
 

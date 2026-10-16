@@ -17,7 +17,7 @@ durable_docs_updated:
 
 Investigation/documentation only. **No Sales product code shipped.** This return is evidence for ChatGPT, not the live map. Live map: [[Current-State]].
 
-Primary input: [[wip/Pre_Development_Product_Architecture_Decision_Worksheet]]. Work order: [[wip/WO-2026-09-11-sales-predev-audit]].
+Primary input: [[wip/archive/Pre_Development_Product_Architecture_Decision_Worksheet]]. Work order: [[wip/archive/WO-2026-09-11-sales-predev-audit]].
 
 ---
 
@@ -49,7 +49,7 @@ No owner decision blocks writing that work order. Remaining owner items are eith
 - [[Work-Order-Protocol]], [[Control-Plane]], [[Customer-Environment]]
 - [[SaaS-Open-Questions]] (NEAR-09 SI dogfood)
 - [[history/C1_CRM_Core_Architecture_Return]]
-- [[wip/Pre_Development_Product_Architecture_Decision_Worksheet]]
+- [[wip/archive/Pre_Development_Product_Architecture_Decision_Worksheet]]
 
 ### Code inspected (not modified)
 

@@ -14,7 +14,7 @@ tags:
 
 # Product release and update lifecycle
 
-Phase 3 of [[wip/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program]]. Work order (archived): [[wip/archive/WO-2026-09-19-pre-vps-product-quality]]. Operator procedure for Martial Arts Customer #1 remains [[Customer-1-Update-Runbook]]. Fleet mechanics: [[S6-Fleet-Runbook]].
+Phase 3 of [[wip/archive/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program]]. Work order (archived): [[wip/archive/WO-2026-09-19-pre-vps-product-quality]]. Operator procedure for Martial Arts Customer #1 remains [[Customer-1-Update-Runbook]]. Fleet mechanics: [[S6-Fleet-Runbook]].
 
 This is the durable map of how SIC ships a new Martial Arts or Sales application release to an already-provisioned customer environment. It does not authorize live VPS/DNS/TLS.
 
@@ -48,12 +48,12 @@ Health already returned `releaseId` from `RELEASE_ID` / `GIT_SHA` / `dev` via `@
 
 A running environment is identified by all of:
 
-- **expected image** (Control Plane row + compose `EXPECTED_IMAGE`, e.g. `martial-arts-acquisition:s4` or `crm-sales:c2`)
-- **running image name/id** (docker inspect, shown when the container is up)
-- **`releaseId`** from `/api/health` (`RELEASE_ID`, else `GIT_SHA`, else `dev`)
+- **expected image** (Control Plane row + compose `EXPECTED_IMAGE`). After a release pin or upgrade this is `repository@sha256:…`, not the mutable product tag.
+- **running image id** (docker inspect)
+- **`releaseId`** from `/api/health`. A pinned environment reports the source release plus the first 12 hex characters of the image id.
 - **`schemaVersion`** from `/api/health` (latest Drizzle journal tag for that product)
 
-Do not use `latest`. Mutable tags (`:s4`, `:c2`) are acceptable only when `RELEASE_ID` is stamped at build/upgrade so two builds of the same tag remain distinguishable in health.
+Do not use `latest`. A mutable tag such as `:s4` may still be the build target. It is not rollback evidence. The backup stores the previous image as a digest reference and the previous release id. Rollback starts that digest and restores that backup.
 
 Operator question *“What exact release is Customer A running?”* is answered on the environment workspace: Image, Running image, Release ID, Schema version.
 
@@ -70,7 +70,7 @@ Control Plane: Backup this environment
         ↓
 Upgrade non-PROD first (when the instance has one)
         ↓
-Upgrade PROD (same image tag + RELEASE_ID)
+Upgrade PROD to the digest DEV is already running (no second build)
         ↓
 Health: ok + reachable + matching releaseId + expected schemaVersion
 ```
@@ -83,7 +83,7 @@ Both product images run Drizzle migrate at container start (`runtime-init`). Fai
 
 | Kind | Rule |
 |---|---|
-| Additive (new table/column/index) | Normal. Idempotent journal. App start applies it. |
+| Additive (new table/column/index) | Normal. Idempotent journal. App start applies it. `0021_cheerful_lethal_legion` is this kind: `acquisition_funnel_events` plus a one-time activation timestamp (`INSERT OR IGNORE`). |
 | Destructive (drop/rename/incompatible) | Do not ship until a restore drill exists. Prefer expand/contract. If shipped, rollback is **restore pre-update backup + previous image**, not “run the old image on the new schema.” |
 | Failure mid-migrate | Container unhealthy. Stop the bad process. Restore the pre-update zip into the same volumes. Start the previous image. |
 | Schema vs app | Health `schemaVersion` must match the journal tag the image was built with. |

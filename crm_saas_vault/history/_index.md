@@ -2,7 +2,7 @@
 type: index
 status: historical
 area: process
-updated: 2026-10-02
+updated: 2026-10-14
 tags:
   - history
   - saas
@@ -42,6 +42,7 @@ Closeouts, superseded roadmaps, and dated snapshots live here so agents do not t
 - [[history/WO-2026-10-02-qa-ticketing-platform-return]] — Control Plane unified ticketing + non-PROD Martial Arts QA runner (code-shipped; not a platform milestone; not owner-accepted Successful)
 - [[history/WO-2026-10-02-qa-ticketing-operational-proof-return]] — live `lab-acme-dev` QA proof, runner tuning, and real finding-to-ticket evidence
 - [[history/WO-2026-10-03-ma-ui-ux-audit-return]] — deep Martial Arts CRM UI/UX audit, persisted findings, evidence, and limitations
+- [[history/WO-2026-10-03-ma-qa-remediation-return]] — seven audit findings triaged, fixed, regression-tested, deployed to `lab-acme-dev`, retested with persisted evidence, and resolved
 - [[history/WO-2026-09-27-sales-local-backup-return]] — Local Sales sqlite backup for the dogfood database (code-shipped; not fleet backup; email automation not included)
 - [[history/WO-2026-09-19-production-hosting-node-return]] — hosting-node / private Control Plane return (repository-complete; live VPS/DNS/TLS external; not official S7/S8)
 - [[history/WO-2026-09-18-ma-customer-1-sell-readiness-return]] — Martial Arts Customer #1 sell-readiness return (repository-complete; not a platform milestone)
@@ -51,7 +52,7 @@ Closeouts, superseded roadmaps, and dated snapshots live here so agents do not t
 - [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]] — B1 implementation return (evidence, not the live map)
 - [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]] — B2 implementation return (evidence, not the live map)
 - [[history/WO-2026-09-14-c2-product-instance-sales-catalog-return]] — C2 implementation return (evidence, not the live map)
-- [[wip/WO-2026-09-11-sales-predev-audit-return]] — 2026-09-11 Sales pre-development architecture audit (still in `wip/` for ChatGPT handoff; not the live map)
+- [[wip/archive/WO-2026-09-11-sales-predev-audit-return]] — 2026-09-11 Sales pre-development architecture audit (moved to `wip/archive/` 2026-10-14; not the live map)
 - [[history/Control_Plane_Bulk_Lifecycle_Return]]
 - [[history/Post_S4_Foundation_Decision_Closeout]] — why Map B became the official S-track
 
@@ -60,5 +61,6 @@ Closeouts, superseded roadmaps, and dated snapshots live here so agents do not t
 - [[history/Current_State_and_Fresh_Agent_Handoff_2026-09-11]] — superseded by [[Current-State]]
 - [[history/Clean_Starting_Point_Decision_Backlog]] — superseded by [[SaaS-Open-Questions]]
 - [[history/CRM_Core_Extraction_Implementation_Plan]] — C2+ narrative; remaining Core-domain units superseded 2026-09-17; not a license to start
+- [[history/Renzo-How-to-Run]] — Renzo-era `How-to-Run` (2026-09-07: Koi-Pi, `renzo-*` volumes). Moved 2026-10-14; superseded by the platform [[How-to-Run]]
 
 Renzo gym sequence and implementation narrative remain at the vault root as labeled evidence: [[Milestones]], [[Implementation-State]], [[Architecture]], [[Decisions]].

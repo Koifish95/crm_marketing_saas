@@ -13,7 +13,7 @@ authorized_scope: |
   behavior into Core.
 base_sha: 83506fc4f5aefc54ff65bfd3365081e16100526e
 decision_refs:
-- "wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet.md#Decisions-1-64"
+- "wip/archive/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet.md#Decisions-1-64"
 - ADR-CRM-Core-Vertical-Architecture
 durable_docs:
 - Current-State.md
@@ -58,7 +58,7 @@ Scott authorizes implementation of **B1 only** against repository
 
 This Work Order converts the owner-approved decisions in:
 
-`crm_saas_vault/wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet.md`
+`crm_saas_vault/wip/archive/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet.md`
 
 into implementation.
 
@@ -87,7 +87,7 @@ Before changing code:
     -   `crm_saas_vault/Current-State.md`
     -   `crm_saas_vault/Work-Order-Protocol.md`
     -   `crm_saas_vault/ADR-CRM-Core-Vertical-Architecture.md`
-    -   `crm_saas_vault/wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet.md`
+    -   `crm_saas_vault/wip/archive/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet.md`
     -   `crm_saas_vault/history/C2B_closeout.md`
     -   the Slice A return/closeout referenced by current state
 6.  Inspect the current `sales_template/` implementation, schema,

@@ -4,7 +4,7 @@ status: done
 id: WO-2026-09-11-si-sales-slice-a
 milestone: C2B
 decision_refs:
-  - "wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet"
+  - "wip/archive/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet"
   - "SaaS-Decisions#2026-09-11 — Official C2A is Successful"
   - "ADR-CRM-Core-Vertical-Architecture"
 base_sha: "cc31984e31c6911274085d2be241e8926f6b034d"
@@ -43,6 +43,6 @@ Return: [[history/WO-2026-09-11-si-sales-slice-a-return]].
 Original authorization text remains below for provenance.
 
 Authorized by Scott in the current Cursor chat. Authoritative decisions:
-[[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]].
+[[wip/archive/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]].
 
 Do not reuse or redefine C2. C2 remains Sales vertical **plus** CP product catalog and stays **not started**.

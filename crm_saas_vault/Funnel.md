@@ -11,6 +11,8 @@ tags:
 
 Immediate business objective ([[wip/archive/PROJCET_UPDATE_2026-08-26]]) remains the intro path. M9 adds upstream marketing operations; it does not replace Trial / FollowUpTask / Conversion.
 
+Public click-path measurement is [[Acquisition-Funnel-Analytics]]. It observes this path. It does not replace Trial or conversion records.
+
 ```text
 Marketing Campaign / Task / Content / Asset / Event
 → Tracking or public registration

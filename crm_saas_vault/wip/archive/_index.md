@@ -2,7 +2,7 @@
 type: index
 status: current
 area: process
-updated: 2026-09-19
+updated: 2026-10-14
 tags:
   - wip
   - archive
@@ -11,6 +11,13 @@ tags:
 # WIP archive
 
 Provenance only. Durable facts belong in permanent notes. Do not treat these files as the map.
+
+## Moved from `wip/` 2026-10-14 (processed)
+
+- [[wip/archive/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program]] · [[wip/archive/Control_Plane_Operator_Experience_and_Lifecycle_Milestone_Prompt]]
+- [[wip/archive/C2_Pre_Development_Audit_and_Decision_Worksheet]] · [[wip/archive/Pre_Development_Product_Architecture_Decision_Worksheet]]
+- [[wip/archive/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]] · [[wip/archive/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] · [[wip/archive/SI_Sales_B2_Pre_Development_Decision_Worksheet]]
+- [[wip/archive/WO-2026-09-11-sales-predev-audit]] · [[wip/archive/WO-2026-09-11-sales-predev-audit-return]]
 
 ## Specs and answers
 

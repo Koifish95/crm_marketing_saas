@@ -113,9 +113,22 @@ The workflow is successful only after the browser reaches a non-`new` lead-detai
 
 - Audit run: `b80cd8c9-1569-40ea-83be-953fc9ae4cbe` against registered `lab-acme-dev`; no product source or environment configuration was changed.
 - Coverage: 20 authenticated desktop route captures, 10 authenticated mobile route captures, and two public mobile routes. Thirty-one route attempts passed; the unpublished `/trial` route returned HTTP 404 and was recorded as a finding. Evidence contains 72 persisted records (screenshots, DOM snapshots, and finding evidence).
-- Findings: seven total, all `MEDIUM`: six `UX` and one `ACCESSIBILITY`. Six remain `NEW`; the missing level-one heading finding is a recurrence linked to `TKT-11AF0427`. No duplicate ticket was created.
+- Findings: seven total, all `MEDIUM`: six `UX` and one `ACCESSIBILITY`. They were subsequently triaged and remediated as described below. The missing level-one heading recurrence remained linked to `TKT-11AF0427`; no duplicate ticket was created.
 - Primary themes: actionability/dead ends (dashboard status cards and empty follow-up queue), inconsistent acquisition language (`intro`/`trial`), public booking mismatch, long mobile lead form, and platform-operation concepts exposed in the academy settings surface.
 - The run was read-only. No new lead, trial, attendance, conversion, or cancellation data was created. Four named disposable QA households from the prior operational proof remain in the isolated DEV database.
 - Limitations: populated follow-up completion and trial reschedule/attendance screens were reviewed from product behavior/source and existing evidence, but were not re-executed in this audit because the second browser interaction attempt was blocked by the local process-spawn restriction. Keyboard/screen-reader and automated contrast audits were not performed.
+
+## Martial Arts finding remediation proof (2026-10-03)
+
+- All seven audit findings were accepted. Six were converted to tickets through the finding-review API; the heading recurrence stayed linked to existing `TKT-11AF0427`. All preserve original run, environment, evidence, and activity history.
+- The verified implementation adds dashboard-to-filter drill-down, actionable empty Follow-up controls, a persistent mobile create action, an academy/operator Settings boundary, a useful unpublished public-booking state, consistent visible intro terminology, and a semantic record `h1`.
+- Full product verification passed: 75 test files / 355 tests, lint, typecheck, production build, and scoped diff check.
+- The verified image was rebuilt and only `lab-acme-dev` was recreated. The container returned healthy. No PROD command was run.
+- Standard read-only QA run `5a840850-ce7d-4856-93cc-5c77e5310c8f` completed with zero findings.
+- Targeted run `ba7db15b-9fae-4a3f-8c5e-760a60f36a87` persisted desktop/mobile screenshots for dashboard drill-down, empty Follow-up, Settings, mobile lead creation, public `/trial`, and the initial heading/terminology attempt.
+- The initial heading/terminology selector chose `/leads/new`; the stored route exposes the mistake and that evidence is not relied upon. Corrective run `89c446c6-a52d-4aa8-ae2a-bb161319c04d` verified one `h1` and intro terminology on actual detail `/leads/4`. Ticket comments identify the correction.
+- All seven tickets advanced through the supported lifecycle to DONE only after successful DEV checks. Remediation QA was read-only and created or changed no Martial Arts records.
+
+Remediation plan and results: [[Martial-Arts-QA-Remediation-Plan]]. Return: [[history/WO-2026-10-03-ma-qa-remediation-return]].
 
 Architecture and safety law: [[QA-Ticketing-Architecture]].

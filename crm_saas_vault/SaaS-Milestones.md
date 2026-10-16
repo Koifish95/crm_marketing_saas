@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-09-17
+updated: 2026-10-06
 aliases:
   - Platform milestones
   - Successful
@@ -203,6 +203,8 @@ Operator auth before the control plane leaves localhost. Image story for a secon
 
 Pre-S7 repository path (2026-09-19, **not** this Successful checkbox): one Linux hosting node, Control Plane still loopback-only, SSH tunnel for operators, generated public edge. See [[Hosting-Node-Architecture]]. Do not mark S7 Successful from that work.
 
+2026-10-06: a Nuxxion DigitalOcean VPS is already in use. The Control Plane has been reached through an SSH tunnel, and environment provisioning has been exercised. That does not check this box. A later live pass ([[Nuxxion-Production-Acceptance]]) proved Acme backup, restore, off-host recovery, upgrade, rollback, and a 2026-10-08 reboot. Operator login before the Control Plane leaves loopback remains open. Do not mark S7 Successful from that pass.
+
 ---
 
 ## S8 — Public Exposure
@@ -241,6 +243,8 @@ Sister business is the second real pilot. Beauty template is not started.
 
 - [ ] **S11 Successful:** A real academy that is not Renzo Kaysville is running on the production VPS, reachable, backed up for production, visible on the control plane, and you could relaunch it. You did not copy Renzo’s database to create them.
 
+Top Tier Hauling is the first committed external paying customer, on the Sales CRM. Revenue is not collected. S11 stays **Not started**. The academy sentence above is the existing Martial Arts-shaped milestone text. It does not describe Top Tier, and this pointer does not redefine the milestone. Record: [[customers/Top-Tier-Hauling]].
+
 ---
 
 ## C1 — CRM Core extraction
@@ -259,19 +263,19 @@ First local Sales CRM vertical consuming `@crm/core`, with Sales-owned CRM domai
 
 Status: **Successful** (2026-09-12). Owner-accepted after Scott’s browser QA at http://localhost:5040. Not S-track. Not C2. Not Slice B. C2B success does **not** authorize Slice B, C2, foundation-domain promotion, or SI migration.
 
-First operational SI sales workflow backbone on the C2A Sales app: Lead, explicit Convert, Opportunity Proposal/Quote → Decision → Won|Lost, activities, notes/history, ownership, Company/Opportunity workspaces. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. Journal `0001_thankful_lyja`. Feature `1ac18e4`. Evidence: [[history/C2B_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-11-si-sales-slice-a]]. Implementation return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. Decisions: [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]].
+First operational SI sales workflow backbone on the C2A Sales app: Lead, explicit Convert, Opportunity Proposal/Quote → Decision → Won|Lost, activities, notes/history, ownership, Company/Opportunity workspaces. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. Journal `0001_thankful_lyja`. Feature `1ac18e4`. Evidence: [[history/C2B_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-11-si-sales-slice-a]]. Implementation return: [[history/WO-2026-09-11-si-sales-slice-a-return]]. Decisions: [[wip/archive/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]].
 
 ## SI Sales B1 — Commercial model + acquisition foundation
 
 Status: **Successful** (2026-09-12). Owner-accepted after Scott’s browser QA at http://localhost:5040. Not S-track. Not C2. Not B2. B1 success does **not** authorize B2, C2, foundation-domain promotion, or SI migration.
 
-Sales-owned Sources, Campaigns (no primary source), Campaign+Source Tracking Links, captured/current attribution, configuration-driven public intake (`/inquire`, `/t/{token}`), Offers, Opportunity commercial lines (one-time + MRR), Company lifecycle, `won_at` / `lost_at`, baseline reporting. Journal `0002_cheerful_firebrand`. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. Feature `40851e0`. Evidence: [[history/B1_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]]. Implementation return: [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]]. Decisions: [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]].
+Sales-owned Sources, Campaigns (no primary source), Campaign+Source Tracking Links, captured/current attribution, configuration-driven public intake (`/inquire`, `/t/{token}`), Offers, Opportunity commercial lines (one-time + MRR), Company lifecycle, `won_at` / `lost_at`, baseline reporting. Journal `0002_cheerful_firebrand`. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. Feature `40851e0`. Evidence: [[history/B1_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b1-commercial-acquisition]]. Implementation return: [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]]. Decisions: [[wip/archive/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]].
 
 ## SI Sales B2 — Proposal system
 
 Status: **Successful** (2026-09-13). Owner-accepted after Scott’s core B2 owner QA, 2026-09-13 refinements, and final regression QA at http://localhost:5040. Not S-track. Not C2. B2 success does **not** authorize C2, foundation-domain promotion, e-sign, email send, or SI migration.
 
-Sales-owned Proposal chain per Opportunity, sequential immutable revisions, Issue snapshots, Mark Sent (`sent_at`, no mailer), staff-recorded Accepted/Declined (no auto-Won), optional valid-through display, instance letterhead, HTML preview, PDFKit PDFs, local `data/proposals/` artifacts, optional signed upload, historical revision selection from the Opportunity card. Journal `0003_clammy_shocker`. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. Feature `84c0cc8`; refinements `c2d611e`; revision-selection `0be7e06`. Evidence: [[history/B2_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system]]. Implementation return: [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]]. Decisions: [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] B2-01–B2-06 plus Slice B 22–31 / 50–51.
+Sales-owned Proposal chain per Opportunity, sequential immutable revisions, Issue snapshots, Mark Sent (`sent_at`, no mailer), staff-recorded Accepted/Declined (no auto-Won), optional valid-through display, instance letterhead, HTML preview, PDFKit PDFs, local `data/proposals/` artifacts, optional signed upload, historical revision selection from the Opportunity card. Journal `0003_clammy_shocker`. Path remains `sales_template/` / `sales-crm` on http://localhost:5040. Feature `84c0cc8`; refinements `c2d611e`; revision-selection `0be7e06`. Evidence: [[history/B2_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-12-si-sales-b2-proposal-system]]. Implementation return: [[history/WO-2026-09-12-si-sales-b2-proposal-system-return]]. Decisions: [[wip/archive/SI_Sales_B2_Pre_Development_Decision_Worksheet]] B2-01–B2-06 plus Slice B 22–31 / 50–51.
 
 ## C2 — Sales as second product + CP catalog
 

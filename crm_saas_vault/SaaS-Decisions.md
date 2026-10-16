@@ -2,7 +2,7 @@
 type: decision
 status: current
 area: process
-updated: 2026-10-02
+updated: 2026-10-14
 tags:
   - adr
   - saas
@@ -24,6 +24,85 @@ Decision: what we chose
 ```
 
 ---
+
+---
+
+## 2026-10-14 — Operator VPS helper and platform How-to-Run
+
+Status: accepted (Scott asked in chat 2026-10-14)
+
+Context: Reaching the live Control Plane meant remembering an SSH tunnel command, and there was no quick way to see whether `sic-control-plane` was up. `How-to-Run.md` at the vault root was still the 2026-09-07 Renzo/Koi-Pi note.
+
+Decision:
+
+- `tools/vps.mjs` (`pnpm vps` from the repo root) is the operator helper: SSH test, status, start / stop / restart of systemd `sic-control-plane`, and the 52100 tunnel. Node only, no dependencies, uses the system `ssh`. It must never run Docker or touch customer environments. Host, user, and key path live in gitignored `tools/vps.config.json`; `tools/vps.config.example.json` is committed.
+- `How-to-Run.md` is now the platform run guide with a Control Plane TL;DR at the top. The Renzo-era note moved to [[history/Renzo-How-to-Run]].
+- This is operator tooling, not S7. The Control Plane stays loopback-only.
+
+---
+
+## 2026-10-08 — Production hosting gate is ready; reboot does not need the owner present
+
+Status: accepted
+
+Context: Off-host recovery and upgrade/rollback were already live-proven on Acme. The remaining production-acceptance blocker was a VPS reboot the runbook required Scott to attend. On 2026-10-08 the host was rebooted with `systemd-run` and recovered over SSH.
+
+Decision:
+
+- The hosting gate is **READY FOR TOP TIER**. Do not provision Top Tier from this decision. Website intake and a later authorization are still required.
+- S7 and S8 stay Not started.
+- A production reboot no longer waits for the owner to be present. If SSH does not return, stop and use the DigitalOcean droplet console. That console has not been tested.
+- This supersedes the “not ready” conclusion in the 2026-10-06 acceptance decision. Evidence: [[Nuxxion-Production-Acceptance]].
+
+---
+
+## 2026-10-06 — Production acceptance did not clear Top Tier provisioning
+
+Status: superseded
+
+Context: The existing Nuxxion VPS was exercised with Acme, not Top Tier. On-host backup and restore worked. Off-host upload is failing, and upgrade, image rollback, and reboot were not proven.
+
+Decision:
+
+- Do not provision Top Tier Hauling on the strength of this pass.
+- S7 and S8 stay Not started.
+- Evidence: [[Nuxxion-Production-Acceptance]].
+
+---
+
+## 2026-10-06 — Top Tier Hauling is the first committed external customer
+
+Status: accepted
+
+Context: Top Tier Hauling agreed to pay once their website contact/request form creates the required CRM records and the workflow is usable. That is a commitment. Money has not been collected. The same reconciliation found the canonical map still saying a VPS had to be obtained. A Nuxxion DigitalOcean VPS is already in use.
+
+Decision:
+
+- Top Tier Hauling is the first committed external paying customer. The product is the Sales CRM unless a later decision says otherwise.
+- Customer #1 revenue is collected only when the agreed workflow is operational, Top Tier accepts it, an invoice or subscription begins, and money is received. A commitment is not revenue.
+- Immediate priority is Top Tier onboarding, production reliability, the capabilities that workflow needs, and the documentation that makes the next onboarding repeatable. Unrelated feature development is frozen.
+- Strategic Insights remains the internal Sales dogfood user. Martial Arts Customer #1 sell-readiness remains a separate track.
+- The Nuxxion VPS already exists. Operators have used the Control Plane there through an SSH tunnel and have provisioned environments. Obtaining a VPS is not an open blocker.
+- That use is not S7 or S8 Successful. Formal live validation is still required for DNS, TLS, edge routing, reboot recovery, backup and restore, off-host backup, and the rest of the production lifecycle. The bootstrap runbook’s Acme hostname record was not re-checked in this decision.
+- This decision does not authorize provisioning Top Tier, website integration, VPS changes, or any product change.
+
+Record: [[customers/Top-Tier-Hauling]].
+
+---
+
+## 2026-10-06 — Martial Arts acquisition funnel stays in the instance database
+
+Status: accepted
+
+Context: Renzo proved a first-party public acquisition funnel. The reusable Martial Arts product needs the same measurement for every provisioned environment. The Control Plane already owns tickets and fleet lifecycle, which is not a place for customer browsing events.
+
+Decision:
+
+- Acquisition funnel events, the anonymous journey cookie, and `acquisition_funnel_activated_at` belong to the Martial Arts product database for that environment.
+- DEV and PROD stay isolated because they are already separate databases. The Control Plane does not copy funnel rows between them.
+- New and upgraded Martial Arts instances receive the schema from the product migration journal at container start. There is no per-customer analytics install step.
+- Trial attended and Joined stay on canonical Trial and conversion records.
+- Do not copy Renzo households, slugs, addresses, phone numbers, or that database’s activation timestamp into the product.
 
 ---
 

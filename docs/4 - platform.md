@@ -64,7 +64,7 @@ They share **application infrastructure** (login cookies, user table framework, 
 | Public capture | `/trial` intro class booking | `/inquire` form (off by default) |
 | Money | Membership offering MRR on convert | Opportunity lines: one-time + monthly |
 | Image | `martial-arts-acquisition:s4` (provisioned) | `crm-sales:c2` |
-| Schema journal | Product-owned (`0020_tidy_frog_thor` on health) | Product-owned (`0004_sales_v1_dogfood` on health) |
+| Schema journal | Product-owned (`0021_cheerful_lethal_legion` on health) | Product-owned (`0006_sales_prospect_outreach` on health) |
 
 A “universal CRM” with a Martial Arts skin would force one Lead model. The two products already proved those models diverge. Beauty, if ever authorized, would be a **third product**, not a configuration flag.
 
@@ -147,7 +147,7 @@ SIC backups (Control Plane Backup tab and `/backups`):
 
 - Zip of sqlite (VACUUM INTO, integrity-checked) + uploads
 - 14-day retention on the node
-- Off-host copy = operator pastes an **existing folder path** (no cloud vendor in the product)
+- Off-host copy = operator pastes an **existing folder path**, or a node script records an `rclone` `remote:path` it already verified. No cloud vendor is built into the product. On the Nuxxion VPS a nightly job (02:30 UTC) uploads every PROD backup to Google Drive through `rclone`
 - Restore is selectable by backup id; never silent “latest”
 
 Martial Arts Admin **Settings → Environment** can download/restore a sqlite file **inside the app**. That is a customer-admin copy tool, not a substitute for Control Plane fleet backup. See [Safety](10 - safety.md).
@@ -156,7 +156,7 @@ Martial Arts Admin **Settings → Environment** can download/restore a sqlite fi
 
 ## Public hostnames and production edge
 
-**Implemented in the repository. Live public HTTPS on a paying customer host is not official S7/S8.**
+**Implemented and live on the Nuxxion VPS for the Acme test customer (`https://acme.nuxxion.com`, Let’s Encrypt). No paying customer is on it yet. Not official S7/S8.**
 
 When SIC assigns a PROD hostname in the Control Plane:
 

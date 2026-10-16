@@ -2,7 +2,7 @@
 type: note
 status: current
 area: architecture
-updated: 2026-09-19
+updated: 2026-10-14
 aliases:
   - Hosting node
   - VPS hosting
@@ -85,7 +85,8 @@ Both use **local Docker** on the same machine as the Control Plane. There is no 
 - Listen: `127.0.0.1:52100` (`NITRO_HOST` / `NITRO_PORT`).
 - Middleware refuses non-loopback clients.
 - Do not publish 52100 on the public firewall.
-- Remote operators: `ssh -N -L 52100:127.0.0.1:52100 user@vps`, then browse `http://127.0.0.1:52100` on the laptop.
+- Remote operators: `ssh -N -L 52100:127.0.0.1:52100 user@vps`, then browse `http://127.0.0.1:52100` on the laptop. From the repo root, `pnpm vps tunnel` does the same ([[How-to-Run]]).
+- Process: systemd `sic-control-plane` (`deploy/hosting-node/sic-control-plane.service`), enabled at boot, `Restart=on-failure`.
 - Do not put the Control Plane in the public nginx config.
 
 ---
@@ -117,11 +118,14 @@ Derived from the repository at `ec16eb90a6b945b54529e7fb10580dd606592b00`. Statu
 | EDGE-10 | CP | Decommission does not refresh edge | Removing an env drops its vhost | Stale hostname could route to a dead port | Wrong customer risk | Regenerated nginx after decommission | Unit test | SUCCESS |
 | BAK-01 | BACKUP | Fleet zips customer apps; CP sqlite is not snapshotted | Hosting node can snapshot Control Plane registry | Node loss loses customer metadata | Unrecoverable inventory | VACUUM INTO CP sqlite + runbook | Unit test | SUCCESS |
 | BAK-02 | BACKUP | Off-host copy path exists; no provider credentials | Document rsync/rclone plug for zips + CP snapshot | Off-host remains operator-configured | Acceptable until credentials exist | Runbook only | Docs | SUCCESS |
-| REL-01 | RELEASE | Health already reports `releaseId` / image; upgrade gated | Same model on the VPS | None beyond hostname/bind | — | Keep existing upgrade | Existing S6 tests | SUCCESS |
+| REL-01 | RELEASE | 2026-10-07 04:35 UTC: Acme DEV built image B, PROD started that digest, PROD rollback returned digest A and its backup | Upgrade then rollback restores the previous digest and the matching backup | None for this path | Mutable tag `:s4` still moves on build; rollback must use the digest | Re-run only with a new work order | [[Nuxxion-Production-Acceptance]] | LIVE-PROVEN |
 | DEC-01 | OPS | Decommission already `compose rm` without `-v` | Same on VPS; never prune | None | — | Keep existing decommission | Existing tests | SUCCESS |
-| TLS-LIVE | TLS | No public DNS | Let's Encrypt HTTP-01 against a real hostname | External DNS/VPS | Cannot prove public issuance here | Repo workflow complete; live BLOCKED | Scott creates DNS + VPS | BLOCKED |
-| DNS-LIVE | DNS | No registrar access in Cursor | A/AAAA for temporary SIC hostname | External | Cannot route Internet traffic | Scott DNS | Scott | BLOCKED |
-| VPS-LIVE | HOST | No VPS credentials in Cursor | Ubuntu 24.04 droplet/VPS | External | Cannot boot a real node here | Scott provisions VPS, runs bootstrap | Scott | BLOCKED |
-| OFFHOST-LIVE | BACKUP | No off-host credentials | Copy backups off the node | External | Off-node disaster recovery | Scott supplies destination | Scott | BLOCKED |
+| TLS-LIVE | TLS | Live check 2026-10-15 UTC: `https://acme.nuxxion.com/api/health` 200, certificate verifies, Let’s Encrypt `YE2`, notAfter 2026-12-24. Renew cron 03:20 UTC | Owner-accepted live HTTPS | No S8 closeout | Healthy today; renewal not yet observed | Watch the first renewal, then S8 acceptance | Live curl + `openssl s_client` on the node | LIVE-CHECKED, NOT S8 |
+| DNS-LIVE | DNS | `acme.nuxxion.com` resolves to and is served by `157.245.136.47` (2026-10-15 HTTPS check) | Owner-accepted public DNS | No S8 closeout | A working A record is not S8 | S8 acceptance | Live HTTPS check | LIVE-CHECKED, NOT S8 |
+| VPS-LIVE | HOST | Nuxxion DigitalOcean VPS `ubuntu-s-2vcpu-4gb-nyc1` (node `nuxxion-vps-1`) runs the Control Plane under systemd; Acme PROD/DEV provisioned; reboot recovery proven 2026-10-08 | That use, recorded without calling S7 Successful | Checkout is `47159a0` plus uncommitted Control Plane files ([[How-to-Run#VPS layout (live, checked 2026-10-15 UTC)]]) | Running Control Plane is not reproducible from GitHub until committed | Commit and push, then align the VPS checkout. Keep S7 open | [[Nuxxion-Production-Acceptance]], live SSH 2026-10-15 | LIVE-PROVEN HOST, NOT S7 |
+| OPS-HELPER | OPS | `pnpm vps` (`tools/vps.mjs`) on Scott’s PC: SSH test, service status, start/stop/restart `sic-control-plane`, tunnel | Operator can recover a stopped Control Plane without remembering commands | None | — | — | Exercised live 2026-10-15 (test, status, restart, stop, start, tunnel) | SUCCESS |
+| OFFHOST-LIVE | BACKUP | 2026-10-07 03:53 UTC: nightly job OK `nuxxion-dr:20261007_035256`. Acme DEV backup `72f0069c-9d7f-4e5a-9c30-e7c98d5c821e` was retrieved from Drive and restored | Retrieved off-host copy restores a disposable environment | None for this path | A later token expiry would block the next night | Re-run the off-host job if `offhost-status.txt` is not `OK` | [[Nuxxion-Production-Acceptance]] | LIVE-PROVEN |
+
+On Acme, the node has live-proven backup and restore, off-host recovery, upgrade and digest rollback, reboot recovery, and public HTTPS ([[Nuxxion-Production-Acceptance]], hosting gate **READY FOR TOP TIER** 2026-10-08). That is still not S7 (operator login) or S8 (owner-accepted product domain). Do not mark either Successful from these rows.
 
 Laptop workflow stays: default node `laptop`, localhost access URLs, existing lab-acme seed. VPS is an explicit node kind, not scattered OS conditionals.

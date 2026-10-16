@@ -639,7 +639,7 @@ Use this when you are about to put a laptop change on the website. Dataview can 
 | [[Workspace]] | Three remotes, locked host, hard stops |
 | [[Deploy-Workflow]] | Short version of the loop |
 | [[Operations-PRODUCTION-SQLite]] | Safe vs destructive table |
-| [[How-to-Run]] | Laptop `pnpm` and laptop Docker |
+| [[history/Renzo-How-to-Run|How-to-Run (Renzo)]] | Laptop `pnpm` and laptop Docker |
 | [[Architecture]] | App stack and public-edge shape |
 | [[Implementation-State]] | What is live vs not started |
 | [[Decisions]] | DNS/TLS, sibling-vs-drop-in, sqlite preservation |

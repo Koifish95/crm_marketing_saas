@@ -36,7 +36,7 @@ durable_docs:
 
 # Control Plane operator experience & lifecycle
 
-Scott authorized this chat and the governing prompt in `crm_saas_vault/wip/Control_Plane_Operator_Experience_and_Lifecycle_Milestone_Prompt.md`.
+Scott authorized this chat and the governing prompt in `crm_saas_vault/wip/archive/Control_Plane_Operator_Experience_and_Lifecycle_Milestone_Prompt.md`.
 
 **Successful criteria:** owner acceptance vs code-shipped. Do not mark a platform milestone Successful. The operator standard in the prompt is the implementation bar.
 

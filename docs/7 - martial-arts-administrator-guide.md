@@ -88,7 +88,7 @@ Configure:
 
 **Afterward:** Public `/trial` and staff scheduling show the new slots.
 
-**Notes:** This is **intro / trial** availability, not the academy’s full class schedule.
+**Notes:** This is **intro-class** availability, not the academy’s full class schedule.
 
 ---
 
@@ -96,9 +96,10 @@ Configure:
 
 On the Settings home you can also set:
 
-- **Allow early trial outcomes** — whether staff may record attended/no-show before the class time.
+- **Allow early intro outcomes** — whether staff may record attended/no-show before the class time.
 - **Tracked acquisition owner** — compensation credit default (marketing compensation, not payroll accounting).
-- Process controls (restart is disabled unless SIC set `APP_RESTART_ENABLED` on the process).
+
+Host paths, database restore, restart, and shutdown are intentionally not academy settings. Ask the platform operator to use the Control Plane for environment operations.
 
 ---
 
@@ -107,26 +108,23 @@ On the Settings home you can also set:
 - **Settings → Campaigns** redirects into Marketing campaign planning.
 - **Settings → Meta** — read-only Marketing API **sync** and explicit campaign mapping. It does **not** publish posts. Live pull needs `META_ACCESS_TOKEN` / ad account in the environment (SIC). Token permission is `ads_read`. After env changes, restart, then **Sync Meta data**.
 - Campaign tracking links and `/t/{slug}` style public entry are campaign tools, not a second CRM.
+- Campaign → Performance → Acquisition funnel counts instrumented public journeys for that environment. It turns on with the product migration. It does not rewrite older households.
 
 ---
 
-## Public trial / intake
+## Public intro intake
 
-Public intro is `/trial`. It uses Intro availability + catalog programs. There is no separate “turn off /trial” toggle documented as a Settings switch in the same way Sales has public intake off-by-default — treat `/trial` as on for a live academy unless SIC has unpublished the route at the host.
+Public intro booking is `/trial`. It uses Intro availability + catalog programs. When no times are published, the route remains available with an honest “online booking unavailable” state and contact guidance instead of a booking form. Measurement of that page fails open: a broken analytics write does not block a booking.
 
 Public events: `/events/{slug}` for published acquisition events.
 
 ---
 
-## Environment backup inside the app (`/settings/environment`)
+## Environment operations
 
-**When:** You want a sqlite file copy for your own records, or SIC asked you to download before a copy.
+Academy administrators do not operate SQLite paths, restore files, or process controls from the Martial Arts Settings UI. `/settings/environment` returns to `/settings`.
 
-This is **not** the Control Plane fleet backup.
-
-**Steps:** Download the database file. Restore requires typing the environment name (`dev` / `stage` / `production`) as confirmation.
-
-**Notes:** Restoring **replaces** this environment’s data. Do not restore a DEV file onto PROD. Prefer asking SIC to use Control Plane restore / PROD→DEV copy-down. See [Safety](10 - safety.md).
+For backup, restore, restart, shutdown, or environment details, contact the platform operator. Operators use the Control Plane and its environment-specific safety gates. See [Safety](10 - safety.md).
 
 ---
 

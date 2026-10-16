@@ -78,8 +78,8 @@ Before implementation:
 3. Read the canonical bootstrap/project-state files under `crm_saas_vault/`.
 4. Read:
 
-   * `crm_saas_vault/wip/Pre_Development_Product_Architecture_Decision_Worksheet.md`
-   * `crm_saas_vault/wip/WO-2026-09-11-sales-predev-audit-return.md`
+   * `crm_saas_vault/wip/archive/Pre_Development_Product_Architecture_Decision_Worksheet.md`
+   * `crm_saas_vault/wip/archive/WO-2026-09-11-sales-predev-audit-return.md`
    * current C1/Core architecture documentation
    * current Work Order protocol
 5. Inspect current implementation before assuming paths or APIs from this Work Order remain exact.

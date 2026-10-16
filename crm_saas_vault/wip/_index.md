@@ -2,7 +2,7 @@
 type: index
 status: current
 area: process
-updated: 2026-09-19
+updated: 2026-10-14
 tags:
   - wip
 ---
@@ -21,15 +21,20 @@ None.
 
 ## Current communication (not a work order)
 
-- [[wip/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program]] — executed 2026-09-19. Return: [[history/WO-2026-09-19-pre-vps-product-quality-return]]. **Not** a work order.
+None. On 2026-10-14 every item that had been sitting here was already processed, so all of them moved to `wip/archive/`. They are listed below as evidence only.
 
-- [[wip/C2_Pre_Development_Audit_and_Decision_Worksheet]] — C2 pre-development audit. Owner decisions **C2-01 B, C2-02 B, C2-03 A, C2-04 A, C2-05 A, C2-06 A** recorded 2026-09-14. **Planning-ready.** **Not** a work order. Does **not** authorize implementation.
-- [[wip/SI_Sales_B2_Pre_Development_Decision_Worksheet]] — SI Sales **B2** pre-development worksheet. Decisions **B2-01 through B2-06 complete**. Evidence. **Not** a work order.
-- [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] — SI Sales Slice B pre-development worksheet. Decisions **1–64 complete**. Used as B1 decision truth. **Not** a work order.
-- [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]] — SI Sales product refinement pre-development worksheet (Slice A decisions; completed). **Not** a work order.
-- [[wip/WO-2026-09-11-sales-predev-audit-return]] — Sales pre-development architecture audit return (`status: done`). Investigation evidence. **Not** the live map.
-- [[wip/WO-2026-09-11-sales-predev-audit]] — matching audit work order (`status: done`).
-- [[wip/Pre_Development_Product_Architecture_Decision_Worksheet]] — Scott checkbox worksheet. Clerical completion boxes ticked after the audit. Checking boxes still does **not** authorize implementation.
+## Archived 2026-10-14 (evidence, not current)
+
+- [[wip/archive/Control_Plane_Operator_Experience_and_Lifecycle_Milestone_Prompt]] — executed 2026-09-20. Return: [[history/WO-2026-09-19-cp-operator-experience-return]].
+- [[wip/archive/CRM_SaaS_Pre_VPS_Product_Quality_and_Release_Readiness_Program]] — executed 2026-09-19. Return: [[history/WO-2026-09-19-pre-vps-product-quality-return]]. **Not** a work order.
+
+- [[wip/archive/C2_Pre_Development_Audit_and_Decision_Worksheet]] — C2 pre-development audit. Owner decisions **C2-01 B, C2-02 B, C2-03 A, C2-04 A, C2-05 A, C2-06 A** recorded 2026-09-14. **Planning-ready.** **Not** a work order. Does **not** authorize implementation.
+- [[wip/archive/SI_Sales_B2_Pre_Development_Decision_Worksheet]] — SI Sales **B2** pre-development worksheet. Decisions **B2-01 through B2-06 complete**. Evidence. **Not** a work order.
+- [[wip/archive/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] — SI Sales Slice B pre-development worksheet. Decisions **1–64 complete**. Used as B1 decision truth. **Not** a work order.
+- [[wip/archive/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]] — SI Sales product refinement pre-development worksheet (Slice A decisions; completed). **Not** a work order.
+- [[wip/archive/WO-2026-09-11-sales-predev-audit-return]] — Sales pre-development architecture audit return (`status: done`). Investigation evidence. **Not** the live map.
+- [[wip/archive/WO-2026-09-11-sales-predev-audit]] — matching audit work order (`status: done`).
+- [[wip/archive/Pre_Development_Product_Architecture_Decision_Worksheet]] — Scott checkbox worksheet. Clerical completion boxes ticked after the audit. Checking boxes still does **not** authorize implementation.
 
 C2A work order and return were archived after owner acceptance: [[wip/archive/WO-2026-09-11-sales-thin-slice]], [[history/WO-2026-09-11-sales-thin-slice-return]], [[history/C2A_closeout]].
 

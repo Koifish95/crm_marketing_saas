@@ -21,7 +21,7 @@ durable_docs_updated:
 
 # C2 return — Product Instances + Sales catalog
 
-**Not the live map.** Live map: [[Current-State]]. Successful closeout: [[history/C2_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog]]. Worksheet: [[wip/C2_Pre_Development_Audit_and_Decision_Worksheet]]. Owner QA: [[history/C2_owner_qa]].
+**Not the live map.** Live map: [[Current-State]]. Successful closeout: [[history/C2_closeout]]. Work order (archived): [[wip/archive/WO-2026-09-14-c2-product-instance-sales-catalog]]. Worksheet: [[wip/archive/C2_Pre_Development_Audit_and_Decision_Worksheet]]. Owner QA: [[history/C2_owner_qa]].
 
 This file is implementation evidence. It retains the code-ship and QA-remediation narrative. C2 is **Successful** as of 2026-09-15 — see the closeout.
 

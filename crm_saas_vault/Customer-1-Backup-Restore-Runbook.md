@@ -20,7 +20,7 @@ tags:
 - Control Plane fleet zip: `control_plane/data/backups/{customerId}/{environmentId}/`
 - In-app PRODUCTION scheduler writes under `APP_BACKUP_DIR` (provisioned default `/app/data/sqlite/backups`)
 
-Retention: 14 days. Off-host survival: Control Plane **Copy off-host** to an existing folder, or copy that folder to operator-controlled storage.
+Retention: 14 days. Off-host survival: Control Plane **Copy off-host** to an existing folder, or copy that folder to operator-controlled storage. On the Nuxxion VPS, `/usr/local/sbin/sic-offhost-backup` (02:30 UTC) uploads every PROD backup plus env file and registry snapshot to `nuxxion-dr:` with `rclone` and records the path only after `rclone check` ([[Hosting-Node-Bootstrap-Runbook#Backup]]).
 
 ## Create a backup
 

@@ -2,7 +2,7 @@
 type: reference
 status: current
 area: process
-updated: 2026-09-17
+updated: 2026-10-14
 aliases:
   - How we work
   - Vault vs wip
@@ -133,12 +133,12 @@ Orientation: [[Current-State]]. Official S-track: [[SaaS-Milestones]]. S0–S6 a
 
 ## What we do not do next
 
-- Start C3, Beauty, Option C, or VPS/S7
+- Start C3, Beauty, Option C, or official S7 (the Nuxxion VPS is already in use; that is not S7)
 - Treat C2 closeout as authorization for Beauty, e-sign, CRM email, or SI migration
 - Promote Leads/Campaigns/Follow-ups into `@crm/core`, implement a Core migrator, rename/split `@crm/core`, or move products into `apps/`
 - Add browser e-sign, CRM email send, or a customer portal
 - Start DNS / TLS / public hostnames (official S8)
-- Start VPS cutover, operator auth, or an image registry (official S7)
+- Start operator auth, a public Control Plane, or an image registry (official S7). Operating the existing VPS through the SSH tunnel and `pnpm vps` is normal work
 - Add `tenant_id` to a product CRM
 - Start Stripe, self-service signup, or a beauty-variant design
 - Touch Koi-Pi PRODUCTION SQLite or `Projects/renzo_crm`

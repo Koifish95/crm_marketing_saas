@@ -22,7 +22,7 @@ Cursor may change Sales (or any other product) code only after a separate active
 
 B2-01 through B2-06 are owner-approved (2026-09-12). Do not promote answers from this file into [[SaaS-Decisions]] or ADRs until a follow-up says to promote. Checking boxes still does **not** authorize implementation.
 
-Prior Slice B decisions: [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] (Decisions 1–64). B1 closeout: [[history/B1_closeout]]. B1 return: [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]].
+Prior Slice B decisions: [[wip/archive/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] (Decisions 1–64). B1 closeout: [[history/B1_closeout]]. B1 return: [[history/WO-2026-09-12-si-sales-b1-commercial-acquisition-return]].
 
 ---
 
@@ -93,7 +93,7 @@ Martial Arts has `data/uploads` + `assets` table (marketing files). Pattern evid
 
 ## 4. Existing owner decisions inherited by B2
 
-**Do not ask Scott these again.** Authority: [[wip/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] unless noted.
+**Do not ask Scott these again.** Authority: [[wip/archive/SI_Sales_Slice_B_Pre_Development_Decision_Worksheet]] unless noted.
 
 ### Already decided (proposal core)
 

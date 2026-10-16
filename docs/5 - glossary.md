@@ -5,7 +5,7 @@ Short, precise meanings as used in **this** platform. Related: [Overview](2 - pr
 | Term | Meaning |
 |---|---|
 | **SIC** | Strategic Insights Consulting — the platform operator (and the primary Sales CRM user). |
-| **Control Plane** | Private operator app at `127.0.0.1:52100`. Not customer Admin. No operator login in the current slice. Nav: Dashboard, Customers, Products, Environments, Backups, Reports, Hosting Nodes, Settings. |
+| **Control Plane** | Private operator app at `127.0.0.1:52100`. Not customer Admin. No operator login in the current slice. Nav: Dashboard, Customers, Products, Environments, Tickets, QA Runs, Backups, Reports, Hosting Nodes, Settings. On the Nuxxion VPS, reach it with `pnpm vps tunnel`. |
 | **Customer Account** | Commercial relationship. May own multiple product instances. |
 | **Product Instance** | One product under an account (Martial Arts **or** Sales). Owns PROD+DEV. |
 | **Product** | Independently owned app: Martial Arts, Sales. Beauty is not started. |

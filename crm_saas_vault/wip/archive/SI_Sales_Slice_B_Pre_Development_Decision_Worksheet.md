@@ -21,7 +21,7 @@ Cursor may change Sales (or any other product) code only after a separate active
 
 Do not promote answers from this file into [[SaaS-Decisions]] or ADRs until Scott has completed the checkboxes **and** a follow-up says to promote.
 
-Prior completed twin: [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]]. ChatGPT draft input for this file was reviewed against Git on `working` at the SHA below.
+Prior completed twin: [[wip/archive/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]]. ChatGPT draft input for this file was reviewed against Git on `working` at the SHA below.
 
 ---
 
@@ -47,7 +47,7 @@ Prior completed twin: [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision
 
 ## 2. Repository reconciliation
 
-Inspected: [[Current-State]], [[project-state.yaml]], [[SaaS-Milestones]], [[SaaS-Decisions]], [[ADR-CRM-Core-Vertical-Architecture]], [[Platform-Architecture]], [[Work-Order-Protocol]], [[history/C2B_closeout]], [[history/WO-2026-09-11-si-sales-slice-a-return]], [[wip/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]], `sales_template/` schema/services/pages/dashboard, Martial Arts `campaigns` / `campaign_tracking_links` / UTM attribution as **comparison evidence only**.
+Inspected: [[Current-State]], [[project-state.yaml]], [[SaaS-Milestones]], [[SaaS-Decisions]], [[ADR-CRM-Core-Vertical-Architecture]], [[Platform-Architecture]], [[Work-Order-Protocol]], [[history/C2B_closeout]], [[history/WO-2026-09-11-si-sales-slice-a-return]], [[wip/archive/SI_Sales_Product_Refinement_Pre_Development_Decision_Worksheet]], `sales_template/` schema/services/pages/dashboard, Martial Arts `campaigns` / `campaign_tracking_links` / UTM attribution as **comparison evidence only**.
 
 ### What Slice A currently implements
 

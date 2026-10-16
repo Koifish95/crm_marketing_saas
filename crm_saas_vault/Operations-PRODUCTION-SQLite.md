@@ -139,7 +139,7 @@ Copying between these worlds is a **deliberate restore**, never a side effect of
 
 ## Related notes
 
-- [[How-to-Run]]
+- [[history/Renzo-How-to-Run|How-to-Run (Renzo)]]
 - [[Deploy-Workflow]]
 - [[Database]]
 - [[Decisions#2026-09-07 — Preserve Koi-Pi PRODUCTION SQLite on every deploy]]
