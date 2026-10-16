@@ -195,6 +195,20 @@ html[data-app-env="stage"] {
     @apply font-semibold text-muted;
   }
 
+  .table-flush {
+    @apply -mx-4 rounded-none border-0 bg-transparent sm:-mx-6;
+  }
+
+  .table-flush .data-table th:first-child,
+  .table-flush .data-table td:first-child {
+    @apply pl-4 sm:pl-6;
+  }
+
+  .table-flush .data-table th:last-child,
+  .table-flush .data-table td:last-child {
+    @apply pr-4 sm:pr-6;
+  }
+
   .data-table td.num,
   .data-table th.num {
     @apply text-right tabular-nums whitespace-nowrap;

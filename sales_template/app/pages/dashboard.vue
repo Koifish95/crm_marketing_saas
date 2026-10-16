@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatUsdFromCents } from '#shared/utils/money'
+import { NuxtLink } from '#components'
 import { REPORT_RANGE_PRESETS } from '#shared/utils/catalog'
 import { activityTypeLabel, leadStageLabel, opportunityStageLabel } from '#shared/utils/pipeline'
 
@@ -65,6 +65,65 @@ function pct(value: number | null) {
   }
   return `${Math.round(value * 1000) / 10}%`
 }
+
+function usd(cents: number) {
+  return `$${(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+
+const sourceRows = computed(() => (data.value?.sources ?? [])
+  .filter(row => row.leads || row.opportunities || row.wonCount || row.name === 'Unattributed'))
+
+const metricGroups = computed(() => {
+  const d = data.value
+  if (!d) {
+    return []
+  }
+  return [
+    {
+      title: 'Leads (current)',
+      to: '/leads',
+      rows: [
+        { label: 'New', value: d.current.leadsByStage.new },
+        { label: 'Contacted', value: d.current.leadsByStage.contacted },
+        { label: 'Qualified', value: d.current.leadsByStage.qualified },
+      ],
+    },
+    {
+      title: 'Activity queue',
+      to: undefined,
+      rows: [
+        { label: 'Due today', value: d.current.activities.dueToday },
+        { label: 'Upcoming', value: d.current.activities.upcoming },
+      ],
+    },
+    {
+      title: 'Period outcomes',
+      to: undefined,
+      rows: [
+        { label: 'New leads', value: d.period.newLeads },
+        { label: 'New opps', value: d.period.newOpportunities },
+        { label: 'Won / Lost', value: `${d.period.wonCount} / ${d.period.lostCount}` },
+        { label: 'Win rate', value: pct(d.period.winRate) },
+        { label: 'Won', value: usd(d.period.wonOneTimeCents) },
+        { label: 'MRR', value: usd(d.period.wonMrrCents) },
+      ],
+      note: `Lead → Opportunity ${pct(d.period.leadToOpportunity)} (simple operational metric, not a cohort funnel)`,
+    },
+    {
+      title: 'Proposals (current)',
+      to: '/proposals',
+      wide: true,
+      rows: [
+        { label: 'Draft', value: d.proposals.draft },
+        { label: 'Issued', value: d.proposals.issued },
+        { label: 'Sent', value: d.proposals.sent },
+        { label: 'Accepted', value: d.proposals.accepted },
+        { label: 'Declined', value: d.proposals.declined },
+        { label: 'Past valid-through', value: d.proposals.pastValidThrough },
+      ],
+    },
+  ]
+})
 
 const presetLabel: Record<string, string> = {
   this_month: 'This month',
@@ -214,8 +273,8 @@ const presetLabel: Record<string, string> = {
           <p class="text-sm text-muted">
             Open pipeline (one-time)
           </p>
-          <p class="mt-1 font-display text-2xl font-semibold">
-            {{ formatUsdFromCents(data.current.openPipelineOneTimeCents) }}
+          <p class="mt-1 font-display text-2xl font-semibold tabular-nums">
+            {{ usd(data.current.openPipelineOneTimeCents) }}
           </p>
         </NuxtLink>
         <NuxtLink
@@ -225,8 +284,8 @@ const presetLabel: Record<string, string> = {
           <p class="text-sm text-muted">
             Open pipeline MRR
           </p>
-          <p class="mt-1 font-display text-2xl font-semibold">
-            {{ formatUsdFromCents(data.current.openPipelineMrrCents) }}
+          <p class="mt-1 font-display text-2xl font-semibold tabular-nums">
+            {{ usd(data.current.openPipelineMrrCents) }}
           </p>
         </NuxtLink>
         <NuxtLink
@@ -236,127 +295,202 @@ const presetLabel: Record<string, string> = {
           <p class="text-sm text-muted">
             Overdue activities
           </p>
-          <p class="mt-1 font-display text-2xl font-semibold">
+          <p class="mt-1 font-display text-2xl font-semibold tabular-nums">
             {{ data.current.activities.overdue }}
           </p>
         </NuxtLink>
-        <NuxtLink
-          to="/leads"
-          class="stat-cell stat-link"
+        <component
+          :is="group.to ? NuxtLink : 'div'"
+          v-for="group in metricGroups"
+          :key="group.title"
+          :to="group.to"
+          class="stat-cell"
+          :class="[group.to ? 'stat-link' : '', group.wide ? 'sm:col-span-3' : '']"
         >
-          <p class="text-sm text-muted">
-            Leads (current)
+          <p class="text-sm font-semibold text-navy-900">
+            {{ group.title }}
           </p>
-          <p class="mt-1 text-sm">
-            New {{ data.current.leadsByStage.new }}
-            · Contacted {{ data.current.leadsByStage.contacted }}
-            · Qualified {{ data.current.leadsByStage.qualified }}
+          <dl
+            class="mt-2 text-sm"
+            :class="group.wide ? 'grid gap-x-12 gap-y-1 sm:grid-cols-3' : 'space-y-1'"
+          >
+            <div
+              v-for="row in group.rows"
+              :key="row.label"
+              class="flex items-baseline justify-between gap-4"
+            >
+              <dt class="min-w-0 text-muted">
+                {{ row.label }}
+              </dt>
+              <dd class="shrink-0 tabular-nums">
+                {{ row.value }}
+              </dd>
+            </div>
+          </dl>
+          <p
+            v-if="group.note"
+            class="mt-2 text-xs text-muted"
+          >
+            {{ group.note }}
           </p>
-        </NuxtLink>
-        <div class="stat-cell">
-          <p class="text-sm text-muted">
-            Activity queue
-          </p>
-          <p class="mt-1 text-sm">
-            Due today {{ data.current.activities.dueToday }}
-            · Upcoming {{ data.current.activities.upcoming }}
-          </p>
-        </div>
-        <div class="stat-cell">
-          <p class="text-sm text-muted">
-            Period outcomes
-          </p>
-          <p class="mt-1 text-sm">
-            New leads {{ data.period.newLeads }}
-            · New opps {{ data.period.newOpportunities }}
-          </p>
-          <p class="text-sm">
-            Won {{ data.period.wonCount }} / Lost {{ data.period.lostCount }}
-            · Win rate {{ pct(data.period.winRate) }}
-          </p>
-          <p class="text-sm">
-            Won {{ formatUsdFromCents(data.period.wonOneTimeCents) }}
-            · MRR {{ formatUsdFromCents(data.period.wonMrrCents) }}
-          </p>
-          <p class="text-xs text-muted">
-            Lead → Opportunity {{ pct(data.period.leadToOpportunity) }} (simple operational metric, not a cohort funnel)
-          </p>
-        </div>
-        <NuxtLink
-          to="/proposals"
-          class="stat-cell stat-link sm:col-span-3"
-        >
-          <p class="text-sm text-muted">
-            Proposals (current)
-          </p>
-          <p class="mt-1 text-sm">
-            Draft {{ data.proposals.draft }}
-            · Issued {{ data.proposals.issued }}
-            · Sent {{ data.proposals.sent }}
-          </p>
-          <p class="text-sm">
-            Accepted {{ data.proposals.accepted }}
-            · Declined {{ data.proposals.declined }}
-            · Past valid-through {{ data.proposals.pastValidThrough }}
-          </p>
-        </NuxtLink>
+        </component>
       </div>
       <AppPanel title="Source performance (current attribution)">
-        <ul class="space-y-2 text-sm">
-          <li
-            v-for="source in data.sources.filter(row => row.leads || row.opportunities || row.wonCount || row.name === 'Unattributed')"
-            :key="String(source.id)"
-          >
-            {{ source.name }}
-            · Leads {{ source.leads }}
-            · Opps {{ source.opportunities }}
-            · Won {{ source.wonCount }}
-            · {{ formatUsdFromCents(source.wonOneTimeCents) }}
-            · MRR {{ formatUsdFromCents(source.wonMrrCents) }}
-          </li>
-        </ul>
+        <div class="table-wrap table-flush">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Source</th>
+                <th class="num">
+                  Leads
+                </th>
+                <th class="num">
+                  Opps
+                </th>
+                <th class="num">
+                  Won
+                </th>
+                <th class="num">
+                  One-time
+                </th>
+                <th class="num">
+                  MRR
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="source in sourceRows"
+                :key="String(source.id)"
+              >
+                <td>{{ source.name }}</td>
+                <td class="num">
+                  {{ source.leads }}
+                </td>
+                <td class="num">
+                  {{ source.opportunities }}
+                </td>
+                <td class="num">
+                  {{ source.wonCount }}
+                </td>
+                <td class="num">
+                  {{ usd(source.wonOneTimeCents) }}
+                </td>
+                <td class="num">
+                  {{ usd(source.wonMrrCents) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </AppPanel>
       <AppPanel title="Campaign performance">
-        <ul class="space-y-2 text-sm">
-          <li
-            v-for="campaign in data.campaigns"
-            :key="campaign.id"
-          >
-            <NuxtLink :to="`/campaigns/${campaign.id}`">
-              {{ campaign.name }}
-            </NuxtLink>
-            · Clicks {{ campaign.clicks }}
-            · Leads {{ campaign.leads }}
-            · Click → Lead {{ pct(campaign.clickToLead) }}
-            · Won {{ campaign.wonCount }}
-            · {{ formatUsdFromCents(campaign.wonOneTimeCents) }}
-          </li>
-        </ul>
-        <p
+        <AppEmpty
           v-if="!data.campaigns.length"
-          class="text-sm text-muted"
+          bare
+          title="No campaigns yet."
+          description="Create a campaign to see its clicks, leads and wins here."
+        />
+        <div
+          v-else
+          class="table-wrap table-flush"
         >
-          No campaigns yet.
-        </p>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Campaign</th>
+                <th class="num">
+                  Clicks
+                </th>
+                <th class="num">
+                  Leads
+                </th>
+                <th class="num">
+                  Click → Lead
+                </th>
+                <th class="num">
+                  Won
+                </th>
+                <th class="num">
+                  One-time
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="campaign in data.campaigns"
+                :key="campaign.id"
+              >
+                <td>
+                  <NuxtLink :to="`/campaigns/${campaign.id}`">
+                    {{ campaign.name }}
+                  </NuxtLink>
+                </td>
+                <td class="num">
+                  {{ campaign.clicks }}
+                </td>
+                <td class="num">
+                  {{ campaign.leads }}
+                </td>
+                <td class="num">
+                  {{ pct(campaign.clickToLead) }}
+                </td>
+                <td class="num">
+                  {{ campaign.wonCount }}
+                </td>
+                <td class="num">
+                  {{ usd(campaign.wonOneTimeCents) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </AppPanel>
       <AppPanel title="Tracking link clicks">
-        <ul class="space-y-2 text-sm">
-          <li
-            v-for="link in data.trackingLinks"
-            :key="link.id"
-          >
-            {{ link.label }}
-            · Clicks {{ link.clicks }}
-            · Leads {{ link.leads }}
-            · Click → Lead {{ pct(link.clickToLead) }}
-          </li>
-        </ul>
-        <p
+        <AppEmpty
           v-if="!data.trackingLinks.length"
-          class="text-sm text-muted"
+          bare
+          title="No tracking links yet."
+          description="Add a tracking link to a campaign to count its clicks here."
+        />
+        <div
+          v-else
+          class="table-wrap table-flush"
         >
-          No tracking links yet.
-        </p>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Link</th>
+                <th class="num">
+                  Clicks
+                </th>
+                <th class="num">
+                  Leads
+                </th>
+                <th class="num">
+                  Click → Lead
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="link in data.trackingLinks"
+                :key="link.id"
+              >
+                <td>{{ link.label }}</td>
+                <td class="num">
+                  {{ link.clicks }}
+                </td>
+                <td class="num">
+                  {{ link.leads }}
+                </td>
+                <td class="num">
+                  {{ pct(link.clickToLead) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </AppPanel>
     </template>
     <p class="text-xs text-muted">
