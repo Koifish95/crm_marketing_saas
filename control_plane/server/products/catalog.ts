@@ -20,6 +20,8 @@ export type ProductDefinition = {
   extraEnv: Record<string, string>
   /** Environments of this product get a generated LEAD_INTAKE_KEY. */
   leadIntakeKey?: boolean
+  /** Environments of this product get the Control Plane's transactional email sender (RESEND_API_KEY, NOTIFY_FROM). */
+  transactionalEmail?: boolean
 }
 
 export const PRODUCTS: Record<ProductId, ProductDefinition> = {
@@ -55,6 +57,7 @@ export const PRODUCTS: Record<ProductId, ProductDefinition> = {
       SALES_PROPOSALS_DIR: '/app/data/uploads/proposals',
     },
     leadIntakeKey: true,
+    transactionalEmail: true,
   },
 }
 

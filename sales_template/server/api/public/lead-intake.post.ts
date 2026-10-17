@@ -1,6 +1,7 @@
 import { createError, defineEventHandler, getRequestHeader, getRequestIP, readBody } from 'h3'
 import { publicLeadIntakeSchema } from '../../../shared/schemas/sales'
 import { LEAD_INTAKE_KEY_HEADER, intakeKeyMatches, submitKeyedLead } from '../../services/public-intake'
+import { notifyNewLead } from '../../services/lead-notify'
 import { useDb } from '../../database'
 import { throwDomain } from '../../utils/api'
 import { allowPublicRequest } from '../../utils/rate-limit'
@@ -23,9 +24,13 @@ export default defineEventHandler(async (event) => {
   if (!parsed.success) {
     throw createError({ statusCode: 400, message: 'Could not submit that lead.' })
   }
+  let result: Awaited<ReturnType<typeof submitKeyedLead>>
   try {
-    return await submitKeyedLead(useDb(), parsed.data)
+    result = await submitKeyedLead(useDb(), parsed.data)
   } catch (error) {
     throwDomain(error)
   }
+  // Not awaited: the lead is saved, so a slow or failed email never delays or fails the response.
+  void notifyNewLead({ id: result.id, ...parsed.data })
+  return result
 })

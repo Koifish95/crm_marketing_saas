@@ -28,6 +28,7 @@ import { inspectRegisteredContainer } from './docker-runtime'
 import { currentReleaseId, productImageSpec, type ProvisionImage, resolveProvisionImage, waitUntilHealthy } from './provision-runtime'
 import { localHostingNodeSpec } from './hosting-node'
 import { patchEnvFileContents, readEnvValue } from './provision-env'
+import { withTransactionalEmail } from './transactional-email'
 import { requireProduct } from '../products/catalog'
 import {
   clearLeadIntakeKeyPending,
@@ -684,6 +685,11 @@ export async function upgradeRegisteredEnvironment(
   if (backfill.created) {
     writeFileSync(envPath, backfill.contents)
   }
+  // The sender follows the Control Plane's current key, so a new or rotated key arrives with the upgrade.
+  const email = product.transactionalEmail ? withTransactionalEmail(readFileSync(envPath, 'utf8')) : { contents: '', changed: false }
+  if (email.changed) {
+    writeFileSync(envPath, email.contents)
+  }
   writeUpgradeEnv(envPath, targetRef, releaseId)
   recreateApp(row, previousEnv)
   if (backfill.created) {
@@ -712,6 +718,7 @@ export async function upgradeRegisteredEnvironment(
       built,
       pulled,
       leadIntakeKeyCreated: backfill.created,
+      transactionalEmailUpdated: email.changed,
     },
   })
   return {

@@ -4,6 +4,7 @@ import { randomBytes } from 'node:crypto'
 import type { ProductDefinition } from '../products/catalog'
 import { MARTIAL_ARTS_PRODUCT } from '../products/catalog'
 import { generateLeadIntakeKey } from './lead-intake-key'
+import { transactionalEmailEnv } from './transactional-email'
 
 export const INITIAL_ACCESS_USERNAME = 'admin'
 export const INITIAL_ACCESS_PASSWORD = 'setup'
@@ -63,7 +64,9 @@ export function renderProvisionedEnv(input: {
   releaseId?: string
   publicHostname?: string | null
   nodeKind?: string
-  product?: Pick<ProductDefinition, 'appNameTemplate' | 'extraEnv' | 'leadIntakeKey'>
+  product?: Pick<ProductDefinition, 'appNameTemplate' | 'extraEnv' | 'leadIntakeKey' | 'transactionalEmail'>
+  /** The Control Plane's own env, for the transactional email sender; defaults to process.env. */
+  controlPlaneEnv?: NodeJS.ProcessEnv
 }) {
   const product = input.product ?? MARTIAL_ARTS_PRODUCT
   const appEnv = input.type === 'PROD' ? 'production' : 'dev'
@@ -75,6 +78,7 @@ export function renderProvisionedEnv(input: {
     nodeKind: input.nodeKind,
   })
   const leadIntakeKey = product.leadIntakeKey ? generateLeadIntakeKey() : ''
+  const emailEnv = product.transactionalEmail ? transactionalEmailEnv(input.controlPlaneEnv) : {}
   const lines = [
     envLine('COMPOSE_PROJECT', input.composeProject),
     envLine('CONTAINER_NAME', input.containerName),
@@ -101,6 +105,7 @@ export function renderProvisionedEnv(input: {
     envLine('APP_BACKUP_DIR', '/app/data/sqlite/backups'),
     ...Object.entries(product.extraEnv).map(([key, value]) => envLine(key, value)),
     ...(leadIntakeKey ? [envLine('LEAD_INTAKE_KEY', leadIntakeKey)] : []),
+    ...Object.entries(emailEnv).map(([key, value]) => envLine(key, value)),
   ]
   return {
     contents: `${lines.join('\n')}\n`,

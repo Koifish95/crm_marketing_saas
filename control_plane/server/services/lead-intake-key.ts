@@ -54,7 +54,7 @@ export function consumeLeadIntakeKeyReveal(envPath: string) {
 
 /** Strips key assignments (and any known key values) from text bound for logs, events, or stored errors. */
 export function redactLeadIntakeKey(text: string, ...knownKeys: string[]) {
-  let out = text.replace(/(LEAD_INTAKE_KEY["']?\s*[=:]\s*)("[^"]*"|'[^']*'|[^\s,"']+)/g, `$1${REDACTED}`)
+  let out = text.replace(/((?:LEAD_INTAKE_KEY|RESEND_API_KEY)["']?\s*[=:]\s*)("[^"]*"|'[^']*'|[^\s,"']+)/g, `$1${REDACTED}`)
   for (const key of knownKeys) {
     if (key) {
       out = out.split(key).join(REDACTED)
@@ -73,7 +73,7 @@ export function redactDeep<T>(value: T): T {
   if (value && typeof value === 'object') {
     return Object.fromEntries(Object.entries(value).map(([k, v]) => [
       k,
-      k === LEAD_INTAKE_KEY_NAME || k === 'leadIntakeKey' ? REDACTED : redactDeep(v),
+      k === LEAD_INTAKE_KEY_NAME || k === 'leadIntakeKey' || k === 'RESEND_API_KEY' ? REDACTED : redactDeep(v),
     ])) as T
   }
   return value
