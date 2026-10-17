@@ -182,12 +182,13 @@ notes:
   cp_schema: 0009_previous_release
   working_tree_uncommitted: false
   git_vps_note: "Current-State.md#Git and the VPS (2026-10-15)"
-  vps_checkout: "3dac855 via pnpm vps deploy 2026-10-17 ~15:17 UTC (from 8ee07df; adds Martial Arts UI cleanup step 1, shared foundations: AppPanel padded by default, crm-core @source, sticky full-height rail below the DEV/STAGE banner; plus docs/customer/top-tier-sales-walkthrough.md). Top Tier DEV backup d457eb9c then upgraded to 3dac855bbba9@2cf16e22991e (pulled). Acme DEV backup c56b759e then upgraded to 3dac855bbba9@83afff64a38d (pulled). Both PRODs unchanged: Top Tier PROD on 8ee07dfde2a8@cc010420c5d8, Acme PROD untouched"
+  vps_checkout: "4291ac1 via pnpm vps deploy 2026-10-17 ~17:15 UTC (from 3dac855; adds the Sales new-lead email to the account admin through Resend from Nuxxion <notifications@nuxxion.com>, RESEND_API_KEY held in /etc/sic/control-plane.env and copied into every Sales environment at provisioning and upgrade, never Martial Arts). Upgraded to 4291ac1ab316@f6558484484f after backups: Strategic Insights DEV (ce9b9dcd, test lead emailed) and PROD (c93aad23), Top Tier DEV (4a412c46) and PROD (3064447f, expectedImage pinned). Acme unchanged"
   vps_registry_migrations: "0000-0009 applied; 0008 backfilled by migrateDatabase on the first deploy"
   vps_deploy: "pnpm vps deploy [sha] -> deploy/hosting-node/deploy-control-plane.sh; origin/working only"
   vps_deploy_first_run: "2026-10-16 47159a0 -> cbee291 OK"
   provision_release_identity: "ghcr.io/koifish95/<product>:<commit> (or host-built <repo>:<commit>) pinned by digest, RELEASE_ID=<commit>@<12hex>"
-  top_tier_sales_envs: "PROD 52202 on ghcr.io/koifish95/crm-sales@sha256:cc010420c5d8 (RELEASE_ID 8ee07dfde2a8@cc010420c5d8); DEV 52203 on crm-sales@sha256:2cf16e22991e (RELEASE_ID 3dac855bbba9@2cf16e22991e), schema 0006; PROD https://top-tier-hauling.nuxxion.com, DEV https://dev-top-tier-hauling.nuxxion.com (certs to 2027-01-14); both initial passwords changed"
+  top_tier_sales_envs: "PROD 52202 / DEV 52203 on ghcr.io/koifish95/crm-sales@sha256:f6558484484f, RELEASE_ID 4291ac1ab316@f6558484484f, schema 0006, new-lead email to the admin on; PROD https://top-tier-hauling.nuxxion.com, DEV https://dev-top-tier-hauling.nuxxion.com (certs to 2027-01-14); both initial passwords changed"
+  strategic_insights_sales_envs: "PROD 52204 https://strategic-insights.nuxxion.com / DEV 52205 https://dev-strategic-insights.nuxxion.com on crm-sales@sha256:f6558484484f (4291ac1ab316@f6558484484f), new-lead email on; prospect desk off until the owner enables it (dogfood: SIC sells Nuxxion)"
   public_hostnames: "S8 in progress: PUBLIC_BASE_DOMAIN=nuxxion.com wildcard; provisioning assigns {customer-slug}.nuxxion.com to PROD and dev-{customer-slug}.nuxxion.com to DEV + EDGE_AUTO_CERT Let's Encrypt; unknown names refused on 443 (ssl_reject_handshake)"
   ci_cd: "ci_checks_live + images pushed to ghcr.io/koifish95/<product>:<commit> on green pushes; provision/upgrade pull them, else build on host; deploy and PROD promotion manual"
   vps_control_plane_service: sic-control-plane_systemd_enabled
