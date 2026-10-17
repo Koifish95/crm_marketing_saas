@@ -2,6 +2,7 @@ import { desc } from 'drizzle-orm'
 import type { Database } from '../database'
 import { operatorEvents } from '../database/schema'
 import { createStableId } from '../../shared/utils/ids'
+import { redactDeep, redactLeadIntakeKey } from './lead-intake-key'
 
 export async function recordOperatorEvent(db: Database, input: {
   action: string
@@ -19,8 +20,8 @@ export async function recordOperatorEvent(db: Database, input: {
     customerId: input.customerId || null,
     productInstanceId: input.productInstanceId || null,
     environmentId: input.environmentId || null,
-    summary: input.summary,
-    detail: input.detail === undefined ? null : JSON.stringify(input.detail),
+    summary: redactLeadIntakeKey(input.summary),
+    detail: input.detail === undefined ? null : JSON.stringify(redactDeep(input.detail)),
   })
   return id
 }

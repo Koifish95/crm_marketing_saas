@@ -3,6 +3,7 @@ import { dirname, isAbsolute, join } from 'node:path'
 import { randomBytes } from 'node:crypto'
 import type { ProductDefinition } from '../products/catalog'
 import { MARTIAL_ARTS_PRODUCT } from '../products/catalog'
+import { generateLeadIntakeKey } from './lead-intake-key'
 
 export const INITIAL_ACCESS_USERNAME = 'admin'
 export const INITIAL_ACCESS_PASSWORD = 'setup'
@@ -62,7 +63,7 @@ export function renderProvisionedEnv(input: {
   releaseId?: string
   publicHostname?: string | null
   nodeKind?: string
-  product?: Pick<ProductDefinition, 'appNameTemplate' | 'extraEnv'>
+  product?: Pick<ProductDefinition, 'appNameTemplate' | 'extraEnv' | 'leadIntakeKey'>
 }) {
   const product = input.product ?? MARTIAL_ARTS_PRODUCT
   const appEnv = input.type === 'PROD' ? 'production' : 'dev'
@@ -73,6 +74,7 @@ export function renderProvisionedEnv(input: {
     hostBind: input.hostBind,
     nodeKind: input.nodeKind,
   })
+  const leadIntakeKey = product.leadIntakeKey ? generateLeadIntakeKey() : ''
   const lines = [
     envLine('COMPOSE_PROJECT', input.composeProject),
     envLine('CONTAINER_NAME', input.containerName),
@@ -98,11 +100,13 @@ export function renderProvisionedEnv(input: {
     envLine('RELEASE_ID', input.releaseId || 'dev'),
     envLine('APP_BACKUP_DIR', '/app/data/sqlite/backups'),
     ...Object.entries(product.extraEnv).map(([key, value]) => envLine(key, value)),
+    ...(leadIntakeKey ? [envLine('LEAD_INTAKE_KEY', leadIntakeKey)] : []),
   ]
   return {
     contents: `${lines.join('\n')}\n`,
     authPassword,
     username: INITIAL_ACCESS_USERNAME,
+    hasLeadIntakeKey: Boolean(leadIntakeKey),
   }
 }
 

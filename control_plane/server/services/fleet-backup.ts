@@ -29,6 +29,14 @@ import { currentReleaseId, productImageSpec, type ProvisionImage, resolveProvisi
 import { localHostingNodeSpec } from './hosting-node'
 import { patchEnvFileContents, readEnvValue } from './provision-env'
 import { requireProduct } from '../products/catalog'
+import {
+  clearLeadIntakeKeyPending,
+  consumeLeadIntakeKeyReveal,
+  generateLeadIntakeKey,
+  markLeadIntakeKeyPending,
+  redactLeadIntakeKey,
+  withLeadIntakeKeyBackfill,
+} from './lead-intake-key'
 import { recordOperatorEvent } from './operator-events'
 import {
   digestImageRef,
@@ -556,7 +564,7 @@ function recreateApp(row: {
     if (revertOnFailure && previousEnv) {
       writeFileSync(absoluteEnvPath(row), previousEnv)
     }
-    throw new FleetBackupError(result.stderr?.trim() || result.stdout?.trim() || 'Compose recreate failed.', 500)
+    throw new FleetBackupError(redactLeadIntakeKey(result.stderr?.trim() || result.stdout?.trim() || 'Compose recreate failed.'), 500)
   }
 }
 
@@ -671,8 +679,16 @@ export async function upgradeRegisteredEnvironment(
     releaseId = image.releaseId
   }
 
+  // Backfill only: an existing key is never replaced on upgrade.
+  const backfill = product.leadIntakeKey ? withLeadIntakeKeyBackfill(previousEnv) : { contents: previousEnv, created: false }
+  if (backfill.created) {
+    writeFileSync(envPath, backfill.contents)
+  }
   writeUpgradeEnv(envPath, targetRef, releaseId)
   recreateApp(row, previousEnv)
+  if (backfill.created) {
+    markLeadIntakeKeyPending(envPath)
+  }
   const runningId = assertSameImage(
     dockerText(['inspect', '-f', '{{.Image}}', row.containerName]),
     targetRef.split('@')[1] || '',
@@ -695,9 +711,11 @@ export async function upgradeRegisteredEnvironment(
       backupId: latest.id,
       built,
       pulled,
+      leadIntakeKeyCreated: backfill.created,
     },
   })
   return {
+    leadIntakeKeyPending: backfill.created,
     environmentId: row.id,
     previousImage: previousRef,
     previousReleaseId,
@@ -709,6 +727,64 @@ export async function upgradeRegisteredEnvironment(
     releaseId: health.releaseId || releaseId,
     schemaVersion: health.schemaVersion || null,
   }
+}
+
+async function requireLeadIntakeEnvironment(db: Database, id: string) {
+  const row = await getRegisteredEnvironment(db, id)
+  const guard = environmentBackupGuard(row)
+  if (guard || !row) {
+    throw new FleetBackupError(guard?.statusMessage ?? 'Environment not registered.', guard?.statusCode ?? 404)
+  }
+  if (!requireProduct(row.productInstance.productId).leadIntakeKey) {
+    throw new FleetBackupError('This product has no lead intake key.', 409)
+  }
+  if (row.lifecycleStatus !== 'ready') {
+    throw new FleetBackupError(`Environment is ${row.lifecycleStatus}; the lead intake key can only be managed on a ready environment.`, 409)
+  }
+  return row
+}
+
+/** Returns the key once, then never again. Use rotate to get a new one. */
+export async function revealLeadIntakeKey(db: Database, id: string) {
+  const row = await requireLeadIntakeEnvironment(db, id)
+  const key = consumeLeadIntakeKeyReveal(absoluteEnvPath(row))
+  if (!key) {
+    throw new FleetBackupError('The lead intake key was already shown. Rotate it to get a new one.', 409)
+  }
+  await recordOperatorEvent(db, {
+    action: 'lead-intake-key-reveal',
+    summary: `${row.slug} lead intake key shown`,
+    customerId: row.customer.id,
+    productInstanceId: row.productInstance.id,
+    environmentId: row.id,
+  })
+  return { leadIntakeKey: key }
+}
+
+/** New key, app recreated so it takes effect, shown once in the response. The old key stops working. */
+export async function rotateLeadIntakeKey(db: Database, id: string) {
+  const row = await requireLeadIntakeEnvironment(db, id)
+  const envPath = absoluteEnvPath(row)
+  if (!existsSync(envPath)) {
+    throw new FleetBackupError(`Env file missing: ${envPath}`, 500)
+  }
+  const previousEnv = readFileSync(envPath, 'utf8')
+  const key = generateLeadIntakeKey()
+  writeFileSync(envPath, patchEnvFileContents(previousEnv, { LEAD_INTAKE_KEY: key }))
+  try {
+    recreateApp(row, previousEnv)
+  } catch (error) {
+    throw new FleetBackupError(redactLeadIntakeKey(error instanceof Error ? error.message : 'Rotation failed.', key), 500)
+  }
+  clearLeadIntakeKeyPending(envPath)
+  await recordOperatorEvent(db, {
+    action: 'lead-intake-key-rotate',
+    summary: `${row.slug} lead intake key rotated`,
+    customerId: row.customer.id,
+    productInstanceId: row.productInstance.id,
+    environmentId: row.id,
+  })
+  return { leadIntakeKey: key }
 }
 
 export async function rollbackRegisteredEnvironment(

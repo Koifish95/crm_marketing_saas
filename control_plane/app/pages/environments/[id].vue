@@ -29,6 +29,10 @@ const restoring = ref(false)
 const copying = ref(false)
 const revealing = ref(false)
 const upgrading = ref(false)
+const intakeKey = ref('')
+const intakeBusy = ref(false)
+const intakeKeyPending = ref(false)
+const isSales = computed(() => env.value?.productInstance?.productId === 'sales')
 const targetImage = ref('')
 const stopping = ref(false)
 const starting = ref(false)
@@ -417,6 +421,27 @@ async function restoreEnvironment() {
   }
 }
 
+async function leadIntakeKeyAction(action: 'reveal' | 'rotate') {
+  if (!env.value) {
+    return
+  }
+  intakeBusy.value = true
+  actionError.value = ''
+  try {
+    const result = await $fetch<{ leadIntakeKey: string }>(`/api/environments/${env.value.id}/lead-intake-key/${action}`, { method: 'POST' })
+    intakeKey.value = result.leadIntakeKey
+    intakeKeyPending.value = false
+  } catch (error) {
+    actionError.value = fetchMessage(error, 'Lead intake key request failed.')
+  } finally {
+    intakeBusy.value = false
+  }
+}
+
+function hideIntakeKey() {
+  intakeKey.value = ''
+}
+
 async function upgradeEnvironment() {
   if (!env.value) {
     return
@@ -431,11 +456,13 @@ async function upgradeEnvironment() {
       backupId: string
       releaseId?: string | null
       schemaVersion?: string | null
+      leadIntakeKeyPending?: boolean
     }>(`/api/environments/${env.value.id}/upgrade`, {
       method: 'POST',
       body: { expectedImage: targetImage.value.trim() || undefined },
     })
     await refreshWorkspace()
+    intakeKeyPending.value = Boolean(result.leadIntakeKeyPending)
     actionNotice.value = [
       `Upgrade finished.`,
       `${result.previousImage} → ${result.expectedImage}.`,
@@ -962,6 +989,42 @@ async function refreshWorkspace() {
             {{ upgrading ? 'Upgrading…' : 'Upgrade' }}
           </button>
         </form>
+        <div
+          v-if="isSales"
+          class="card"
+        >
+          <h3>Lead intake key</h3>
+          <p class="muted">
+            The website lead form sends this as the <code>x-intake-key</code> header. It is shown once, then only the environment file holds it. Rotating replaces it and restarts the app; the old key stops working.
+          </p>
+          <p v-if="intakeKeyPending">
+            A new key was created by the upgrade and has not been shown yet.
+          </p>
+          <div v-if="intakeKey">
+            <p><strong>Copy it now. It will not be shown again.</strong></p>
+            <code data-testid="lead-intake-key">{{ intakeKey }}</code>
+            <button
+              type="button"
+              @click="hideIntakeKey"
+            >
+              Hide
+            </button>
+          </div>
+          <button
+            type="button"
+            :disabled="intakeBusy || decommissioned"
+            @click="leadIntakeKeyAction('reveal')"
+          >
+            Show key (once)
+          </button>
+          <button
+            type="button"
+            :disabled="intakeBusy || decommissioned"
+            @click="leadIntakeKeyAction('rotate')"
+          >
+            {{ intakeBusy ? 'Working…' : 'Rotate key' }}
+          </button>
+        </div>
       </section>
       <section
         v-else-if="tab === 'network'"
