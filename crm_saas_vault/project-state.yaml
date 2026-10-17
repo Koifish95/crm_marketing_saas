@@ -182,7 +182,7 @@ notes:
   cp_schema: 0009_previous_release
   working_tree_uncommitted: false
   git_vps_note: "Current-State.md#Git and the VPS (2026-10-15)"
-  vps_checkout: "df1a5d3 via pnpm vps deploy 2026-10-16 ~22:33 UTC (from 03ef751; includes the Sales snapshot fix 990164d and DEV public hostnames). Top Tier DEV runs df1a5d3c2214@e1fdd8cbf362 (pulled from GHCR); live backup d158957e verified. Top Tier PROD upgraded 2026-10-16 22:40 UTC to the same digest (df1a5d3c2214@e1fdd8cbf362) after its first backup 965c38ab (stopped); live PROD backup ff2c04dd verified"
+  vps_checkout: "8ee07df via pnpm vps deploy 2026-10-17 ~03:31 UTC (from df1a5d3; adds the Control Plane LEAD_INTAKE_KEY generation, reveal and rotate for Sales environments, and Sales data-app-env so DEV shows red). Top Tier DEV upgraded to 8ee07dfde2a8@cc010420c5d8 (pulled from GHCR) after live backup 7ac9ab78; the upgrade backfilled a lead intake key, not yet revealed. Top Tier PROD unchanged on df1a5d3c2214@e1fdd8cbf362 (backups ff2c04dd live) until the owner approves"
   vps_registry_migrations: "0000-0009 applied; 0008 backfilled by migrateDatabase on the first deploy"
   vps_deploy: "pnpm vps deploy [sha] -> deploy/hosting-node/deploy-control-plane.sh; origin/working only"
   vps_deploy_first_run: "2026-10-16 47159a0 -> cbee291 OK"
