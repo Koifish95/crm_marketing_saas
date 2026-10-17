@@ -11,6 +11,7 @@ import {
   renderProspectTemplate,
   senderBlockReason,
   touchDueAt,
+  type DeskView,
   type ProspectDeskConfig,
 } from '../../shared/utils/prospect-desk'
 import { denverYmd, utcNowMs } from '../../shared/utils/time'
@@ -297,6 +298,7 @@ export async function prospectDeskSummary(db: Database, nowMs = utcNowMs()) {
   return {
     config: publicProspectDeskConfig(config),
     stored: prospects.length,
+    awaitingApproval: prospects.filter(row => row.outreachStatus === 'awaiting_approval' && row.status !== 'do_not_contact' && row.status !== 'promoted').length,
     ready: prospects.filter(row => row.outreachStatus === 'ready' && row.status !== 'do_not_contact' && row.status !== 'promoted').length,
     sendingToday: sentToday,
     sendingCap: config.dailyCap,
@@ -309,10 +311,28 @@ export async function prospectDeskSummary(db: Database, nowMs = utcNowMs()) {
   }
 }
 
-export async function listDeskProspects(db: Database, view: 'needs_you' | 'ready' | 'sending') {
+export function firstEmailPreview(config: ProspectDeskConfig, row: { name: string, city: string | null }) {
+  const template = config.templates[0]
+  const values = {
+    academy: row.name,
+    city: row.city ?? '',
+    address: config.postalAddress,
+    unsubscribe: config.unsubscribeLine,
+  }
+  return {
+    subject: renderProspectTemplate(template.subject, values),
+    body: renderProspectTemplate(template.body, values),
+  }
+}
+
+export async function listDeskProspects(db: Database, view: DeskView) {
+  const config = await readProspectDeskConfig(db)
   const prospects = await db.select().from(salesProspects).orderBy(asc(salesProspects.updatedAt))
   const messages = await db.select().from(salesProspectMessages).orderBy(asc(salesProspectMessages.step))
   return prospects.filter((row) => {
+    if (view === 'awaiting_approval') {
+      return row.outreachStatus === 'awaiting_approval' && row.status !== 'do_not_contact' && row.status !== 'promoted'
+    }
     if (view === 'ready') {
       return row.outreachStatus === 'ready' && row.status !== 'do_not_contact' && row.status !== 'promoted'
     }
@@ -338,6 +358,7 @@ export async function listDeskProspects(db: Database, view: 'needs_you' | 'ready
       why: view === 'needs_you' ? why : null,
       step: latest?.step ?? null,
       subject: latest?.subject ?? null,
+      firstEmail: view === 'awaiting_approval' ? firstEmailPreview(config, row) : null,
     }
   })
 }

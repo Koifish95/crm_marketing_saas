@@ -13,10 +13,10 @@ export const US_STATE_CODES = [
   'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
 ] as const
 
-export const OUTREACH_STATUSES = ['none', 'ready', 'queued', 'active', 'needs_you', 'bounced', 'stopped', 'paused'] as const
+export const OUTREACH_STATUSES = ['none', 'awaiting_approval', 'ready', 'queued', 'active', 'needs_you', 'bounced', 'stopped', 'paused'] as const
 export type OutreachStatus = (typeof OUTREACH_STATUSES)[number]
 
-export const DESK_VIEWS = ['needs_you', 'ready', 'sending'] as const
+export const DESK_VIEWS = ['needs_you', 'awaiting_approval', 'ready', 'sending'] as const
 export type DeskView = (typeof DESK_VIEWS)[number]
 
 export type ProspectTemplate = {
