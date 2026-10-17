@@ -738,6 +738,9 @@ async function requireLeadIntakeEnvironment(db: Database, id: string) {
   if (!requireProduct(row.productInstance.productId).leadIntakeKey) {
     throw new FleetBackupError('This product has no lead intake key.', 409)
   }
+  if (row.lifecycleStatus !== 'ready') {
+    throw new FleetBackupError(`Environment is ${row.lifecycleStatus}; the lead intake key can only be managed on a ready environment.`, 409)
+  }
   return row
 }
 

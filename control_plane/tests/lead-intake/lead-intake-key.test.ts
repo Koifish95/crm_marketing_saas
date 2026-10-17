@@ -70,6 +70,7 @@ async function openSalesEnvironment(productId: 'sales' | 'martial-arts' = 'sales
   const envPath = join(root, created.envFileLocal)
   // Fleet services resolve relative env paths against the process cwd; pin this one.
   await db.update(environments).set({ envFileLocal: envPath, envFileExample: envPath }).where(eq(environments.id, created.id))
+  await setLifecycleStatus(db, created.id, 'ready')
   return { client, db, envPath, id: created.id }
 }
 
@@ -143,6 +144,24 @@ describe('reveal and rotate', () => {
       const events = JSON.stringify(await db.select().from(operatorEvents))
       expect(events).not.toContain(rotated.leadIntakeKey)
       expect(events).not.toContain(oldKey)
+    } finally {
+      client.close()
+    }
+  })
+
+  it('refuses reveal and rotate on a decommissioned environment without touching it', async () => {
+    const { client, db, envPath, id } = await openSalesEnvironment()
+    try {
+      await setLifecycleStatus(db, id, 'decommissioned')
+      const before = readFileSync(envPath, 'utf8')
+      const { spawnSync } = await import('node:child_process')
+      const calls = vi.mocked(spawnSync).mock.calls.length
+      await expect(rotateLeadIntakeKey(db, id)).rejects.toMatchObject({ statusCode: 409 })
+      await expect(revealLeadIntakeKey(db, id)).rejects.toMatchObject({ statusCode: 409 })
+      expect(readFileSync(envPath, 'utf8')).toBe(before)
+      expect(vi.mocked(spawnSync).mock.calls.length).toBe(calls)
+      const row = (await db.select().from(environments).where(eq(environments.id, id)))[0]!
+      expect(row.lifecycleStatus).toBe('decommissioned')
     } finally {
       client.close()
     }
