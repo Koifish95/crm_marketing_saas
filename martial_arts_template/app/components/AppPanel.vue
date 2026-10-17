@@ -1,9 +1,11 @@
 <script setup lang="ts">
-defineProps<{
+withDefaults(defineProps<{
   title?: string
   description?: string
   padded?: boolean
-}>()
+}>(), {
+  padded: true,
+})
 </script>
 
 <template>
@@ -34,8 +36,7 @@ defineProps<{
       </div>
     </header>
     <div
-      class="p-4 sm:p-6 lg:p-8"
-      :class="{ '!p-0': padded === false }"
+      :class="padded ? 'p-4 sm:p-6 lg:p-8' : ''"
     >
       <slot />
     </div>

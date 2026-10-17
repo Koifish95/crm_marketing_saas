@@ -47,6 +47,11 @@
   flex-direction: column;
 }
 
+/* Room below the last section so content never sits on the viewport edge. */
+.staff-main-column > main {
+  padding-bottom: 3rem;
+}
+
 .staff-mobile-header {
   position: sticky;
   top: 0;
@@ -63,7 +68,10 @@
   }
 
   .staff-nav {
-    position: static;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    align-self: flex-start;
     transform: none;
   }
 
