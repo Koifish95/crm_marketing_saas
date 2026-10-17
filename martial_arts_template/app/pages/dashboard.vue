@@ -71,27 +71,48 @@ const pipelineCounts = computed(() => LEAD_STATUSES.map(status => ({
           </NuxtLink>
         </template>
         <div class="stat-row border-t-0">
-          <component
-            :is="canUseCrm ? resolveComponent('NuxtLink') : 'div'"
+          <template
             v-for="item in followUpCounts"
             :key="item.label"
-            v-bind="canUseCrm ? { to: item.to } : {}"
-            class="stat"
           >
-            <p class="stat-label">
-              {{ item.label }}
-            </p>
-            <p
-              class="stat-value"
-              :class="{
-                'text-danger-700': item.tone === 'danger',
-                'text-warning-800': item.tone === 'warning',
-                'text-ink': item.tone === 'default',
-              }"
+            <NuxtLink
+              v-if="canUseCrm"
+              :to="item.to"
+              class="stat"
             >
-              {{ item.value }}
-            </p>
-          </component>
+              <p class="stat-label">
+                {{ item.label }}
+              </p>
+              <p
+                class="stat-value"
+                :class="{
+                  'text-danger-700': item.tone === 'danger',
+                  'text-warning-800': item.tone === 'warning',
+                  'text-ink': item.tone === 'default',
+                }"
+              >
+                {{ item.value }}
+              </p>
+            </NuxtLink>
+            <div
+              v-else
+              class="stat"
+            >
+              <p class="stat-label">
+                {{ item.label }}
+              </p>
+              <p
+                class="stat-value"
+                :class="{
+                  'text-danger-700': item.tone === 'danger',
+                  'text-warning-800': item.tone === 'warning',
+                  'text-ink': item.tone === 'default',
+                }"
+              >
+                {{ item.value }}
+              </p>
+            </div>
+          </template>
         </div>
         <AppEmpty
           v-if="!data?.followUp?.priority?.length"
