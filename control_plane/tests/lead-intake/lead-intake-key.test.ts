@@ -33,7 +33,11 @@ const roots: string[] = []
 
 afterEach(() => {
   for (const root of roots.splice(0)) {
-    rmSync(root, { recursive: true, force: true })
+    try {
+      rmSync(root, { recursive: true, force: true })
+    } catch {
+      // sqlite unlock can lag on Windows
+    }
   }
 })
 
