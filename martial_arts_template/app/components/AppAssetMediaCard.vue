@@ -80,7 +80,7 @@ function onSelect() {
     </div>
     <div class="space-y-1 p-3">
       <div class="flex items-start gap-2">
-        <p class="min-w-0 flex-1 break-words font-medium text-navy-900">
+        <p class="min-w-0 flex-1 break-words font-medium text-ink">
           {{ displayName }}
         </p>
         <div
@@ -149,7 +149,7 @@ function onSelect() {
       </span>
     </div>
     <div class="space-y-1 p-3">
-      <p class="min-w-0 break-words font-medium text-navy-900">
+      <p class="min-w-0 break-words font-medium text-ink">
         {{ displayName }}
       </p>
       <p class="text-sm text-muted">
@@ -201,7 +201,7 @@ function onSelect() {
       </span>
     </div>
     <div class="space-y-1 p-3">
-      <p class="min-w-0 break-words font-medium text-navy-900">
+      <p class="min-w-0 break-words font-medium text-ink">
         {{ displayName }}
       </p>
       <p class="text-sm text-muted">

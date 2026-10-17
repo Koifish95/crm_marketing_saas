@@ -130,7 +130,7 @@ async function submit() {
         <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">
           {{ brandLine }}
         </p>
-        <h1 class="font-display text-3xl font-semibold text-navy-900">
+        <h1 class="font-display text-3xl font-semibold text-ink">
           {{ event.title }}
         </h1>
         <p
@@ -143,7 +143,7 @@ async function submit() {
 
       <p
         v-if="confirmation"
-        class="panel p-5 text-navy-900"
+        class="panel p-5 text-ink"
       >
         {{ confirmation }}
       </p>
@@ -163,7 +163,7 @@ async function submit() {
           Registration is closed.
         </p>
         <fieldset class="panel grid gap-3 p-5">
-          <legend class="font-medium text-navy-900">
+          <legend class="font-medium text-ink">
             Primary contact / household
           </legend>
           <AppField
@@ -222,7 +222,7 @@ async function submit() {
           :key="person.key"
           class="panel grid gap-3 p-5"
         >
-          <legend class="font-medium text-navy-900">
+          <legend class="font-medium text-ink">
             Participant {{ index + 1 }}
           </legend>
           <AppField
@@ -297,7 +297,7 @@ async function submit() {
           v-if="event.questions.length"
           class="panel grid gap-3 p-5"
         >
-          <legend class="font-medium text-navy-900">
+          <legend class="font-medium text-ink">
             A few questions
           </legend>
           <AppField

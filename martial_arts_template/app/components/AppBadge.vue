@@ -8,7 +8,7 @@ withDefaults(defineProps<{
 })
 
 const toneClass: Record<BadgeTone, string> = {
-  neutral: 'bg-canvas text-navy-800 ring-line',
+  neutral: 'bg-canvas text-ink ring-line',
   brand: 'bg-brand-50 text-brand-700 ring-brand-100',
   success: 'bg-success-50 text-success-700 ring-emerald-100',
   warning: 'bg-warning-50 text-warning-800 ring-amber-100',

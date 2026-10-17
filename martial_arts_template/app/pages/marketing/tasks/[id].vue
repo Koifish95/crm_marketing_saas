@@ -547,7 +547,7 @@ async function confirmCancelTask() {
             </select>
           </AppField>
           <div class="sm:col-span-2 space-y-3">
-            <p class="text-sm font-medium text-navy-900">
+            <p class="text-sm font-medium text-ink">
               Related asset
             </p>
             <div
@@ -621,18 +621,18 @@ async function confirmCancelTask() {
     >
       <div class="space-y-6">
         <section class="panel space-y-4 p-4 sm:p-6">
-          <h2 class="font-display text-lg font-semibold text-navy-900">
+          <h2 class="font-display text-lg font-semibold text-ink">
             Task
           </h2>
           <AppBadge tone="neutral">
             {{ marketingTaskTypeLabel(task.type) }}
           </AppBadge>
-          <p class="whitespace-pre-wrap text-navy-900">
+          <p class="whitespace-pre-wrap text-ink">
             {{ task.description?.trim() || 'No description provided' }}
           </p>
         </section>
         <section class="panel space-y-4 p-4 sm:p-6">
-          <h2 class="font-display text-lg font-semibold text-navy-900">
+          <h2 class="font-display text-lg font-semibold text-ink">
             Related work
           </h2>
           <dl class="space-y-4 text-sm">
@@ -650,7 +650,7 @@ async function confirmCancelTask() {
                 </NuxtLink>
                 <span
                   v-else
-                  class="text-navy-900"
+                  class="text-ink"
                 >Not linked</span>
               </dd>
             </div>
@@ -699,7 +699,7 @@ async function confirmCancelTask() {
                 </template>
                 <span
                   v-else
-                  class="text-navy-900"
+                  class="text-ink"
                 >Not linked</span>
               </dd>
             </div>
@@ -723,7 +723,7 @@ async function confirmCancelTask() {
                 </div>
                 <span
                   v-else
-                  class="text-navy-900"
+                  class="text-ink"
                 >Not linked</span>
               </dd>
             </div>
@@ -741,24 +741,24 @@ async function confirmCancelTask() {
                 </NuxtLink>
                 <span
                   v-else
-                  class="text-navy-900"
+                  class="text-ink"
                 >Not linked</span>
               </dd>
             </div>
           </dl>
         </section>
         <section class="panel space-y-3 p-4 sm:p-6">
-          <h2 class="font-display text-lg font-semibold text-navy-900">
+          <h2 class="font-display text-lg font-semibold text-ink">
             Notes
           </h2>
-          <p class="whitespace-pre-wrap text-sm text-navy-900">
+          <p class="whitespace-pre-wrap text-sm text-ink">
             {{ task.notes?.trim() || 'No notes' }}
           </p>
         </section>
       </div>
       <div class="space-y-6">
         <section class="panel space-y-4 p-4 sm:p-6">
-          <h2 class="font-display text-lg font-semibold text-navy-900">
+          <h2 class="font-display text-lg font-semibold text-ink">
             Assignment
           </h2>
           <dl class="space-y-4 text-sm">
@@ -766,7 +766,7 @@ async function confirmCancelTask() {
               <dt class="text-muted">
                 Assignee
               </dt>
-              <dd class="mt-1 text-navy-900">
+              <dd class="mt-1 text-ink">
                 {{ task.assignee?.displayName || 'Unassigned' }}
               </dd>
             </div>
@@ -774,7 +774,7 @@ async function confirmCancelTask() {
               <dt class="text-muted">
                 Due
               </dt>
-              <dd class="mt-1 text-navy-900">
+              <dd class="mt-1 text-ink">
                 {{ whenLabel(task.dueAt) }}
               </dd>
             </div>

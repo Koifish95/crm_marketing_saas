@@ -936,7 +936,7 @@ function closeTaskConfirm(open: boolean) {
           <a
             v-if="lead.phone"
             :href="`tel:${lead.phone}`"
-            class="font-medium text-navy-800 hover:text-brand-700"
+            class="font-medium text-ink hover:text-brand-700"
           >{{ lead.phone }}</a>
           <template v-if="lead.phone && lead.email">
             <span aria-hidden="true">·</span>
@@ -1171,7 +1171,7 @@ function closeTaskConfirm(open: boolean) {
                     Latest intro
                   </p>
                   <template v-if="lineSummaries[line.id]!.latestTrial">
-                    <p class="mt-1 break-words font-medium text-navy-900">
+                    <p class="mt-1 break-words font-medium text-ink">
                       {{ formatDenverCardDate(new Date(lineSummaries[line.id]!.latestTrial!.scheduledAt).getTime()) }}
                       · {{ formatDenverCardTime(new Date(lineSummaries[line.id]!.latestTrial!.scheduledAt).getTime()) }}
                     </p>
@@ -1203,10 +1203,10 @@ function closeTaskConfirm(open: boolean) {
                   <p class="text-xs font-semibold uppercase tracking-wide text-muted">
                     Outcome
                   </p>
-                  <p class="mt-1 font-medium text-navy-900">
+                  <p class="mt-1 font-medium text-ink">
                     Joined {{ formatDenverCardDate(new Date(lineSummaries[line.id]!.conversion!.joinedAt).getTime()) }}
                   </p>
-                  <p class="mt-1 break-words text-sm text-navy-800">
+                  <p class="mt-1 break-words text-sm text-ink">
                     {{ lineSummaries[line.id]!.conversion?.offeringName || lineSummaries[line.id]!.offeringName || 'Membership' }}
                     · ${{ centsToDollarString(lineSummaries[line.id]!.conversion!.monthlyCents) }}/month
                   </p>
@@ -1225,7 +1225,7 @@ function closeTaskConfirm(open: boolean) {
                   <p class="text-xs font-semibold uppercase tracking-wide text-muted">
                     Outcome
                   </p>
-                  <p class="mt-1 font-medium text-navy-900">
+                  <p class="mt-1 font-medium text-ink">
                     Lost
                     <template v-if="lineSummaries[line.id]!.lost">
                       {{ formatDenverCardDate(new Date(lineSummaries[line.id]!.lost!.createdAt).getTime()) }}
@@ -1233,7 +1233,7 @@ function closeTaskConfirm(open: boolean) {
                   </p>
                   <p
                     v-if="lineSummaries[line.id]!.lost?.reasonName"
-                    class="mt-1 break-words text-sm text-navy-800"
+                    class="mt-1 break-words text-sm text-ink"
                   >
                     Reason: {{ lineSummaries[line.id]!.lost?.reasonName }}
                   </p>
@@ -1254,19 +1254,19 @@ function closeTaskConfirm(open: boolean) {
                   </p>
                   <p
                     v-if="lineSummaries[line.id]!.nextScheduledTrial"
-                    class="mt-1 text-sm text-navy-800"
+                    class="mt-1 text-sm text-ink"
                   >
                     Intro is scheduled.
                   </p>
                   <p
                     v-else-if="linePrimaryKind(line) === 'convert'"
-                    class="mt-1 text-sm text-navy-800"
+                    class="mt-1 text-sm text-ink"
                   >
                     Decide: convert or mark lost.
                   </p>
                   <p
                     v-else
-                    class="mt-1 text-sm text-navy-800"
+                    class="mt-1 text-sm text-ink"
                   >
                     Needs an intro or a decision.
                   </p>
@@ -1401,7 +1401,7 @@ function closeTaskConfirm(open: boolean) {
                 class="mt-4 space-y-4 border-t border-line pt-4"
               >
                 <div class="space-y-3">
-                  <p class="text-sm font-semibold text-navy-900">
+                  <p class="text-sm font-semibold text-ink">
                     Intro for {{ personName(line) }}
                   </p>
                   <div
@@ -1411,7 +1411,7 @@ function closeTaskConfirm(open: boolean) {
                     <p class="text-xs font-semibold uppercase tracking-wide text-muted">
                       {{ trialHasOccurred(nextTrialForLine(line)!) ? 'Intro class' : 'Upcoming intro class' }}
                     </p>
-                    <p class="mt-1 font-medium text-navy-900">
+                    <p class="mt-1 font-medium text-ink">
                       {{ toBusinessDateTime(new Date(nextTrialForLine(line)!.scheduledAt).getTime()) }}
                     </p>
                     <p class="text-muted">
@@ -1525,7 +1525,7 @@ function closeTaskConfirm(open: boolean) {
                       >
                         <div class="flex flex-wrap items-start justify-between gap-2">
                           <div>
-                            <p class="font-medium text-navy-900">
+                            <p class="font-medium text-ink">
                               {{ toBusinessDateTime(new Date(trial.scheduledAt).getTime()) }}
                             </p>
                             <p
@@ -1625,7 +1625,7 @@ function closeTaskConfirm(open: boolean) {
                 </form>
                 <p
                   v-else-if="line.notes"
-                  class="text-sm text-navy-800"
+                  class="text-sm text-ink"
                 >
                   {{ line.notes }}
                 </p>
@@ -1703,7 +1703,7 @@ function closeTaskConfirm(open: boolean) {
                     v-if="line.compensationAttribution"
                     class="mt-3 space-y-2 text-sm"
                   >
-                    <p class="font-medium text-navy-900">
+                    <p class="font-medium text-ink">
                       Current: {{ line.compensationAttribution.creditedUser?.displayName || 'Unassigned' }}
                       <span class="text-muted"> · established {{ toBusinessDateTime(new Date(line.compensationAttribution.establishedAt).getTime()) }}</span>
                     </p>
@@ -1715,7 +1715,7 @@ function closeTaskConfirm(open: boolean) {
                       <NuxtLink
                         v-if="canViewMarketing && line.compensationAttribution.campaign.id"
                         :to="campaignStaffPath(line.compensationAttribution.campaign.id)"
-                        class="font-medium text-navy-800 hover:text-brand-700"
+                        class="font-medium text-ink hover:text-brand-700"
                       >
                         {{ line.compensationAttribution.campaign.name }}
                       </NuxtLink>
@@ -1761,7 +1761,7 @@ function closeTaskConfirm(open: boolean) {
                   v-if="activeConversion(line)"
                   class="rounded-md bg-canvas p-4 text-sm"
                 >
-                  <p class="font-medium text-navy-900">
+                  <p class="font-medium text-ink">
                     Converted MRR ${{ centsToDollarString(activeConversion(line)!.monthlyCents) }}/mo
                     <span v-if="activeConversion(line)!.offeringName">
                       · {{ activeConversion(line)!.offeringName }}
@@ -2094,7 +2094,7 @@ function closeTaskConfirm(open: boolean) {
               :class="task.dueState === 'OVERDUE' ? 'border-l-4 border-l-danger-700' : ''"
             >
               <div class="flex flex-wrap items-start justify-between gap-2">
-                <p class="font-medium text-navy-900">
+                <p class="font-medium text-ink">
                   {{ followUpPurposeLabel(task.purpose) }} · {{ taskStatusLabel(task.status) }}
                 </p>
                 <AppBadge
@@ -2127,7 +2127,7 @@ function closeTaskConfirm(open: boolean) {
                   <li
                     v-for="intro in task.confirmationIntros"
                     :key="intro.trialId"
-                    class="text-navy-800"
+                    class="text-ink"
                   >
                     {{ personName({ firstName: intro.firstName, lastName: intro.lastName }, 'Prospect') }}
                     <span v-if="intro.programName"> — {{ intro.programName }}</span>
@@ -2273,7 +2273,7 @@ function closeTaskConfirm(open: boolean) {
               :key="task.id"
               class="rounded-md border border-line p-4 text-sm text-muted"
             >
-              <p class="font-medium text-navy-900">
+              <p class="font-medium text-ink">
                 {{ followUpPurposeLabel(task.purpose) }} · {{ taskStatusLabel(task.status) }}
               </p>
               <p
@@ -2364,7 +2364,7 @@ function closeTaskConfirm(open: boolean) {
               :key="line.id"
               class="rounded-md border border-line p-4 text-sm"
             >
-              <p class="font-medium text-navy-900">
+              <p class="font-medium text-ink">
                 {{ personName(line) }}
               </p>
               <p
@@ -2450,7 +2450,7 @@ function closeTaskConfirm(open: boolean) {
               <p class="text-xs font-semibold uppercase tracking-wide text-muted">
                 Forecast MRR
               </p>
-              <p class="mt-1 break-words font-medium text-navy-900">
+              <p class="mt-1 break-words font-medium text-ink">
                 ${{ centsToDollarString(forecast.monthlyCents) }}
               </p>
             </div>
@@ -2458,7 +2458,7 @@ function closeTaskConfirm(open: boolean) {
               <p class="text-xs font-semibold uppercase tracking-wide text-muted">
                 Forecasted enrollment / upfront
               </p>
-              <p class="mt-1 break-words font-medium text-navy-900">
+              <p class="mt-1 break-words font-medium text-ink">
                 ${{ centsToDollarString(forecast.enrollmentCents) }}
               </p>
             </div>
@@ -2472,10 +2472,10 @@ function closeTaskConfirm(open: boolean) {
               :key="row.leadLineId"
               class="flex flex-wrap items-baseline justify-between gap-2"
             >
-              <span class="min-w-0 break-words text-navy-800">
+              <span class="min-w-0 break-words text-ink">
                 {{ row.line ? personName(row.line) : 'Prospective member' }}
               </span>
-              <span class="shrink-0 tabular-nums text-navy-900">
+              <span class="shrink-0 tabular-nums text-ink">
                 ${{ centsToDollarString(row.forecastMonthlyCents) }}/mo
               </span>
             </li>

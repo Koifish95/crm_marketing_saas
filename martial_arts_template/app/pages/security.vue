@@ -137,7 +137,7 @@ function person(name: string | null, email: string | null) {
           <p class="text-xs text-muted">
             {{ when(event.createdAt) }}
           </p>
-          <p class="font-medium text-navy-900">
+          <p class="font-medium text-ink">
             {{ securityActionLabel(event.action) }}
             <span class="font-normal text-muted"> · {{ person(event.actorName, event.actorEmail) }}</span>
           </p>
@@ -202,7 +202,7 @@ function person(name: string | null, email: string | null) {
             <td class="whitespace-nowrap px-4 py-3 text-muted">
               {{ when(event.createdAt) }}
             </td>
-            <td class="px-4 py-3 font-medium text-navy-900">
+            <td class="px-4 py-3 font-medium text-ink">
               {{ securityActionLabel(event.action) }}
             </td>
             <td class="px-4 py-3">

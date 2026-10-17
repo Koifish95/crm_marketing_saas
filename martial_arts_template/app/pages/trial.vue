@@ -270,10 +270,10 @@ async function submit() {
       class="space-y-5 text-center sm:text-left"
     >
       <div>
-        <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-600">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted">
           {{ brandName }}
         </p>
-        <h1 class="mt-2 font-display text-3xl font-semibold tracking-tight text-navy-900 sm:text-4xl">
+        <h1 class="mt-2 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
           Online booking is temporarily unavailable
         </h1>
         <p class="mt-3 text-sm leading-6 text-muted">
@@ -290,10 +290,10 @@ async function submit() {
 
     <template v-else>
       <div class="text-center sm:text-left">
-        <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-600">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted">
           {{ brandName }}
         </p>
-        <h1 class="mt-2 font-display text-3xl font-semibold tracking-tight text-navy-900 sm:text-4xl">
+        <h1 class="mt-2 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
           Book your free class
         </h1>
         <p class="mt-3 text-sm leading-6 text-muted">
@@ -315,12 +315,12 @@ async function submit() {
         <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-success-700">
           You’re booked
         </p>
-        <h2 class="font-display text-2xl font-semibold text-navy-900">
+        <h2 class="font-display text-2xl font-semibold text-ink">
           {{ confirmation.people.length > 1 ? 'Your intros are scheduled' : 'Your intro is scheduled' }}
         </h2>
         <p
           v-if="confirmation.householdContactName"
-          class="text-sm text-navy-800"
+          class="text-sm text-ink"
         >
           Household contact: {{ confirmation.householdContactName }}
         </p>
@@ -329,13 +329,13 @@ async function submit() {
             v-for="(person, index) in confirmation.people"
             :key="`${person.firstName}-${index}`"
           >
-            <p class="font-medium text-navy-900">
+            <p class="font-medium text-ink">
               {{ [person.firstName, person.lastName].filter(Boolean).join(' ') }}
             </p>
-            <p class="text-sm text-navy-800">
+            <p class="text-sm text-ink">
               {{ person.programName ? `${person.programName} — ` : '' }}{{ person.className }}
             </p>
-            <p class="text-sm text-navy-800">
+            <p class="text-sm text-ink">
               {{ formatDenverLongDate(person.date) }} at {{ person.time }}
             </p>
           </li>
@@ -355,14 +355,14 @@ async function submit() {
         </AppAlert>
 
         <fieldset>
-          <legend class="text-sm font-medium text-navy-900">
+          <legend class="text-sm font-medium text-ink">
             Who would you like to book for?
           </legend>
           <div class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
             <button
               type="button"
               class="rounded-md border px-3 py-3 text-sm font-medium"
-              :class="shape === 'ONE' ? 'border-navy-900 bg-navy-900 text-white' : 'border-line bg-paper text-navy-800'"
+              :class="shape === 'ONE' ? 'border-navy-900 bg-navy-900 text-white' : 'border-line bg-paper text-ink'"
               :aria-pressed="shape === 'ONE'"
               @click="chooseShape('ONE')"
             >
@@ -371,7 +371,7 @@ async function submit() {
             <button
               type="button"
               class="rounded-md border px-3 py-3 text-sm font-medium"
-              :class="shape === 'FAMILY' ? 'border-navy-900 bg-navy-900 text-white' : 'border-line bg-paper text-navy-800'"
+              :class="shape === 'FAMILY' ? 'border-navy-900 bg-navy-900 text-white' : 'border-line bg-paper text-ink'"
               :aria-pressed="shape === 'FAMILY'"
               @click="chooseShape('FAMILY')"
             >
@@ -436,14 +436,14 @@ async function submit() {
 
           <template v-if="shape === 'ONE'">
             <fieldset>
-              <legend class="text-sm font-medium text-navy-900">
+              <legend class="text-sm font-medium text-ink">
                 Who is taking the class?
               </legend>
               <div class="mt-2 grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   class="rounded-md border px-3 py-3 text-sm font-medium"
-                  :class="oneWho === 'SELF' ? 'border-navy-900 bg-navy-900 text-white' : 'border-line bg-paper text-navy-800'"
+                  :class="oneWho === 'SELF' ? 'border-navy-900 bg-navy-900 text-white' : 'border-line bg-paper text-ink'"
                   :aria-pressed="oneWho === 'SELF'"
                   @click="chooseWho('SELF')"
                 >
@@ -452,7 +452,7 @@ async function submit() {
                 <button
                   type="button"
                   class="rounded-md border px-3 py-3 text-sm font-medium"
-                  :class="oneWho === 'CHILD' ? 'border-navy-900 bg-navy-900 text-white' : 'border-line bg-paper text-navy-800'"
+                  :class="oneWho === 'CHILD' ? 'border-navy-900 bg-navy-900 text-white' : 'border-line bg-paper text-ink'"
                   :aria-pressed="oneWho === 'CHILD'"
                   @click="chooseWho('CHILD')"
                 >
@@ -524,7 +524,7 @@ async function submit() {
               class="space-y-2"
             >
               <div class="flex items-center justify-between gap-2">
-                <p class="text-sm font-medium text-navy-900">
+                <p class="text-sm font-medium text-ink">
                   Family member {{ index + 1 }}
                 </p>
                 <AppButton

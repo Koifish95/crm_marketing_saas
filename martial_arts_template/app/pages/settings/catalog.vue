@@ -612,7 +612,7 @@ async function savePricingDollars(row: PricingRow, first: string, additional: st
           :key="rule.id"
           class="grid gap-3 py-3 lg:grid-cols-5"
         >
-          <p class="self-end font-medium text-navy-900">
+          <p class="self-end font-medium text-ink">
             {{ rule.program?.name || 'Program' }}
           </p>
           <AppField label="First member">

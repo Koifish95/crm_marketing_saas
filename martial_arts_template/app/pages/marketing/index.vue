@@ -64,61 +64,61 @@ const { data, error } = await useFetch<MarketingOverview>('/api/marketing/overvi
 
     <div
       v-if="data"
-      class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+      class="stat-row"
     >
       <NuxtLink
         to="/marketing/tasks"
-        class="panel p-4"
+        class="stat"
       >
-        <p class="text-xs uppercase tracking-wide text-muted">
+        <p class="stat-label">
           Marketing Tasks
         </p>
-        <p class="mt-1 text-2xl font-semibold text-navy-900">
+        <p class="stat-value text-ink">
           {{ data.tasks.overdue }}
         </p>
-        <p class="text-sm text-muted">
+        <p class="stat-hint">
           Overdue · {{ data.tasks.dueToday }} due today · {{ data.tasks.assetRequests }} asset requests
         </p>
       </NuxtLink>
       <NuxtLink
         to="/marketing/content"
-        class="panel p-4"
+        class="stat"
       >
-        <p class="text-xs uppercase tracking-wide text-muted">
+        <p class="stat-label">
           Content
         </p>
-        <p class="mt-1 text-2xl font-semibold text-navy-900">
+        <p class="stat-value text-ink">
           {{ data.content.needingReview }}
         </p>
-        <p class="text-sm text-muted">
+        <p class="stat-hint">
           Needs review · {{ data.content.needingAssets }} need assets · {{ data.content.readyToPublish }} ready
         </p>
       </NuxtLink>
       <NuxtLink
         to="/marketing/campaigns"
-        class="panel p-4"
+        class="stat"
       >
-        <p class="text-xs uppercase tracking-wide text-muted">
+        <p class="stat-label">
           Active Campaigns
         </p>
-        <p class="mt-1 text-2xl font-semibold text-navy-900">
+        <p class="stat-value text-ink">
           {{ data.activeCampaigns.length }}
         </p>
-        <p class="text-sm text-muted">
+        <p class="stat-hint">
           {{ data.approachingCampaigns.length }} approaching a start or end date
         </p>
       </NuxtLink>
       <NuxtLink
         to="/marketing/events"
-        class="panel p-4"
+        class="stat"
       >
-        <p class="text-xs uppercase tracking-wide text-muted">
+        <p class="stat-label">
           Upcoming events
         </p>
-        <p class="mt-1 text-2xl font-semibold text-navy-900">
+        <p class="stat-value text-ink">
           {{ data.events.length }}
         </p>
-        <p class="text-sm text-muted">
+        <p class="stat-hint">
           Registration counts are internal CRM event rows, not unique people.
         </p>
       </NuxtLink>
@@ -129,14 +129,14 @@ const { data, error } = await useFetch<MarketingOverview>('/api/marketing/overvi
       title="Campaign outcomes"
       description="Labels say where each number comes from. Meta spend requires an explicit campaign map."
     >
-      <div class="space-y-3 md:hidden">
+      <div class="divide-y divide-line md:hidden">
         <NuxtLink
           v-for="row in data.campaignOutcomes"
           :key="row.id"
           :to="campaignStaffPath(row.id)"
-          class="block rounded-md border border-line p-4"
+          class="block py-3 first:pt-0 last:pb-0"
         >
-          <p class="font-medium text-navy-900">
+          <p class="font-medium text-ink">
             {{ row.name }}
           </p>
           <p class="mt-1 text-sm text-muted">
@@ -193,20 +193,25 @@ const { data, error } = await useFetch<MarketingOverview>('/api/marketing/overvi
       </p>
     </AppPanel>
 
-    <div class="grid gap-4 sm:grid-cols-2">
-      <NuxtLink
-        v-for="area in data?.areas ?? []"
-        :key="area.to"
-        :to="area.to"
-        class="panel p-5 hover:border-navy-600/40"
-      >
-        <p class="font-medium text-navy-900">
-          {{ area.title }}
-        </p>
-        <p class="mt-1 text-sm text-muted">
-          {{ area.description }}
-        </p>
-      </NuxtLink>
-    </div>
+    <AppPanel>
+      <ul class="link-list">
+        <li
+          v-for="area in data?.areas ?? []"
+          :key="area.to"
+        >
+          <NuxtLink
+            :to="area.to"
+            class="link-list-item"
+          >
+            <p class="link-list-title">
+              {{ area.title }}
+            </p>
+            <p class="link-list-text">
+              {{ area.description }}
+            </p>
+          </NuxtLink>
+        </li>
+      </ul>
+    </AppPanel>
   </section>
 </template>

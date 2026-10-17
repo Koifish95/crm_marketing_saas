@@ -156,7 +156,7 @@ function confirmCancel() {
           class="min-h-11 shrink-0 rounded-md border px-3 py-2 text-sm"
           :class="view === item.id
             ? 'border-navy-900 bg-navy-900 text-white'
-            : 'border-line bg-paper text-navy-800 hover:border-navy-600/40'"
+            : 'border-line bg-paper text-ink hover:border-navy-600/40'"
           :aria-pressed="view === item.id"
           @click="view = item.id"
         >
@@ -212,7 +212,7 @@ function confirmCancel() {
           <div class="min-w-0">
             <NuxtLink
               :to="`/leads/${task.lead?.id}`"
-              class="text-base font-semibold text-navy-900 hover:text-brand-700"
+              class="text-base font-semibold text-ink hover:text-brand-700"
             >
               {{ personName(task.lead) }}
             </NuxtLink>
@@ -220,7 +220,7 @@ function confirmCancel() {
               <a
                 v-if="task.lead?.phone"
                 :href="`tel:${task.lead.phone}`"
-                class="inline-flex min-h-11 items-center font-medium text-navy-800 hover:text-brand-700"
+                class="inline-flex min-h-11 items-center font-medium text-ink hover:text-brand-700"
               >{{ task.lead.phone }}</a>
               <span
                 v-else

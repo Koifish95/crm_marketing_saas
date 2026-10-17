@@ -36,7 +36,7 @@ function close() {
   >
     <div class="space-y-4 p-4">
       <div class="flex items-start justify-between gap-2">
-        <h2 class="text-base font-semibold text-navy-900">
+        <h2 class="text-base font-semibold text-ink">
           {{ title || 'Filters' }}
         </h2>
         <button

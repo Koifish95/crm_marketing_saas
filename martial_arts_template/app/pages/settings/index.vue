@@ -129,21 +129,26 @@ async function saveTrackedAcquisitionOwner() {
     >
       {{ settingNotice }}
     </AppAlert>
-    <div class="grid gap-4 sm:grid-cols-2">
-      <NuxtLink
-        v-for="area in areas"
-        :key="area.to"
-        :to="area.to"
-        class="panel p-5 hover:border-navy-600/40"
-      >
-        <p class="font-medium text-navy-900">
-          {{ area.title }}
-        </p>
-        <p class="mt-1 text-sm text-muted">
-          {{ area.description }}
-        </p>
-      </NuxtLink>
-    </div>
+    <AppPanel>
+      <ul class="link-list">
+        <li
+          v-for="area in areas"
+          :key="area.to"
+        >
+          <NuxtLink
+            :to="area.to"
+            class="link-list-item"
+          >
+            <p class="link-list-title">
+              {{ area.title }}
+            </p>
+            <p class="link-list-text">
+              {{ area.description }}
+            </p>
+          </NuxtLink>
+        </li>
+      </ul>
+    </AppPanel>
 
     <AppPanel
       :title="ALLOW_EARLY_TRIAL_OUTCOMES_LABEL"

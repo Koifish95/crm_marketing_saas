@@ -1168,7 +1168,7 @@ async function executeProcess() {
             class="mt-5 space-y-3"
           >
             <div>
-              <h2 class="text-sm font-semibold text-navy-900">
+              <h2 class="text-sm font-semibold text-ink">
                 Roster
               </h2>
               <p class="mt-0.5 text-sm text-muted">
@@ -1198,7 +1198,7 @@ async function executeProcess() {
                       <a
                         v-if="registration.phone"
                         :href="`tel:${registration.phone}`"
-                        class="font-medium text-navy-800 hover:text-brand-700"
+                        class="font-medium text-ink hover:text-brand-700"
                       >{{ registration.phone }}</a>
                       <span
                         v-if="registration.phone && registration.email"
@@ -1207,7 +1207,7 @@ async function executeProcess() {
                       <a
                         v-if="registration.email"
                         :href="`mailto:${registration.email}`"
-                        class="font-medium text-navy-800 hover:text-brand-700"
+                        class="font-medium text-ink hover:text-brand-700"
                       >{{ registration.email }}</a>
                       <span v-if="!registration.phone && !registration.email">No contact</span>
                       <template v-if="registration.source">
@@ -1251,7 +1251,7 @@ async function executeProcess() {
                   >
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                       <div class="min-w-0">
-                        <p class="font-medium text-navy-900">
+                        <p class="font-medium text-ink">
                           {{ line.firstName }} {{ line.lastName }}
                         </p>
                         <p class="record-item-meta">
@@ -1453,7 +1453,7 @@ async function executeProcess() {
               v-if="preview"
               class="mt-4 space-y-4 text-sm"
             >
-              <p class="rounded-md bg-canvas px-3 py-2 font-medium text-navy-900">
+              <p class="rounded-md bg-canvas px-3 py-2 font-medium text-ink">
                 {{ preview.registrations }} included · {{ preview.newHouseholds }} new households ·
                 {{ preview.existingMatches }} existing matches · {{ preview.ambiguous }} ambiguous ·
                 {{ preview.excluded }} excluded · {{ preview.followUpTasksToCreate }} Follow-up calls
@@ -1468,7 +1468,7 @@ async function executeProcess() {
                     <AppBadge :tone="outcomeTone(row.outcome)">
                       {{ outcomeLabel(row.outcome) }}
                     </AppBadge>
-                    <p class="font-medium text-navy-900">
+                    <p class="font-medium text-ink">
                       {{ row.proposedAction }}
                     </p>
                   </div>

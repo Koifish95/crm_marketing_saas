@@ -321,7 +321,7 @@ const activeFilterCount = computed(() => [status.value, programId.value, source.
           <div class="flex min-w-0 flex-wrap items-start gap-2">
             <NuxtLink
               :to="householdHref(household.lead.id)"
-              class="min-w-0 break-words font-semibold text-navy-900 hover:text-brand-700"
+              class="min-w-0 break-words font-semibold text-ink hover:text-brand-700"
             >
               {{ personName(household.lead) }}
             </NuxtLink>
@@ -346,7 +346,7 @@ const activeFilterCount = computed(() => [status.value, programId.value, source.
             <a
               v-if="household.lead.phone"
               :href="`tel:${household.lead.phone}`"
-              class="inline-flex min-h-11 items-center font-medium text-navy-800 hover:text-brand-700"
+              class="inline-flex min-h-11 items-center font-medium text-ink hover:text-brand-700"
             >{{ household.lead.phone }}</a>
             <span v-else>{{ household.lead.email || 'No contact' }}</span>
           </p>
@@ -397,7 +397,7 @@ const activeFilterCount = computed(() => [status.value, programId.value, source.
               <td class="min-w-0 px-4 py-3">
                 <NuxtLink
                   :to="householdHref(household.lead.id)"
-                  class="break-words font-medium text-navy-900 hover:text-brand-700"
+                  class="break-words font-medium text-ink hover:text-brand-700"
                 >
                   {{ personName(household.lead) }}
                 </NuxtLink>
@@ -466,7 +466,7 @@ const activeFilterCount = computed(() => [status.value, programId.value, source.
           :to="householdHref(household.lead.id)"
           class="mt-2 block rounded-md border border-line bg-paper p-2.5 text-sm hover:border-navy-600/40"
         >
-          <p class="flex flex-wrap items-center gap-2 font-medium text-navy-900">
+          <p class="flex flex-wrap items-center gap-2 font-medium text-ink">
             <span>{{ personName(household.lead) }}</span>
             <AppBadge
               v-if="household.lead.possibleDuplicateMatches?.length"

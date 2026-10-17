@@ -8,7 +8,7 @@ defineProps<{
 </script>
 
 <template>
-  <label class="block text-sm font-medium text-navy-800">
+  <label class="block text-sm font-medium text-ink">
     <span class="flex items-baseline justify-between gap-2">
       <span>
         {{ label }}

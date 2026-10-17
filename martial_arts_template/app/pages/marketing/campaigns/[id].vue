@@ -1093,7 +1093,7 @@ const linkableAssets = computed(() => {
                   </select>
                 </AppField>
                 <fieldset class="sm:col-span-2">
-                  <legend class="mb-2 text-sm font-medium text-navy-900">
+                  <legend class="mb-2 text-sm font-medium text-ink">
                     Collaborators
                   </legend>
                   <div class="flex flex-wrap gap-2">
@@ -1105,7 +1105,7 @@ const linkableAssets = computed(() => {
                       {{ personNameById(id) }}
                       <button
                         type="button"
-                        class="min-h-11 min-w-11 text-muted hover:text-navy-900"
+                        class="min-h-11 min-w-11 text-muted hover:text-ink"
                         :aria-label="`Remove ${personNameById(id)}`"
                         @click="removeCollaborator(id)"
                       >
@@ -1139,7 +1139,7 @@ const linkableAssets = computed(() => {
                   </p>
                 </fieldset>
                 <fieldset class="sm:col-span-2">
-                  <legend class="mb-2 text-sm font-medium text-navy-900">
+                  <legend class="mb-2 text-sm font-medium text-ink">
                     Programs
                   </legend>
                   <div class="flex flex-wrap gap-2">
@@ -1150,7 +1150,7 @@ const linkableAssets = computed(() => {
                       class="min-h-11 rounded-md border px-3 text-sm"
                       :class="edit.programIds.includes(program.id)
                         ? 'border-navy-900 bg-navy-900 text-white'
-                        : 'border-line bg-paper text-navy-900'"
+                        : 'border-line bg-paper text-ink'"
                       :aria-pressed="edit.programIds.includes(program.id)"
                       @click="edit.programIds = toggleMulti(edit.programIds, program.id)"
                     >
@@ -1273,7 +1273,7 @@ const linkableAssets = computed(() => {
           >
             <div class="space-y-6">
               <section class="panel space-y-5 p-4 sm:p-6">
-                <h2 class="font-display text-lg font-semibold text-navy-900">
+                <h2 class="font-display text-lg font-semibold text-ink">
                   Campaign plan
                 </h2>
                 <dl class="space-y-4 text-sm">
@@ -1281,7 +1281,7 @@ const linkableAssets = computed(() => {
                     <dt class="text-muted">
                       Objective
                     </dt>
-                    <dd class="mt-1 whitespace-pre-wrap text-navy-900">
+                    <dd class="mt-1 whitespace-pre-wrap text-ink">
                       {{ displayValue(campaign.objective) }}
                     </dd>
                   </div>
@@ -1289,7 +1289,7 @@ const linkableAssets = computed(() => {
                     <dt class="text-muted">
                       Offer
                     </dt>
-                    <dd class="mt-1 whitespace-pre-wrap text-navy-900">
+                    <dd class="mt-1 whitespace-pre-wrap text-ink">
                       {{ displayValue(campaign.offer) }}
                     </dd>
                   </div>
@@ -1297,7 +1297,7 @@ const linkableAssets = computed(() => {
                     <dt class="text-muted">
                       Target audience
                     </dt>
-                    <dd class="mt-1 whitespace-pre-wrap text-navy-900">
+                    <dd class="mt-1 whitespace-pre-wrap text-ink">
                       {{ displayValue(campaign.targetAudience) }}
                     </dd>
                   </div>
@@ -1305,7 +1305,7 @@ const linkableAssets = computed(() => {
                     <dt class="text-muted">
                       Programs
                     </dt>
-                    <dd class="mt-1 text-navy-900">
+                    <dd class="mt-1 text-ink">
                       {{ programSummary }}
                     </dd>
                   </div>
@@ -1313,7 +1313,7 @@ const linkableAssets = computed(() => {
                     <dt class="text-muted">
                       Primary channel
                     </dt>
-                    <dd class="mt-1 text-navy-900">
+                    <dd class="mt-1 text-ink">
                       {{ campaign.channel }}
                     </dd>
                   </div>
@@ -1321,7 +1321,7 @@ const linkableAssets = computed(() => {
                     <dt class="text-muted">
                       Description
                     </dt>
-                    <dd class="mt-1 max-w-3xl whitespace-pre-wrap text-navy-900">
+                    <dd class="mt-1 max-w-3xl whitespace-pre-wrap text-ink">
                       {{ displayValue(campaign.description) }}
                     </dd>
                   </div>
@@ -1330,17 +1330,17 @@ const linkableAssets = computed(() => {
                   v-if="campaign.notes"
                   class="border-t border-line pt-4"
                 >
-                  <summary class="min-h-11 cursor-pointer text-sm font-medium text-navy-900">
+                  <summary class="min-h-11 cursor-pointer text-sm font-medium text-ink">
                     Show notes
                   </summary>
-                  <p class="mt-2 max-w-3xl whitespace-pre-wrap text-sm text-navy-800">
+                  <p class="mt-2 max-w-3xl whitespace-pre-wrap text-sm text-ink">
                     {{ campaign.notes }}
                   </p>
                 </details>
               </section>
 
               <section class="panel space-y-4 p-4 sm:p-6">
-                <h2 class="font-display text-lg font-semibold text-navy-900">
+                <h2 class="font-display text-lg font-semibold text-ink">
                   Activity
                 </h2>
                 <ul class="space-y-2 text-sm">
@@ -1398,7 +1398,7 @@ const linkableAssets = computed(() => {
                     <dt class="text-muted">
                       Attributed households
                     </dt>
-                    <dd class="mt-1 font-medium text-navy-900">
+                    <dd class="mt-1 font-medium text-ink">
                       {{ campaign.leads.length }}
                     </dd>
                   </div>
@@ -1406,7 +1406,7 @@ const linkableAssets = computed(() => {
                     <dt class="text-muted">
                       Joined
                     </dt>
-                    <dd class="mt-1 font-medium text-navy-900">
+                    <dd class="mt-1 font-medium text-ink">
                       {{ joinedLineCount }}
                     </dd>
                   </div>
@@ -1414,7 +1414,7 @@ const linkableAssets = computed(() => {
                     <dt class="text-muted">
                       Planned budget
                     </dt>
-                    <dd class="mt-1 font-medium text-navy-900">
+                    <dd class="mt-1 font-medium text-ink">
                       {{ budgetSummary(campaign.budgetCents) }}
                     </dd>
                   </div>
@@ -1424,7 +1424,7 @@ const linkableAssets = computed(() => {
 
             <div class="space-y-6">
               <section class="panel space-y-4 p-4 sm:p-6">
-                <h2 class="font-display text-lg font-semibold text-navy-900">
+                <h2 class="font-display text-lg font-semibold text-ink">
                   Ownership
                 </h2>
                 <dl class="space-y-4 text-sm">
@@ -1432,7 +1432,7 @@ const linkableAssets = computed(() => {
                     <dt class="text-muted">
                       Owner
                     </dt>
-                    <dd class="mt-1 text-navy-900">
+                    <dd class="mt-1 text-ink">
                       {{ campaign.owner?.displayName || 'Unassigned' }}
                     </dd>
                   </div>
@@ -1440,7 +1440,7 @@ const linkableAssets = computed(() => {
                     <dt class="text-muted">
                       Collaborators
                     </dt>
-                    <dd class="mt-1 text-navy-900">
+                    <dd class="mt-1 text-ink">
                       <template v-if="collaboratorNames.length">
                         {{ collaboratorNames.join(', ') }}
                       </template>
@@ -1452,7 +1452,7 @@ const linkableAssets = computed(() => {
                 </dl>
               </section>
               <section class="panel space-y-4 p-4 sm:p-6">
-                <h2 class="font-display text-lg font-semibold text-navy-900">
+                <h2 class="font-display text-lg font-semibold text-ink">
                   Schedule
                 </h2>
                 <dl class="space-y-4 text-sm">
@@ -1460,7 +1460,7 @@ const linkableAssets = computed(() => {
                     <dt class="text-muted">
                       Planned
                     </dt>
-                    <dd class="mt-1 text-navy-900">
+                    <dd class="mt-1 text-ink">
                       {{ dateRangeLabel(campaign.startsAt, campaign.endsAt, 'open') || 'Not set' }}
                     </dd>
                   </div>
@@ -1468,17 +1468,17 @@ const linkableAssets = computed(() => {
                     <dt class="text-muted">
                       Actual
                     </dt>
-                    <dd class="mt-1 text-navy-900">
+                    <dd class="mt-1 text-ink">
                       {{ dateRangeLabel(campaign.actualStartsAt, campaign.actualEndsAt) || 'Not set' }}
                     </dd>
                   </div>
                 </dl>
               </section>
               <section class="panel space-y-3 p-4 sm:p-6">
-                <h2 class="font-display text-lg font-semibold text-navy-900">
+                <h2 class="font-display text-lg font-semibold text-ink">
                   Tracking
                 </h2>
-                <p class="text-sm text-navy-900">
+                <p class="text-sm text-ink">
                   {{ trackingSummary }}
                 </p>
                 <p
@@ -1515,7 +1515,7 @@ const linkableAssets = computed(() => {
               >
                 <NuxtLink
                   :to="contentStaffPath(item.id, { campaignId: campaign?.id })"
-                  class="font-medium text-navy-900 hover:text-brand-700"
+                  class="font-medium text-ink hover:text-brand-700"
                 >
                   {{ item.title }}
                 </NuxtLink>
@@ -1578,7 +1578,7 @@ const linkableAssets = computed(() => {
                 <div class="min-w-0">
                   <NuxtLink
                     :to="marketingTaskStaffPath(task.id)"
-                    class="font-medium text-navy-900 hover:text-brand-700"
+                    class="font-medium text-ink hover:text-brand-700"
                   >
                     {{ task.title }}
                   </NuxtLink>
@@ -1686,7 +1686,7 @@ const linkableAssets = computed(() => {
                 :key="asset.id"
                 class="record-item flex flex-wrap items-center justify-between gap-2"
               >
-                <span class="font-medium text-navy-900">
+                <span class="font-medium text-ink">
                   <NuxtLink
                     :to="assetStaffPath(asset.id)"
                     class="hover:text-brand-700"
@@ -1796,7 +1796,7 @@ const linkableAssets = computed(() => {
               >
                 <div class="flex flex-wrap items-start justify-between gap-2">
                   <div class="min-w-0">
-                    <p class="font-medium text-navy-900">
+                    <p class="font-medium text-ink">
                       {{ link.label }}
                       <AppBadge
                         v-if="link.isDefault"
@@ -1805,7 +1805,7 @@ const linkableAssets = computed(() => {
                         Default
                       </AppBadge>
                     </p>
-                    <p class="break-all text-navy-900">
+                    <p class="break-all text-ink">
                       {{ publicUrl(link) }}
                     </p>
                     <p class="mt-1 text-xs text-muted">
@@ -1951,7 +1951,7 @@ const linkableAssets = computed(() => {
               >
                 <NuxtLink
                   :to="`/marketing/events/${item.id}`"
-                  class="font-medium text-navy-900 hover:text-brand-700"
+                  class="font-medium text-ink hover:text-brand-700"
                 >
                   {{ item.title }}
                 </NuxtLink>
@@ -2042,9 +2042,9 @@ const linkableAssets = computed(() => {
                     :key="stage.key"
                     class="flex items-baseline justify-between gap-3 border-b border-line py-2 text-sm"
                   >
-                    <span class="text-navy-900">{{ stage.label }}</span>
+                    <span class="text-ink">{{ stage.label }}</span>
                     <span class="shrink-0 text-right">
-                      <span class="font-medium text-navy-900">{{ stage.journeys }}</span>
+                      <span class="font-medium text-ink">{{ stage.journeys }}</span>
                       <span
                         v-if="funnelPercent(stage.rateFromPrevious)"
                         class="ml-2 text-muted"
@@ -2099,7 +2099,7 @@ const linkableAssets = computed(() => {
                   class="mt-4 grid gap-4 sm:grid-cols-3"
                 >
                   <div v-if="funnel.breakdowns.program.length">
-                    <p class="text-sm font-medium text-navy-900">
+                    <p class="text-sm font-medium text-ink">
                       Program
                     </p>
                     <ul class="mt-1 text-sm text-muted">
@@ -2112,7 +2112,7 @@ const linkableAssets = computed(() => {
                     </ul>
                   </div>
                   <div v-if="funnel.breakdowns.path.length">
-                    <p class="text-sm font-medium text-navy-900">
+                    <p class="text-sm font-medium text-ink">
                       Who
                     </p>
                     <ul class="mt-1 text-sm text-muted">
@@ -2125,7 +2125,7 @@ const linkableAssets = computed(() => {
                     </ul>
                   </div>
                   <div v-if="funnel.breakdowns.device.length">
-                    <p class="text-sm font-medium text-navy-900">
+                    <p class="text-sm font-medium text-ink">
                       Device
                     </p>
                     <ul class="mt-1 text-sm text-muted">
@@ -2142,7 +2142,7 @@ const linkableAssets = computed(() => {
                   v-if="funnel.breakdowns.trackingLink.length"
                   class="mt-4"
                 >
-                  <p class="text-sm font-medium text-navy-900">
+                  <p class="text-sm font-medium text-ink">
                     Tracking link
                   </p>
                   <ul class="mt-1 text-sm text-muted">
@@ -2158,7 +2158,7 @@ const linkableAssets = computed(() => {
                   v-if="funnel.breakdowns.day.length"
                   class="mt-4"
                 >
-                  <p class="text-sm font-medium text-navy-900">
+                  <p class="text-sm font-medium text-ink">
                     By day
                   </p>
                   <ul class="mt-1 text-sm text-muted">
@@ -2235,7 +2235,7 @@ const linkableAssets = computed(() => {
                 </div>
               </dl>
               <div class="mt-4">
-                <p class="text-sm font-medium text-navy-900">
+                <p class="text-sm font-medium text-ink">
                   Mapped Meta campaigns
                 </p>
                 <ul
@@ -2286,7 +2286,7 @@ const linkableAssets = computed(() => {
                 >
                   <NuxtLink
                     :to="leadStaffPath(household.id, { campaignId: String(campaign.id) })"
-                    class="font-medium text-navy-900 hover:text-brand-700"
+                    class="font-medium text-ink hover:text-brand-700"
                   >
                     {{ personName(household) }}
                   </NuxtLink>

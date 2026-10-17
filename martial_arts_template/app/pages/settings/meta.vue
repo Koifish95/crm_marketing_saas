@@ -171,7 +171,7 @@ async function unmap(campaignId: number) {
         >
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div class="min-w-0">
-              <p class="break-words font-medium text-navy-900">
+              <p class="break-words font-medium text-ink">
                 {{ campaign.name }}
               </p>
               <p class="text-muted">

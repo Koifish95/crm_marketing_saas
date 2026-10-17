@@ -110,7 +110,7 @@ function plannedRange(campaign: CampaignRow) {
         class="panel block p-5"
       >
         <div class="flex min-w-0 flex-wrap items-start gap-2">
-          <p class="min-w-0 break-words font-semibold text-navy-900">
+          <p class="min-w-0 break-words font-semibold text-ink">
             {{ campaign.name }}
           </p>
           <AppBadge
@@ -180,7 +180,7 @@ function plannedRange(campaign: CampaignRow) {
             <td class="px-4 py-3">
               <NuxtLink
                 :to="campaignStaffPath(campaign.id)"
-                class="font-medium text-navy-900 hover:text-brand-700"
+                class="font-medium text-ink hover:text-brand-700"
               >
                 {{ campaign.name }}
               </NuxtLink>

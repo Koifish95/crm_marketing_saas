@@ -70,50 +70,28 @@ const pipelineCounts = computed(() => LEAD_STATUSES.map(status => ({
             Open queue
           </NuxtLink>
         </template>
-        <div class="panel-list grid gap-3 sm:grid-cols-3">
-          <template v-if="canUseCrm">
-            <NuxtLink
-              v-for="item in followUpCounts"
-              :key="item.label"
-              :to="item.to"
-              class="rounded-md border border-line px-4 py-3 hover:border-navy-600/30"
+        <div class="stat-row border-t-0">
+          <component
+            :is="canUseCrm ? resolveComponent('NuxtLink') : 'div'"
+            v-for="item in followUpCounts"
+            :key="item.label"
+            v-bind="canUseCrm ? { to: item.to } : {}"
+            class="stat"
+          >
+            <p class="stat-label">
+              {{ item.label }}
+            </p>
+            <p
+              class="stat-value"
+              :class="{
+                'text-danger-700': item.tone === 'danger',
+                'text-warning-800': item.tone === 'warning',
+                'text-ink': item.tone === 'default',
+              }"
             >
-              <p class="text-sm text-muted">
-                {{ item.label }}
-              </p>
-              <p
-                class="mt-1 font-display text-2xl font-semibold"
-                :class="{
-                  'text-danger-700': item.tone === 'danger',
-                  'text-warning-800': item.tone === 'warning',
-                  'text-navy-900': item.tone === 'default',
-                }"
-              >
-                {{ item.value }}
-              </p>
-            </NuxtLink>
-          </template>
-          <template v-else>
-            <div
-              v-for="item in followUpCounts"
-              :key="item.label"
-              class="rounded-md border border-line px-4 py-3"
-            >
-              <p class="text-sm text-muted">
-                {{ item.label }}
-              </p>
-              <p
-                class="mt-1 font-display text-2xl font-semibold"
-                :class="{
-                  'text-danger-700': item.tone === 'danger',
-                  'text-warning-800': item.tone === 'warning',
-                  'text-navy-900': item.tone === 'default',
-                }"
-              >
-                {{ item.value }}
-              </p>
-            </div>
-          </template>
+              {{ item.value }}
+            </p>
+          </component>
         </div>
         <AppEmpty
           v-if="!data?.followUp?.priority?.length"
@@ -124,7 +102,7 @@ const pipelineCounts = computed(() => LEAD_STATUSES.map(status => ({
         />
         <ul
           v-else
-          class="panel-list mt-4 divide-y divide-line"
+          class="mt-4 divide-y divide-line"
         >
           <li
             v-for="task in data.followUp.priority"
@@ -135,13 +113,13 @@ const pipelineCounts = computed(() => LEAD_STATUSES.map(status => ({
               <NuxtLink
                 v-if="canUseCrm"
                 :to="`/leads/${task.leadId}`"
-                class="font-medium text-navy-900 hover:text-brand-700"
+                class="font-medium text-ink hover:text-brand-700"
               >
                 {{ personName(task.lead) }}
               </NuxtLink>
               <p
                 v-else
-                class="font-medium text-navy-900"
+                class="font-medium text-ink"
               >
                 {{ personName(task.lead) }}
               </p>
@@ -149,7 +127,7 @@ const pipelineCounts = computed(() => LEAD_STATUSES.map(status => ({
                 <a
                   v-if="task.lead?.phone"
                   :href="`tel:${task.lead.phone}`"
-                  class="hover:text-navy-900"
+                  class="hover:text-ink"
                 >{{ task.lead.phone }}</a>
                 <span v-else>No phone</span>
                 · due {{ toBusinessDateTime(new Date(task.dueAt).getTime()) }}
@@ -166,7 +144,7 @@ const pipelineCounts = computed(() => LEAD_STATUSES.map(status => ({
         </ul>
       </AppPanel>
 
-      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div class="stat-row">
         <AppStat label="Households this month">
           {{ data?.householdsThisMonth ?? data?.leadsThisMonth ?? 0 }}
         </AppStat>
@@ -202,7 +180,7 @@ const pipelineCounts = computed(() => LEAD_STATUSES.map(status => ({
           />
           <ul
             v-else
-            class="panel-list divide-y divide-line"
+            class="divide-y divide-line"
           >
             <li
               v-for="trial in data.upcomingTrials"
@@ -213,13 +191,13 @@ const pipelineCounts = computed(() => LEAD_STATUSES.map(status => ({
                 <NuxtLink
                   v-if="canUseCrm"
                   :to="`/leads/${trial.leadId}`"
-                  class="font-medium text-navy-900 hover:text-brand-700"
+                  class="font-medium text-ink hover:text-brand-700"
                 >
                   {{ personName(trial.lead) }}
                 </NuxtLink>
                 <p
                   v-else
-                  class="font-medium text-navy-900"
+                  class="font-medium text-ink"
                 >
                   {{ personName(trial.lead) }}
                 </p>
@@ -233,7 +211,7 @@ const pipelineCounts = computed(() => LEAD_STATUSES.map(status => ({
         </AppPanel>
 
         <AppPanel title="Pipeline by status">
-          <ul class="panel-list divide-y divide-line text-sm">
+          <ul class="divide-y divide-line text-sm">
             <li
               v-for="item in pipelineCounts"
               :key="item.status"
@@ -245,14 +223,14 @@ const pipelineCounts = computed(() => LEAD_STATUSES.map(status => ({
                 :aria-label="`Open ${item.label} leads (${item.value})`"
               >
                 <span>{{ item.label }}</span>
-                <span class="font-medium tabular-nums text-navy-900">{{ item.value }}</span>
+                <span class="font-medium tabular-nums text-ink">{{ item.value }}</span>
               </NuxtLink>
               <div
                 v-else
                 class="flex items-center justify-between gap-4 py-2"
               >
                 <span class="text-muted">{{ item.label }}</span>
-                <span class="font-medium tabular-nums text-navy-900">{{ item.value }}</span>
+                <span class="font-medium tabular-nums text-ink">{{ item.value }}</span>
               </div>
             </li>
           </ul>

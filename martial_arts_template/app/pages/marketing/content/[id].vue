@@ -493,7 +493,7 @@ async function recordPublish() {
       </AppOverflowMenu>
 
       <section class="space-y-4">
-        <h2 class="font-display text-lg font-semibold text-navy-900">
+        <h2 class="font-display text-lg font-semibold text-ink">
           Plan
         </h2>
         <div class="panel p-4 sm:p-6">
@@ -545,7 +545,7 @@ async function recordPublish() {
               </select>
             </AppField>
             <fieldset class="md:col-span-2">
-              <legend class="mb-2 text-sm font-medium text-navy-900">
+              <legend class="mb-2 text-sm font-medium text-ink">
                 Channels
               </legend>
               <div class="flex flex-col gap-1 sm:flex-row sm:flex-wrap">
@@ -626,7 +626,7 @@ async function recordPublish() {
       </section>
 
       <section class="space-y-4">
-        <h2 class="font-display text-lg font-semibold text-navy-900">
+        <h2 class="font-display text-lg font-semibold text-ink">
           Creative
         </h2>
         <div class="panel space-y-5 p-4 sm:p-6">
@@ -638,13 +638,13 @@ async function recordPublish() {
             />
             <p
               v-else
-              class="whitespace-pre-wrap text-navy-800"
+              class="whitespace-pre-wrap text-ink"
             >
               {{ item.body || 'No caption yet.' }}
             </p>
           </AppField>
           <div>
-            <p class="mb-3 text-sm font-medium text-navy-900">
+            <p class="mb-3 text-sm font-medium text-ink">
               Attached media
             </p>
             <AppAlert
@@ -711,11 +711,11 @@ async function recordPublish() {
       </section>
 
       <section class="space-y-4">
-        <h2 class="font-display text-lg font-semibold text-navy-900">
+        <h2 class="font-display text-lg font-semibold text-ink">
           Publish
         </h2>
         <div class="panel space-y-5 p-4 sm:p-6">
-          <p class="text-sm text-navy-900">
+          <p class="text-sm text-ink">
             {{ contentStatusLabel(item.status) }}
             <span class="text-muted"> · Planned {{ whenLabel(item.plannedPublishAt) }}</span>
           </p>
@@ -777,7 +777,7 @@ async function recordPublish() {
             </AppAlert>
           </form>
           <div>
-            <p class="mb-3 text-sm font-medium text-navy-900">
+            <p class="mb-3 text-sm font-medium text-ink">
               Publication history
             </p>
             <ul
@@ -789,7 +789,7 @@ async function recordPublish() {
                 :key="index"
                 class="rounded-md border border-line p-3 text-sm"
               >
-                <p class="font-medium text-navy-900">
+                <p class="font-medium text-ink">
                   {{ contentChannelLabel(pub.channel) }}
                 </p>
                 <p class="mt-1 break-all text-muted">
