@@ -149,7 +149,7 @@ async function create() {
         class="panel block p-5"
       >
         <div class="flex min-w-0 flex-wrap items-start gap-2">
-          <p class="min-w-0 break-words font-semibold text-navy-900">
+          <p class="min-w-0 break-words font-semibold text-ink">
             {{ item.title }}
           </p>
           <AppBadge
@@ -193,7 +193,7 @@ async function create() {
             <td>
               <NuxtLink
                 :to="eventStaffPath(item.id)"
-                class="font-medium text-navy-900 hover:text-brand-700"
+                class="font-medium text-ink hover:text-brand-700"
               >
                 {{ item.title }}
               </NuxtLink>

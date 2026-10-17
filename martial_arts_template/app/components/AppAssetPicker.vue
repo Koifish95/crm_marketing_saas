@@ -66,7 +66,7 @@ function pick(id: number) {
     <div class="space-y-4 p-4 sm:p-6">
       <div class="flex items-start justify-between gap-2">
         <div>
-          <h2 class="text-base font-semibold text-navy-900">
+          <h2 class="text-base font-semibold text-ink">
             Choose media
           </h2>
           <p class="mt-1 text-sm text-muted">

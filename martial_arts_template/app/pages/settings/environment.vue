@@ -129,13 +129,13 @@ async function restoreBackup() {
       title="Copy between environments"
       description="Containers cannot see each other’s volumes. Download a zip on the source, then restore that file on the destination. Session cookies do not carry across ports. After restore, sign in with users from the backup."
     >
-      <ol class="list-decimal space-y-2 pl-5 text-sm text-navy-900">
+      <ol class="list-decimal space-y-2 pl-5 text-sm text-ink">
         <li>On the source environment, download a backup. The browser asks where to save it.</li>
-        <li>Open the destination with the PRODUCTION / STAGE / DEV links in the staff chrome (<code class="text-navy-900">:5000</code> / <code class="text-navy-900">:5010</code> / <code class="text-navy-900">:5020</code>), or stay on this URL to restore in place.</li>
+        <li>Open the destination with the PRODUCTION / STAGE / DEV links in the staff chrome (<code class="text-ink">:5000</code> / <code class="text-ink">:5010</code> / <code class="text-ink">:5020</code>), or stay on this URL to restore in place.</li>
         <li>On the destination, restore the zip. That overwrites this environment’s SQLite and marketing uploads.</li>
       </ol>
       <p class="mt-4 text-sm text-muted">
-        Host shortcuts still work: <code class="text-navy-900">pnpm env:pull -- --confirm-pull-from-prod</code> copies PRODUCTION onto STAGE and DEV without downloading. Daily PRODUCTION zips land on this machine under <code class="text-navy-900">data/backups/production/</code> (<code class="text-navy-900">pnpm backup:status</code>). Those files do not survive disk or laptop loss; off-host copies are later work.
+        Host shortcuts still work: <code class="text-ink">pnpm env:pull -- --confirm-pull-from-prod</code> copies PRODUCTION onto STAGE and DEV without downloading. Daily PRODUCTION zips land on this machine under <code class="text-ink">data/backups/production/</code> (<code class="text-ink">pnpm backup:status</code>). Those files do not survive disk or laptop loss; off-host copies are later work.
       </p>
     </AppPanel>
 

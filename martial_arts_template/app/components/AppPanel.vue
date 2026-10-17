@@ -17,7 +17,7 @@ withDefaults(defineProps<{
       <div class="min-w-0">
         <h2
           v-if="title"
-          class="text-sm font-semibold text-navy-900"
+          class="text-base font-semibold text-ink"
         >
           {{ title }}
         </h2>

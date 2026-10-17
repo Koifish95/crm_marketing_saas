@@ -128,7 +128,7 @@ function toggleRoleRight(role: CatalogRole, right: AccessRight) {
           :key="type.id"
           class="border-b border-line pb-5 last:border-b-0 last:pb-0"
         >
-          <p class="font-medium text-navy-900">
+          <p class="font-medium text-ink">
             {{ type.name }}
           </p>
           <p class="mt-1 text-sm text-muted">
@@ -167,7 +167,7 @@ function toggleRoleRight(role: CatalogRole, right: AccessRight) {
           :key="role.id"
           class="border-b border-line pb-5 last:border-b-0 last:pb-0"
         >
-          <p class="font-medium text-navy-900">
+          <p class="font-medium text-ink">
             {{ role.name }}
           </p>
           <p class="mt-1 text-sm text-muted">

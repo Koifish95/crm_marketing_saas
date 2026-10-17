@@ -211,7 +211,7 @@ onBeforeUnmount(() => {
               v-if="compact"
               class="flex items-center justify-between border-b border-line px-3 py-2"
             >
-              <p class="text-sm font-medium text-navy-900">
+              <p class="text-sm font-medium text-ink">
                 {{ searchPlaceholder }}
               </p>
               <button

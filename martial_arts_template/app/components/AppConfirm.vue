@@ -48,7 +48,7 @@ function confirm() {
       @submit.prevent="confirm"
     >
       <div>
-        <h2 class="text-base font-semibold text-navy-900">
+        <h2 class="text-base font-semibold text-ink">
           {{ title }}
         </h2>
         <p

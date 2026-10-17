@@ -40,7 +40,7 @@ function chooseDate(date: string) {
 <template>
   <div class="space-y-4">
     <fieldset class="space-y-2">
-      <legend class="text-sm font-medium text-navy-900">
+      <legend class="text-sm font-medium text-ink">
         1. Choose a date
       </legend>
       <p
@@ -85,7 +85,7 @@ function chooseDate(date: string) {
       v-if="selectedDate"
       class="space-y-2"
     >
-      <legend class="text-sm font-medium text-navy-900">
+      <legend class="text-sm font-medium text-ink">
         2. Choose a class
       </legend>
       <p class="text-sm text-muted">
@@ -107,7 +107,7 @@ function chooseDate(date: string) {
           @change="emit('update:selectedSlotId', slot.id)"
         >
         <span>
-          <span class="font-medium text-navy-900">{{ formatMinuteOfDay(slot.startMinute) }}</span>
+          <span class="font-medium text-ink">{{ formatMinuteOfDay(slot.startMinute) }}</span>
           <span
             v-if="slot.endMinute"
             class="text-muted"

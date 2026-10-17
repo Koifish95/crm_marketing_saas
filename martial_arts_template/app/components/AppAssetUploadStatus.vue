@@ -52,7 +52,7 @@ function mark(item: AssetUploadItem) {
     </ul>
     <p
       v-if="summary"
-      class="text-sm font-medium text-navy-900"
+      class="text-sm font-medium text-ink"
     >
       {{ summary }}
     </p>

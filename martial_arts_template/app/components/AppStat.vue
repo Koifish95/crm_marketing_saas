@@ -6,7 +6,7 @@ defineProps<{
 }>()
 
 const toneClass: Record<string, string> = {
-  default: 'text-navy-900',
+  default: 'text-ink',
   danger: 'text-danger-700',
   warning: 'text-warning-800',
   success: 'text-success-700',
@@ -14,19 +14,19 @@ const toneClass: Record<string, string> = {
 </script>
 
 <template>
-  <div class="panel p-4 md:p-6">
-    <p class="text-sm text-muted">
+  <div class="stat">
+    <p class="stat-label">
       {{ label }}
     </p>
     <p
-      class="mt-1 font-display text-2xl font-semibold tracking-tight"
+      class="stat-value"
       :class="toneClass[tone || 'default']"
     >
       <slot />
     </p>
     <p
       v-if="hint || $slots.hint"
-      class="mt-1 break-words text-sm text-muted"
+      class="stat-hint"
     >
       <slot name="hint">
         {{ hint }}

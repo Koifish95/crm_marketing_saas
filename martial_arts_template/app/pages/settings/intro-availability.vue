@@ -211,7 +211,7 @@ watch(introPrograms, (rows) => {
         :key="day.value"
         class="panel p-5"
       >
-        <h2 class="font-semibold text-navy-900">
+        <h2 class="font-semibold text-ink">
           {{ day.label }}
         </h2>
         <p
@@ -230,7 +230,7 @@ watch(introPrograms, (rows) => {
             class="flex flex-wrap items-center justify-between gap-2 py-2.5"
           >
             <div>
-              <p :class="rule.enabled ? 'font-medium text-navy-900' : 'text-muted'">
+              <p :class="rule.enabled ? 'font-medium text-ink' : 'text-muted'">
                 {{ formatMinuteOfDay(rule.startMinute) }}
                 <span v-if="rule.endMinute">– {{ formatMinuteOfDay(rule.endMinute) }}</span>
                 · {{ rule.name }}
@@ -274,7 +274,7 @@ watch(introPrograms, (rows) => {
       class="panel grid gap-4 p-5 sm:grid-cols-2 sm:p-6"
       @submit.prevent="saveClass"
     >
-      <h2 class="sm:col-span-2 text-sm font-semibold text-navy-900">
+      <h2 class="sm:col-span-2 text-sm font-semibold text-ink">
         {{ editingId ? 'Edit class' : 'Add class' }}
       </h2>
       <AppField
@@ -395,7 +395,7 @@ watch(introPrograms, (rows) => {
           class="flex flex-wrap items-center justify-between gap-2 rounded-md border border-line px-3 py-2"
         >
           <span>
-            <span class="font-medium text-navy-900">{{ item.onDate }}</span>
+            <span class="font-medium text-ink">{{ item.onDate }}</span>
             · {{ exceptionKindLabel(item.kind) }}
             <span v-if="item.name"> · {{ item.name }}</span>
             <span

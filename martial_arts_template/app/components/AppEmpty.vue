@@ -13,7 +13,7 @@ withDefaults(defineProps<{
     class="px-4 py-8 text-center"
     :class="bare ? '' : 'panel'"
   >
-    <p class="font-medium text-navy-900">
+    <p class="font-medium text-ink">
       {{ title }}
     </p>
     <p

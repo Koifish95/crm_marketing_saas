@@ -12,10 +12,10 @@ useHead({
 <template>
   <section class="mx-auto max-w-2xl space-y-8">
     <div>
-      <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-600">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted">
         {{ brandName }}
       </p>
-      <h1 class="mt-2 font-display text-3xl font-semibold tracking-tight text-navy-900">
+      <h1 class="mt-2 font-display text-3xl font-semibold tracking-tight text-ink">
         Acquisition
       </h1>
       <p class="mt-3 max-w-xl text-sm leading-6 text-muted">
@@ -29,7 +29,7 @@ useHead({
       to="/trial"
       class="panel block p-5 ring-1 ring-navy-900/10 hover:border-navy-600/40"
     >
-      <p class="text-sm font-semibold text-navy-900">
+      <p class="text-sm font-semibold text-ink">
         Book a free class
       </p>
       <p class="mt-1 text-sm text-muted">
@@ -40,7 +40,7 @@ useHead({
       v-else
       class="panel p-5"
     >
-      <p class="text-sm font-semibold text-navy-900">
+      <p class="text-sm font-semibold text-ink">
         Online booking is temporarily unavailable
       </p>
       <p class="mt-1 text-sm text-muted">
@@ -51,7 +51,7 @@ useHead({
       Work at the academy?
       <NuxtLink
         to="/login"
-        class="font-medium text-brand-700 hover:text-brand-600"
+        class="font-medium text-brand-700 hover:text-muted"
       >
         Staff sign-in
       </NuxtLink>

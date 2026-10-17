@@ -16,6 +16,14 @@ describe('QA audit remediation contracts', () => {
     expect(tasks).toContain('to="/leads/new"')
   })
 
+  it('renders follow-up counters as static NuxtLinks, never an unresolved dynamic component', () => {
+    const dashboard = source('app/pages/dashboard.vue')
+
+    expect(dashboard).not.toContain('resolveComponent')
+    expect(dashboard).not.toMatch(/:is="[^"]*NuxtLink/)
+    expect(dashboard).toMatch(/<NuxtLink\s+v-if="canUseCrm"\s+:to="item\.to"\s+class="stat"/)
+  })
+
   it('keeps lead creation saveable from a mobile sticky action', () => {
     const page = source('app/pages/leads/new.vue')
 

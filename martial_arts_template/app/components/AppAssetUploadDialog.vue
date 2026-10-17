@@ -185,7 +185,7 @@ onBeforeUnmount(() => {
     >
       <div class="flex items-start justify-between gap-2">
         <div>
-          <h2 class="text-base font-semibold text-navy-900">
+          <h2 class="text-base font-semibold text-ink">
             Upload assets
           </h2>
           <p class="mt-1 text-sm text-muted">

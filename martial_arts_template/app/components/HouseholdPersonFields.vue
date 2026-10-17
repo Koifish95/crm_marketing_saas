@@ -50,9 +50,9 @@ function changeProgram(programId: string) {
 </script>
 
 <template>
-  <div class="space-y-4 rounded-md border border-line bg-canvas/60 p-4">
+  <div class="space-y-4 border-t border-line pt-6 first:border-t-0 first:pt-0">
     <div class="flex flex-wrap items-start justify-between gap-3">
-      <p class="text-sm font-semibold text-navy-900">
+      <p class="text-sm font-semibold text-ink">
         {{ isSelf ? 'Primary contact as a prospective member' : 'Prospective member' }}
       </p>
       <AppButton

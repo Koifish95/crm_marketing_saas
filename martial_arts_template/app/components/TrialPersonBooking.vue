@@ -119,7 +119,7 @@ const kidsHint = computed(() => {
   <div class="space-y-4">
     <p
       v-if="title"
-      class="text-sm font-semibold text-navy-900"
+      class="text-sm font-semibold text-ink"
     >
       {{ title }}
     </p>
@@ -171,14 +171,14 @@ const kidsHint = computed(() => {
     </div>
 
     <fieldset>
-      <legend class="text-sm font-medium text-navy-900">
+      <legend class="text-sm font-medium text-ink">
         Program
       </legend>
       <div class="mt-2 grid grid-cols-2 gap-2">
         <button
           type="button"
           class="rounded-md border px-3 py-3 text-sm font-medium"
-          :class="modelValue.programCode === 'ADULT_BJJ' ? 'border-navy-900 bg-navy-900 text-white' : 'border-line bg-paper text-navy-800'"
+          :class="modelValue.programCode === 'ADULT_BJJ' ? 'border-navy-900 bg-navy-900 text-white' : 'border-line bg-paper text-ink'"
           :aria-pressed="modelValue.programCode === 'ADULT_BJJ'"
           @click="patch({ programCode: 'ADULT_BJJ', age: '', slotId: '', selectedDate: '' })"
         >
@@ -187,7 +187,7 @@ const kidsHint = computed(() => {
         <button
           type="button"
           class="rounded-md border px-3 py-3 text-sm font-medium"
-          :class="modelValue.programCode === 'KIDS_BJJ' ? 'border-navy-900 bg-navy-900 text-white' : 'border-line bg-paper text-navy-800'"
+          :class="modelValue.programCode === 'KIDS_BJJ' ? 'border-navy-900 bg-navy-900 text-white' : 'border-line bg-paper text-ink'"
           :aria-pressed="modelValue.programCode === 'KIDS_BJJ'"
           @click="patch({ programCode: 'KIDS_BJJ', slotId: '', selectedDate: '' })"
         >

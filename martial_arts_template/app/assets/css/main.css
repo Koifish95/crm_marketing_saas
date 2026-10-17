@@ -39,7 +39,8 @@
 /*
   Must stay unlayered. Tailwind @theme writes --color-navy-* on :root outside
   any layer; @layer base cannot override those. html[data-app-env] remaps every
-  navy-* utility (header, rail, auth, primary buttons, and navy text/borders).
+  navy-* utility (header, rail, auth, primary buttons). Headings and labels use
+  text-ink and never follow the environment; the accent is for buttons and links only.
   PRODUCTION leaves the academy navy from @theme.
 */
 :root[data-app-env="dev"],
@@ -111,7 +112,7 @@ html[data-app-env="stage"] {
   .control {
     @apply w-full min-h-11 rounded-md border border-line bg-paper px-3 py-2.5 text-base text-ink shadow-none;
     @apply placeholder:text-muted/80;
-    @apply hover:border-navy-600/30;
+    @apply hover:border-muted/50;
     @apply focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20;
     @apply disabled:cursor-not-allowed disabled:bg-canvas disabled:text-muted;
   }
@@ -211,7 +212,7 @@ html[data-app-env="stage"] {
   }
 
   .record-identity-name {
-    @apply min-w-0 break-words font-display text-xl font-semibold tracking-tight text-navy-900 sm:text-2xl;
+    @apply min-w-0 break-words font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl;
   }
 
   .record-identity-chevron {
@@ -247,11 +248,11 @@ html[data-app-env="stage"] {
   }
 
   .record-selector-option-active {
-    @apply bg-brand-50 text-navy-900;
+    @apply bg-brand-50 text-ink;
   }
 
   .record-selector-option-current {
-    @apply font-semibold text-navy-900;
+    @apply font-semibold text-ink;
   }
 
   .record-tablist {
@@ -259,8 +260,8 @@ html[data-app-env="stage"] {
   }
 
   .record-tab {
-    @apply shrink-0 rounded-t-md px-3 py-3 text-sm font-medium text-navy-800 transition-colors;
-    @apply hover:bg-brand-50 hover:text-navy-900;
+    @apply shrink-0 rounded-t-md px-3 py-3 text-sm font-medium text-ink transition-colors;
+    @apply hover:bg-brand-50 hover:text-ink;
   }
 
   .record-tab-active {
@@ -304,7 +305,7 @@ html[data-app-env="stage"] {
   }
 
   .record-item-title {
-    @apply min-w-0 break-words font-medium text-navy-900;
+    @apply min-w-0 break-words font-medium text-ink;
   }
 
   .record-item-meta {
@@ -313,5 +314,56 @@ html[data-app-env="stage"] {
 
   .record-item-actions {
     @apply mt-3 flex min-w-0 max-w-full flex-wrap items-end gap-3;
+  }
+}
+
+@layer components {
+  /* Stats and link lists group with dividers, not boxes. */
+  .stat-row {
+    @apply grid divide-y divide-line border-y border-line md:grid-flow-col md:auto-cols-fr md:divide-x md:divide-y-0;
+  }
+
+  .stat {
+    @apply block min-w-0 py-4 md:px-6 md:first:pl-0 md:last:pr-0;
+  }
+
+  a.stat {
+    @apply hover:bg-canvas;
+  }
+
+  .stat-label {
+    @apply text-sm text-muted;
+  }
+
+  .stat-value {
+    @apply mt-1 font-display text-2xl font-semibold tracking-tight tabular-nums;
+  }
+
+  .stat-hint {
+    @apply mt-1 break-words text-sm text-muted;
+  }
+
+  .link-list > li {
+    @apply py-3 first:pt-0 last:pb-0;
+  }
+
+  .link-list {
+    @apply divide-y divide-line;
+  }
+
+  .link-list-item {
+    @apply block min-w-0;
+  }
+
+  .link-list-title {
+    @apply font-medium text-brand-700;
+  }
+
+  .link-list-item:hover .link-list-title {
+    @apply text-brand-600 underline;
+  }
+
+  .link-list-text {
+    @apply mt-0.5 text-sm text-muted;
   }
 }

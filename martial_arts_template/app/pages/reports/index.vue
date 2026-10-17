@@ -277,7 +277,7 @@ const activeFilterCount = computed(() => [programId.value, source.value, campaig
     </p>
 
     <template v-else-if="data">
-      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div class="stat-row">
         <AppStat
           label="Households"
           hint="Lead headers created in range"
@@ -316,45 +316,45 @@ const activeFilterCount = computed(() => [programId.value, source.value, campaig
         title="Person funnel"
         description="Unique LeadLines. Reschedules do not add people."
       >
-        <dl class="panel-list grid gap-3 sm:grid-cols-4">
-          <div>
-            <dt class="text-sm text-muted">
+        <dl class="stat-row border-y-0">
+          <div class="stat">
+            <dt class="stat-label">
               Prospective members
             </dt>
-            <dd class="font-display text-xl font-semibold">
+            <dd class="stat-value text-ink">
               {{ data.funnel.prospectiveMembers }}
             </dd>
           </div>
-          <div>
-            <dt class="text-sm text-muted">
+          <div class="stat">
+            <dt class="stat-label">
               Intro scheduled
             </dt>
-            <dd class="font-display text-xl font-semibold">
+            <dd class="stat-value text-ink">
               {{ data.funnel.trialScheduled }}
             </dd>
-            <p class="text-sm text-muted">
+            <p class="stat-hint">
               {{ pct(data.funnel.lineToTrialRate) }} of people
             </p>
           </div>
-          <div>
-            <dt class="text-sm text-muted">
+          <div class="stat">
+            <dt class="stat-label">
               Intro attended
             </dt>
-            <dd class="font-display text-xl font-semibold">
+            <dd class="stat-value text-ink">
               {{ data.funnel.trialAttended }}
             </dd>
-            <p class="text-sm text-muted">
+            <p class="stat-hint">
               {{ pct(data.funnel.scheduledToAttendedRate) }} of scheduled
             </p>
           </div>
-          <div>
-            <dt class="text-sm text-muted">
+          <div class="stat">
+            <dt class="stat-label">
               Converted
             </dt>
-            <dd class="font-display text-xl font-semibold">
+            <dd class="stat-value text-ink">
               {{ data.funnel.converted }}
             </dd>
-            <p class="text-sm text-muted">
+            <p class="stat-hint">
               {{ pct(data.funnel.attendedToJoinedRate) }} of attended · {{ pct(data.funnel.lineToJoinedRate) }} of people
             </p>
           </div>

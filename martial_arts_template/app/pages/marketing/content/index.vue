@@ -197,7 +197,7 @@ async function create() {
         </div>
         <div class="min-w-0 flex-1">
           <div class="flex min-w-0 flex-wrap items-start gap-2">
-            <p class="min-w-0 break-words font-semibold text-navy-900">
+            <p class="min-w-0 break-words font-semibold text-ink">
               {{ item.title }}
             </p>
             <AppBadge
@@ -261,7 +261,7 @@ async function create() {
                 >
                 <NuxtLink
                   :to="contentStaffPath(item.id)"
-                  class="font-medium text-navy-900 hover:text-brand-700"
+                  class="font-medium text-ink hover:text-brand-700"
                 >
                   {{ item.title }}
                 </NuxtLink>
@@ -300,7 +300,7 @@ async function create() {
         @submit.prevent="create"
       >
         <div class="flex items-start justify-between gap-2">
-          <h2 class="text-base font-semibold text-navy-900">
+          <h2 class="text-base font-semibold text-ink">
             New content item
           </h2>
           <button
@@ -339,7 +339,7 @@ async function create() {
           </select>
         </AppField>
         <fieldset>
-          <legend class="mb-2 text-sm font-medium text-navy-900">
+          <legend class="mb-2 text-sm font-medium text-ink">
             Channels
           </legend>
           <label

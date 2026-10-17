@@ -401,7 +401,7 @@ async function remove() {
       class="panel grid gap-3 p-5 sm:grid-cols-2"
       @submit.prevent="save"
     >
-      <h2 class="sm:col-span-2 font-medium text-navy-900">
+      <h2 class="sm:col-span-2 font-medium text-ink">
         Asset details
       </h2>
       <AppField label="Display name">

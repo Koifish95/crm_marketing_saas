@@ -72,7 +72,7 @@ async function markPaid(id: number) {
         :key="row.id"
         class="panel p-4"
       >
-        <p class="font-medium text-navy-900">
+        <p class="font-medium text-ink">
           <NuxtLink
             v-if="row.leadLine"
             :to="`/leads/${row.leadLine.leadId}`"

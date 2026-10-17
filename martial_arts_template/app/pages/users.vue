@@ -652,7 +652,7 @@ async function runConfirm() {
           </select>
         </AppField>
         <fieldset>
-          <legend class="mb-2 text-sm font-medium text-navy-900">
+          <legend class="mb-2 text-sm font-medium text-ink">
             Extra User Roles
           </legend>
           <p class="mb-3 text-sm text-muted">
@@ -759,7 +759,7 @@ async function runConfirm() {
         class="panel p-4"
       >
         <div class="flex flex-wrap items-start gap-2">
-          <p class="min-w-0 font-medium text-navy-900">
+          <p class="min-w-0 font-medium text-ink">
             {{ person.displayName }}
           </p>
           <AppBadge
@@ -842,14 +842,14 @@ async function runConfirm() {
             class="border-t border-line"
           >
             <td class="px-4 py-3">
-              <p class="font-medium text-navy-900">
+              <p class="font-medium text-ink">
                 {{ person.displayName }}
               </p>
               <p class="text-xs text-muted">
                 {{ person.email }}
               </p>
             </td>
-            <td class="px-4 py-3 text-navy-900">
+            <td class="px-4 py-3 text-ink">
               {{ person.username }}
             </td>
             <td class="px-4 py-3">

@@ -364,7 +364,7 @@ async function submit() {
         title="Prospective members"
         description="Each person can have a different program. The household contact does not have to be a prospective member."
       >
-        <div class="space-y-4">
+        <div class="space-y-6">
           <HouseholdPersonFields
             v-for="person in people"
             :key="person.key"
