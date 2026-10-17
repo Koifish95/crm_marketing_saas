@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { salesProspectMessages, salesProspects, users } from '../../server/database/schema'
 import { writeProspectDeskConfig } from '../../server/services/prospect-desk-settings'
-import { createFixtureMailbox } from '../../server/services/prospect-mailbox'
+import { createFixtureMailbox, isOutreachMail, outreachSearchCommand } from '../../server/services/prospect-mailbox'
 import { listDeskProspects, prospectDeskSummary, runProspectTick } from '../../server/services/prospect-outreach'
 import { storeQualifiedProspects } from '../../server/services/prospect-runs'
 import { approveProspect, approveProspects, createManualProspect, markProspectDoNotContact, promoteProspect, skipProspect } from '../../server/services/prospects'
@@ -343,5 +343,18 @@ describe('prospect desk owner approval', () => {
     const [row] = await dbHandle.db.select().from(salesProspects).where(eq(salesProspects.id, created.prospect.id))
     expect(row?.outreachStatus).toBe('awaiting_approval')
     vi.unstubAllGlobals()
+  })
+})
+
+describe('prospect mailbox reading', () => {
+  it('asks the server only for unread mail that answers or bounces outreach', () => {
+    expect(outreachSearchCommand('A3')).toBe('A3 UID SEARCH UNSEEN OR OR HEADER IN-REPLY-TO "prospects.nuxxion.local" HEADER REFERENCES "prospects.nuxxion.local" BODY "prospects.nuxxion.local"')
+  })
+
+  it('uses and marks read only mail that names an outreach message', () => {
+    expect(isOutreachMail('In-Reply-To: <p12.s1.ab12cd34ef56@prospects.nuxxion.local>\n\nSounds good')).toBe(true)
+    expect(isOutreachMail('Subject: Undelivered\n\nMessage-ID: <p3.s2.0011aabbccdd@prospects.nuxxion.local>')).toBe(true)
+    expect(isOutreachMail('From: bank@example.com\nSubject: Your statement\n\nprospects.nuxxion.local is not a mailbox')).toBe(false)
+    expect(isOutreachMail('From: friend@example.com\n\nLunch?')).toBe(false)
   })
 })

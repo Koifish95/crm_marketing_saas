@@ -55,6 +55,23 @@ type MailboxConfig = {
   mailboxPassword: string
 }
 
+/** The domain of every outreach Message-ID (prospect-outreach.ts messageIdFor). Replies and bounces quote it. */
+const OUTREACH_ID_DOMAIN = 'prospects.nuxxion.local'
+
+/**
+ * Only unread mail that answers or bounces our outreach: a reply names our Message-ID in In-Reply-To or
+ * References, and a bounce quotes it in its body. The owner's other mail in the same inbox is never read or touched.
+ */
+export function outreachSearchCommand(tag: string) {
+  const id = `"${OUTREACH_ID_DOMAIN}"`
+  return `${tag} UID SEARCH UNSEEN OR OR HEADER IN-REPLY-TO ${id} HEADER REFERENCES ${id} BODY ${id}`
+}
+
+/** A second check on what the server returned, before the message is used or marked read. */
+export function isOutreachMail(raw: string) {
+  return raw.includes(`@${OUTREACH_ID_DOMAIN}`)
+}
+
 export function createSmtpImapMailbox(config: MailboxConfig): ProspectMailbox {
   return {
     async send(message) {
@@ -261,7 +278,7 @@ async function imapPollUnseen(config: MailboxConfig): Promise<InboundMail[]> {
     }
     proto.write('A2 SELECT INBOX')
     await readImapTag(proto, 'A2')
-    proto.write('A3 UID SEARCH UNSEEN')
+    proto.write(outreachSearchCommand('A3'))
     const searchLines: string[] = []
     let searchDone = ''
     while (!searchDone) {
@@ -286,6 +303,10 @@ async function imapPollUnseen(config: MailboxConfig): Promise<InboundMail[]> {
         }
       }
       const raw = fetched.join('\n')
+      if (!isOutreachMail(raw)) {
+        // Not ours: leave it unread, exactly as the owner left it.
+        continue
+      }
       const splitAt = raw.search(/\r?\n\r?\n/)
       const headers = splitAt >= 0 ? raw.slice(0, splitAt) : raw
       const text = splitAt >= 0 ? raw.slice(splitAt).trim() : ''
