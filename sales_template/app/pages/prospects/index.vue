@@ -19,6 +19,7 @@ type DeskItem = {
   why: string | null
   step: number | null
   subject: string | null
+  firstEmail: { subject: string, body: string } | null
 }
 
 type Run = {
@@ -33,6 +34,7 @@ type Run = {
 
 type Desk = {
   stored: number
+  awaitingApproval: number
   ready: number
   sendingToday: number
   sendingCap: number
@@ -53,7 +55,7 @@ type Desk = {
 const route = useRoute()
 const view = computed(() => {
   const value = String(route.query.view ?? 'needs_you')
-  return value === 'ready' || value === 'sending' ? value : 'needs_you'
+  return value === 'awaiting_approval' || value === 'ready' || value === 'sending' ? value : 'needs_you'
 })
 
 const { data, error, refresh } = await useFetch<Desk>('/api/prospects/desk', {
@@ -64,6 +66,7 @@ const state = ref('')
 const starting = ref(false)
 const resuming = ref(false)
 const formError = ref('')
+const notice = ref('')
 const run = ref<Run | null>(null)
 let pollTimer: ReturnType<typeof setInterval> | undefined
 
@@ -83,10 +86,16 @@ const emptyCopy = computed(() => {
       description: data.value.senderPausedReason || 'Check the bounces, then resume sending.',
     }
   }
+  if (view.value === 'awaiting_approval') {
+    return {
+      title: 'Nothing is waiting for your OK',
+      description: 'Run discovery for a practice state. New academies wait here until you approve them.',
+    }
+  }
   if (view.value === 'ready') {
     return {
-      title: 'No academies are waiting',
-      description: 'Run discovery for a practice state. Ready should stay larger than what you send.',
+      title: 'No approved academies are waiting',
+      description: 'Approve academies from Awaiting your OK. Approved academies wait here for the send window.',
     }
   }
   if (view.value === 'sending') {
@@ -95,16 +104,19 @@ const emptyCopy = computed(() => {
       description: 'Qualified academies move here when a send window and the daily cap allow a message.',
     }
   }
-  const ready = data.value?.ready ?? 0
+  const waiting = data.value?.awaitingApproval ?? 0
   return {
     title: 'Nothing needs you',
-    description: ready > 0
-      ? `${ready} ${ready === 1 ? 'academy is' : 'academies are'} Ready. Open that list to see them. Quiet follow-ups stay in Sending.`
+    description: waiting > 0
+      ? `${waiting} ${waiting === 1 ? 'academy is' : 'academies are'} waiting for your OK. Open that list to review them. Quiet follow-ups stay in Sending.`
       : 'Replies and the sender pause show up here. Quiet follow-ups stay in Sending.',
   }
 })
 
 const viewLabel = computed(() => {
+  if (view.value === 'awaiting_approval') {
+    return 'Awaiting your OK'
+  }
   if (view.value === 'ready') {
     return 'Ready'
   }
@@ -161,6 +173,49 @@ async function discover() {
   }
 }
 
+const acting = ref(false)
+const confirmingBulk = ref(false)
+
+function errorMessage(caught: unknown, fallback: string) {
+  const err = caught as { data?: { message?: string } }
+  return err.data?.message || fallback
+}
+
+async function approve(ids: number[]) {
+  formError.value = ''
+  notice.value = ''
+  acting.value = true
+  try {
+    const result = await $fetch<{ approved: number[], skipped: number[] }>('/api/prospects/approve', {
+      method: 'POST',
+      body: { ids },
+    })
+    notice.value = `Approved ${result.approved.length} ${result.approved.length === 1 ? 'academy' : 'academies'}. All three touches are cleared to send.`
+    confirmingBulk.value = false
+    await refresh()
+  } catch (caught: unknown) {
+    formError.value = errorMessage(caught, 'Nothing was approved.')
+  } finally {
+    acting.value = false
+  }
+}
+
+async function act(id: number, action: 'skip' | 'do-not-contact') {
+  formError.value = ''
+  notice.value = ''
+  acting.value = true
+  try {
+    await $fetch(`/api/prospects/${id}/${action}`, { method: 'POST' })
+    notice.value = action === 'skip' ? 'Skipped. Nothing will be sent.' : 'Marked do not contact. Nothing will be sent.'
+    confirmingBulk.value = false
+    await refresh()
+  } catch (caught: unknown) {
+    formError.value = errorMessage(caught, 'That action failed.')
+  } finally {
+    acting.value = false
+  }
+}
+
 async function resume() {
   formError.value = ''
   resuming.value = true
@@ -187,7 +242,7 @@ onBeforeUnmount(() => {
     <div class="space-y-3">
       <AppPageHeader
         title="Prospects"
-        description="Academies are stored here before anyone is emailed. The daily cap limits what goes out."
+        description="Academies are stored here before anyone is emailed. Nothing sends until you approve it, and the daily cap limits what goes out."
       >
         <template #actions>
           <NuxtLink
@@ -200,6 +255,12 @@ onBeforeUnmount(() => {
       </AppPageHeader>
       <AppAlert v-if="error || formError">
         {{ formError || 'Could not load the prospect desk.' }}
+      </AppAlert>
+      <AppAlert
+        v-if="notice"
+        tone="success"
+      >
+        {{ notice }}
       </AppAlert>
       <AppAlert
         v-if="data?.senderPaused"
@@ -220,13 +281,13 @@ onBeforeUnmount(() => {
         Connect the mailbox and add the postal address before anything sends.
       </AppAlert>
       <AppAlert v-else-if="data?.capReached">
-        Today's cap of {{ data.sendingCap }} is reached. Ready academies stay in the backlog.
+        Today's cap of {{ data.sendingCap }} is reached. Approved academies stay in the backlog.
       </AppAlert>
       <AppAlert v-else-if="data?.blockReason && data.blockReason !== 'Outside the weekday send window.'">
         {{ data.blockReason }}
       </AppAlert>
     </div>
-    <div class="stat-grid sm:!grid-cols-4">
+    <div class="stat-grid sm:!grid-cols-5">
       <button
         type="button"
         :class="cardClass('needs_you')"
@@ -238,6 +299,19 @@ onBeforeUnmount(() => {
         </p>
         <p class="text-2xl">
           {{ data?.needsYou ?? '—' }}
+        </p>
+      </button>
+      <button
+        type="button"
+        :class="cardClass('awaiting_approval')"
+        :aria-pressed="view === 'awaiting_approval'"
+        @click="selectView('awaiting_approval')"
+      >
+        <p class="text-sm text-muted">
+          Awaiting your OK
+        </p>
+        <p class="text-2xl">
+          {{ data?.awaitingApproval ?? '—' }}
         </p>
       </button>
       <button
@@ -318,9 +392,41 @@ onBeforeUnmount(() => {
         </span>
       </p>
     </AppPanel>
-    <p class="text-sm text-muted">
-      Showing {{ viewLabel }}
-    </p>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <p class="text-sm text-muted">
+        Showing {{ viewLabel }}
+      </p>
+      <AppButton
+        v-if="view === 'awaiting_approval' && data?.items.length && !confirmingBulk"
+        type="button"
+        @click="confirmingBulk = true"
+      >
+        Approve all {{ data.items.length }}
+      </AppButton>
+    </div>
+    <AppAlert
+      v-if="confirmingBulk && data"
+      tone="warning"
+    >
+      Approve {{ data.items.length }} {{ data.items.length === 1 ? 'academy' : 'academies' }}? Each one gets all three touches without asking again.
+      <AppButton
+        class="ml-3"
+        type="button"
+        :loading="acting"
+        @click="approve(data.items.map(item => item.id))"
+      >
+        Yes, approve {{ data.items.length }}
+      </AppButton>
+      <AppButton
+        class="ml-2"
+        type="button"
+        variant="secondary"
+        :disabled="acting"
+        @click="confirmingBulk = false"
+      >
+        Cancel
+      </AppButton>
+    </AppAlert>
     <AppEmpty
       v-if="data && !data.items.length"
       :title="emptyCopy.title"
@@ -353,6 +459,41 @@ onBeforeUnmount(() => {
         <p class="record-item-meta">
           {{ item.email || item.website || 'No public contact yet' }}
         </p>
+        <template v-if="item.firstEmail">
+          <div class="mt-3 rounded border border-gray-200 p-3 text-sm">
+            <p class="font-medium">
+              First email: {{ item.firstEmail.subject }}
+            </p>
+            <p class="mt-2 whitespace-pre-wrap">
+              {{ item.firstEmail.body }}
+            </p>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <AppButton
+              type="button"
+              :disabled="acting"
+              @click="approve([item.id])"
+            >
+              Approve
+            </AppButton>
+            <AppButton
+              type="button"
+              variant="secondary"
+              :disabled="acting"
+              @click="act(item.id, 'skip')"
+            >
+              Skip
+            </AppButton>
+            <AppButton
+              type="button"
+              variant="secondary"
+              :disabled="acting"
+              @click="act(item.id, 'do-not-contact')"
+            >
+              Do not contact
+            </AppButton>
+          </div>
+        </template>
       </li>
     </ul>
   </section>

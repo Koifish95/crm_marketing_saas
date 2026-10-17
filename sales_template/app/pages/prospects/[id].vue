@@ -133,6 +133,14 @@ function formatWhen(value: string | Date) {
       class="mb-6 flex flex-wrap gap-2"
     >
       <AppButton
+        v-if="prospect.outreachStatus === 'awaiting_approval'"
+        type="button"
+        :loading="saving"
+        @click="act(`/api/prospects/${prospect.id}/approve`, 'Approved. All three touches are cleared to send.')"
+      >
+        Approve
+      </AppButton>
+      <AppButton
         v-if="canPromote"
         type="button"
         :loading="saving"

@@ -339,6 +339,8 @@ export const salesProspects = sqliteTable('sales_prospects', {
   nextTouchAt: integer('next_touch_at', { mode: 'timestamp_ms' }),
   sequenceStartedAt: integer('sequence_started_at', { mode: 'timestamp_ms' }),
   emailSourceUrl: text('email_source_url'),
+  approvedByUserId: integer('approved_by_user_id').references(() => users.id),
+  approvedAt: integer('approved_at', { mode: 'timestamp_ms' }),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
 }, table => [

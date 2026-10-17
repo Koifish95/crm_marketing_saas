@@ -177,14 +177,15 @@ async function syncOutreachReadiness(db: Database, id: number) {
   if (current.status === 'promoted' || current.status === 'do_not_contact') {
     return current
   }
-  if (current.outreachStatus !== 'none' && current.outreachStatus !== 'ready') {
+  if (current.outreachStatus !== 'none' && current.outreachStatus !== 'awaiting_approval' && current.outreachStatus !== 'ready') {
     return current
   }
   const excluded = isExcludedOutreachState(current.state)
   const failure = qualificationFailure(current)
   await db.update(salesProspects).set({
     lane: excluded ? 'local' : 'national',
-    outreachStatus: failure ? 'none' : 'ready',
+    // A newly qualifying prospect waits for the owner. Only approveProspects sets ready.
+    outreachStatus: failure ? 'none' : (current.outreachStatus === 'ready' ? 'ready' : 'awaiting_approval'),
     updatedAt: now(),
   }).where(eq(salesProspects.id, id))
   return requireProspect(db, id)
@@ -354,6 +355,44 @@ export async function getProspectDetail(db: Database, id: number) {
     observations,
     messages,
   }
+}
+
+// Approval covers the whole three-touch sequence. Touches 2 and 3 are not asked again.
+export async function approveProspects(db: Database, ids: number[], actorUserId: number) {
+  const unique = [...new Set(ids)]
+  if (!unique.length) {
+    throw new DomainError('Choose at least one academy to approve.')
+  }
+  const approved: number[] = []
+  const skipped: number[] = []
+  for (const id of unique) {
+    const prospect = await requireProspect(db, id)
+    const eligible = prospect.outreachStatus === 'awaiting_approval'
+      && prospect.status !== 'promoted'
+      && prospect.status !== 'do_not_contact'
+      && !qualificationFailure(prospect)
+    if (!eligible) {
+      skipped.push(id)
+      continue
+    }
+    const stamp = now()
+    await db.update(salesProspects).set({
+      outreachStatus: 'ready',
+      approvedByUserId: actorUserId,
+      approvedAt: stamp,
+      updatedAt: stamp,
+    }).where(and(eq(salesProspects.id, id), eq(salesProspects.outreachStatus, 'awaiting_approval')))
+    approved.push(id)
+  }
+  return { approved, skipped }
+}
+
+export async function approveProspect(db: Database, id: number, actorUserId: number) {
+  const result = await approveProspects(db, [id], actorUserId)
+  if (!result.approved.length) {
+    throw new DomainError('This academy is not waiting for approval.')
+  }
+  return getProspectDetail(db, id)
 }
 
 export async function skipProspect(db: Database, id: number) {
