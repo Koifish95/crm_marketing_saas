@@ -39,13 +39,27 @@ function isEmail(value: string) {
   return EMAIL.test(value)
 }
 
+/** Replaces control characters with a space; LF survives only when keepNewlines is set. */
+function stripControls(value: string, keepNewlines: boolean) {
+  let out = ''
+  for (const ch of value) {
+    const code = ch.charCodeAt(0)
+    if (code < 32 || code === 127) {
+      out += keepNewlines && code === 10 ? '\n' : ' '
+    } else {
+      out += ch
+    }
+  }
+  return out.replace(/ {2,}/g, ' ')
+}
+
 /** Control characters (including CR and LF) are removed from single-line values. */
 function oneLine(value: string | null | undefined, max = 200) {
-  return String(value ?? '').replace(/[\u0000-\u001f\u007f]+/g, ' ').trim().slice(0, max)
+  return stripControls(String(value ?? ''), false).trim().slice(0, max)
 }
 
 function multiLine(value: string | null | undefined) {
-  return String(value ?? '').replace(/\r\n?/g, '\n').replace(/[\u0000-\u0009\u000b-\u001f\u007f]+/g, ' ').trim().slice(0, MAX_FIELD)
+  return stripControls(String(value ?? '').replace(/\r\n?/g, '\n'), true).trim().slice(0, MAX_FIELD)
 }
 
 /** Null when the sender or the recipient is missing: then nothing is sent. */
