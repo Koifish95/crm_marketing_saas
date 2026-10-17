@@ -7,6 +7,24 @@
   color: var(--color-ink);
 }
 
+/* The DEV/STAGE banner is sticky above the shell; fixed and sticky chrome
+   starts below it. Its height is pinned here (text-xs line 1rem + py-1.5). */
+.app-env-banner {
+  box-sizing: border-box;
+  height: 1.75rem;
+  overflow: hidden;
+  white-space: nowrap;
+  line-height: 1rem;
+}
+
+.staff-shell {
+  --staff-banner-h: 0px;
+}
+
+.staff-shell:has(.app-env-banner) {
+  --staff-banner-h: 1.75rem;
+}
+
 .staff-shell-body {
   display: flex;
   min-height: 0;
@@ -23,7 +41,7 @@
 
 .staff-nav {
   position: fixed;
-  inset: 0 auto 0 0;
+  inset: var(--staff-banner-h) auto 0 0;
   z-index: 50;
   display: flex;
   width: 16rem;
@@ -54,7 +72,7 @@
 
 .staff-mobile-header {
   position: sticky;
-  top: 0;
+  top: var(--staff-banner-h);
   z-index: 30;
   display: block;
   border-bottom: 1px solid var(--color-line);
@@ -69,8 +87,8 @@
 
   .staff-nav {
     position: sticky;
-    top: 0;
-    height: 100vh;
+    top: var(--staff-banner-h);
+    height: calc(100vh - var(--staff-banner-h));
     align-self: flex-start;
     transform: none;
   }

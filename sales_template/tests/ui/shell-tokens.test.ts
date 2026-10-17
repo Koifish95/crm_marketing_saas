@@ -34,3 +34,25 @@ describe('Sales UI cleanup 1/4: layout shell and CSS tokens', () => {
     expect(shell).toMatch(/px-5 py-5/)
   })
 })
+
+describe('Staff shell with the DEV/STAGE banner', () => {
+  const shellCss = readFileSync(
+    join(process.cwd(), '../packages/crm-core/app/assets/css/staff-shell.css'),
+    'utf8',
+  )
+  const banner = readFileSync(
+    join(process.cwd(), '../packages/crm-core/app/components/AppEnvBanner.vue'),
+    'utf8',
+  )
+
+  it('marks the banner so the shell can offset for it', () => {
+    expect(banner).toMatch(/class="app-env-banner /)
+    expect(shellCss).toMatch(/\.staff-shell:has\(\.app-env-banner\)\s*\{\s*--staff-banner-h:\s*1\.75rem/)
+    expect(shellCss).toMatch(/\.app-env-banner\s*\{[^}]*height:\s*1\.75rem/)
+  })
+
+  it('sticks the desktop rail below the banner, not at the viewport top', () => {
+    expect(shellCss).toMatch(/top:\s*var\(--staff-banner-h\);\s*height:\s*calc\(100vh - var\(--staff-banner-h\)\)/)
+    expect(shellCss).toMatch(/inset:\s*var\(--staff-banner-h\) auto 0 0/)
+  })
+})
