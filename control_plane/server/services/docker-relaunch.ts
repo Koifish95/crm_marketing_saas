@@ -5,6 +5,7 @@ import { LAB_ENVIRONMENTS } from '../database/lab-seed'
 import { isProductId, requireProduct } from '../products/catalog'
 import { PROVISIONED_COMPOSE_FILE } from './provision-contract'
 import { assertSafeVolumeName } from '../../shared/utils/fleet-backup'
+import { redactLeadIntakeKey } from './lead-intake-key'
 
 const FORBIDDEN = ['-v', '--volumes', 'prune', 'down']
 const LAB_COMPOSE = LAB_ENVIRONMENTS.map(row => row.composeFile)
@@ -39,7 +40,7 @@ export function spawnDocker(args: readonly string[], cwd: string): SpawnSyncRetu
 }
 
 export function dockerFailureMessage(result: SpawnSyncReturns<string>, fallback: string) {
-  const text = `${result.stderr || ''}\n${result.stdout || ''}`.trim()
+  const text = redactLeadIntakeKey(`${result.stderr || ''}\n${result.stdout || ''}`.trim())
   if (result.error?.message) {
     return `${result.error.message}${text ? `\n${text}` : ''}`.slice(-4000)
   }

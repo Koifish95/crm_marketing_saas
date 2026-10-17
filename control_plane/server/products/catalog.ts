@@ -18,6 +18,8 @@ export type ProductDefinition = {
   uploadsInContainer: string
   appNameTemplate: 'acquisition' | 'plain'
   extraEnv: Record<string, string>
+  /** Environments of this product get a generated LEAD_INTAKE_KEY. */
+  leadIntakeKey?: boolean
 }
 
 export const PRODUCTS: Record<ProductId, ProductDefinition> = {
@@ -52,6 +54,7 @@ export const PRODUCTS: Record<ProductId, ProductDefinition> = {
     extraEnv: {
       SALES_PROPOSALS_DIR: '/app/data/uploads/proposals',
     },
+    leadIntakeKey: true,
   },
 }
 

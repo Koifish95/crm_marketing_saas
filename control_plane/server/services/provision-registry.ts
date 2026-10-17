@@ -14,6 +14,7 @@ import {
   type NonProdEnvironmentType,
 } from './provision-contract'
 import { listRegisteredEnvironments } from './registry'
+import { markLeadIntakeKeyPending } from './lead-intake-key'
 import { INITIAL_ACCESS_PASSWORD, INITIAL_ACCESS_USERNAME, renderProvisionedEnv, writeProvisionedEnvFile } from './provision-env'
 import { requireLocalHostingNode } from './hosting-node'
 
@@ -121,7 +122,10 @@ export async function insertNamedEnvironment(db: Database, input: {
     nodeKind: input.nodeKind,
     product,
   })
-  writeProvisionedEnvFile(envFile, rendered.contents, input.filesRoot)
+  const envPath = writeProvisionedEnvFile(envFile, rendered.contents, input.filesRoot)
+  if (rendered.hasLeadIntakeKey) {
+    markLeadIntakeKeyPending(envPath)
+  }
   return {
     id,
     slug: input.names.slug,

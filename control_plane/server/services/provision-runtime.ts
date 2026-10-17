@@ -21,6 +21,7 @@ import {
 } from './docker-relaunch'
 import { probeRegisteredHealth } from './health'
 import { localHostingNodeSpec } from './hosting-node'
+import { redactLeadIntakeKey } from './lead-intake-key'
 import { patchProvisionedEnvFile, provisionedEnvAbsolutePath } from './provision-env'
 import { listRegisteredEnvironments } from './registry'
 import { autoAssignPublicHostname } from './public-hostname'
@@ -244,7 +245,7 @@ export async function setLifecycleStatus(
 ) {
   await db.update(environments).set({
     lifecycleStatus,
-    provisionError: lifecycleStatus === 'failed' ? provisionError : null,
+    provisionError: lifecycleStatus === 'failed' && provisionError ? redactLeadIntakeKey(provisionError) : null,
   }).where(eq(environments.id, id))
 }
 
