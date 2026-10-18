@@ -89,7 +89,7 @@ export function extractPublicContacts(html: string, academyName = '') {
   for (const match of html.matchAll(EMAIL_PATTERN)) {
     const at = match.index ?? 0
     // A match glued to another "@" is a malformed address, not a clean one.
-    if (html[at - 1] === '@' || /^@[a-z0-9]/i.test(html.slice(at + match[0].length, at + match[0].length + 2))) {
+    if (html[at - 1] === '@' || html[at + match[0].length] === '@') {
       continue
     }
     const email = cleanEmail(match[0] ?? '')

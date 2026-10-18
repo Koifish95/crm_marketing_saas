@@ -18,7 +18,7 @@ import {
 import { denverYmd, utcNowMs } from '../../shared/utils/time'
 import { readProspectDeskConfig, saveProspectDeskInternal } from './prospect-desk-settings'
 import { createSmtpImapMailbox, type InboundMail, type ProspectMailbox } from './prospect-mailbox'
-import { markProspectDoNotContact } from './prospects'
+import { markProspectDoNotContact, requalifyStoredProspects } from './prospects'
 
 function nowDate(nowMs: number) {
   return new Date(nowMs)
@@ -105,6 +105,8 @@ export async function runProspectTick(db: Database, options: {
   if (blockReason || !mailbox) {
     return { sent: 0, polled, blockReason: blockReason || 'Connect the mailbox and add the postal address before anything sends.' }
   }
+  // Approved rows stored before the current email rules must not send on the strength of an old check.
+  await requalifyStoredProspects(db)
   const prospect = await nextSendable(db, activeConfig, nowMs)
   if (!prospect) {
     return { sent: 0, polled, blockReason: null }

@@ -163,6 +163,21 @@ describe('prospect desk queue', () => {
     expect(waiting[0]?.outreachStatus).toBe('ready')
   })
 
+  it('re-checks approved prospects before sending, so an address the rules now reject never sends', async () => {
+    dbHandle = await openTestDatabase()
+    await enableDesk()
+    await createManualProspect(dbHandle.db, academy('Old Dojo', 'old-dojo.example'))
+    await approveByName('Old Dojo')
+    // Stored and approved under older rules: another business's address, still Ready.
+    await dbHandle.db.update(salesProspects).set({ email: 'matt@pixelspread.com' }).where(eq(salesProspects.name, 'Old Dojo'))
+    const mailbox = createFixtureMailbox()
+    const result = await runProspectTick(dbHandle.db, { nowMs: MONDAY, mailbox })
+    expect(result.sent).toBe(0)
+    expect(mailbox.sent).toHaveLength(0)
+    const [row] = await dbHandle.db.select().from(salesProspects).where(eq(salesProspects.name, 'Old Dojo'))
+    expect(row).toMatchObject({ outreachStatus: 'rejected', rejectionReason: 'third_party_email' })
+  })
+
   it('does not send on Sunday', async () => {
     dbHandle = await openTestDatabase()
     await enableDesk()

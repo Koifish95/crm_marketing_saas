@@ -155,6 +155,7 @@ describe('discovery stores rejected candidates with a reason', () => {
 })
 
 describe('homepage lookup coverage', () => {
+  // 120 homepage lookups: well over the default 5s on a slow machine.
   it('looks up at most the cap per run, only new sites, and reports progress', async () => {
     dbHandle = await openTestDatabase()
     const total = LOOKUPS_PER_RUN + 20
@@ -185,7 +186,7 @@ describe('homepage lookup coverage', () => {
     expect(third.detail).toBe('All sites looked up')
     const stored = await dbHandle.db.select().from(salesProspects).where(eq(salesProspects.outreachStatus, 'awaiting_approval'))
     expect(stored).toHaveLength(total)
-  })
+  }, 30_000)
 })
 
 describe('lookups for already stored candidates', () => {
@@ -232,7 +233,7 @@ describe('overpass retry', () => {
 
 describe('malformed and late addresses', () => {
   it('ignores a page address glued to a second @', () => {
-    const contacts = extractPublicContacts('<p>a@falcon.org@evil.com</p><p>b@evil.com@falcon.org</p>')
+    const contacts = extractPublicContacts('<p>a@falcon.org@evil.com</p><p>b@evil.com@falcon.org</p><p>a@falcon.org@-evil.com</p><p>c@falcon.org@.evil</p>')
     expect(contacts.emails).toEqual([])
     expect(normalizeEmailAddress('a@falcon.org@evil.com')).toBeNull()
   })
