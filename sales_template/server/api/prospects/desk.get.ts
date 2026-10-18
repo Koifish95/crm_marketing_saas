@@ -16,8 +16,10 @@ export default defineEventHandler(async (event) => {
     }
     const requested = String(getQuery(event).view ?? 'needs_you')
     const view = (DESK_VIEWS as readonly string[]).includes(requested) ? requested as DeskView : 'needs_you'
+    const state = String(getQuery(event).state ?? '').trim()
+    const reason = String(getQuery(event).reason ?? '').trim()
     const [items, run] = await Promise.all([
-      listDeskProspects(db, view),
+      listDeskProspects(db, view, { state, reason }),
       latestProspectRun(db),
     ])
     return { ...summary, view, items, run }

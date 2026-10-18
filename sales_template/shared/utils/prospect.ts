@@ -252,12 +252,18 @@ export function normalizePhoneKey(value: string | null | undefined) {
   return national.length >= 10 ? national.slice(-10) : null
 }
 
+const SINGLE_EMAIL = /^[a-z0-9_%+-]+(?:\.[a-z0-9_%+-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/
+const EMAIL_EDGE_JUNK = /^[\s<("'\\]+|[\s>)"'\\.,;]+$/g
+
+// One plain address or null. Strips mailto:, a mailto query, and the quote, slash,
+// bracket and punctuation scraps that cling to addresses lifted from pages and tags.
 export function normalizeEmailAddress(value: string | null | undefined) {
-  const trimmed = value?.trim().toLowerCase()
-  if (!trimmed || !trimmed.includes('@')) {
-    return null
+  let text = value?.trim().toLowerCase() ?? ''
+  if (text.startsWith('mailto:')) {
+    text = text.slice('mailto:'.length).split('?')[0] ?? ''
   }
-  return trimmed
+  text = text.replace(EMAIL_EDGE_JUNK, '')
+  return SINGLE_EMAIL.test(text) ? text : null
 }
 
 function hostnameOf(website: string) {

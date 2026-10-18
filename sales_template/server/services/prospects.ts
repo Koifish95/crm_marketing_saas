@@ -61,6 +61,9 @@ export type ProspectIngestInput = {
   rawRef?: string | null
   discoveredAt?: Date
   emailSourceUrl?: string | null
+  emailEvidence?: string | null
+  // Set when the homepage lookup, not the data, is why there is no email.
+  lookupFailure?: 'lookup_blocked_by_robots' | 'lookup_failed' | null
 }
 
 export type IngestOutcome = 'created' | 'deduped' | 'known'
@@ -164,6 +167,8 @@ async function fillProspect(db: Database, id: number, input: ProspectIngestInput
     phone: current.phone ?? blankToNull(input.phone),
     phoneKey: current.phoneKey ?? normalizePhoneKey(input.phone ?? current.phone),
     emailSourceUrl: current.emailSourceUrl ?? blankToNull(input.emailSourceUrl),
+    emailEvidence: current.email ? current.emailEvidence : (normalizeEmailAddress(input.email) ? blankToNull(input.emailEvidence) : null),
+    rejectionReason: current.rejectionReason ?? input.lookupFailure ?? null,
     priority,
     status,
     updatedAt: now(),
@@ -177,15 +182,19 @@ async function syncOutreachReadiness(db: Database, id: number) {
   if (current.status === 'promoted' || current.status === 'do_not_contact') {
     return current
   }
-  if (current.outreachStatus !== 'none' && current.outreachStatus !== 'awaiting_approval' && current.outreachStatus !== 'ready') {
+  if (!['none', 'awaiting_approval', 'ready', 'rejected'].includes(current.outreachStatus)) {
     return current
   }
   const excluded = isExcludedOutreachState(current.state)
-  const failure = qualificationFailure(current)
+  let failure: string | null = qualificationFailure(current)
+  if (failure === 'missing_email' && current.rejectionReason?.startsWith('lookup_')) {
+    failure = current.rejectionReason
+  }
   await db.update(salesProspects).set({
     lane: excluded ? 'local' : 'national',
     // A newly qualifying prospect waits for the owner. Only approveProspects sets ready.
-    outreachStatus: failure ? 'none' : (current.outreachStatus === 'ready' ? 'ready' : 'awaiting_approval'),
+    outreachStatus: failure ? 'rejected' : (current.outreachStatus === 'ready' ? 'ready' : 'awaiting_approval'),
+    rejectionReason: failure,
     updatedAt: now(),
   }).where(eq(salesProspects.id, id))
   return requireProspect(db, id)
@@ -253,6 +262,8 @@ export async function ingestProspect(db: Database, input: ProspectIngestInput) {
     lane: input.lane ?? 'national',
     notes: blankToNull(input.notes),
     emailSourceUrl: blankToNull(input.emailSourceUrl),
+    emailEvidence: blankToNull(input.emailEvidence),
+    rejectionReason: input.lookupFailure ?? null,
     createdAt,
     updatedAt: createdAt,
   }).returning()
@@ -263,6 +274,27 @@ export async function ingestProspect(db: Database, input: ProspectIngestInput) {
   await flagPossibleDuplicate(db, created.id, identity.phoneKey)
   await syncOutreachReadiness(db, created.id)
   return { outcome: 'created' as const, prospect: await requireProspect(db, created.id) }
+}
+
+// Applies a late homepage lookup to a stored, unsent candidate that has no email yet.
+export async function applyLookupToProspect(db: Database, id: number, input: ProspectIngestInput) {
+  const current = await requireProspect(db, id)
+  if (current.outreachStatus !== 'rejected' || current.status === 'promoted' || current.status === 'do_not_contact') {
+    return current
+  }
+  const found = normalizeEmailAddress(input.email)
+  const email = found ?? current.email
+  const fromLookup = Boolean(found)
+  await db.update(salesProspects).set({
+    email,
+    emailSourceUrl: fromLookup ? blankToNull(input.emailSourceUrl) : current.emailSourceUrl,
+    emailEvidence: email ? (fromLookup ? blankToNull(input.emailEvidence) : current.emailEvidence) : null,
+    phone: current.phone ?? blankToNull(input.phone),
+    phoneKey: current.phoneKey ?? normalizePhoneKey(input.phone),
+    rejectionReason: email ? null : (input.lookupFailure ?? current.rejectionReason),
+    updatedAt: now(),
+  }).where(eq(salesProspects.id, id))
+  return syncOutreachReadiness(db, id)
 }
 
 export async function createManualProspect(db: Database, input: Omit<ProspectIngestInput, 'source' | 'externalId'> & {
@@ -588,4 +620,27 @@ export async function listObservations(db: Database, prospectId: number) {
   return db.select().from(salesProspectObservations)
     .where(eq(salesProspectObservations.prospectId, prospectId))
     .orderBy(asc(salesProspectObservations.discoveredAt))
+}
+
+// Re-checks stored prospects that have not been sent anything, so addresses saved
+// before the cleaner and the domain rules cannot stay Ready.
+export async function requalifyStoredProspects(db: Database) {
+  const rows = await db.select().from(salesProspects)
+  const sent = new Set((await db.select({ prospectId: salesProspectMessages.prospectId, sentAt: salesProspectMessages.sentAt })
+    .from(salesProspectMessages)).filter(row => row.sentAt).map(row => row.prospectId))
+  let changed = 0
+  for (const row of rows) {
+    if (sent.has(row.id) || !['none', 'awaiting_approval', 'ready', 'rejected'].includes(row.outreachStatus)) {
+      continue
+    }
+    const email = normalizeEmailAddress(row.email)
+    if (email !== row.email) {
+      await db.update(salesProspects).set({ email, updatedAt: now() }).where(eq(salesProspects.id, row.id))
+    }
+    const after = await syncOutreachReadiness(db, row.id)
+    if (after.outreachStatus !== row.outreachStatus || after.rejectionReason !== row.rejectionReason || email !== row.email) {
+      changed += 1
+    }
+  }
+  return changed
 }

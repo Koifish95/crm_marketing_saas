@@ -1,3 +1,6 @@
+import { normalizeEmailAddress, registrableDomain } from '../../shared/utils/prospect'
+import { isFreeMailAddress, type EmailEvidence } from '../../shared/utils/prospect-desk'
+
 const EMAIL_PATTERN = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi
 const MAILTO_PATTERN = /mailto:([^"'?\s>]+)/gi
 const TEL_PATTERN = /tel:([^"'?\s>]+)/gi
@@ -37,8 +40,8 @@ export function robotsAllowsHomepage(robotsText: string) {
 }
 
 function cleanEmail(value: string) {
-  const email = value.trim().toLowerCase().replace(/^mailto:/, '')
-  if (!email.includes('@') || email.endsWith('.png') || email.endsWith('.jpg') || email.endsWith('.webp') || email.endsWith('.svg')) {
+  const email = normalizeEmailAddress(value)
+  if (!email || email.endsWith('.png') || email.endsWith('.jpg') || email.endsWith('.webp') || email.endsWith('.svg')) {
     return null
   }
   const host = email.split('@')[1] ?? ''
@@ -60,19 +63,43 @@ function cleanPhone(value: string) {
   return decoded
 }
 
-export function extractPublicContacts(html: string) {
-  const emails = new Set<string>()
+const NAME_WINDOW = 300
+
+export function academyNameTokens(academyName: string) {
+  return academyName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .split(/\s+/)
+    .filter(token => token.length >= 4 && !['martial', 'arts', 'academy', 'dojo', 'center', 'centre', 'studio', 'studios'].includes(token))
+}
+
+export type FoundEmail = { address: string, evidence: EmailEvidence }
+
+export function extractPublicContacts(html: string, academyName = '') {
+  const found = new Map<string, EmailEvidence>()
   const phones = new Set<string>()
+  const tokens = academyNameTokens(academyName)
+  const lower = html.toLowerCase()
   for (const match of html.matchAll(MAILTO_PATTERN)) {
     const email = cleanEmail(match[1] ?? '')
     if (email) {
-      emails.add(email)
+      found.set(email, 'mailto')
     }
   }
   for (const match of html.matchAll(EMAIL_PATTERN)) {
+    const at = match.index ?? 0
+    // A match glued to another "@" is a malformed address, not a clean one.
+    if (html[at - 1] === '@' || /^@[a-z0-9]/i.test(html.slice(at + match[0].length, at + match[0].length + 2))) {
+      continue
+    }
     const email = cleanEmail(match[0] ?? '')
-    if (email) {
-      emails.add(email)
+    if (!email || found.get(email) === 'mailto') {
+      continue
+    }
+    const around = lower.slice(Math.max(0, at - NAME_WINDOW), at + match[0].length + NAME_WINDOW)
+    const near = tokens.some(token => around.includes(token))
+    if (near || !found.has(email)) {
+      found.set(email, near ? 'near_name' : 'page')
     }
   }
   for (const match of html.matchAll(TEL_PATTERN)) {
@@ -81,19 +108,34 @@ export function extractPublicContacts(html: string) {
       phones.add(phone)
     }
   }
+  const candidates: FoundEmail[] = [...found].map(([address, evidence]) => ({ address, evidence }))
   return {
-    emails: [...emails],
+    emails: candidates.map(candidate => candidate.address),
+    candidates,
     phones: [...phones],
   }
 }
 
+// Best address for a site: its own domain first, then a free-mail address with real
+// evidence, then another business's address, then a free-mail address with none.
+export function chooseSiteEmail(candidates: FoundEmail[], website: string) {
+  const domain = registrableDomain(website)
+  const rank = (candidate: FoundEmail) => {
+    const host = candidate.address.split('@')[1] ?? ''
+    if (domain && (host === domain || host.endsWith(`.${domain}`))) {
+      return 0
+    }
+    if (isFreeMailAddress(candidate.address)) {
+      return candidate.evidence === 'mailto' || candidate.evidence === 'near_name' ? 1 : 3
+    }
+    return 2
+  }
+  return [...candidates].sort((left, right) => rank(left) - rank(right))[0] ?? null
+}
+
 export function pageMentionsAcademy(html: string, academyName: string) {
   const text = html.toLowerCase()
-  const tokens = academyName
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
-    .split(/\s+/)
-    .filter(token => token.length >= 4 && !['martial', 'arts', 'academy', 'dojo', 'center', 'centre', 'studio', 'studios'].includes(token))
+  const tokens = academyNameTokens(academyName)
   if (!tokens.length) {
     return true
   }

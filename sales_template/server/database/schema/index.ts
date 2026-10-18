@@ -339,6 +339,8 @@ export const salesProspects = sqliteTable('sales_prospects', {
   nextTouchAt: integer('next_touch_at', { mode: 'timestamp_ms' }),
   sequenceStartedAt: integer('sequence_started_at', { mode: 'timestamp_ms' }),
   emailSourceUrl: text('email_source_url'),
+  emailEvidence: text('email_evidence'),
+  rejectionReason: text('rejection_reason'),
   approvedByUserId: integer('approved_by_user_id').references(() => users.id),
   approvedAt: integer('approved_at', { mode: 'timestamp_ms' }),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
@@ -403,4 +405,17 @@ export const salesProspectRuns = sqliteTable('sales_prospect_runs', {
   finishedAt: integer('finished_at', { mode: 'timestamp_ms' }),
 }, table => [
   index('sales_prospect_runs_status_idx').on(table.status),
+])
+
+export const salesProspectLookups = sqliteTable('sales_prospect_lookups', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  homepageUrl: text('homepage_url').notNull(),
+  result: text('result').notNull(),
+  email: text('email'),
+  emailEvidence: text('email_evidence'),
+  emailSourceUrl: text('email_source_url'),
+  phone: text('phone'),
+  lookedUpAt: integer('looked_up_at', { mode: 'timestamp_ms' }).notNull(),
+}, table => [
+  uniqueIndex('sales_prospect_lookups_homepage_url_unique').on(table.homepageUrl),
 ])

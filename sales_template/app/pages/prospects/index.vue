@@ -20,6 +20,8 @@ type DeskItem = {
   step: number | null
   subject: string | null
   firstEmail: { subject: string, body: string } | null
+  emailSourceUrl: string | null
+  rejectionReason: string | null
 }
 
 type Run = {
@@ -34,6 +36,9 @@ type Run = {
 
 type Desk = {
   stored: number
+  rejected: number
+  rejectedByReason: Record<string, number>
+  states: string[]
   awaitingApproval: number
   ready: number
   sendingToday: number
@@ -55,11 +60,13 @@ type Desk = {
 const route = useRoute()
 const view = computed(() => {
   const value = String(route.query.view ?? 'needs_you')
-  return value === 'awaiting_approval' || value === 'ready' || value === 'sending' ? value : 'needs_you'
+  return value === 'awaiting_approval' || value === 'ready' || value === 'sending' || value === 'all' ? value : 'needs_you'
 })
+const filterState = computed(() => String(route.query.state ?? ''))
+const filterReason = computed(() => String(route.query.reason ?? ''))
 
 const { data, error, refresh } = await useFetch<Desk>('/api/prospects/desk', {
-  query: computed(() => ({ view: view.value })),
+  query: computed(() => ({ view: view.value, state: filterState.value, reason: filterReason.value })),
 })
 
 const state = ref('')
@@ -84,6 +91,12 @@ const emptyCopy = computed(() => {
     return {
       title: 'Sending is paused',
       description: data.value.senderPausedReason || 'Check the bounces, then resume sending.',
+    }
+  }
+  if (view.value === 'all') {
+    return {
+      title: 'No prospects match',
+      description: 'Run discovery for a practice state, or clear the filters.',
     }
   }
   if (view.value === 'awaiting_approval') {
@@ -114,6 +127,9 @@ const emptyCopy = computed(() => {
 })
 
 const viewLabel = computed(() => {
+  if (view.value === 'all') {
+    return 'All prospects'
+  }
   if (view.value === 'awaiting_approval') {
     return 'Awaiting your OK'
   }
@@ -130,6 +146,15 @@ function cardClass(name: string) {
   return view.value === name
     ? 'stat-cell stat-link bg-brand-50 text-left ring-1 ring-inset ring-brand-500'
     : 'stat-cell stat-link text-left'
+}
+
+function setFilter(key: 'state' | 'reason', value: string) {
+  return navigateTo({ path: '/prospects', query: { ...route.query, [key]: value || undefined } })
+}
+
+function label(value: string) {
+  const text = value.replaceAll('_', ' ')
+  return text.charAt(0).toUpperCase() + text.slice(1)
 }
 
 function selectView(next: string) {
@@ -277,7 +302,10 @@ onBeforeUnmount(() => {
           Resume sending
         </AppButton>
       </AppAlert>
-      <AppAlert v-else-if="data && !data.mailboxReady">
+      <AppAlert
+        v-else-if="data && !data.mailboxReady"
+        tone="info"
+      >
         Connect the mailbox and add the postal address before anything sends.
       </AppAlert>
       <AppAlert v-else-if="data?.capReached">
@@ -340,14 +368,19 @@ onBeforeUnmount(() => {
           {{ data ? `${data.sendingToday} / ${data.sendingCap}` : '—' }}
         </p>
       </button>
-      <div class="stat-cell">
+      <button
+        type="button"
+        :class="cardClass('all')"
+        :aria-pressed="view === 'all'"
+        @click="selectView('all')"
+      >
         <p class="text-sm text-muted">
-          Stored
+          All prospects
         </p>
         <p class="text-2xl">
           {{ data?.stored ?? '—' }}
         </p>
-      </div>
+      </button>
     </div>
     <AppPanel title="Discovery">
       <form
@@ -396,6 +429,45 @@ onBeforeUnmount(() => {
       <p class="text-sm text-muted">
         Showing {{ viewLabel }}
       </p>
+      <div
+        v-if="view === 'all' && data"
+        class="flex flex-wrap gap-3"
+      >
+        <select
+          class="control"
+          aria-label="Filter by state"
+          :value="filterState"
+          @change="setFilter('state', ($event.target as HTMLSelectElement).value)"
+        >
+          <option value="">
+            Any state
+          </option>
+          <option
+            v-for="option in data.states"
+            :key="option"
+            :value="option"
+          >
+            {{ label(option) }}
+          </option>
+        </select>
+        <select
+          class="control"
+          aria-label="Filter by reason"
+          :value="filterReason"
+          @change="setFilter('reason', ($event.target as HTMLSelectElement).value)"
+        >
+          <option value="">
+            Any reason
+          </option>
+          <option
+            v-for="(count, option) in data.rejectedByReason"
+            :key="option"
+            :value="option"
+          >
+            {{ label(option) }} ({{ count }})
+          </option>
+        </select>
+      </div>
       <AppButton
         v-if="view === 'awaiting_approval' && data?.items.length && !confirmingBulk"
         type="button"
@@ -455,9 +527,15 @@ onBeforeUnmount(() => {
           <span v-if="item.why">
             · {{ item.why }}
           </span>
+          <span v-if="view === 'all'">
+            · {{ label(item.outreachStatus) }}<template v-if="item.rejectionReason">: {{ label(item.rejectionReason) }}</template>
+          </span>
         </p>
         <p class="record-item-meta">
           {{ item.email || item.website || 'No public contact yet' }}
+          <template v-if="item.rejectionReason && item.email && item.emailSourceUrl">
+            · found at {{ item.emailSourceUrl }}
+          </template>
         </p>
         <template v-if="item.firstEmail">
           <div class="mt-3 rounded border border-gray-200 p-3 text-sm">
