@@ -276,6 +276,27 @@ export async function ingestProspect(db: Database, input: ProspectIngestInput) {
   return { outcome: 'created' as const, prospect: await requireProspect(db, created.id) }
 }
 
+// Applies a late homepage lookup to a stored, unsent candidate that has no email yet.
+export async function applyLookupToProspect(db: Database, id: number, input: ProspectIngestInput) {
+  const current = await requireProspect(db, id)
+  if (current.outreachStatus !== 'rejected' || current.status === 'promoted' || current.status === 'do_not_contact') {
+    return current
+  }
+  const found = normalizeEmailAddress(input.email)
+  const email = found ?? current.email
+  const fromLookup = Boolean(found && found !== current.email)
+  await db.update(salesProspects).set({
+    email,
+    emailSourceUrl: fromLookup ? blankToNull(input.emailSourceUrl) : current.emailSourceUrl,
+    emailEvidence: email ? (fromLookup ? blankToNull(input.emailEvidence) : current.emailEvidence) : null,
+    phone: current.phone ?? blankToNull(input.phone),
+    phoneKey: current.phoneKey ?? normalizePhoneKey(input.phone),
+    rejectionReason: email ? null : (input.lookupFailure ?? current.rejectionReason),
+    updatedAt: now(),
+  }).where(eq(salesProspects.id, id))
+  return syncOutreachReadiness(db, id)
+}
+
 export async function createManualProspect(db: Database, input: Omit<ProspectIngestInput, 'source' | 'externalId'> & {
   source?: string
   externalId?: string

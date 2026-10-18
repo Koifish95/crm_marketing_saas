@@ -37,6 +37,10 @@ describe('email cleaning', () => {
     expect(normalizeEmailAddress('blackwidowmmatx@gmail.com\\')).toBe('blackwidowmmatx@gmail.com')
     expect(normalizeEmailAddress('mailto:x@y.com"')).toBe('x@y.com')
     expect(normalizeEmailAddress('x@y.com.')).toBe('x@y.com')
+    for (const bad of ['a..b@y.com', '.a@y.com', 'a.@y.com', 'a@y..com', 'a@.y.com', 'a@-y.com', 'a@y-.com']) {
+      expect(normalizeEmailAddress(bad), bad).toBeNull()
+    }
+    expect(qualificationFailure({ name: 'G', city: 'C', state: 'OH', website: 'https://y.com', email: 'a..b@y.com' })).toBe('missing_email')
     expect(normalizeEmailAddress('(x@y.com),')).toBe('x@y.com')
   })
 
@@ -166,6 +170,9 @@ describe('homepage lookup coverage', () => {
     const first = await ingestDiscoveryElements(dbHandle.db, 'OH', elements, pages(html, calls))
     expect(calls).toHaveLength(LOOKUPS_PER_RUN)
     expect(first.detail).toBe(`Looked up ${LOOKUPS_PER_RUN} of ${total} sites; run again to continue`)
+    // Candidates past the cap are stored (rejected, not yet looked up) so All prospects shows them.
+    expect(await listDeskProspects(dbHandle.db, 'all')).toHaveLength(total)
+    expect(await dbHandle.db.select().from(salesProspects).where(eq(salesProspects.outreachStatus, 'awaiting_approval'))).toHaveLength(LOOKUPS_PER_RUN)
     const firstCalls = new Set(calls)
     calls.length = 0
     const second = await ingestDiscoveryElements(dbHandle.db, 'OH', elements, pages(html, calls))
@@ -178,6 +185,24 @@ describe('homepage lookup coverage', () => {
     expect(third.detail).toBe('All sites looked up')
     const stored = await dbHandle.db.select().from(salesProspects).where(eq(salesProspects.outreachStatus, 'awaiting_approval'))
     expect(stored).toHaveLength(total)
+  })
+})
+
+describe('lookups for already stored candidates', () => {
+  it('looks up a stored candidate whose homepage was never looked up', async () => {
+    dbHandle = await openTestDatabase()
+    const elements = [element(1, { name: 'Late Karate', website: 'https://late.example' })]
+    const html = { 'late.example': '<h1>Late Karate</h1><a href="mailto:hi@late.example">mail</a>' }
+    // First run is cut off by a failing fetch only for the lookup row: simulate by storing without one.
+    await ingestDiscoveryElements(dbHandle.db, 'OH', elements, pages({}))
+    await dbHandle.db.delete(salesProspectLookups)
+    await dbHandle.db.update(salesProspects).set({ rejectionReason: 'missing_email' })
+    const calls: string[] = []
+    const result = await ingestDiscoveryElements(dbHandle.db, 'OH', elements, pages(html, calls))
+    expect(calls).toEqual(['late.example'])
+    expect(result.detail).toBe('All sites looked up')
+    const [row] = await dbHandle.db.select().from(salesProspects)
+    expect(row).toMatchObject({ outreachStatus: 'awaiting_approval', email: 'hi@late.example', rejectionReason: null })
   })
 })
 

@@ -252,7 +252,7 @@ export function normalizePhoneKey(value: string | null | undefined) {
   return national.length >= 10 ? national.slice(-10) : null
 }
 
-const SINGLE_EMAIL = /^[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}$/
+const SINGLE_EMAIL = /^[a-z0-9_%+-]+(?:\.[a-z0-9_%+-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/
 const EMAIL_EDGE_JUNK = /^[\s<("'\\]+|[\s>)"'\\.,;]+$/g
 
 // One plain address or null. Strips mailto:, a mailto query, and the quote, slash,

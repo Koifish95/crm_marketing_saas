@@ -1,14 +1,14 @@
 import { and, desc, eq } from 'drizzle-orm'
 import { DomainError } from '@crm/core/server/services/errors'
 import type { Database } from '../database'
-import { salesProspectLookups, salesProspectObservations, salesProspectRuns } from '../database/schema'
+import { salesProspectLookups, salesProspectObservations, salesProspectRuns, salesProspects } from '../database/schema'
 import { qualificationFailure } from '../../shared/utils/prospect-desk'
 import { normalizeState } from '../../shared/utils/prospect'
 import { utcNowMs } from '../../shared/utils/time'
 import { overpassQueryForState, prospectsFromOverpassDocument, type OverpassElement } from './prospect-discovery'
 import { chooseSiteEmail, extractPublicContacts, pageMentionsAcademy, robotsAllowsHomepage } from './prospect-enrichment'
 import { readProspectDeskConfig } from './prospect-desk-settings'
-import { ingestProspect, requalifyStoredProspects, type ProspectIngestInput } from './prospects'
+import { applyLookupToProspect, ingestProspect, requalifyStoredProspects, type ProspectIngestInput } from './prospects'
 
 const OVERPASS_ENDPOINTS = ['https://overpass-api.de/api/interpreter']
 const OVERPASS_RETRY_STATUSES = [429, 502, 503, 504]
@@ -111,7 +111,7 @@ function applyLookup(input: ProspectIngestInput, outcome: LookupOutcome): Prospe
   return { ...input, phone: input.phone ?? outcome.phone }
 }
 
-function needsLookup(input: ProspectIngestInput) {
+function needsLookup(input: Parameters<typeof qualificationFailure>[0]) {
   const failure = qualificationFailure(input)
   return Boolean(failure && LOOKUP_REASONS.includes(failure) && homepageKey(input.website))
 }
@@ -132,21 +132,26 @@ export async function ingestDiscoveryElements(
   let rejected = parsed.skipped.length
   let fetches = 0
   for (const prospect of parsed.prospects) {
-    const [known] = await db.select({ id: salesProspectObservations.id }).from(salesProspectObservations).where(and(
+    const [known] = await db.select({ prospectId: salesProspectObservations.prospectId }).from(salesProspectObservations).where(and(
       eq(salesProspectObservations.source, prospect.source),
       eq(salesProspectObservations.externalId, prospect.externalId),
     )).limit(1)
-    if (known) {
+    // An already stored candidate only needs work when its homepage was never looked up.
+    const [current] = known
+      ? await db.select().from(salesProspects).where(eq(salesProspects.id, known.prospectId)).limit(1)
+      : []
+    if (known && !(current && current.outreachStatus === 'rejected' && needsLookup(current))) {
       continue
     }
     let candidate = prospect
-    if (needsLookup(candidate)) {
-      const key = homepageKey(candidate.website)!
+    const subject = current ?? candidate
+    if (needsLookup(subject)) {
+      const key = homepageKey(subject.website)!
       let outcome: LookupOutcome | undefined = lookups.get(key)
-      if (!outcome) {
-        if (fetches >= LOOKUPS_PER_RUN) {
-          continue
-        }
+      if (known && outcome) {
+        continue
+      }
+      if (!outcome && fetches < LOOKUPS_PER_RUN) {
         fetches += 1
         outcome = await lookUpHomepage(candidate, fetchImpl)
         const [row] = await db.insert(salesProspectLookups).values({
@@ -156,7 +161,17 @@ export async function ingestDiscoveryElements(
         }).returning()
         lookups.set(key, row!)
       }
-      candidate = applyLookup(candidate, outcome)
+      // Past the cap a new candidate is still stored (rejected, no lookup yet) so it shows in
+      // All prospects; the next run looks its site up.
+      if (outcome) {
+        candidate = applyLookup(candidate, outcome)
+      }
+    }
+    if (known) {
+      if (candidate !== prospect) {
+        await applyLookupToProspect(db, known.prospectId, candidate)
+      }
+      continue
     }
     const result = await ingestProspect(db, candidate)
     if (result.outcome === 'created') {
