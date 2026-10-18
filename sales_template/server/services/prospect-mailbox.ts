@@ -16,6 +16,23 @@ export type InboundMail = {
   inReplyTo: string | null
   subject: string
   text: string
+  /** Every outreach Message-ID named anywhere in the raw mail, so a bounce that quotes ours only in its body still matches. */
+  outreachIds?: string[]
+}
+
+/**
+ * Why a send failed, so the desk never calls a network blip a bounce:
+ * - rejected: the server refused this recipient or message for good (5xx). Treat as a bounce.
+ * - not_sent: nothing was handed over (connection, login, a temporary 4xx). Safe to try again.
+ * - uncertain: the message went out but no answer came back. It may have arrived; never resend blindly.
+ */
+export type SendOutcome = 'rejected' | 'not_sent' | 'uncertain'
+
+export class SmtpSendError extends Error {
+  constructor(readonly outcome: SendOutcome, readonly stage: 'connect' | 'auth' | 'sender' | 'recipient' | 'data' | 'accept', message: string) {
+    super(message)
+    this.name = 'SmtpSendError'
+  }
 }
 
 export type ProspectMailbox = {
@@ -70,6 +87,15 @@ export function outreachSearchCommand(tag: string) {
 /** A second check on what the server returned, before the message is used or marked read. */
 export function isOutreachMail(raw: string) {
   return raw.includes(`@${OUTREACH_ID_DOMAIN}`)
+}
+
+export function outreachIdsIn(raw: string) {
+  return [...new Set(raw.match(/<[^<>\s]+@prospects\.nuxxion\.local>/gi) ?? [])]
+}
+
+/** A tagged IMAP status line is OK when its status word is OK, whatever text follows ("A1 OK LOGIN completed"). */
+export function imapTaggedOk(line: string, tag: string) {
+  return new RegExp(`^${tag} OK(\\s|$)`, 'i').test(line)
 }
 
 export function createSmtpImapMailbox(config: MailboxConfig): ProspectMailbox {
@@ -190,6 +216,22 @@ function connectSocket(host: string, port: number, secure: boolean) {
 }
 
 async function smtpSend(config: MailboxConfig, message: OutboundMail) {
+  const progress = { dataSent: false }
+  try {
+    await smtpSession(config, message, progress)
+  } catch (error) {
+    if (error instanceof SmtpSendError) {
+      throw error
+    }
+    // A dropped connection or a timeout: before the message went out nothing was delivered; after, it may have been.
+    const reason = error instanceof Error ? error.message : 'The mail server connection failed.'
+    throw progress.dataSent
+      ? new SmtpSendError('uncertain', 'accept', `The mail server did not confirm the message: ${reason}`)
+      : new SmtpSendError('not_sent', 'connect', `The message was not sent: ${reason}`)
+  }
+}
+
+async function smtpSession(config: MailboxConfig, message: OutboundMail, progress: { dataSent: boolean }) {
   let socket = await connectSocket(config.smtpHost, config.smtpPort, config.smtpSecure)
   const proto = new LineProtocol(socket)
   try {
@@ -214,16 +256,16 @@ async function smtpSend(config: MailboxConfig, message: OutboundMail) {
       const secureProto = new LineProtocol(socket)
       secureProto.write('EHLO nuxxion')
       await secureProto.readReply()
-      await smtpAuthAndSend(secureProto, config, message)
+      await smtpAuthAndSend(secureProto, config, message, progress)
       return
     }
-    await smtpAuthAndSend(proto, config, message)
+    await smtpAuthAndSend(proto, config, message, progress)
   } finally {
     socket.end()
   }
 }
 
-async function smtpAuthAndSend(proto: LineProtocol, config: MailboxConfig, message: OutboundMail) {
+async function smtpAuthAndSend(proto: LineProtocol, config: MailboxConfig, message: OutboundMail, progress: { dataSent: boolean }) {
   proto.write('AUTH LOGIN')
   await proto.readReply()
   proto.write(Buffer.from(config.mailboxUsername).toString('base64'))
@@ -231,27 +273,33 @@ async function smtpAuthAndSend(proto: LineProtocol, config: MailboxConfig, messa
   proto.write(Buffer.from(config.mailboxPassword).toString('base64'))
   const auth = await proto.readReply()
   if (!auth.code.startsWith('2')) {
-    throw new Error(`SMTP login failed. ${auth.line}`)
+    throw new SmtpSendError('not_sent', 'auth', `SMTP login failed. ${auth.line}`)
   }
   proto.write(`MAIL FROM:<${config.mailboxUsername}>`)
   const from = await proto.readReply()
   if (!from.code.startsWith('2')) {
-    throw new Error('SMTP rejected the sender.')
+    throw new SmtpSendError('not_sent', 'sender', `SMTP rejected the sender. ${from.line}`)
   }
   proto.write(`RCPT TO:<${message.to}>`)
   const to = await proto.readReply()
   if (!to.code.startsWith('2')) {
-    throw new Error('SMTP rejected the recipient.')
+    // 5xx: this address will never take mail. 4xx: try later (greylisting, a full mailbox).
+    throw to.code.startsWith('5')
+      ? new SmtpSendError('rejected', 'recipient', `SMTP rejected the recipient. ${to.line}`)
+      : new SmtpSendError('not_sent', 'recipient', `SMTP deferred the recipient. ${to.line}`)
   }
   proto.write('DATA')
   const data = await proto.readReply()
   if (!data.code.startsWith('3')) {
-    throw new Error('SMTP refused the message.')
+    throw new SmtpSendError('not_sent', 'data', `SMTP refused the message. ${data.line}`)
   }
+  progress.dataSent = true
   proto.write(`${dotStuff(buildRaw(message))}\r\n.`)
   const sent = await proto.readReply()
   if (!sent.code.startsWith('2')) {
-    throw new Error('SMTP did not accept the message.')
+    throw sent.code.startsWith('5')
+      ? new SmtpSendError('rejected', 'accept', `SMTP did not accept the message. ${sent.line}`)
+      : new SmtpSendError('not_sent', 'accept', `SMTP deferred the message. ${sent.line}`)
   }
   proto.write('QUIT')
 }
@@ -273,7 +321,7 @@ async function imapPollUnseen(config: MailboxConfig): Promise<InboundMail[]> {
     await proto.readLine()
     proto.write(`A1 LOGIN ${imapQuote(config.mailboxUsername)} ${imapQuote(config.mailboxPassword)}`)
     const login = await readImapTag(proto, 'A1')
-    if (!login.endsWith('OK')) {
+    if (!imapTaggedOk(login, 'A1')) {
       throw new Error('IMAP login failed.')
     }
     proto.write('A2 SELECT INBOX')
@@ -315,6 +363,8 @@ async function imapPollUnseen(config: MailboxConfig): Promise<InboundMail[]> {
         inReplyTo: headerValue(headers, 'in-reply-to') ?? headerValue(headers, 'references'),
         subject: headerValue(headers, 'subject') ?? '',
         text: text.slice(0, 4000),
+        // From the whole mail: a bounce often quotes our Message-ID past the part kept as text.
+        outreachIds: outreachIdsIn(raw),
       })
       proto.write(`A5 UID STORE ${uid} +FLAGS (\\Seen)`)
       await readImapTag(proto, 'A5')

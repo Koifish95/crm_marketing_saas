@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { salesProspectMessages, salesProspects, users } from '../../server/database/schema'
 import { writeProspectDeskConfig } from '../../server/services/prospect-desk-settings'
-import { createFixtureMailbox, isOutreachMail, outreachSearchCommand } from '../../server/services/prospect-mailbox'
+import { createFixtureMailbox, createSmtpImapMailbox, imapTaggedOk, isOutreachMail, outreachIdsIn, outreachSearchCommand, SmtpSendError } from '../../server/services/prospect-mailbox'
 import { listDeskProspects, prospectDeskSummary, runProspectTick } from '../../server/services/prospect-outreach'
 import { storeQualifiedProspects } from '../../server/services/prospect-runs'
 import { approveProspect, approveProspects, createManualProspect, markProspectDoNotContact, promoteProspect, skipProspect } from '../../server/services/prospects'
@@ -371,5 +371,176 @@ describe('prospect mailbox reading', () => {
     expect(isOutreachMail('Subject: Undelivered\n\nMessage-ID: <p3.s2.0011aabbccdd@prospects.nuxxion.local>')).toBe(true)
     expect(isOutreachMail('From: bank@example.com\nSubject: Your statement\n\nprospects.nuxxion.local is not a mailbox')).toBe(false)
     expect(isOutreachMail('From: friend@example.com\n\nLunch?')).toBe(false)
+  })
+})
+
+describe('mailbox failures found in the dry run', () => {
+  const failingMailbox = (error: Error) => ({
+    async send(): Promise<{ providerMessageId: string }> {
+      throw error
+    },
+    async poll() {
+      return []
+    },
+  })
+
+  async function oneApproved() {
+    dbHandle = await openTestDatabase()
+    await enableDesk(5, 1)
+    await createManualProspect(dbHandle.db, academy('Dry Run Dojo', 'dry-run-dojo.example'))
+    return approveByName('Dry Run Dojo')
+  }
+
+  const prospect = async () => (await dbHandle!.db.select().from(salesProspects).where(eq(salesProspects.name, 'Dry Run Dojo')))[0]!
+  const messages = async () => dbHandle!.db.select().from(salesProspectMessages)
+
+  it('accepts a tagged OK login reply with text after it, and only that', () => {
+    expect(imapTaggedOk('A1 OK LOGIN completed', 'A1')).toBe(true)
+    expect(imapTaggedOk('A1 OK [CAPABILITY IMAP4rev1] Logged in', 'A1')).toBe(true)
+    expect(imapTaggedOk('A1 OK', 'A1')).toBe(true)
+    expect(imapTaggedOk('a1 ok done', 'A1')).toBe(true)
+    expect(imapTaggedOk('A1 NO [AUTHENTICATIONFAILED] Invalid credentials', 'A1')).toBe(false)
+    expect(imapTaggedOk('A1 BAD command unknown', 'A1')).toBe(false)
+    expect(imapTaggedOk('A1 OKAY', 'A1')).toBe(false)
+    expect(imapTaggedOk('A10 OK LOGIN completed', 'A1')).toBe(false)
+  })
+
+  it('finds every outreach Message-ID anywhere in a raw mail', () => {
+    const raw = 'Subject: Undelivered Mail\r\n\r\nquoted:\r\nMessage-ID: <p3.s1.abc123@prospects.nuxxion.local>\r\nIn-Reply-To: <P3.S1.ABC123@PROSPECTS.NUXXION.LOCAL>\r\n<other@elsewhere.com>'
+    expect(outreachIdsIn(raw)).toEqual(['<p3.s1.abc123@prospects.nuxxion.local>', '<P3.S1.ABC123@PROSPECTS.NUXXION.LOCAL>'])
+  })
+
+  it('stops the sequence on a bounce that quotes our Message-ID only in its body', async () => {
+    await oneApproved()
+    const mailbox = createFixtureMailbox()
+    expect((await runProspectTick(dbHandle!.db, { nowMs: MONDAY, mailbox })).sent).toBe(1)
+    const id = mailbox.sent[0]!.messageId
+    // No In-Reply-To, a quoted unsubscribe line, and our id past the kept text: still a bounce for this prospect.
+    mailbox.pushInbound({
+      messageId: '<dsn-1@mx.example>',
+      inReplyTo: null,
+      subject: 'Undelivered Mail Returned to Sender',
+      text: 'This is the mail system. Your message could not be delivered. Reply unsubscribe to stop.',
+      outreachIds: [id],
+    })
+    await runProspectTick(dbHandle!.db, { nowMs: MONDAY + 60_000, mailbox })
+    expect(await prospect()).toMatchObject({ outreachStatus: 'bounced', status: expect.not.stringMatching('do_not_contact') })
+    expect((await messages())[0]?.bouncedAt).toBeTruthy()
+    const later = await runProspectTick(dbHandle!.db, { nowMs: MONDAY + 4 * 86_400_000, mailbox })
+    expect(later.sent).toBe(0)
+    expect(mailbox.sent).toHaveLength(1)
+  })
+
+  it('matches a bounce whose only trace of our Message-ID is in the kept text', async () => {
+    await oneApproved()
+    const mailbox = createFixtureMailbox()
+    await runProspectTick(dbHandle!.db, { nowMs: MONDAY, mailbox })
+    const id = mailbox.sent[0]!.messageId
+    mailbox.pushInbound({ messageId: null, inReplyTo: null, subject: 'Delivery Status Notification (Failure)', text: `Original-Message-ID: ${id}` })
+    await runProspectTick(dbHandle!.db, { nowMs: MONDAY + 60_000, mailbox })
+    expect((await prospect()).outreachStatus).toBe('bounced')
+  })
+
+  it('treats a connection failure as not sent: no bounce, no pause, and the next tick sends', async () => {
+    await oneApproved()
+    const result = await runProspectTick(dbHandle!.db, { nowMs: MONDAY, mailbox: failingMailbox(new SmtpSendError('not_sent', 'connect', 'The message was not sent: Mail server timed out.')) })
+    expect(result.sent).toBe(0)
+    expect(await messages()).toHaveLength(0)
+    expect((await prospect()).outreachStatus).toBe('ready')
+    expect((await prospectDeskSummary(dbHandle!.db, MONDAY)).config.senderPaused).toBe(false)
+    const mailbox = createFixtureMailbox()
+    expect((await runProspectTick(dbHandle!.db, { nowMs: MONDAY + 60_000, mailbox })).sent).toBe(1)
+    expect((await messages()).map(row => row.delivery)).toEqual(['sent'])
+  })
+
+  it('pauses sending when the mailbox login fails, so a wrong password is not retried every tick', async () => {
+    await oneApproved()
+    await runProspectTick(dbHandle!.db, { nowMs: MONDAY, mailbox: failingMailbox(new SmtpSendError('not_sent', 'auth', 'SMTP login failed. 535 Authentication failed')) })
+    const summary = await prospectDeskSummary(dbHandle!.db, MONDAY)
+    expect(summary.config.senderPaused).toBe(true)
+    expect((await prospect()).outreachStatus).toBe('ready')
+    expect(await messages()).toHaveLength(0)
+  })
+
+  it('never resends a message the server may have received, and asks the owner instead', async () => {
+    await oneApproved()
+    await runProspectTick(dbHandle!.db, { nowMs: MONDAY, mailbox: failingMailbox(new SmtpSendError('uncertain', 'accept', 'The mail server did not confirm the message: Mail server timed out.')) })
+    expect(await prospect()).toMatchObject({ outreachStatus: 'needs_you', nextTouchAt: null })
+    const [row] = await messages()
+    expect(row).toMatchObject({ delivery: 'uncertain', bouncedAt: null })
+    expect((await prospectDeskSummary(dbHandle!.db, MONDAY)).config.senderPaused).toBe(false)
+    const mailbox = createFixtureMailbox()
+    expect((await runProspectTick(dbHandle!.db, { nowMs: MONDAY + 60_000, mailbox })).sent).toBe(0)
+    const [needs] = await listDeskProspects(dbHandle!.db, 'needs_you')
+    expect(needs?.why).toMatch(/never confirmed/)
+  })
+
+  it('counts a permanent recipient refusal as a bounce', async () => {
+    await oneApproved()
+    await runProspectTick(dbHandle!.db, { nowMs: MONDAY, mailbox: failingMailbox(new SmtpSendError('rejected', 'recipient', 'SMTP rejected the recipient. 550 5.1.1 User unknown')) })
+    expect((await prospect()).outreachStatus).toBe('bounced')
+    expect((await messages())[0]).toMatchObject({ delivery: 'bounced' })
+  })
+})
+
+describe('SMTP replies over a real socket', () => {
+  /** A fake SMTP server on localhost that answers RCPT TO with the given reply. */
+  async function fakeSmtp(rcptReply: string) {
+    const net = await import('node:net')
+    const server = net.createServer((socket) => {
+      socket.write('220 fake ESMTP\r\n')
+      let inData = false
+      socket.on('data', (chunk) => {
+        for (const line of chunk.toString().split('\r\n').filter(Boolean)) {
+          if (inData) {
+            if (line === '.') {
+              inData = false
+              socket.write('250 queued\r\n')
+            }
+            continue
+          }
+          const verb = line.split(' ')[0]!.toUpperCase()
+          if (verb === 'EHLO') socket.write('250-fake\r\n250 AUTH LOGIN\r\n')
+          else if (verb === 'AUTH') socket.write('334 VXNlcm5hbWU6\r\n')
+          else if (verb === 'MAIL') socket.write('250 ok\r\n')
+          else if (verb === 'RCPT') socket.write(`${rcptReply}\r\n`)
+          else if (verb === 'DATA') {
+            inData = true
+            socket.write('354 go\r\n')
+          } else if (verb === 'QUIT') socket.end('221 bye\r\n')
+          else socket.write(line.length > 20 ? '235 ok\r\n' : '334 UGFzc3dvcmQ6\r\n')
+        }
+      })
+    })
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
+    return { server, port: (server.address() as { port: number }).port }
+  }
+
+  async function sendThrough(rcptReply: string) {
+    const { server, port } = await fakeSmtp(rcptReply)
+    const mailbox = createSmtpImapMailbox({ smtpHost: '127.0.0.1', smtpPort: port, smtpSecure: false, imapHost: '127.0.0.1', imapPort: 1, mailboxUsername: 'scott@example.com', mailboxPassword: 'a-long-enough-password-value' })
+    try {
+      await mailbox.send({ messageId: '<t@prospects.nuxxion.local>', fromName: 'Scott', fromAddress: 'scott@example.com', to: 'info@gym.example', subject: 'Hi', text: 'Hello', html: null })
+      return null
+    } catch (error) {
+      return error
+    } finally {
+      server.close()
+    }
+  }
+
+  it('sends when the server accepts', async () => {
+    expect(await sendThrough('250 ok')).toBeNull()
+  })
+
+  it('calls a 550 at RCPT a permanent rejection, and a 451 a deferral that was not sent', async () => {
+    expect(await sendThrough('550 5.1.1 User unknown')).toMatchObject({ outcome: 'rejected', stage: 'recipient' })
+    expect(await sendThrough('451 4.7.1 Greylisted, try again')).toMatchObject({ outcome: 'not_sent', stage: 'recipient' })
+  })
+
+  it('calls a refused connection not sent', async () => {
+    const mailbox = createSmtpImapMailbox({ smtpHost: '127.0.0.1', smtpPort: 1, smtpSecure: false, imapHost: '127.0.0.1', imapPort: 1, mailboxUsername: 'a@b.c', mailboxPassword: 'x' })
+    await expect(mailbox.send({ messageId: '<t@prospects.nuxxion.local>', fromName: 'S', fromAddress: 'a@b.c', to: 'c@d.e', subject: 's', text: 't', html: null }))
+      .rejects.toMatchObject({ outcome: 'not_sent', stage: 'connect' })
   })
 })

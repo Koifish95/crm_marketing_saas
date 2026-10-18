@@ -17,7 +17,7 @@ import {
 } from '../../shared/utils/prospect-desk'
 import { denverYmd, utcNowMs } from '../../shared/utils/time'
 import { readProspectDeskConfig, saveProspectDeskInternal } from './prospect-desk-settings'
-import { createSmtpImapMailbox, type InboundMail, type ProspectMailbox } from './prospect-mailbox'
+import { createSmtpImapMailbox, SmtpSendError, type InboundMail, type ProspectMailbox, type SendOutcome } from './prospect-mailbox'
 import { markProspectDoNotContact, requalifyStoredProspects } from './prospects'
 
 function nowDate(nowMs: number) {
@@ -201,15 +201,40 @@ async function sendTouch(
       html,
     })
   } catch (error) {
-    await db.update(salesProspectMessages).set({
-      delivery: 'bounced',
-      bouncedAt: createdAt,
-    }).where(eq(salesProspectMessages.providerMessageId, providerMessageId))
-    await db.update(salesProspects).set({
-      outreachStatus: 'bounced',
-      nextTouchAt: null,
-      updatedAt: createdAt,
-    }).where(eq(salesProspects.id, target.row.id))
+    // Only a refusal from the recipient's side is a bounce. Anything we cannot classify is treated as uncertain:
+    // never counted as a bounce, never resent blindly.
+    const outcome: SendOutcome = error instanceof SmtpSendError ? error.outcome : 'uncertain'
+    if (outcome === 'rejected') {
+      await db.update(salesProspectMessages).set({
+        delivery: 'bounced',
+        bouncedAt: createdAt,
+      }).where(eq(salesProspectMessages.providerMessageId, providerMessageId))
+      await db.update(salesProspects).set({
+        outreachStatus: 'bounced',
+        nextTouchAt: null,
+        updatedAt: createdAt,
+      }).where(eq(salesProspects.id, target.row.id))
+    } else if (outcome === 'not_sent') {
+      // Nothing left the desk: drop the attempt so a later tick sends this touch.
+      await db.delete(salesProspectMessages).where(eq(salesProspectMessages.providerMessageId, providerMessageId))
+      if (error instanceof SmtpSendError && error.stage === 'auth') {
+        // Retrying a wrong password every tick can get the mailbox locked.
+        await saveProspectDeskInternal(db, {
+          ...config,
+          senderPaused: true,
+          senderPausedReason: 'The mailbox login failed, so sending is paused. Check the mailbox password in Settings, then resume.',
+        }, null)
+      }
+    } else {
+      await db.update(salesProspectMessages).set({
+        delivery: 'uncertain',
+      }).where(eq(salesProspectMessages.providerMessageId, providerMessageId))
+      await db.update(salesProspects).set({
+        outreachStatus: 'needs_you',
+        nextTouchAt: null,
+        updatedAt: createdAt,
+      }).where(eq(salesProspects.id, target.row.id))
+    }
     throw error
   }
   const sequenceStartedAt = target.row.sequenceStartedAt ?? createdAt
@@ -239,13 +264,12 @@ async function applyInbound(db: Database, inbound: InboundMail[], nowMs: number)
   let applied = 0
   const messages = await db.select().from(salesProspectMessages)
   for (const item of inbound) {
-    const match = messages.find((message) => {
-      if (!message.providerMessageId) {
-        return false
-      }
-      const replyTo = `${item.inReplyTo ?? ''} ${item.subject}`
-      return replyTo.includes(message.providerMessageId)
-    })
+    // A reply names our Message-ID in its headers; a bounce often only quotes it in the body.
+    const headerIds = `${item.inReplyTo ?? ''} ${item.subject}`
+    const quoted = new Set(item.outreachIds ?? [])
+    const named = (id: string) => quoted.has(id) || item.text.includes(id)
+    const match = messages.find(message => message.providerMessageId && headerIds.includes(message.providerMessageId))
+      ?? messages.find(message => message.providerMessageId && named(message.providerMessageId))
     if (!match) {
       continue
     }
@@ -358,7 +382,9 @@ export async function listDeskProspects(db: Database, view: DeskView, filters: {
     const latest = own.at(-1)
     const why = row.outreachStatus === 'bounced'
       ? 'Bounced'
-      : (latest?.replyExcerpt || 'Reply needs a look')
+      : latest?.delivery === 'uncertain'
+        ? 'The mail server never confirmed the last message. Check your Sent folder before contacting them again.'
+        : (latest?.replyExcerpt || 'Reply needs a look')
     return {
       id: row.id,
       name: row.name,

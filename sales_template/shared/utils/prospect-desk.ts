@@ -262,12 +262,18 @@ export function renderProspectTemplate(template: string, values: {
 
 export type ReplyClass = 'unsubscribe' | 'bounce' | 'out_of_office' | 'needs_you'
 
+const BOUNCE_TEXT = /mailer-daemon|delivery status notification|undeliverable|undelivered mail|returned to sender|delivery has failed|delivery failure|failure notice|address not found|user unknown/
+
 export function classifyProspectReply(subject: string, body: string): ReplyClass {
   const text = `${subject}\n${body}`.toLowerCase()
+  // A bounce quotes our message, unsubscribe line included, so its subject is checked first.
+  if (BOUNCE_TEXT.test(subject.toLowerCase())) {
+    return 'bounce'
+  }
   if (/unsubscribe|remove me|do not (email|contact)|stop emailing|opt out/.test(text)) {
     return 'unsubscribe'
   }
-  if (/mailer-daemon|delivery status notification|undeliverable|delivery has failed|address not found|user unknown/.test(text)) {
+  if (BOUNCE_TEXT.test(text)) {
     return 'bounce'
   }
   if (/out of office|automatic reply|auto-reply|autoreply|away from the office/.test(text)) {
