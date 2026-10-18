@@ -13,11 +13,33 @@ export const US_STATE_CODES = [
   'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
 ] as const
 
-export const OUTREACH_STATUSES = ['none', 'awaiting_approval', 'ready', 'queued', 'active', 'needs_you', 'bounced', 'stopped', 'paused'] as const
+export const OUTREACH_STATUSES = ['none', 'awaiting_approval', 'ready', 'queued', 'active', 'needs_you', 'bounced', 'stopped', 'paused', 'rejected'] as const
 export type OutreachStatus = (typeof OUTREACH_STATUSES)[number]
 
-export const DESK_VIEWS = ['needs_you', 'awaiting_approval', 'ready', 'sending'] as const
+export const DESK_VIEWS = ['needs_you', 'awaiting_approval', 'ready', 'sending', 'all'] as const
 export type DeskView = (typeof DESK_VIEWS)[number]
+
+export const REJECTION_REASONS = [
+  'missing_city',
+  'missing_website',
+  'missing_email',
+  'email_not_on_site',
+  'excluded_state',
+  'lookup_blocked_by_robots',
+  'lookup_failed',
+  'third_party_email',
+] as const
+export type RejectionReason = (typeof REJECTION_REASONS)[number]
+
+export const FREE_MAIL_DOMAINS = ['gmail.com', 'yahoo.com', 'outlook.com', 'icloud.com', 'hotmail.com', 'aol.com'] as const
+
+// Where an address was found. A free-mail address counts only from a mailto link
+// or from text next to the academy's name.
+export type EmailEvidence = 'mailto' | 'near_name' | 'page' | 'osm'
+
+export function isFreeMailAddress(email: string) {
+  return (FREE_MAIL_DOMAINS as readonly string[]).includes(email.split('@')[1] ?? '')
+}
 
 export type ProspectTemplate = {
   subject: string
@@ -190,6 +212,7 @@ export type QualificationInput = {
   website?: string | null
   email?: string | null
   emailSourceUrl?: string | null
+  emailEvidence?: string | null
 }
 
 export function qualificationFailure(input: QualificationInput) {
@@ -215,12 +238,13 @@ export function qualificationFailure(input: QualificationInput) {
     return 'missing_email'
   }
   const emailHost = email.split('@')[1]?.replace(/^www\./, '') ?? ''
-  const domainMatch = emailHost === domain || emailHost.endsWith(`.${domain}`)
-  const foundOnSite = Boolean(input.emailSourceUrl?.trim())
-  if (!domainMatch && !foundOnSite) {
-    return 'email_not_on_site'
+  if (emailHost === domain || emailHost.endsWith(`.${domain}`)) {
+    return null
   }
-  return null
+  if (isFreeMailAddress(email)) {
+    return input.emailEvidence === 'mailto' || input.emailEvidence === 'near_name' ? null : 'email_not_on_site'
+  }
+  return 'third_party_email'
 }
 
 export function renderProspectTemplate(template: string, values: {

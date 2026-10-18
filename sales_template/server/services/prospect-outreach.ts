@@ -9,6 +9,7 @@ import {
   nextSequenceStep,
   publicProspectDeskConfig,
   renderProspectTemplate,
+  REJECTION_REASONS,
   senderBlockReason,
   touchDueAt,
   type DeskView,
@@ -298,6 +299,12 @@ export async function prospectDeskSummary(db: Database, nowMs = utcNowMs()) {
   return {
     config: publicProspectDeskConfig(config),
     stored: prospects.length,
+    rejected: prospects.filter(row => row.outreachStatus === 'rejected').length,
+    rejectedByReason: Object.fromEntries(REJECTION_REASONS.map(reason => [
+      reason,
+      prospects.filter(row => row.outreachStatus === 'rejected' && row.rejectionReason === reason).length,
+    ])),
+    states: [...new Set(prospects.map(row => row.outreachStatus))].sort(),
     awaitingApproval: prospects.filter(row => row.outreachStatus === 'awaiting_approval' && row.status !== 'do_not_contact' && row.status !== 'promoted').length,
     ready: prospects.filter(row => row.outreachStatus === 'ready' && row.status !== 'do_not_contact' && row.status !== 'promoted').length,
     sendingToday: sentToday,
@@ -325,11 +332,15 @@ export function firstEmailPreview(config: ProspectDeskConfig, row: { name: strin
   }
 }
 
-export async function listDeskProspects(db: Database, view: DeskView) {
+export async function listDeskProspects(db: Database, view: DeskView, filters: { state?: string, reason?: string } = {}) {
   const config = await readProspectDeskConfig(db)
   const prospects = await db.select().from(salesProspects).orderBy(asc(salesProspects.updatedAt))
   const messages = await db.select().from(salesProspectMessages).orderBy(asc(salesProspectMessages.step))
   return prospects.filter((row) => {
+    if (view === 'all') {
+      return (!filters.state || row.outreachStatus === filters.state)
+        && (!filters.reason || row.rejectionReason === filters.reason)
+    }
     if (view === 'awaiting_approval') {
       return row.outreachStatus === 'awaiting_approval' && row.status !== 'do_not_contact' && row.status !== 'promoted'
     }
@@ -352,6 +363,8 @@ export async function listDeskProspects(db: Database, view: DeskView) {
       city: row.city,
       state: row.state,
       email: row.email,
+      emailSourceUrl: row.emailSourceUrl,
+      rejectionReason: row.rejectionReason,
       website: row.website,
       outreachStatus: row.outreachStatus,
       status: row.status,
