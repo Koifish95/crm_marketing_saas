@@ -4,7 +4,7 @@ import { salesProspectLookups, salesProspects } from '../../server/database/sche
 import { extractPublicContacts } from '../../server/services/prospect-enrichment'
 import { listDeskProspects, prospectDeskSummary } from '../../server/services/prospect-outreach'
 import { fetchOverpass, ingestDiscoveryElements, LOOKUPS_PER_RUN } from '../../server/services/prospect-runs'
-import { createManualProspect, requalifyStoredProspects } from '../../server/services/prospects'
+import { applyLookupToProspect, createManualProspect, requalifyStoredProspects } from '../../server/services/prospects'
 import { normalizeEmailAddress } from '../../shared/utils/prospect'
 import { qualificationFailure } from '../../shared/utils/prospect-desk'
 import { openTestDatabase } from '../helpers/db'
@@ -227,5 +227,30 @@ describe('overpass retry', () => {
     }) as typeof fetch
     await expect(fetchOverpass('q', { fetchImpl: fatal, wait: async () => {} })).rejects.toThrow(/400/)
     expect(fatalCalls).toBe(1)
+  })
+})
+
+describe('malformed and late addresses', () => {
+  it('ignores a page address glued to a second @', () => {
+    const contacts = extractPublicContacts('<p>a@falcon.org@evil.com</p><p>b@evil.com@falcon.org</p>')
+    expect(contacts.emails).toEqual([])
+    expect(normalizeEmailAddress('a@falcon.org@evil.com')).toBeNull()
+  })
+
+  it('keeps new evidence and source URL when a late lookup finds the stored address', async () => {
+    dbHandle = await openTestDatabase()
+    const base = { city: 'Columbus', state: 'OH', name: 'Late Karate', website: 'https://late.example' }
+    const created = await createManualProspect(dbHandle.db, { ...base, email: 'owner@gmail.com', emailEvidence: 'osm' })
+    expect(created.prospect.outreachStatus).toBe('rejected')
+    await applyLookupToProspect(dbHandle.db, created.prospect.id, {
+      ...base,
+      source: 'x',
+      externalId: 'x',
+      email: 'owner@gmail.com',
+      emailEvidence: 'mailto',
+      emailSourceUrl: 'https://late.example/',
+    })
+    const [row] = await dbHandle.db.select().from(salesProspects).where(eq(salesProspects.id, created.prospect.id))
+    expect(row).toMatchObject({ emailEvidence: 'mailto', emailSourceUrl: 'https://late.example/', outreachStatus: 'awaiting_approval' })
   })
 })

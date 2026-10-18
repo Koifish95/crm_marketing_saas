@@ -87,11 +87,15 @@ export function extractPublicContacts(html: string, academyName = '') {
     }
   }
   for (const match of html.matchAll(EMAIL_PATTERN)) {
+    const at = match.index ?? 0
+    // A match glued to another "@" is a malformed address, not a clean one.
+    if (html[at - 1] === '@' || /^@[a-z0-9]/i.test(html.slice(at + match[0].length, at + match[0].length + 2))) {
+      continue
+    }
     const email = cleanEmail(match[0] ?? '')
     if (!email || found.get(email) === 'mailto') {
       continue
     }
-    const at = match.index ?? 0
     const around = lower.slice(Math.max(0, at - NAME_WINDOW), at + match[0].length + NAME_WINDOW)
     const near = tokens.some(token => around.includes(token))
     if (near || !found.has(email)) {

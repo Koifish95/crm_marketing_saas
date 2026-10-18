@@ -284,7 +284,7 @@ export async function applyLookupToProspect(db: Database, id: number, input: Pro
   }
   const found = normalizeEmailAddress(input.email)
   const email = found ?? current.email
-  const fromLookup = Boolean(found && found !== current.email)
+  const fromLookup = Boolean(found)
   await db.update(salesProspects).set({
     email,
     emailSourceUrl: fromLookup ? blankToNull(input.emailSourceUrl) : current.emailSourceUrl,
