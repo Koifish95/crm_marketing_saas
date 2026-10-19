@@ -362,7 +362,7 @@ export function intakeKeyMatches(presented: string | null | undefined, expected 
 }
 
 export const LEAD_IDEMPOTENCY_HEADER = 'idempotency-key'
-const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9._~-]{1,128}$/
+const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9._~%-]{1,128}$/
 
 export function validIdempotencyKey(value: string | null | undefined) {
   return !value || IDEMPOTENCY_KEY_PATTERN.test(value)
@@ -444,4 +444,14 @@ async function submitKeyedLeadUnserialized(db: Database, input: {
     await db.insert(salesPublicSubmissions).values({ idempotencyKey: storedKey, leadId: lead.id, createdAt: now() })
   }
   return { ok: true as const, id: lead.id, replay: false }
+}
+
+/** Writes the lead-notification outcome as a staff-visible note. Provider acceptance is not delivery. */
+export async function recordLeadNotifyOutcome(db: Database, leadId: number, result: { sent: boolean, reason?: string }) {
+  const body = result.sent
+    ? 'Email notification: accepted by the email provider (not a delivery confirmation).'
+    : result.reason === 'not_configured'
+      ? 'Email notification: not sent, because email notifications are not configured.'
+      : `Email notification: failed (${result.reason ?? 'error'}). The lead was saved.`
+  await db.insert(salesNotes).values({ recordKind: 'lead', recordId: leadId, body, authorUserId: null, createdAt: now() })
 }

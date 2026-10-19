@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, toWebHandler } from 'h3'
 import { setUseDbForTests } from '../../server/database'
 import { listLeads } from '../../server/services/sales'
@@ -147,5 +147,26 @@ describe('keyed public lead intake', () => {
     const ids = await Promise.all(responses.map(async r => (await r.json()).id))
     expect(new Set(ids).size).toBe(1)
     expect(await leadCount()).toBe(baseline + 1)
+  })
+
+  it('accepts percent-sign keys as distinct keys', async () => {
+    const send = (body: unknown, idem: string) => handle(new Request('http://localhost/api/public/lead-intake', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-intake-key': KEY, 'idempotency-key': idem },
+      body: JSON.stringify(body),
+    }))
+    expect((await send(lead, 'abc%def')).status).toBe(200)
+    expect((await send({ ...lead, phone: '801-555-0199' }, 'abcXdef')).status).toBe(200)
+    expect((await send({ ...lead, phone: '801-555-0188' }, 'abc%')).status).toBe(200)
+    expect(await leadCount()).toBe(baseline + 3)
+  })
+
+  it('records the notification outcome as a note on the saved lead', async () => {
+    const res = await post(lead, KEY)
+    const { id } = await res.json()
+    await vi.waitFor(async () => {
+      const notes = await dbHandle.db.select().from(salesNotes)
+      expect(notes.some(n => n.recordId === id && n.body.startsWith('Email notification: not sent'))).toBe(true)
+    })
   })
 })

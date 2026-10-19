@@ -1,6 +1,6 @@
 import { createError, defineEventHandler, getRequestHeader, getRequestIP, readBody } from 'h3'
 import { publicLeadIntakeSchema } from '../../../shared/schemas/sales'
-import { LEAD_IDEMPOTENCY_HEADER, LEAD_INTAKE_KEY_HEADER, intakeKeyMatches, submitKeyedLead, validIdempotencyKey } from '../../services/public-intake'
+import { LEAD_IDEMPOTENCY_HEADER, LEAD_INTAKE_KEY_HEADER, intakeKeyMatches, recordLeadNotifyOutcome, submitKeyedLead, validIdempotencyKey } from '../../services/public-intake'
 import { notifyNewLead } from '../../services/lead-notify'
 import { useDb } from '../../database'
 import { throwDomain } from '../../utils/api'
@@ -38,6 +38,9 @@ export default defineEventHandler(async (event) => {
     return { ok: true as const, id: result.id }
   }
   // Not awaited: the lead is saved, so a slow or failed email never delays or fails the response.
+  const db = useDb()
   void notifyNewLead({ id: result.id, ...parsed.data })
+    .then(res => recordLeadNotifyOutcome(db, result.id, res))
+    .catch(error => console.error(`[lead-notify] lead ${result.id} outcome not recorded: ${error instanceof Error ? error.message : 'error'}`))
   return { ok: true as const, id: result.id }
 })
