@@ -1,4 +1,5 @@
 import { ensureAppSettings, readAppSetting, upsertAppSetting } from '@crm/core/server/services/app-settings'
+import { createError } from 'h3'
 import type { Database } from '../database'
 import { getDatabaseUrl } from '../database'
 import {
@@ -6,6 +7,7 @@ import {
   baseProspectDeskConfig,
   isLocalDogfoodDatabase,
   normalizeProspectDeskConfig,
+  unknownTemplateTokens,
   publicProspectDeskConfig,
   type ProspectDeskConfig,
   type PublicProspectDeskConfig,
@@ -38,6 +40,10 @@ export async function writeProspectDeskConfig(
   input: Partial<ProspectDeskConfig> & { mailboxPassword?: string },
   actorUserId: number | null,
 ): Promise<PublicProspectDeskConfig> {
+  const unknown = unknownTemplateTokens(input.templates ?? [])
+  if (unknown.length) {
+    throw createError({ statusCode: 400, statusMessage: `Templates can only use {{academy}}, {{city}}, {{address}} and {{unsubscribe}}. Remove ${unknown.join(', ')}.` })
+  }
   const current = await readProspectDeskConfig(db)
   const password = input.mailboxPassword?.trim()
     ? input.mailboxPassword

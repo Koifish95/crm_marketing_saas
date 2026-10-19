@@ -106,6 +106,11 @@ describe('prospect desk rules', () => {
 
   it('sorts replies without treating an open as a reason to write again', () => {
     expect(classifyProspectReply('Re: hello', 'Please unsubscribe me')).toBe('unsubscribe')
+    expect(classifyProspectReply('Re: hello', 'stop')).toBe('unsubscribe')
+    expect(classifyProspectReply('Re: hello', 'STOP.')).toBe('unsubscribe')
+    expect(classifyProspectReply('Re: hello', 'Please stop\n\n> Reply stop and I will not email you again.')).toBe('unsubscribe')
+    expect(classifyProspectReply('Re: hello', 'Sounds good, call me.\n\n> Reply stop and I will not email you again.')).toBe('needs_you')
+    expect(classifyProspectReply('Re: hello', 'Do not stop by today')).toBe('needs_you')
     expect(classifyProspectReply('Mail delivery failed', 'Address not found')).toBe('bounce')
     expect(classifyProspectReply('Automatic reply', 'I am out of office until Monday')).toBe('out_of_office')
     expect(classifyProspectReply('Re: hello', 'Can you show me how it works?')).toBe('needs_you')
@@ -163,6 +168,31 @@ describe('prospect desk queue', () => {
     expect(waiting[0]?.outreachStatus).toBe('ready')
   })
 
+  it('refuses templates with unknown placeholders', async () => {
+    dbHandle = await openTestDatabase()
+    const templates = [
+      { subject: 'Hi {{name}}', body: 'Body {{academy}}' },
+      { subject: 'Two', body: 'Body' },
+      { subject: 'Three', body: 'Body' },
+    ]
+    await expect(writeProspectDeskConfig(dbHandle.db, { templates } as never, null)).rejects.toMatchObject({ statusCode: 400 })
+  })
+
+  it('does not send a touch that would show a raw placeholder or an empty city', async () => {
+    dbHandle = await openTestDatabase()
+    await enableDesk()
+    await createManualProspect(dbHandle.db, academy('Nocity Dojo', 'nocity-dojo.example'))
+    await createManualProspect(dbHandle.db, academy('Next Dojo', 'next-dojo.example'))
+    await approveByName('Nocity Dojo')
+    await approveByName('Next Dojo')
+    await dbHandle.db.update(salesProspects).set({ city: '' }).where(eq(salesProspects.name, 'Nocity Dojo'))
+    const mailbox = createFixtureMailbox()
+    const tick = await runProspectTick(dbHandle.db, { nowMs: MONDAY, mailbox })
+    expect(tick.sent).toBe(1)
+    expect(mailbox.sent).toHaveLength(1)
+    expect(mailbox.sent[0]?.to).toBe('info@next-dojo.example')
+    expect(mailbox.sent[0]?.text).not.toContain('{{')
+  })
   it('re-checks approved prospects before sending, so an address the rules now reject never sends', async () => {
     dbHandle = await openTestDatabase()
     await enableDesk()

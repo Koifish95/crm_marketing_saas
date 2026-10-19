@@ -260,6 +260,26 @@ export function renderProspectTemplate(template: string, values: {
     .replaceAll('{{unsubscribe}}', values.unsubscribe)
 }
 
+const TEMPLATE_TOKENS = ['academy', 'city', 'address', 'unsubscribe']
+
+export function unknownTemplateTokens(templates: Array<Partial<ProspectTemplate> | undefined>) {
+  const unknown = new Set<string>()
+  for (const template of templates) {
+    for (const match of `${template?.subject ?? ''}\n${template?.body ?? ''}`.matchAll(/\{\{\s*([^{}]*?)\s*\}\}/g)) {
+      if (!TEMPLATE_TOKENS.includes(match[1]!)) {
+        unknown.add(match[0])
+      }
+    }
+  }
+  return [...unknown]
+}
+
+// A one-word "stop" reply, ignoring quoted lines, honours the footer's "Reply stop".
+function isBareStop(body: string) {
+  const first = body.split('\n').map(line => line.trim()).find(line => line && !line.startsWith('>'))
+  return Boolean(first && /^(please |pls )?stop( (it|this|please|now))?[\s.!]*$/i.test(first))
+}
+
 export type ReplyClass = 'unsubscribe' | 'bounce' | 'out_of_office' | 'needs_you'
 
 const BOUNCE_TEXT = /mailer-daemon|delivery status notification|undeliverable|undelivered mail|returned to sender|delivery has failed|delivery failure|failure notice|address not found|user unknown/
@@ -270,7 +290,7 @@ export function classifyProspectReply(subject: string, body: string): ReplyClass
   if (BOUNCE_TEXT.test(subject.toLowerCase())) {
     return 'bounce'
   }
-  if (/unsubscribe|remove me|do not (email|contact)|stop emailing|opt out/.test(text)) {
+  if (isBareStop(body) || /unsubscribe|remove me|do not (email|contact)|stop emailing|opt out/.test(text)) {
     return 'unsubscribe'
   }
   if (BOUNCE_TEXT.test(text)) {

@@ -147,12 +147,35 @@ async function nextSendable(db: Database, config: ProspectDeskConfig, nowMs: num
     if (!step) {
       continue
     }
+    if (!renderTouch(config, row, step)) {
+      continue
+    }
     if (step > 1 && row.nextTouchAt && row.nextTouchAt.getTime() > nowMs) {
       continue
     }
     return { row, step }
   }
   return null
+}
+
+// Null when the touch would go out with a raw {{token}} or a missing city ("in .").
+function renderTouch(config: ProspectDeskConfig, row: typeof salesProspects.$inferSelect, step: number) {
+  const template = config.templates[step - 1]
+  if (!template) {
+    return null
+  }
+  const values = {
+    academy: row.name,
+    city: row.city ?? '',
+    address: config.postalAddress,
+    unsubscribe: config.unsubscribeLine,
+  }
+  if (!values.city.trim() && /\{\{\s*city\s*\}\}/.test(`${template.subject}\n${template.body}`)) {
+    return null
+  }
+  const subject = renderProspectTemplate(template.subject, values)
+  const text = renderProspectTemplate(template.body, values)
+  return subject.includes('{{') || text.includes('{{') ? null : { subject, text }
 }
 
 async function sendTouch(
@@ -166,14 +189,11 @@ async function sendTouch(
   if (!template || !target.row.email) {
     return
   }
-  const values = {
-    academy: target.row.name,
-    city: target.row.city ?? '',
-    address: config.postalAddress,
-    unsubscribe: config.unsubscribeLine,
+  const rendered = renderTouch(config, target.row, target.step)
+  if (!rendered) {
+    return
   }
-  const subject = renderProspectTemplate(template.subject, values)
-  const text = renderProspectTemplate(template.body, values)
+  const { subject, text } = rendered
   const providerMessageId = messageIdFor(target.row.id, target.step)
   const openToken = randomBytes(12).toString('hex')
   const html = config.publicBaseUrl
