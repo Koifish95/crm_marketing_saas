@@ -28,3 +28,17 @@ describe('Sales UI cleanup 4/4: new-record forms', () => {
     expect(read('app/assets/css/main.css')).toMatch(/\.form-actions\s*\{\s*@apply pt-2;/)
   })
 })
+
+describe('dry-run stumbles: approval scope and intake switch', () => {
+  it('prospect detail and list explain the three-touch scope before approving', () => {
+    const detail = read('app/pages/prospects/[id].vue')
+    expect(detail).toContain('Approval covers all three touches')
+    expect(detail).toContain('confirmingApprove')
+    expect(detail).toContain('prospect.firstEmail')
+    expect(read('app/pages/prospects/index.vue')).toContain('Approval covers all three touches')
+  })
+
+  it('the intake switch says it controls only /inquire', () => {
+    expect(read('app/pages/settings/intake.vue')).toContain('controls only the public /inquire page')
+  })
+})

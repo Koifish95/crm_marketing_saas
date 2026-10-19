@@ -1,5 +1,7 @@
 import { createError, defineEventHandler } from 'h3'
 import { getProspectDetail } from '../../services/prospects'
+import { readProspectDeskConfig } from '../../services/prospect-desk-settings'
+import { firstEmailPreview } from '../../services/prospect-outreach'
 import { useDb } from '../../database'
 import { throwDomain } from '../../utils/api'
 import { requireSalesAccess } from '../../utils/auth'
@@ -11,7 +13,14 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Invalid prospect id.' })
   }
   try {
-    return await getProspectDetail(useDb(), id)
+    const db = useDb()
+    const detail = await getProspectDetail(db, id)
+    return {
+      ...detail,
+      firstEmail: detail.outreachStatus === 'awaiting_approval'
+        ? firstEmailPreview(await readProspectDeskConfig(db), detail)
+        : null,
+    }
   } catch (error) {
     throwDomain(error)
   }

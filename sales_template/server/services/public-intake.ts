@@ -1,5 +1,5 @@
 import { createHash, randomUUID, timingSafeEqual } from 'node:crypto'
-import { eq } from 'drizzle-orm'
+import { eq, like } from 'drizzle-orm'
 import { DomainError } from '@crm/core/server/services/errors'
 import { ensureAppSettings, readAppSetting, upsertAppSetting } from '@crm/core/server/services/app-settings'
 import type { Database } from '../database'
@@ -361,13 +361,43 @@ export function intakeKeyMatches(presented: string | null | undefined, expected 
   return timingSafeEqual(a, b)
 }
 
+export const LEAD_IDEMPOTENCY_HEADER = 'idempotency-key'
+const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9._~-]{1,128}$/
+
+export function validIdempotencyKey(value: string | null | undefined) {
+  return !value || IDEMPOTENCY_KEY_PATTERN.test(value)
+}
+
+/**
+ * With an Idempotency-Key, a retry of the same payload returns the original lead id and creates nothing.
+ * The same key with a different payload is rejected. The payload hash rides in the stored key.
+ */
 export async function submitKeyedLead(db: Database, input: {
   name?: string | null
   email?: string | null
   phone?: string | null
   message?: string | null
   source?: string | null
-}) {
+}, requestKey?: string | null) {
+  let storedKey: string | null = null
+  if (requestKey) {
+    if (!IDEMPOTENCY_KEY_PATTERN.test(requestKey)) {
+      throw new DomainError('That idempotency key is not valid.')
+    }
+    const fingerprint = createHash('sha256')
+      .update(JSON.stringify([input.name ?? '', input.email ?? '', input.phone ?? '', input.message ?? '', input.source ?? '']))
+      .digest('hex')
+    storedKey = `website:${requestKey}:${fingerprint}`
+    const [previous] = await db.select().from(salesPublicSubmissions)
+      .where(like(salesPublicSubmissions.idempotencyKey, `website:${requestKey}:%`))
+      .limit(1)
+    if (previous) {
+      if (previous.idempotencyKey !== storedKey) {
+        throw new DomainError('That idempotency key was already used for a different submission.')
+      }
+      return { ok: true as const, id: previous.leadId, replay: true }
+    }
+  }
   const organic = await websiteOrganicSource(db)
   const lead = await createLead(db, {
     displayName: input.name ?? '',
@@ -384,5 +414,8 @@ export async function submitKeyedLead(db: Database, input: {
     authorUserId: null,
     createdAt: now(),
   })
-  return { ok: true as const, id: lead.id }
+  if (storedKey) {
+    await db.insert(salesPublicSubmissions).values({ idempotencyKey: storedKey, leadId: lead.id, createdAt: now() })
+  }
+  return { ok: true as const, id: lead.id, replay: false }
 }

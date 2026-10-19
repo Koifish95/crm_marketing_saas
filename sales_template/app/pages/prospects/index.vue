@@ -200,6 +200,7 @@ async function discover() {
 
 const acting = ref(false)
 const confirmingBulk = ref(false)
+const confirmingId = ref<number | null>(null)
 
 function errorMessage(caught: unknown, fallback: string) {
   const err = caught as { data?: { message?: string } }
@@ -217,6 +218,7 @@ async function approve(ids: number[]) {
     })
     notice.value = `Approved ${result.approved.length} ${result.approved.length === 1 ? 'academy' : 'academies'}. All three touches are cleared to send.`
     confirmingBulk.value = false
+    confirmingId.value = null
     await refresh()
   } catch (caught: unknown) {
     formError.value = errorMessage(caught, 'Nothing was approved.')
@@ -547,10 +549,34 @@ onBeforeUnmount(() => {
             </p>
           </div>
           <div class="mt-3 flex flex-wrap gap-2">
+            <p
+              v-if="confirmingId === item.id"
+              class="w-full text-sm"
+            >
+              Approval covers all three touches. Touches 2 and 3 send later without asking again.
+            </p>
             <AppButton
+              v-if="confirmingId === item.id"
               type="button"
               :disabled="acting"
               @click="approve([item.id])"
+            >
+              Yes, approve all three touches
+            </AppButton>
+            <AppButton
+              v-if="confirmingId === item.id"
+              type="button"
+              variant="secondary"
+              :disabled="acting"
+              @click="confirmingId = null"
+            >
+              Cancel
+            </AppButton>
+            <AppButton
+              v-else
+              type="button"
+              :disabled="acting"
+              @click="confirmingId = item.id"
             >
               Approve
             </AppButton>
