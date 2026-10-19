@@ -124,4 +124,28 @@ describe('keyed public lead intake', () => {
     expect((await send(lead, 'bad key!')).status).toBe(400)
     expect(await leadCount()).toBe(baseline + 1)
   })
+
+  it('treats keys that differ only by a LIKE wildcard as distinct', async () => {
+    const send = (body: unknown, idem: string) => handle(new Request('http://localhost/api/public/lead-intake', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-intake-key': KEY, 'idempotency-key': idem },
+      body: JSON.stringify(body),
+    }))
+    expect((await send(lead, 'abcXdef')).status).toBe(200)
+    expect((await send({ ...lead, phone: '801-555-0199' }, 'abc_def')).status).toBe(200)
+    expect(await leadCount()).toBe(baseline + 2)
+  })
+
+  it('replays one lead for concurrent identical keyed requests', async () => {
+    const send = () => handle(new Request('http://localhost/api/public/lead-intake', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-intake-key': KEY, 'idempotency-key': 'race-1' },
+      body: JSON.stringify(lead),
+    }))
+    const responses = await Promise.all([send(), send(), send()])
+    expect(responses.map(r => r.status)).toEqual([200, 200, 200])
+    const ids = await Promise.all(responses.map(async r => (await r.json()).id))
+    expect(new Set(ids).size).toBe(1)
+    expect(await leadCount()).toBe(baseline + 1)
+  })
 })

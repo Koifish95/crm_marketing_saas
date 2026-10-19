@@ -1,5 +1,5 @@
 import { createHash, randomUUID, timingSafeEqual } from 'node:crypto'
-import { eq, like } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { DomainError } from '@crm/core/server/services/errors'
 import { ensureAppSettings, readAppSetting, upsertAppSetting } from '@crm/core/server/services/app-settings'
 import type { Database } from '../database'
@@ -372,7 +372,32 @@ export function validIdempotencyKey(value: string | null | undefined) {
  * With an Idempotency-Key, a retry of the same payload returns the original lead id and creates nothing.
  * The same key with a different payload is rejected. The payload hash rides in the stored key.
  */
-export async function submitKeyedLead(db: Database, input: {
+export function submitKeyedLead(db: Database, input: {
+  name?: string | null
+  email?: string | null
+  phone?: string | null
+  message?: string | null
+  source?: string | null
+}, requestKey?: string | null) {
+  if (!requestKey) {
+    return submitKeyedLeadUnserialized(db, input, requestKey)
+  }
+  // Serialize same-key requests in this process so concurrent retries replay one lead.
+  const turn = keyedLeadQueues.get(requestKey) ?? Promise.resolve()
+  const run = turn.then(() => submitKeyedLeadUnserialized(db, input, requestKey))
+  const tail = run.then(() => undefined, () => undefined)
+  keyedLeadQueues.set(requestKey, tail)
+  void tail.then(() => {
+    if (keyedLeadQueues.get(requestKey) === tail) {
+      keyedLeadQueues.delete(requestKey)
+    }
+  })
+  return run
+}
+
+const keyedLeadQueues = new Map<string, Promise<void>>()
+
+async function submitKeyedLeadUnserialized(db: Database, input: {
   name?: string | null
   email?: string | null
   phone?: string | null
@@ -387,9 +412,10 @@ export async function submitKeyedLead(db: Database, input: {
     const fingerprint = createHash('sha256')
       .update(JSON.stringify([input.name ?? '', input.email ?? '', input.phone ?? '', input.message ?? '', input.source ?? '']))
       .digest('hex')
-    storedKey = `website:${requestKey}:${fingerprint}`
+    const keyPrefix = `website:${requestKey}:`
+    storedKey = `${keyPrefix}${fingerprint}`
     const [previous] = await db.select().from(salesPublicSubmissions)
-      .where(like(salesPublicSubmissions.idempotencyKey, `website:${requestKey}:%`))
+      .where(sql`substr(${salesPublicSubmissions.idempotencyKey}, 1, ${keyPrefix.length}) = ${keyPrefix}`)
       .limit(1)
     if (previous) {
       if (previous.idempotencyKey !== storedKey) {
