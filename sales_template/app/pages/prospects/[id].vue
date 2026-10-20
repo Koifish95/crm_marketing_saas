@@ -55,6 +55,7 @@ type Prospect = {
   salesAccountId: number | null
   salesContactId: number | null
   salesOpportunityId: number | null
+  firstEmail: { subject: string, body: string } | null
   observations: Observation[]
   messages: Message[]
 }
@@ -63,6 +64,7 @@ const { data: prospect, error, pending, refresh } = await useFetch<Prospect>(() 
 const notice = ref('')
 const formError = ref('')
 const saving = ref(false)
+const confirmingApprove = ref(false)
 
 useHead({
   title: computed(() => prospect.value?.name || 'Prospect'),
@@ -87,6 +89,11 @@ async function act(path: string, success: string) {
   } finally {
     saving.value = false
   }
+}
+
+async function approveConfirmed() {
+  await act(`/api/prospects/${id.value}/approve`, 'Approved. All three touches are cleared to send.')
+  confirmingApprove.value = false
 }
 
 function formatWhen(value: string | Date) {
@@ -128,15 +135,49 @@ function formatWhen(value: string | Date) {
     >
       {{ notice }}
     </AppAlert>
+    <AppAlert
+      v-if="prospect && confirmingApprove && prospect.outreachStatus === 'awaiting_approval'"
+      tone="warning"
+    >
+      Approve {{ prospect.name }}? Approval covers all three touches. Touches 2 and 3 send later without asking again.
+      <div
+        v-if="prospect.firstEmail"
+        class="mt-3 rounded border border-gray-200 p-3 text-sm"
+      >
+        <p class="font-medium">
+          First email: {{ prospect.firstEmail.subject }}
+        </p>
+        <p class="mt-2 whitespace-pre-wrap">
+          {{ prospect.firstEmail.body }}
+        </p>
+      </div>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <AppButton
+          type="button"
+          :loading="saving"
+          @click="approveConfirmed"
+        >
+          Yes, approve all three touches
+        </AppButton>
+        <AppButton
+          type="button"
+          variant="secondary"
+          :disabled="saving"
+          @click="confirmingApprove = false"
+        >
+          Cancel
+        </AppButton>
+      </div>
+    </AppAlert>
     <div
       v-if="prospect"
       class="mb-6 flex flex-wrap gap-2"
     >
       <AppButton
-        v-if="prospect.outreachStatus === 'awaiting_approval'"
+        v-if="prospect.outreachStatus === 'awaiting_approval' && !confirmingApprove"
         type="button"
         :loading="saving"
-        @click="act(`/api/prospects/${prospect.id}/approve`, 'Approved. All three touches are cleared to send.')"
+        @click="confirmingApprove = true"
       >
         Approve
       </AppButton>

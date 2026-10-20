@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, toWebHandler } from 'h3'
 import { setUseDbForTests } from '../../server/database'
 import { listLeads } from '../../server/services/sales'
@@ -96,5 +96,77 @@ describe('keyed public lead intake', () => {
     expect((await post({ email: 'a@example.com' }, KEY)).status).toBe(400)
     expect((await post({ name: 'No Contact' }, KEY)).status).toBeGreaterThanOrEqual(400)
     expect(await leadCount()).toBe(baseline)
+  })
+
+  it('replays a retry with the same Idempotency-Key and payload without a second lead', async () => {
+    const send = (body: unknown, idem: string) => handle(new Request('http://localhost/api/public/lead-intake', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-intake-key': KEY, 'idempotency-key': idem },
+      body: JSON.stringify(body),
+    }))
+    const first = await (await send(lead, 'retry-1')).json()
+    const second = await send(lead, 'retry-1')
+    expect(second.status).toBe(200)
+    expect((await second.json()).id).toBe(first.id)
+    expect(await leadCount()).toBe(baseline + 1)
+    const notes = await dbHandle.db.select().from(salesNotes)
+    expect(notes.filter(n => n.recordId === first.id && n.body.includes('Hello there'))).toHaveLength(1)
+  })
+
+  it('rejects an Idempotency-Key reused with a different payload and bad keys', async () => {
+    const send = (body: unknown, idem: string) => handle(new Request('http://localhost/api/public/lead-intake', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-intake-key': KEY, 'idempotency-key': idem },
+      body: JSON.stringify(body),
+    }))
+    expect((await send(lead, 'reuse-1')).status).toBe(200)
+    expect((await send({ ...lead, phone: '801-555-0199' }, 'reuse-1')).status).toBe(400)
+    expect((await send(lead, 'bad key!')).status).toBe(400)
+    expect(await leadCount()).toBe(baseline + 1)
+  })
+
+  it('treats keys that differ only by a LIKE wildcard as distinct', async () => {
+    const send = (body: unknown, idem: string) => handle(new Request('http://localhost/api/public/lead-intake', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-intake-key': KEY, 'idempotency-key': idem },
+      body: JSON.stringify(body),
+    }))
+    expect((await send(lead, 'abcXdef')).status).toBe(200)
+    expect((await send({ ...lead, phone: '801-555-0199' }, 'abc_def')).status).toBe(200)
+    expect(await leadCount()).toBe(baseline + 2)
+  })
+
+  it('replays one lead for concurrent identical keyed requests', async () => {
+    const send = () => handle(new Request('http://localhost/api/public/lead-intake', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-intake-key': KEY, 'idempotency-key': 'race-1' },
+      body: JSON.stringify(lead),
+    }))
+    const responses = await Promise.all([send(), send(), send()])
+    expect(responses.map(r => r.status)).toEqual([200, 200, 200])
+    const ids = await Promise.all(responses.map(async r => (await r.json()).id))
+    expect(new Set(ids).size).toBe(1)
+    expect(await leadCount()).toBe(baseline + 1)
+  })
+
+  it('accepts percent-sign keys as distinct keys', async () => {
+    const send = (body: unknown, idem: string) => handle(new Request('http://localhost/api/public/lead-intake', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-intake-key': KEY, 'idempotency-key': idem },
+      body: JSON.stringify(body),
+    }))
+    expect((await send(lead, 'abc%def')).status).toBe(200)
+    expect((await send({ ...lead, phone: '801-555-0199' }, 'abcXdef')).status).toBe(200)
+    expect((await send({ ...lead, phone: '801-555-0188' }, 'abc%')).status).toBe(200)
+    expect(await leadCount()).toBe(baseline + 3)
+  })
+
+  it('records the notification outcome as a note on the saved lead', async () => {
+    const res = await post(lead, KEY)
+    const { id } = await res.json()
+    await vi.waitFor(async () => {
+      const notes = await dbHandle.db.select().from(salesNotes)
+      expect(notes.some(n => n.recordId === id && n.body.startsWith('Email notification: not sent'))).toBe(true)
+    })
   })
 })

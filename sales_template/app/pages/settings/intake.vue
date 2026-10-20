@@ -110,8 +110,11 @@ async function save() {
           v-model="enabled"
           type="checkbox"
         >
-        Accept public submissions
+        Accept public submissions on the /inquire page
       </label>
+      <p class="text-sm text-muted">
+        This switch controls only the public /inquire page. Your own website's lead form uses its own secret key and keeps working when this is off.
+      </p>
       <AppField label="Intro text">
         <textarea
           v-model="introText"
