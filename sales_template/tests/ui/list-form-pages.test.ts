@@ -42,3 +42,12 @@ describe('dry-run stumbles: approval scope and intake switch', () => {
     expect(read('app/pages/settings/intake.vue')).toContain('controls only the public /inquire page')
   })
 })
+
+describe('Proposal issue confirmation', () => {
+  it('the Issue button only opens a confirm step; the API call runs from Confirm Issue', () => {
+    const src = read('app/pages/opportunities/[id].vue')
+    expect(src).toMatch(/@click="confirmIssue = true"\s*>\s*Issue\s*</)
+    expect(src).not.toMatch(/@click="issueCurrentProposal"\s*>\s*Issue\s*</)
+    expect(src).toMatch(/@click="issueCurrentProposal"\s*>\s*Confirm Issue/)
+  })
+})

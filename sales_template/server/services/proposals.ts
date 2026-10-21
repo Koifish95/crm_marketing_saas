@@ -482,6 +482,9 @@ export async function issueProposal(db: Database, proposalId: number, actorUserI
     throw new DomainError('Only a Draft revision can be issued.')
   }
   const opportunity = await getOpportunity(db, proposal.opportunityId)
+  if ((await listOpportunityLines(db, opportunity.id)).length === 0) {
+    throw new DomainError('Add at least one commercial line to the Opportunity before issuing the Proposal.')
+  }
   const letterhead = await readProposalLetterhead(db)
   const recipient = await snapshotRecipient(db, opportunity, current.recipientContactId)
   const letterheadSnap = await snapshotLetterhead(proposal.id, current.revision, letterhead)

@@ -6,6 +6,7 @@ import { isPublicPath } from '../../server/services/authorization'
 import {
   addOpportunityLine,
   createOffer,
+  deleteOpportunityLine,
   listOpportunityLines,
   updateOffer,
   updateOpportunityLine,
@@ -116,6 +117,17 @@ describe('B2 proposal system', () => {
     })
     await issueProposal(dbHandle.db, first.proposal.id, actor)
     await expect(createDraftProposal(dbHandle.db, opportunity.id, actor)).rejects.toThrow(/already has a Proposal/)
+  })
+
+  it('refuses to issue a Proposal when the Opportunity has no commercial lines', async () => {
+    dbHandle = await openTestDatabase()
+    const { actor, opportunity } = await seededOpportunity()
+    const [line] = await listOpportunityLines(dbHandle.db, opportunity.id)
+    await deleteOpportunityLine(dbHandle.db, line!.id)
+    const bundle = await createDraftProposal(dbHandle.db, opportunity.id, actor)
+    await expect(issueProposal(dbHandle.db, bundle.proposal.id, actor)).rejects.toThrow(/at least one commercial line/)
+    const after = await getProposalBundle(dbHandle.db, bundle.proposal.id)
+    expect(after.current.status).toBe('draft')
   })
 
   it('snapshots Opportunity commercial lines at Issue and ignores later Opportunity and Offer edits', async () => {
