@@ -1084,14 +1084,14 @@ function companyName() {
             </p>
             <div class="flex flex-wrap gap-2">
               <NuxtLink
-                class="btn-secondary"
+                class="btn btn-secondary"
                 :to="`/proposals/${proposalBundle.proposal.id}/r/${selectedRevision.id}`"
               >
                 Preview
               </NuxtLink>
               <a
                 v-if="canUploadSignedProposal(selectedRevision.status)"
-                class="btn-secondary"
+                class="btn btn-secondary"
                 :href="`/api/proposals/${proposalBundle.proposal.id}/revisions/${selectedRevision.id}/pdf`"
               >
                 Download PDF
