@@ -18,7 +18,8 @@ import {
   updateLead,
   updateOpportunity,
 } from '../../server/services/sales'
-import { users } from '../../server/database/schema'
+import { listOffers } from '../../server/services/commercial'
+import { salesLeads, users } from '../../server/database/schema'
 import { openTestDatabase } from '../helpers/db'
 import { activityQueueBucket } from '../../shared/utils/queue'
 
@@ -40,6 +41,18 @@ describe('Sales domain', () => {
     const companies = await listCompanies(dbHandle.db)
     expect(companies.length).toBeGreaterThanOrEqual(1)
     expect(companies[0]?.name).toBe('Northwind Advisors')
+  })
+
+  it('skips the demo pipeline in production and still seeds the catalog', async () => {
+    dbHandle = await openTestDatabase({ appEnv: 'production' })
+    const companies = await listCompanies(dbHandle.db)
+    const leads = await dbHandle.db.select().from(salesLeads)
+    const offers = await listOffers(dbHandle.db)
+    const [admin] = await dbHandle.db.select().from(users)
+    expect(companies).toHaveLength(0)
+    expect(leads).toHaveLength(0)
+    expect(offers.map(row => row.name).sort()).toEqual(['Martial Arts CRM', 'Provisioning / Setup'])
+    expect(admin?.email).toBe('admin@local')
   })
 
   it('rejects a Lead without phone, email, or reachability note', async () => {

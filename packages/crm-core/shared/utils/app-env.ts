@@ -154,6 +154,75 @@ export function currentAppEnvFromLocation(input: {
   return appEnvForHostPort(impliedHostPort(input.protocol, input.port))
 }
 
+export function configuredSwitcherOrigin(raw: string | null | undefined) {
+  const value = (raw ?? '').trim().replace(/\/+$/, '')
+  if (!/^https?:\/\/[a-z0-9.-]+(?::\d+)?$/i.test(value)) {
+    return ''
+  }
+  return value
+}
+
+export type SwitcherEntry = {
+  env: AppEnv
+  current: boolean
+  href: string | null
+}
+
+/**
+ * Sales passes mode "origins" and only Production and Dev.
+ * A missing origin is omitted. Port 5000/5010/5020 links stay the fallback
+ * for an image that does not opt into origins.
+ */
+export function switcherEntries(input: {
+  mode?: string | null
+  appEnv?: string | null
+  origins?: Partial<Record<AppEnv, string | null | undefined>>
+  location: {
+    protocol: string
+    hostname: string
+    port?: string | number | null
+    pathname?: string
+    search?: string
+    hash?: string
+  }
+}): SwitcherEntry[] {
+  if (input.mode === 'origins') {
+    const order: readonly AppEnv[] = ['production', 'dev']
+    const appEnv = input.appEnv?.trim().toLowerCase()
+    const current = appEnv === 'production' || appEnv === 'dev' ? appEnv : null
+    const path = `${input.location.pathname || '/'}${input.location.search || ''}${input.location.hash || ''}`
+    return order.flatMap((env) => {
+      const origin = configuredSwitcherOrigin(input.origins?.[env])
+      const isCurrent = current === env
+      if (!isCurrent && !origin) {
+        return []
+      }
+      return [{
+        env,
+        current: isCurrent,
+        href: isCurrent || !origin ? null : `${origin}${path}`,
+      }]
+    })
+  }
+
+  const locationEnv = currentAppEnvFromLocation(input.location)
+  return APP_ENV_SWITCHER_ORDER.map(env => ({
+    env,
+    current: locationEnv === env,
+    href: locationEnv === env
+      ? null
+      : environmentSwitcherHref({
+          protocol: input.location.protocol,
+          hostname: input.location.hostname,
+          port: input.location.port,
+          pathname: input.location.pathname,
+          search: input.location.search,
+          hash: input.location.hash,
+          targetEnv: env,
+        }),
+  }))
+}
+
 export function environmentSwitcherHref(input: {
   protocol: string
   hostname: string

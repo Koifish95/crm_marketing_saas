@@ -41,6 +41,9 @@ export default defineNuxtConfig({
       staffSubtitle: process.env.NUXT_PUBLIC_STAFF_SUBTITLE?.trim() || '',
       timezone: process.env.NUXT_PUBLIC_TIMEZONE || 'America/Denver',
       appEnv: process.env.NUXT_PUBLIC_APP_ENV || process.env.APP_ENV || 'dev',
+      envSwitcherMode: 'origins',
+      productionOrigin: process.env.NUXT_PUBLIC_PRODUCTION_ORIGIN?.trim() || '',
+      devOrigin: process.env.NUXT_PUBLIC_DEV_ORIGIN?.trim() || '',
     },
   },
   devServer: {

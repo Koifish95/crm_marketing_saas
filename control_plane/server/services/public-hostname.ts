@@ -3,7 +3,7 @@ import type { Database } from '../database'
 import { environments } from '../database/schema'
 import { accessUrlForEnvironment, assertPublicHostname, canHavePublicHostname, publicOriginForHostname } from '../../shared/utils/public-hostname'
 import { relaunchRegisteredEnvironment } from './docker-relaunch'
-import { publicEnvSettings, patchProvisionedEnvFile } from './provision-env'
+import { environmentOriginUpdates, publicEnvSettings, patchProvisionedEnvFile } from './provision-env'
 import { generateProductionEdgeFilesFromRegistry } from './production-edge-sync'
 import { edgeRoot } from './production-edge'
 import { autoCertificateEnabled, type CertificateIssuer, type CertificateResult, ensureHostnameCertificate } from './edge-certificate'
@@ -66,6 +66,21 @@ export async function assignPublicHostname(db: Database, id: string, rawHostname
     TRUSTED_PROXY_IPS: settings.trustedProxyIps,
     HOST_BIND: settings.hostBind,
   }, input.filesRoot)
+
+  if (row.productInstance.productId === 'sales') {
+    const siblings = (await listRegisteredEnvironments(db))
+      .filter(item => item.productInstance.id === row.productInstance.id)
+    const origins = environmentOriginUpdates(siblings)
+    for (const sibling of siblings) {
+      if (sibling.lifecycleStatus === 'decommissioned') {
+        continue
+      }
+      if (sibling.type !== 'PROD' && sibling.type !== 'DEV') {
+        continue
+      }
+      patchProvisionedEnvFile(sibling.envFileLocal, origins, input.filesRoot)
+    }
+  }
 
   const edgeKind = row.node.kind === 'vps' ? 'vps' : 'laptop'
   let edge = generateProductionEdgeFilesFromRegistry(await listRegisteredEnvironments(db), {

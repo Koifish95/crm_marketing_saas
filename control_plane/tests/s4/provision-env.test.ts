@@ -24,6 +24,7 @@ describe('S4 provisioned env and compose', () => {
     expect(env.contents).toMatch(/NUXT_AUTH_MUST_CHANGE_PASSWORD="true"/)
     expect(env.contents).toMatch(/NUXT_PUBLIC_APP_NAME="Strategic Insights Consulting, LLC Acquisition"/)
     expect(env.contents).toMatch(/SQLITE_VOLUME="strategic-insights-prod-sqlite"/)
+    expect(env.contents).not.toMatch(/NUXT_PUBLIC_PRODUCTION_ORIGIN/)
     expect(env.contents).not.toMatch(/renzo/i)
     expect(env.contents).not.toMatch(/webhosting/i)
     expect(env.contents).not.toMatch(/m10a/)
@@ -80,9 +81,12 @@ describe('S4 provisioned env and compose', () => {
       product: {
         appNameTemplate: 'plain',
         extraEnv: { SALES_PROPOSALS_DIR: '/app/data/uploads/proposals' },
+        environmentOrigins: true,
       },
     })
     expect(env.contents).toMatch(/NUXT_PUBLIC_APP_NAME="C2 Proof"/)
+    expect(env.contents).toMatch(/NUXT_PUBLIC_PRODUCTION_ORIGIN=""/)
+    expect(env.contents).toMatch(/NUXT_PUBLIC_DEV_ORIGIN=""/)
     expect(env.contents).not.toMatch(/Acquisition/)
     expect(env.contents).toMatch(/SALES_PROPOSALS_DIR="\/app\/data\/uploads\/proposals"/)
     expect(env.contents).toMatch(/EXPECTED_IMAGE="crm-sales:c2"/)
@@ -91,6 +95,8 @@ describe('S4 provisioned env and compose', () => {
       'utf8',
     )
     expect(salesCompose).toMatch(/NUXT_PUBLIC_ORIGIN/)
+    expect(salesCompose).toMatch(/NUXT_PUBLIC_PRODUCTION_ORIGIN/)
+    expect(salesCompose).toMatch(/NUXT_PUBLIC_DEV_ORIGIN/)
     expect(salesCompose).toMatch(/TRUSTED_PROXY_IPS/)
   })
 

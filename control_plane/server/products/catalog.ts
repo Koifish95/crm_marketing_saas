@@ -22,6 +22,8 @@ export type ProductDefinition = {
   leadIntakeKey?: boolean
   /** Environments of this product get the Control Plane's transactional email sender (RESEND_API_KEY, NOTIFY_FROM). */
   transactionalEmail?: boolean
+  /** Sales writes the sibling Production and Dev public origins into each env file. */
+  environmentOrigins?: boolean
 }
 
 export const PRODUCTS: Record<ProductId, ProductDefinition> = {
@@ -58,6 +60,7 @@ export const PRODUCTS: Record<ProductId, ProductDefinition> = {
     },
     leadIntakeKey: true,
     transactionalEmail: true,
+    environmentOrigins: true,
   },
 }
 

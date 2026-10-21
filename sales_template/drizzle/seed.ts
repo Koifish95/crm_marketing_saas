@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { seedAccessFramework } from '@crm/core/server/services/access-rights'
 import { hashStaffPassword } from '@crm/core/server/services/password'
-import { readAppEnv } from '@crm/core/shared/utils/app-env'
+import { isNonProductionAppEnv, readAppEnv } from '@crm/core/shared/utils/app-env'
 import { createDb, getDatabaseUrl } from '../server/database'
 import { salesAccounts, salesActivities, salesContacts, salesLeads, salesOpportunities, salesOpportunityLines, users, userRoles, userTypes, userTypeRoles } from '../server/database/schema'
 import { SEEDED_USER_ROLES, SEEDED_USER_ROLE_RIGHTS } from '../shared/utils/access-rights'
@@ -28,8 +28,11 @@ export function getBootstrapAdmin(env: NodeJS.Dict<string | undefined> = process
   return { username, email, password, reset, mustChangePassword, appEnv }
 }
 
-export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
-  const admin = getBootstrapAdmin()
+export async function seedDatabase(
+  databaseUrl = getDatabaseUrl(),
+  env: NodeJS.Dict<string | undefined> = process.env,
+) {
+  const admin = getBootstrapAdmin(env)
   const { client, db } = createDb(databaseUrl)
   const createdAt = new Date(utcNowMs())
 
@@ -93,7 +96,7 @@ export async function seedDatabase(databaseUrl = getDatabaseUrl()) {
     }
 
     const companies = await db.select().from(salesAccounts).limit(1)
-    if (companies.length === 0) {
+    if (companies.length === 0 && isNonProductionAppEnv(admin.appEnv)) {
       await db.insert(salesAccounts).values({
         name: 'Northwind Advisors',
         notes: 'Demo company for local Sales development. Not Strategic Insights data.',

@@ -129,6 +129,17 @@ describe('provisioning hostname', () => {
       expect(second?.hostname).toBe('nova-bjj-sales.nuxxion.com')
       const envFile = readFileSync(join(root, salesProd.envFileLocal), 'utf8')
       expect(envFile).toContain('NUXT_PUBLIC_ORIGIN="https://nova-bjj-sales.nuxxion.com"')
+      expect(envFile).toContain('NUXT_PUBLIC_PRODUCTION_ORIGIN="https://nova-bjj-sales.nuxxion.com"')
+      const maEnv = readFileSync(join(root, maProd.envFileLocal), 'utf8')
+      expect(maEnv).not.toContain('NUXT_PUBLIC_PRODUCTION_ORIGIN')
+      const salesDev = rows.find(row => row.type === 'DEV' && row.productInstance.productId === 'sales')!
+      const salesDevHost = await autoAssignPublicHostname(db, salesDev, options)
+      expect(salesDevHost?.hostname).toBe('dev-nova-bjj-sales.nuxxion.com')
+      const salesProdAfter = readFileSync(join(root, salesProd.envFileLocal), 'utf8')
+      const salesDevAfter = readFileSync(join(root, salesDev.envFileLocal), 'utf8')
+      expect(salesProdAfter).toContain('NUXT_PUBLIC_DEV_ORIGIN="https://dev-nova-bjj-sales.nuxxion.com"')
+      expect(salesDevAfter).toContain('NUXT_PUBLIC_PRODUCTION_ORIGIN="https://nova-bjj-sales.nuxxion.com"')
+      expect(salesDevAfter).toContain('NUXT_PUBLIC_DEV_ORIGIN="https://dev-nova-bjj-sales.nuxxion.com"')
       expect(existsSync(join(edgeDir, 'certs', 'nova-bjj-sales.nuxxion.com', 'privkey.pem'))).toBe(true)
       const assignedAgain = (await listRegisteredEnvironments(db)).find(row => row.id === maProd.id)!
       expect(await autoAssignPublicHostname(db, assignedAgain, options)).toBeNull()

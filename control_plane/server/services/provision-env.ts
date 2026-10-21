@@ -3,6 +3,7 @@ import { dirname, isAbsolute, join } from 'node:path'
 import { randomBytes } from 'node:crypto'
 import type { ProductDefinition } from '../products/catalog'
 import { MARTIAL_ARTS_PRODUCT } from '../products/catalog'
+import { publicOriginForHostname } from '../../shared/utils/public-hostname'
 import { generateLeadIntakeKey } from './lead-intake-key'
 import { transactionalEmailEnv } from './transactional-email'
 
@@ -64,7 +65,9 @@ export function renderProvisionedEnv(input: {
   releaseId?: string
   publicHostname?: string | null
   nodeKind?: string
-  product?: Pick<ProductDefinition, 'appNameTemplate' | 'extraEnv' | 'leadIntakeKey' | 'transactionalEmail'>
+  product?: Pick<ProductDefinition, 'appNameTemplate' | 'extraEnv' | 'leadIntakeKey' | 'transactionalEmail' | 'environmentOrigins'>
+  productionOrigin?: string
+  devOrigin?: string
   /** The Control Plane's own env, for the transactional email sender; defaults to process.env. */
   controlPlaneEnv?: NodeJS.ProcessEnv
 }) {
@@ -104,6 +107,12 @@ export function renderProvisionedEnv(input: {
     envLine('RELEASE_ID', input.releaseId || 'dev'),
     envLine('APP_BACKUP_DIR', '/app/data/sqlite/backups'),
     ...Object.entries(product.extraEnv).map(([key, value]) => envLine(key, value)),
+    ...(product.environmentOrigins
+      ? [
+          envLine('NUXT_PUBLIC_PRODUCTION_ORIGIN', input.productionOrigin ?? ''),
+          envLine('NUXT_PUBLIC_DEV_ORIGIN', input.devOrigin ?? ''),
+        ]
+      : []),
     ...(leadIntakeKey ? [envLine('LEAD_INTAKE_KEY', leadIntakeKey)] : []),
     ...Object.entries(emailEnv).map(([key, value]) => envLine(key, value)),
   ]
@@ -112,6 +121,21 @@ export function renderProvisionedEnv(input: {
     authPassword,
     username: INITIAL_ACCESS_USERNAME,
     hasLeadIntakeKey: Boolean(leadIntakeKey),
+  }
+}
+
+/** Sibling public origins for a Sales product instance. Empty when that side has no hostname. */
+export function environmentOriginUpdates(siblings: ReadonlyArray<{
+  type: string
+  publicHostname?: string | null
+  lifecycleStatus?: string | null
+}>) {
+  const live = siblings.filter(row => row.lifecycleStatus !== 'decommissioned')
+  const prod = live.find(row => row.type === 'PROD' && row.publicHostname)
+  const dev = live.find(row => row.type === 'DEV' && row.publicHostname)
+  return {
+    NUXT_PUBLIC_PRODUCTION_ORIGIN: prod?.publicHostname ? publicOriginForHostname(prod.publicHostname) : '',
+    NUXT_PUBLIC_DEV_ORIGIN: dev?.publicHostname ? publicOriginForHostname(dev.publicHostname) : '',
   }
 }
 

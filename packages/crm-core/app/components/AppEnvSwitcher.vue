@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import {
   APP_ENV_LABELS,
-  APP_ENV_SWITCHER_ORDER,
-  currentAppEnvFromLocation,
-  environmentSwitcherHref,
+  switcherEntries,
   type AppEnv,
 } from '@crm/core/shared/utils/app-env'
 
@@ -14,30 +12,34 @@ withDefaults(defineProps<{
 })
 
 const url = useRequestURL()
-const currentEnv = computed(() => currentAppEnvFromLocation({
-  protocol: url.protocol,
-  hostname: url.hostname,
-  port: url.port,
-}))
+const config = useRuntimeConfig()
+const publicConfig = computed(() => config.public as {
+  appEnv?: string
+  envSwitcherMode?: string
+  productionOrigin?: string
+  devOrigin?: string
+  stageOrigin?: string
+})
 
-function hrefFor(env: AppEnv) {
-  return environmentSwitcherHref({
+const entries = computed(() => switcherEntries({
+  mode: publicConfig.value.envSwitcherMode,
+  appEnv: publicConfig.value.appEnv,
+  origins: {
+    production: publicConfig.value.productionOrigin,
+    dev: publicConfig.value.devOrigin,
+    stage: publicConfig.value.stageOrigin,
+  },
+  location: {
     protocol: url.protocol,
     hostname: url.hostname,
     port: url.port,
     pathname: url.pathname,
     search: url.search,
     hash: url.hash,
-    targetEnv: env,
-  })
-}
+  },
+}))
 
-function isCurrent(env: AppEnv) {
-  return currentEnv.value === env
-}
-
-function itemClass(env: AppEnv, inverted: boolean) {
-  const current = isCurrent(env)
+function itemClass(env: AppEnv, current: boolean, inverted: boolean) {
   if (inverted) {
     if (env === 'dev') {
       return current
@@ -75,24 +77,24 @@ function itemClass(env: AppEnv, inverted: boolean) {
     aria-label="Environments"
   >
     <template
-      v-for="env in APP_ENV_SWITCHER_ORDER"
-      :key="env"
+      v-for="entry in entries"
+      :key="entry.env"
     >
       <span
-        v-if="isCurrent(env)"
+        v-if="entry.current || !entry.href"
         class="rounded-md px-2 py-1 text-[11px] font-semibold uppercase tracking-wide"
-        :class="itemClass(env, inverted)"
-        aria-current="true"
+        :class="itemClass(entry.env, entry.current, inverted)"
+        :aria-current="entry.current ? 'true' : undefined"
       >
-        {{ APP_ENV_LABELS[env] }}
+        {{ APP_ENV_LABELS[entry.env] }}
       </span>
       <a
         v-else
-        :href="hrefFor(env)"
+        :href="entry.href"
         class="rounded-md px-2 py-1 text-[11px] font-semibold uppercase tracking-wide"
-        :class="itemClass(env, inverted)"
+        :class="itemClass(entry.env, false, inverted)"
       >
-        {{ APP_ENV_LABELS[env] }}
+        {{ APP_ENV_LABELS[entry.env] }}
       </a>
     </template>
   </nav>
