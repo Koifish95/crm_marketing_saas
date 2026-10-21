@@ -51,3 +51,20 @@ describe('Proposal issue confirmation', () => {
     expect(src).toMatch(/@click="issueCurrentProposal"\s*>\s*Confirm Issue/)
   })
 })
+
+describe('lead arrival: unsaved edits are not erased by a stage change', () => {
+  const src = read('app/pages/leads/[id].vue')
+
+  it('compares every editable field with the saved lead', () => {
+    const block = src.slice(src.indexOf('const dirty = computed'), src.indexOf('async function save'))
+    for (const field of ['displayName', 'email', 'phone', 'reachabilityNote', 'ownerUserId', 'sourceId', 'campaignId', 'sourceDetail', 'intakeCompanyName']) {
+      expect(block).toContain(`${field}.value !==`)
+    }
+  })
+
+  it('blocks stage buttons and setStage while the form has unsaved edits', () => {
+    expect(src).toMatch(/:disabled="converted \|\| lead\.stage === stage \|\| saving \|\| dirty"/)
+    expect(src).toMatch(/async function setStage[^{]*\{\s*if \(dirty\.value\) \{\s*return/)
+    expect(src).toContain('Save changes before changing stage.')
+  })
+})

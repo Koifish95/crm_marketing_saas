@@ -79,6 +79,22 @@ watch(lead, (value) => {
 
 const converted = computed(() => lead.value?.stage === 'converted')
 
+const dirty = computed(() => {
+  const value = lead.value
+  if (!value) {
+    return false
+  }
+  return displayName.value !== value.displayName
+    || email.value !== (value.email || '')
+    || phone.value !== (value.phone || '')
+    || reachabilityNote.value !== (value.reachabilityNote || '')
+    || ownerUserId.value !== (value.ownerUserId ? String(value.ownerUserId) : '')
+    || sourceId.value !== (value.sourceId ? String(value.sourceId) : '')
+    || campaignId.value !== (value.campaignId ? String(value.campaignId) : '')
+    || sourceDetail.value !== (value.sourceDetail || '')
+    || intakeCompanyName.value !== (value.intakeCompanyName || '')
+})
+
 async function save() {
   formError.value = ''
   notice.value = ''
@@ -109,6 +125,9 @@ async function save() {
 }
 
 async function setStage(stage: Exclude<LeadStage, 'converted'>) {
+  if (dirty.value) {
+    return
+  }
   formError.value = ''
   saving.value = true
   try {
@@ -338,12 +357,18 @@ function companyName(accountId: number | null) {
           :key="stage"
           type="button"
           variant="secondary"
-          :disabled="converted || lead.stage === stage || saving"
+          :disabled="converted || lead.stage === stage || saving || dirty"
           @click="setStage(stage)"
         >
           {{ leadStageLabel(stage) }}
         </AppButton>
       </div>
+      <p
+        v-if="dirty && !converted"
+        class="text-sm text-muted"
+      >
+        Save changes before changing stage.
+      </p>
     </form>
     <template #tabs>
       <div
