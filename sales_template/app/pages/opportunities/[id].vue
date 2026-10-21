@@ -149,6 +149,7 @@ const activityDue = ref('')
 const completingId = ref<number | null>(null)
 const cancelOpenOnClose = ref(true)
 const confirmClose = ref<'won' | 'lost' | null>(null)
+const confirmIssue = ref(false)
 const lineDescription = ref('')
 const lineQuantity = ref('1')
 const linePrice = ref('')
@@ -531,6 +532,7 @@ async function saveDraftProposal() {
 }
 
 async function issueCurrentProposal() {
+  confirmIssue.value = false
   const bundle = proposalBundle.value
   if (!bundle) {
     return
@@ -1097,10 +1099,33 @@ function companyName() {
               <AppButton
                 v-if="selectedRevision.status === 'draft'"
                 :loading="saving"
-                @click="issueCurrentProposal"
+                @click="confirmIssue = true"
               >
                 Issue
               </AppButton>
+              <div
+                v-if="confirmIssue && selectedRevision.status === 'draft'"
+                class="w-full space-y-3 border-t border-line pt-3"
+              >
+                <p class="text-sm">
+                  Issue this proposal? Issued revisions are immutable; changing it later needs a new revision.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  <AppButton
+                    :loading="saving"
+                    @click="issueCurrentProposal"
+                  >
+                    Confirm Issue
+                  </AppButton>
+                  <AppButton
+                    type="button"
+                    variant="secondary"
+                    @click="confirmIssue = false"
+                  >
+                    Back
+                  </AppButton>
+                </div>
+              </div>
               <AppButton
                 v-if="canRecordIssuedProposalActions(selectedRevision.status, selectedRevision.id, proposalBundle.current.id)"
                 variant="secondary"
