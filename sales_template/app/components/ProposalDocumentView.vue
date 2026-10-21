@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { formatUsdFromCents } from '#shared/utils/money'
 import { offerPricingTypeLabel } from '#shared/utils/catalog'
-import { SIGNATURE_ACCEPTANCE_COPY, proposalStatusLabel } from '#shared/utils/proposals'
+import { SIGNATURE_ACCEPTANCE_COPY, proposalFooterToPrint, proposalStatusLabel } from '#shared/utils/proposals'
 
 type Line = {
   description: string
@@ -155,10 +155,10 @@ defineProps<{
       </p>
     </section>
     <p
-      v-if="document.letterheadFooter"
+      v-if="proposalFooterToPrint(document)"
       class="text-xs text-muted whitespace-pre-wrap"
     >
-      {{ document.letterheadFooter }}
+      {{ proposalFooterToPrint(document) }}
     </p>
     <section class="border-t border-navy-900/10 pt-4">
       <h2 class="text-sm font-semibold">
