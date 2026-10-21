@@ -45,6 +45,22 @@ async function leadCount() {
 }
 
 describe('keyed public lead intake', () => {
+  it('does not throttle a burst of valid keyed leads from one IP', async () => {
+    for (let i = 0; i < 20; i++) {
+      const res = await post({ ...lead, name: `Burst ${i}`, email: `burst${i}@example.com` }, KEY)
+      expect(res.status).toBe(200)
+    }
+    expect(await leadCount()).toBe(baseline + 20)
+  })
+
+  it('does not count wrong-key requests toward the limit, and a 429 carries Retry-After', async () => {
+    for (let i = 0; i < 400; i++) expect((await post(lead, 'wrong')).status).toBe(401)
+    let last: Response | undefined
+    for (let i = 0; i < 301; i++) last = await post({}, KEY)
+    expect(last!.status).toBe(429)
+    expect(last!.headers.get('retry-after')).toBe('600')
+  })
+
   it('creates the lead with the correct key and maps every field', async () => {
     const res = await post(lead, KEY)
     expect(res.status).toBe(200)
