@@ -12,7 +12,7 @@ describe('Sales UI cleanup 4/4: new-record forms', () => {
     expect(src).not.toContain('col-span-3')
   })
 
-  it.each([...forms, 'users'])('%s puts the submit button in a full-width form-actions row', (page) => {
+  it.each(forms)('%s puts the submit button in a full-width form-actions row', (page) => {
     const src = read(`app/pages/${page}.vue`)
     expect(src).toContain('sm:grid-cols-2')
     expect(src).toMatch(/sm:col-span-2 form-actions/)

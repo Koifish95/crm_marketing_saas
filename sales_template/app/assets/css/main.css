@@ -376,4 +376,98 @@ html[data-app-env="stage"] {
   .record-item-actions {
     @apply mt-3 flex min-w-0 max-w-full flex-wrap items-end gap-3;
   }
+
+  .directory {
+    @apply space-y-5;
+  }
+
+  .directory-mast {
+    @apply flex flex-wrap items-end justify-between gap-3;
+  }
+
+  .directory-title {
+    @apply text-2xl font-semibold text-navy-900;
+  }
+
+  .directory-count {
+    @apply mt-1 text-sm text-muted;
+  }
+
+  .directory-toolbar {
+    @apply flex flex-wrap items-center gap-2;
+  }
+
+  .directory-search {
+    @apply min-w-[14rem] flex-1;
+  }
+
+  .directory-filter {
+    @apply w-auto min-w-[9rem];
+  }
+
+  .directory-row {
+    @apply cursor-pointer;
+  }
+
+  .directory-row:hover,
+  .directory-row:focus-visible {
+    @apply bg-canvas outline-none;
+  }
+
+  .directory-empty {
+    @apply text-muted;
+  }
+
+  .directory-dialog,
+  .directory-drawer {
+    @apply w-[min(28rem,calc(100vw-2rem))] border border-line bg-paper p-0 text-ink;
+  }
+
+  .directory-dialog {
+    @apply rounded-lg;
+  }
+
+  dialog.directory-drawer {
+    margin: 0 0 0 auto;
+    height: 100%;
+    max-height: none;
+    @apply rounded-none border-y-0 border-r-0;
+  }
+
+  .directory-dialog::backdrop,
+  .directory-drawer::backdrop {
+    @apply bg-navy-950/40;
+  }
+
+  .directory-dialog-body {
+    @apply space-y-4 p-5;
+  }
+
+  .directory-dialog-head {
+    @apply flex items-start justify-between gap-3;
+  }
+
+  .directory-dialog-head h2 {
+    @apply text-lg font-semibold text-navy-900;
+  }
+
+  .directory-facts {
+    @apply grid grid-cols-2 gap-3 text-sm;
+  }
+
+  .directory-facts dt {
+    @apply text-muted;
+  }
+
+  .directory-facts dd {
+    @apply font-medium text-navy-900;
+  }
+
+  .directory-note {
+    @apply text-sm text-muted;
+  }
+
+  .directory-actions {
+    @apply flex flex-wrap gap-2;
+  }
 }
