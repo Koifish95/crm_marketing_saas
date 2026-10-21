@@ -1,4 +1,4 @@
-import { createError, defineEventHandler, getRequestHeader, getRequestIP, readBody } from 'h3'
+import { createError, defineEventHandler, getRequestHeader, getRequestIP, readBody, setResponseHeader } from 'h3'
 import { publicLeadIntakeSchema } from '../../../shared/schemas/sales'
 import { LEAD_IDEMPOTENCY_HEADER, LEAD_INTAKE_KEY_HEADER, intakeKeyMatches, recordLeadNotifyOutcome, submitKeyedLead, validIdempotencyKey } from '../../services/public-intake'
 import { notifyNewLead } from '../../services/lead-notify'
@@ -7,6 +7,9 @@ import { throwDomain } from '../../utils/api'
 import { allowPublicRequest } from '../../utils/rate-limit'
 
 const MAX_BYTES = 32_768
+// The key is already verified here, so this is only a runaway guard. A proxied site shares one IP.
+const KEYED_INTAKE_LIMIT = 300
+const KEYED_INTAKE_WINDOW_MS = 10 * 60_000
 
 export default defineEventHandler(async (event) => {
   if (!intakeKeyMatches(getRequestHeader(event, LEAD_INTAKE_KEY_HEADER))) {
@@ -17,7 +20,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 413, message: 'That request is too large.' })
   }
   const ip = getRequestIP(event, { xForwardedFor: true }) || 'unknown'
-  if (!allowPublicRequest(`lead-intake:${ip}`)) {
+  if (!allowPublicRequest(`lead-intake:${ip}`, KEYED_INTAKE_LIMIT, KEYED_INTAKE_WINDOW_MS)) {
+    setResponseHeader(event, 'Retry-After', KEYED_INTAKE_WINDOW_MS / 1000)
     throw createError({ statusCode: 429, message: 'Please try again later.' })
   }
   const parsed = publicLeadIntakeSchema.safeParse(await readBody(event))
