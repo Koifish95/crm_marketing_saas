@@ -3,7 +3,7 @@ import { dirname } from 'node:path'
 import PDFDocument from 'pdfkit'
 import { formatUsdFromCents } from '../../shared/utils/money'
 import { offerPricingTypeLabel } from '../../shared/utils/catalog'
-import { SIGNATURE_ACCEPTANCE_COPY } from '../../shared/utils/proposals'
+import { SIGNATURE_ACCEPTANCE_COPY, proposalFooterToPrint } from '../../shared/utils/proposals'
 
 export type ProposalDocumentLine = {
   description: string
@@ -141,8 +141,9 @@ export async function renderProposalPdf(document: ProposalDocument): Promise<Buf
     pdf.font('Helvetica').text(document.notes, { width: 504 })
     pdf.moveDown()
   }
-  if (document.letterheadFooter) {
-    pdf.fontSize(9).fillColor('#444444').text(document.letterheadFooter, { width: 504 })
+  const footer = proposalFooterToPrint(document)
+  if (footer) {
+    pdf.fontSize(9).fillColor('#444444').text(footer, { width: 504 })
     pdf.fillColor('#000000')
     pdf.moveDown()
   }

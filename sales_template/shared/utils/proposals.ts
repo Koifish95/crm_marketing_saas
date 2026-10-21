@@ -12,6 +12,13 @@ export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
 export const PROPOSAL_LETTERHEAD_SETTING_KEY = 'sales.proposal_letterhead'
 export const SIGNATURE_ACCEPTANCE_COPY = 'Accepted by ____________________________    Date ____________    Name ____________________________'
 
+/** The footer is skipped when it repeats the Terms verbatim (new Drafts copy the footer into Terms). */
+export function proposalFooterToPrint(doc: { terms?: string | null, letterheadFooter?: string | null }): string {
+  const footer = (doc.letterheadFooter ?? '').trim()
+  if (!footer) return ''
+  return footer === (doc.terms ?? '').trim() ? '' : footer
+}
+
 export function isProposalStatus(value: string): value is ProposalStatus {
   return (PROPOSAL_STATUSES as readonly string[]).includes(value)
 }
