@@ -158,6 +158,7 @@ describe('M7 RBAC and forced password change HTTP', () => {
         role: 'STAFF',
         password: 'TempPass1!',
       })
+      await testDb.db.update(users).set({ mustChangePassword: true }).where(eq(users.id, created.id))
       const actor = asUser({ ...created, mustChangePassword: true })
       const base = await start(testDb)
       currentActor = actor
