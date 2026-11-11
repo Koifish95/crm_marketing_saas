@@ -1,7 +1,8 @@
 import { readAppEnv } from '@crm/core/shared/utils/app-env'
-import '../../shared/utils/access-rights'
+import { registerSalesAccessRights } from '../../shared/utils/access-rights'
 
 export default defineNitroPlugin(() => {
+  registerSalesAccessRights()
   const appEnv = readAppEnv()
   const publicEnv = String(useRuntimeConfig().public.appEnv || '')
   if (publicEnv && publicEnv !== appEnv) {

@@ -15,14 +15,20 @@ export const ACCESS_RIGHT_DESCRIPTIONS: Record<AccessRight, string> = {
 
 export const SEEDED_USER_ROLES = [
   { code: 'SALES_USER', name: 'Sales user', description: 'Work Companies, Contacts, Opportunities, and Activities.' },
+  { code: 'SALES_READER', name: 'Sales reader', description: 'Read Companies, Contacts, Opportunities, and Activities. Cannot change them.' },
 ] as const
 
 export const SEEDED_USER_ROLE_RIGHTS: Record<string, readonly AccessRight[]> = {
   SALES_USER: ['VIEW_SALES', 'MANAGE_SALES'],
+  SALES_READER: ['VIEW_SALES'],
 }
 
-registerAccessRights(ACCESS_RIGHTS.map(code => ({
-  code,
-  label: ACCESS_RIGHT_LABELS[code],
-  description: ACCESS_RIGHT_DESCRIPTIONS[code],
-})))
+export function registerSalesAccessRights() {
+  registerAccessRights(ACCESS_RIGHTS.map(code => ({
+    code,
+    label: ACCESS_RIGHT_LABELS[code],
+    description: ACCESS_RIGHT_DESCRIPTIONS[code],
+  })))
+}
+
+registerSalesAccessRights()

@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { seedAccessFramework } from '@crm/core/server/services/access-rights'
 import { hashStaffPassword } from '@crm/core/server/services/password'
 import { isNonProductionAppEnv, readAppEnv } from '@crm/core/shared/utils/app-env'
@@ -90,6 +90,22 @@ export async function seedDatabase(
         await db.insert(userTypeRoles).values({
           userTypeId: staffType.id,
           userRoleId: salesRole.id,
+          createdAt,
+        })
+      }
+    }
+
+    const [viewerType] = await db.select().from(userTypes).where(eq(userTypes.code, 'VIEWER')).limit(1)
+    const [readerRole] = await db.select().from(userRoles).where(eq(userRoles.code, 'SALES_READER')).limit(1)
+    if (viewerType && readerRole) {
+      const [existing] = await db.select().from(userTypeRoles).where(and(
+        eq(userTypeRoles.userTypeId, viewerType.id),
+        eq(userTypeRoles.userRoleId, readerRole.id),
+      )).limit(1)
+      if (!existing) {
+        await db.insert(userTypeRoles).values({
+          userTypeId: viewerType.id,
+          userRoleId: readerRole.id,
           createdAt,
         })
       }

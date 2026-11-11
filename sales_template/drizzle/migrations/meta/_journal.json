@@ -64,6 +64,13 @@
       "when": 1792195200000,
       "tag": "0008_sales_prospect_discovery_quality",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1792800000000,
+      "tag": "0009_sales_reader_role",
+      "breakpoints": true
     }
   ]
 }

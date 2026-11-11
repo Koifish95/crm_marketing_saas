@@ -148,7 +148,8 @@ export async function createManagedUser(
     await assertUsernameAvailable(db, chosen)
   }
   const username = chosen ?? await uniqueUsername(db, email)
-  const password = input.password || TEMPORARY_PASSWORD_DEFAULT
+  const provided = input.password?.trim() ?? ''
+  const password = provided || TEMPORARY_PASSWORD_DEFAULT
   const now = new Date(utcNowMs())
   const passwordHash = await hashStaffPassword(password)
   const userType = await userTypeForCoarseRole(db, input.role)
@@ -160,7 +161,7 @@ export async function createManagedUser(
     userTypeId: userType?.id ?? null,
     active: true,
     passwordHash,
-    mustChangePassword: true,
+    mustChangePassword: !provided || !isPermanentPasswordCompliant(provided),
     sessionVersion: 0,
     createdAt: now,
     updatedAt: now,

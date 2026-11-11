@@ -2,7 +2,7 @@
 type: note
 status: current
 area: process
-updated: 2026-10-15
+updated: 2026-11-11
 aliases:
   - CURRENT_STATE
   - Current state
@@ -59,6 +59,8 @@ The Nuxxion DigitalOcean VPS is already the hosting node. Do not treat “obtain
 ---
 
 ## Git and the VPS (2026-10-15)
+
+**Viewer read role, not deployed (2026-11-11):** Sales Viewer accounts had no sales role, so `/api/auth/me` returned no `VIEW_SALES`. The only seeded sales role, `SALES_USER`, also has `MANAGE_SALES` and stays on Staff. Migration `0009_sales_reader_role` adds `SALES_READER` with only `VIEW_SALES` and links it to the Viewer type. The production Nitro bundle had dropped the side-effect registration of those rights; the server plugin and `/api/auth/me` now call `registerSalesAccessRights()`. A blank or weak new password still requires a change. A new password that meets the permanent rule does not. Strategic Insights production still runs `6c9ca6d80065@f5e43fcd5f26`, schema `0008_sales_prospect_discovery_quality`. The role rows are already in that database. The running bundle still filters them out. A fresh backup of that environment is `6d501840-5bf3-4296-beab-0b4ca179b2a9` (2026-11-11T17:58:31Z, integrity ok, Viewer linked to `SALES_READER` only). The previous nightly backup `7827ac4e-8bc2-4383-8c9e-548cb5de6125` is also intact and predates the role rows. Nothing has been pushed or upgraded. Acme and Top Tier were not changed. Upgrade still requires Strategic Insights DEV on the same digest before PROD.
 
 Everything described here is committed and pushed to `origin/working` (release identity, Martial Arts funnel `0021`, QA remediation, vault overhaul; then the deploy foundation in `dd35777` and `6e08a1d`). Control Plane checks at `6e08a1d`: test 139/139, lint and typecheck clean, build passes.
 

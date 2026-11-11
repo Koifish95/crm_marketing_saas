@@ -420,7 +420,7 @@ async function requireChange() {
           >
         </AppField>
         <p class="directory-note">
-          Leave the password blank to issue a temporary one. They must change it before login. It is not shown again.
+          Leave the password blank to issue a temporary one. A blank or weak password must be changed before login. A password with at least 8 characters, one uppercase letter, and one symbol is ready to use. It is not shown again.
         </p>
         <div class="directory-actions">
           <AppButton
