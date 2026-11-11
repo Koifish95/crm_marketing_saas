@@ -25,7 +25,7 @@ describe('Viewer sales access', () => {
     const me = readFileSync(new URL('../../server/api/auth/me.get.ts', import.meta.url), 'utf8')
     expect(plugin).toContain('registerSalesAccessRights()')
     expect(me).toContain('registerSalesAccessRights()')
-    expect(me).toContain("../../../shared/utils/access-rights")
+    expect(me).toContain('../../../shared/utils/access-rights')
     expect(plugin).not.toMatch(/import ['"][^'"]*access-rights['"]/)
   })
 
